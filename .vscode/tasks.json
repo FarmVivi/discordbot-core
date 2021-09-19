@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile",
+            "type": "shell",
+            "command": "mvn clean compile package",
+            "group": "build"
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "mvn clean compile exec:java",
+            "group": "test"
+        }
+    ]
+}
