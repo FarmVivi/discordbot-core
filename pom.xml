@@ -39,11 +39,10 @@
       <version>2.0</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.discord4j/discord4j-core -->
     <dependency>
-      <groupId>com.discord4j</groupId>
-      <artifactId>discord4j-core</artifactId>
-      <version>3.1.7</version>
+      <groupId>net.dv8tion</groupId>
+      <artifactId>JDA</artifactId>
+      <version>4.3.0_277</version>
     </dependency>
 
     <dependency>
