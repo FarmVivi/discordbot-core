@@ -26,7 +26,8 @@ public class MusicController {
             }
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
-            musicManager.getPlayer(guild).getAudioPlayer().setVolume(50);
+            //Default volume
+            musicManager.getPlayer(guild).getAudioPlayer().setVolume(10);
         }
 
         if (musicManager.getPlayer(textChannel.getGuild()).getAudioPlayer().isPaused()) {
