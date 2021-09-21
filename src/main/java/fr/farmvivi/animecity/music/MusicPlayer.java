@@ -10,6 +10,7 @@ public class MusicPlayer {
     private final TrackScheduler trackScheduler;
     private final Guild guild;
 
+    private boolean loopQueueMode = false;
     private boolean loopMode = false;
 
     public MusicPlayer(AudioPlayer audioPlayer, Guild guild) {
@@ -41,6 +42,14 @@ public class MusicPlayer {
 
     public synchronized AudioTrack skipTrack() {
         return trackScheduler.nextTrack();
+    }
+
+    public void setLoopQueueMode(boolean loopQueueMode) {
+        this.loopQueueMode = loopQueueMode;
+    }
+
+    public boolean isLoopQueueMode() {
+        return loopQueueMode;
     }
 
     public void setLoopMode(boolean loopMode) {

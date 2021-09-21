@@ -1,5 +1,7 @@
 package fr.farmvivi.animecity.music;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -9,9 +11,9 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
+import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.jda.JDAManager;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Activity.ActivityType;
 
 public class TrackScheduler extends AudioEventAdapter {
     private final BlockingQueue<AudioTrack> tracks = new LinkedBlockingQueue<>();
@@ -39,13 +41,22 @@ public class TrackScheduler extends AudioEventAdapter {
             if (player.getGuild().getAudioManager().getConnectedChannel() != null) {
                 player.getGuild().getAudioManager().closeAudioConnection();
                 player.getAudioPlayer().stopTrack();
-                JDAManager.getShardManager().setActivity(Activity.of(ActivityType.DEFAULT, "Rien"));
+                Bot.getInstance().setDefaultActivity();
             }
             return null;
         }
         AudioTrack track = tracks.poll();
         player.getAudioPlayer().startTrack(track, false);
         return track;
+    }
+
+    public synchronized void addTrackFirst(AudioTrack track) {
+        List<AudioTrack> remainingTracks = new ArrayList<>();
+        tracks.drainTo(remainingTracks);
+        tracks.offer(track);
+        for (AudioTrack tmpTrack : remainingTracks) {
+            tracks.offer(tmpTrack);
+        }
     }
 
     @Override
@@ -69,7 +80,11 @@ public class TrackScheduler extends AudioEventAdapter {
         if (endReason.mayStartNext) {
             // Start next track
             if (this.player.isLoopMode()) {
-                this.player.playTrack(track);
+                player.playTrack(track.makeClone());
+                return;
+            }
+            if (this.player.isLoopQueueMode()) {
+                this.player.playTrack(track.makeClone());
             }
             nextTrack();
         }

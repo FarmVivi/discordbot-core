@@ -2,6 +2,7 @@ package fr.farmvivi.animecity.jda;
 
 import javax.security.auth.login.LoginException;
 
+import fr.farmvivi.animecity.Bot;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
@@ -18,7 +19,7 @@ public class JDAManager {
         try {
             return DefaultShardManagerBuilder.createDefault(BOT_TOKEN).build();
         } catch (LoginException e) {
-            System.out.println("Impossible de build le Shard !");
+            Bot.logger.info("Impossible de build le Shard !");
             e.printStackTrace();
         }
         return null;
