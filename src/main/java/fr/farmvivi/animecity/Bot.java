@@ -52,10 +52,10 @@ public class Bot {
 
     public void shutdown(Message message) {
         new Thread(() -> {
-            logger.info("Shutdown... (requested by " + message.getAuthor().getName() + ")");
+            logger.info("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")");
             JDAManager.getShardManager().removeEventListener(messageListener);
             JDAManager.getShardManager().removeEventListener(commandsManager);
-            message.getChannel().sendMessage("Shutdown... (requested by " + message.getAuthor().getName() + ")")
+            message.getChannel().sendMessage("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")")
                     .queue();
             musicController.getMusicManager().getAudioPlayerManager().shutdown();
             JDAManager.getShardManager().shutdown();
