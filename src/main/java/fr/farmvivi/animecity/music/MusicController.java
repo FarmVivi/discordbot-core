@@ -26,7 +26,7 @@ public class MusicController {
             }
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
-            //Default volume
+            // Default volume
             musicManager.getPlayer(guild).getAudioPlayer().setVolume(10);
         }
 
@@ -189,7 +189,7 @@ public class MusicController {
 
         int volumeInt = 0;
 
-        if (volume != null && volume != "" && !DetermineIsNumber.isInteger(volume)) {
+        if (volume.length() > 0 && DetermineIsNumber.isInteger(volume)) {
             volumeInt = Integer.valueOf(volume);
         } else {
             textChannel
