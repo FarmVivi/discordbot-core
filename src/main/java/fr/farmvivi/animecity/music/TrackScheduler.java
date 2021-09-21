@@ -47,6 +47,7 @@ public class TrackScheduler extends AudioEventAdapter {
         }
         AudioTrack track = tracks.poll();
         player.getAudioPlayer().startTrack(track, false);
+        Bot.logger.info("Playing: " + track.getInfo().title + track.getInfo().uri);
         return track;
     }
 
