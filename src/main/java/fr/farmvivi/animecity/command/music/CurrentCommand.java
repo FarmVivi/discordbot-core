@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class CurrentCommand extends Command {
     public CurrentCommand() {
         this.name = "current";
-        this.aliases = new String[] { "np" };
+        this.aliases = new String[] { "np", "info" };
     }
 
     @Override
