@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.Message;
 public class Bot {
     private static Bot instance;
 
-    public static final String version = "1.0.0.0";
+    public static final String version = "1.0.0.1";
     public static final String name = "AnimeCity";
     public static final boolean production = false;
 
