@@ -9,6 +9,7 @@ public class Main {
     //TODO Don't leave channel if no more music to play
     //TODO music commands only if connected as same voicechannel
     //TODO Commande viewqueue
+    //TODO Commande help
     public static void main(String[] args) {
         Bot.setInstance(new Bot());
     }
