@@ -15,9 +15,6 @@ public class MusicController {
     public void playMusic(TextChannel textChannel, User user, String music) {
         Guild guild = textChannel.getGuild();
 
-        if (guild == null || music.length() == 0)
-            return;
-
         if (!guild.getAudioManager().isConnected()) {
             VoiceChannel voiceChannel = guild.getMember(user).getVoiceState().getChannel();
             if (voiceChannel == null) {
@@ -41,9 +38,6 @@ public class MusicController {
     public void skipMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
 
-        if (guild == null)
-            return;
-
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
             return;
@@ -60,9 +54,6 @@ public class MusicController {
 
     public void clearMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
-
-        if (guild == null)
-            return;
 
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
@@ -83,9 +74,6 @@ public class MusicController {
     public void currentMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
 
-        if (guild == null)
-            return;
-
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
             return;
@@ -99,9 +87,6 @@ public class MusicController {
 
     public void stopMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
-
-        if (guild == null)
-            return;
 
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
@@ -118,9 +103,6 @@ public class MusicController {
 
     public void pauseMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
-
-        if (guild == null)
-            return;
 
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
@@ -139,9 +121,6 @@ public class MusicController {
     public void loopQueueMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
 
-        if (guild == null)
-            return;
-
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
             return;
@@ -159,9 +138,6 @@ public class MusicController {
     public void loopMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
 
-        if (guild == null)
-            return;
-
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
             return;
@@ -178,9 +154,6 @@ public class MusicController {
 
     public void volumeMusic(TextChannel textChannel, String volume) {
         Guild guild = textChannel.getGuild();
-
-        if (guild == null)
-            return;
 
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
@@ -210,9 +183,6 @@ public class MusicController {
     public void replayMusic(TextChannel textChannel) {
         Guild guild = textChannel.getGuild();
 
-        if (guild == null)
-            return;
-
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
             return;
@@ -227,9 +197,6 @@ public class MusicController {
 
     public void seekMusic(TextChannel textChannel, String content) {
         Guild guild = textChannel.getGuild();
-
-        if (guild == null)
-            return;
 
         if (!guild.getAudioManager().isConnected()) {
             textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
