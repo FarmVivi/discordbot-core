@@ -13,14 +13,17 @@ public class PlayCommand extends Command {
     }
 
     @Override
-    protected void execute(MessageReceivedEvent event, String content) {
+    protected boolean execute(MessageReceivedEvent event, String content) {
+        if (!super.execute(event, content))
+            return false;
         if (args != null && content.length() == 0) {
             event.getChannel()
                     .sendMessage(
                             "Utilisation de la commande: **" + CommandsManager.CMD_PREFIX + name + " " + args + "**")
                     .queue();
-            return;
+            return false;
         }
         Bot.getInstance().getMusicController().playMusic(event.getTextChannel(), event.getAuthor(), content);
+        return true;
     }
 }

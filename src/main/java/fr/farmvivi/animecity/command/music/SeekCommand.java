@@ -6,20 +6,23 @@ import fr.farmvivi.animecity.command.CommandsManager;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SeekCommand extends Command {
-    public SeekCommand(){
+    public SeekCommand() {
         this.name = "seek";
         this.args = "<time>";
     }
 
     @Override
-    protected void execute(MessageReceivedEvent event, String content) {
+    protected boolean execute(MessageReceivedEvent event, String content) {
+        if (!super.execute(event, content))
+            return false;
         if (args != null && content.length() == 0) {
             event.getChannel()
                     .sendMessage(
                             "Utilisation de la commande: **" + CommandsManager.CMD_PREFIX + name + " " + args + "**")
                     .queue();
-            return;
+            return false;
         }
         Bot.getInstance().getMusicController().seekMusic(event.getTextChannel(), content);
+        return true;
     }
 }

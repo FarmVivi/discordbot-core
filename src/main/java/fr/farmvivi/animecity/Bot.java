@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import fr.farmvivi.animecity.command.CommandsManager;
 import fr.farmvivi.animecity.jda.JDAManager;
-import fr.farmvivi.animecity.jda.MessageListener;
 import fr.farmvivi.animecity.music.MusicController;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,9 +18,7 @@ public class Bot {
 
     public static final Logger logger = LoggerFactory.getLogger(name);
 
-    private MessageListener messageListener;
     private CommandsManager commandsManager;
-
     private MusicController musicController = new MusicController();
 
     public Bot() {
@@ -35,9 +32,7 @@ public class Bot {
         logger.info("System.getProperty('sun.arch.data.model') == '" + System.getProperty("sun.arch.data.model") + "'");
 
         JDAManager.getShardManager();
-        messageListener = new MessageListener();
         commandsManager = new CommandsManager();
-        JDAManager.getShardManager().addEventListener(messageListener);
         JDAManager.getShardManager().addEventListener(commandsManager);
         setDefaultActivity();
     }
@@ -53,7 +48,6 @@ public class Bot {
     public void shutdown(Message message) {
         new Thread(() -> {
             logger.info("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")");
-            JDAManager.getShardManager().removeEventListener(messageListener);
             JDAManager.getShardManager().removeEventListener(commandsManager);
             message.getChannel().sendMessage("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")")
                     .queue();

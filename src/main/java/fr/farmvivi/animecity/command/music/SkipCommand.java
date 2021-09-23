@@ -11,7 +11,10 @@ public class SkipCommand extends Command {
     }
 
     @Override
-    protected void execute(MessageReceivedEvent event, String content) {
+    protected boolean execute(MessageReceivedEvent event, String content) {
+        if (!super.execute(event, content))
+            return false;
         Bot.getInstance().getMusicController().skipMusic(event.getTextChannel());
+        return true;
     }
 }

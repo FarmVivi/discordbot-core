@@ -10,7 +10,10 @@ public class LoopCommand extends Command {
     }
 
     @Override
-    protected void execute(MessageReceivedEvent event, String content) {
+    protected boolean execute(MessageReceivedEvent event, String content) {
+        if (!super.execute(event, content))
+            return false;
         Bot.getInstance().getMusicController().loopMusic(event.getTextChannel());
+        return true;
     }
 }

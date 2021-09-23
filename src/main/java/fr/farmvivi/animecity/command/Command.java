@@ -9,7 +9,13 @@ public abstract class Command {
 
     protected String args;
 
-    protected void execute(MessageReceivedEvent event, String content) {
-        
+    protected boolean adminOnly;
+
+    protected boolean execute(MessageReceivedEvent event, String content) {
+        if (adminOnly && !CommandsManager.ADMINS.contains(event.getAuthor().getIdLong())) {
+            event.getChannel().sendMessage("Vous n'avez pas la permission d'exécuter cette commande.").queue();
+            return false;
+        }
+        return true;
     };
 }

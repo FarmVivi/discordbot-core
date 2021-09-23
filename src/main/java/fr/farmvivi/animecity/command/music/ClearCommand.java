@@ -10,7 +10,10 @@ public class ClearCommand extends Command {
     }
 
     @Override
-    protected void execute(MessageReceivedEvent event, String content) {
+    protected boolean execute(MessageReceivedEvent event, String content) {
+        if (!super.execute(event, content))
+            return false;
         Bot.getInstance().getMusicController().clearMusic(event.getTextChannel());
+        return true;
     }
 }

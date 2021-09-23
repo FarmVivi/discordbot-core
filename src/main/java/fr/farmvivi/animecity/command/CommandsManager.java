@@ -12,6 +12,7 @@ import fr.farmvivi.animecity.command.music.PauseCommand;
 import fr.farmvivi.animecity.command.music.PlayCommand;
 import fr.farmvivi.animecity.command.music.ReplayCommand;
 import fr.farmvivi.animecity.command.music.SeekCommand;
+import fr.farmvivi.animecity.command.music.ShutdownCommand;
 import fr.farmvivi.animecity.command.music.SkipCommand;
 import fr.farmvivi.animecity.command.music.StopCommand;
 import fr.farmvivi.animecity.command.music.VolumeCommand;
@@ -21,9 +22,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandsManager extends ListenerAdapter {
     public static final String CMD_PREFIX = "*";
+    public static final List<Long> ADMINS = new ArrayList<>();
+
+    static {
+        ADMINS.add(177135083222859776L);
+    }
+
     private final List<Command> commands = new ArrayList<>();
 
     public CommandsManager() {
+        commands.add(new ShutdownCommand());
         commands.add(new PlayCommand());
         commands.add(new SkipCommand());
         commands.add(new ClearCommand());

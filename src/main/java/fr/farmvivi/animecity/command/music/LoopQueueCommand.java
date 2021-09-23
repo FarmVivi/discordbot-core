@@ -5,12 +5,15 @@ import fr.farmvivi.animecity.command.Command;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class LoopQueueCommand extends Command {
-    public LoopQueueCommand(){
+    public LoopQueueCommand() {
         this.name = "loopqueue";
     }
 
     @Override
-    protected void execute(MessageReceivedEvent event, String content) {
+    protected boolean execute(MessageReceivedEvent event, String content) {
+        if (!super.execute(event, content))
+            return false;
         Bot.getInstance().getMusicController().loopQueueMusic(event.getTextChannel());
+        return true;
     }
 }
