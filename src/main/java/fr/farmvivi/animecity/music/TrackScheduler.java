@@ -3,7 +3,11 @@ package fr.farmvivi.animecity.music;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -16,8 +20,11 @@ import fr.farmvivi.animecity.jda.JDAManager;
 import net.dv8tion.jda.api.entities.Activity;
 
 public class TrackScheduler extends AudioEventAdapter {
+    private static final int QUIT_TIMEOUT = 300;
     private final BlockingQueue<AudioTrack> tracks = new LinkedBlockingQueue<>();
     private final MusicPlayer player;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> quitTask;
 
     public TrackScheduler(MusicPlayer player) {
         this.player = player;
@@ -38,13 +45,18 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public AudioTrack nextTrack() {
         if (tracks.isEmpty()) {
-            if (player.getGuild().getAudioManager().getConnectedChannel() != null) {
-                player.getGuild().getAudioManager().closeAudioConnection();
-                player.getAudioPlayer().stopTrack();
-                Bot.getInstance().setDefaultActivity();
-            }
+            player.getAudioPlayer().stopTrack();
+            Bot.getInstance().setDefaultActivity();
+            quitTask = scheduler.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    if (player.getGuild().getAudioManager().getConnectedChannel() != null)
+                        player.getGuild().getAudioManager().closeAudioConnection();
+                }
+            }, QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
-        }
+        } else if (quitTask != null && !quitTask.isDone())
+            quitTask.cancel(true);
         AudioTrack track = tracks.poll();
         player.getAudioPlayer().startTrack(track, false);
         Bot.logger.info("Playing: " + track.getInfo().title + " | " + track.getInfo().uri);
