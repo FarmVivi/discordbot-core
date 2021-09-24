@@ -39,6 +39,8 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void queue(AudioTrack track) {
+        if (quitTask != null && !quitTask.isDone())
+            quitTask.cancel(true);
         if (!player.getAudioPlayer().startTrack(track, true))
             tracks.offer(track);
     }
@@ -50,13 +52,15 @@ public class TrackScheduler extends AudioEventAdapter {
             quitTask = scheduler.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    if (player.getGuild().getAudioManager().getConnectedChannel() != null)
+                    if (player.getGuild().getAudioManager().getConnectedChannel() != null) {
+                        Bot.logger.info("Quit channel "
+                                + player.getGuild().getAudioManager().getConnectedChannel().getName() + "...");
                         player.getGuild().getAudioManager().closeAudioConnection();
+                    }
                 }
             }, QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
-        } else if (quitTask != null && !quitTask.isDone())
-            quitTask.cancel(true);
+        }
         AudioTrack track = tracks.poll();
         player.getAudioPlayer().startTrack(track, false);
         Bot.logger.info("Playing: " + track.getInfo().title + " | " + track.getInfo().uri);

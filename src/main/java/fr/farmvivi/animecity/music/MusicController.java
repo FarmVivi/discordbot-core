@@ -2,6 +2,7 @@ package fr.farmvivi.animecity.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.otherclass.DetermineIsNumber;
 import fr.farmvivi.animecity.otherclass.TimeToIntCalculator;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,6 +22,7 @@ public class MusicController {
                 textChannel.sendMessage("Vous devez être connecté à un salon vocal.").queue();
                 return;
             }
+            Bot.logger.info("Join channel " + voiceChannel.getName() + "...");
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
             // Default volume
