@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class ShutdownCommand extends Command {
     public ShutdownCommand() {
         this.name = "shutdown";
+        this.guildOnly = false;
         this.adminOnly = true;
     }
 

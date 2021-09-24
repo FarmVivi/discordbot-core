@@ -9,12 +9,17 @@ public abstract class Command {
     protected String name = "null";
     protected String[] aliases = new String[0];
     protected String args = "";
+    protected boolean guildOnly = true;
     protected boolean adminOnly = false;
 
     protected List<Command> subCommands = new ArrayList<>();
 
     protected boolean execute(MessageReceivedEvent event, String content) {
-        if (adminOnly && !CommandsManager.ADMINS.contains(event.getAuthor().getIdLong())) {
+        if (guildOnly && event.getGuild() == null) {
+            event.getChannel().sendMessage("Cette commande peut seulement être exécuté sur un serveur discord.")
+                    .queue();
+            return false;
+        } else if (adminOnly && !CommandsManager.ADMINS.contains(event.getAuthor().getIdLong())) {
             event.getChannel().sendMessage("Vous n'avez pas la permission d'exécuter cette commande.").queue();
             return false;
         } else if (subCommands.size() > 0 && content.length() > 0) {

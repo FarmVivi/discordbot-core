@@ -48,7 +48,7 @@ public class CommandsManager extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.isFromType(ChannelType.TEXT) && event.getGuild() != null) {
+        if (event.isFromType(ChannelType.TEXT)) {
             String message = event.getMessage().getContentDisplay();
 
             if (!message.startsWith(CMD_PREFIX))
