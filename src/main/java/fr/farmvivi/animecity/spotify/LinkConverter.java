@@ -38,6 +38,7 @@ public class LinkConverter {
         }
 
         if (type.contentEquals("playlist")) {
+            SpotifyManager.logger.info("Getting playlist tracks with id " + id);
             GetPlaylistRequest playlistRequest = SpotifyManager.getSpotifyApi().getPlaylist(id).build();
             Playlist playlist = playlistRequest.execute();
             Paging<PlaylistTrack> playlistPaging = playlist.getTracks();
@@ -45,8 +46,7 @@ public class LinkConverter {
 
             for (PlaylistTrack i : playlistTracks) {
                 Track track = (Track) i.getTrack();
-                String trackID = track.getId();
-                listOfTracks.add(getArtistAndName(trackID));
+                listOfTracks.add(formatArtistAndName(track));
             }
 
             return listOfTracks;
@@ -56,17 +56,17 @@ public class LinkConverter {
     }
 
     private String getArtistAndName(String trackID) throws ParseException, SpotifyWebApiException, IOException {
-        String artistNameAndTrackName = "";
+        SpotifyManager.logger.info("Getting track with id " + trackID);
         GetTrackRequest trackRequest = SpotifyManager.getSpotifyApi().getTrack(trackID).build();
-
         Track track = trackRequest.execute();
-        artistNameAndTrackName = track.getName() + " - ";
+        return formatArtistAndName(track);
+    }
 
+    private String formatArtistAndName(Track track) {
+        String artistNameAndTrackName = track.getName() + " - ";
         ArtistSimplified[] artists = track.getArtists();
-        for (ArtistSimplified i : artists) {
+        for (ArtistSimplified i : artists)
             artistNameAndTrackName += i.getName() + " ";
-        }
-
         return artistNameAndTrackName;
     }
 }
