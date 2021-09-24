@@ -48,28 +48,22 @@ public class CommandsManager extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.isFromType(ChannelType.TEXT)) {
-            if (event.getGuild() == null)
-                return;
-
+        if (event.isFromType(ChannelType.TEXT) && event.getGuild() != null) {
             String message = event.getMessage().getContentDisplay();
 
-            if (!message.startsWith(CMD_PREFIX)) {
+            if (!message.startsWith(CMD_PREFIX))
                 return;
-            }
 
             String cmd = message.substring(CMD_PREFIX.length()).split(" ")[0];
 
             for (Command command : commands) {
                 List<String> cmds = new ArrayList<>();
                 cmds.add(command.name);
-                if (command.aliases.length != 0) {
-                    for (String tempCmd : command.aliases) {
+                if (command.aliases.length > 0)
+                    for (String tempCmd : command.aliases)
                         cmds.add(tempCmd);
-                    }
-                }
                 if (cmds.contains(cmd.toLowerCase())) {
-                    if (command.args != null) {
+                    if (command.args.length() > 0) {
                         int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
                         if (message.length() > commandLength) {
                             command.execute(event, message.substring(commandLength));
