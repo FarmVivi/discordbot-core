@@ -15,6 +15,7 @@ import fr.farmvivi.animecity.command.music.SeekCommand;
 import fr.farmvivi.animecity.command.music.ShutdownCommand;
 import fr.farmvivi.animecity.command.music.SkipCommand;
 import fr.farmvivi.animecity.command.music.StopCommand;
+import fr.farmvivi.animecity.command.music.ViewQueueCommand;
 import fr.farmvivi.animecity.command.music.VolumeCommand;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -44,6 +45,7 @@ public class CommandsManager extends ListenerAdapter {
         commands.add(new VolumeCommand());
         commands.add(new SeekCommand());
         commands.add(new ReplayCommand());
+        commands.add(new ViewQueueCommand());
     }
 
     @Override

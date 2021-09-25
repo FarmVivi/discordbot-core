@@ -74,13 +74,12 @@ public class MusicManager {
                     @Override
                     public void playlistLoaded(AudioPlaylist playlist) {
                         final StringBuilder builder = new StringBuilder();
-                        builder.append("Ajout de la playlist **").append(playlist.getName()).append("\n");
+                        builder.append("Ajout de la playlist **").append(playlist.getName()).append("** :\n");
 
                         for (final AudioTrack track : playlist.getTracks()) {
-                            builder.append("\n **->** ").append(track.getInfo().title);
+                            builder.append("\n-> **").append(track.getInfo().title).append("**");
                             player.playTrack(track);
                         }
-                        builder.append("**");
 
                         channel.sendMessage(builder.toString()).queue();
                     }
