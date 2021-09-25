@@ -2,15 +2,15 @@ package fr.farmvivi.animecity.otherclass;
 
 public class TimeToIntCalculator {
     public static boolean isFormated(String time) {
-        String[] numbers = time.split(":");
-        for (String number : numbers)
+        final String[] numbers = time.split(":");
+        for (final String number : numbers)
             if (!DetermineIsNumber.isInteger(number))
                 return false;
         return true;
     }
 
     public static int format(String time) {
-        String[] numbers = time.split(":");
+        final String[] numbers = time.split(":");
         switch (numbers.length) {
             case 1:
                 // return seconds

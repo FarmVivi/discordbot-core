@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 
+//TODO Remove this class
 public class MusicController {
     private final MusicManager musicManager = new MusicManager();
 

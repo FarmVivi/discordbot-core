@@ -24,11 +24,11 @@ public class CommandsManager extends ListenerAdapter {
     public static final String CMD_PREFIX = "*";
     public static final List<Long> ADMINS = new ArrayList<>();
 
+    private final List<Command> commands = new ArrayList<>();
+
     static {
         ADMINS.add(177135083222859776L);
     }
-
-    private final List<Command> commands = new ArrayList<>();
 
     public CommandsManager() {
         commands.add(new ShutdownCommand());
@@ -49,22 +49,22 @@ public class CommandsManager extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.isFromType(ChannelType.TEXT) || event.isFromType(ChannelType.PRIVATE)) {
-            String message = event.getMessage().getContentDisplay();
+            final String message = event.getMessage().getContentDisplay();
 
             if (!message.startsWith(CMD_PREFIX))
                 return;
 
-            String cmd = message.substring(CMD_PREFIX.length()).split(" ")[0];
+            final String cmd = message.substring(CMD_PREFIX.length()).split(" ")[0];
 
-            for (Command command : commands) {
-                List<String> cmds = new ArrayList<>();
+            for (final Command command : commands) {
+                final List<String> cmds = new ArrayList<>();
                 cmds.add(command.name);
                 if (command.aliases.length > 0)
-                    for (String tempCmd : command.aliases)
+                    for (final String tempCmd : command.aliases)
                         cmds.add(tempCmd);
                 if (cmds.contains(cmd.toLowerCase())) {
                     if (command.args.length() > 0) {
-                        int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
+                        final int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
                         if (message.length() > commandLength) {
                             command.execute(event, message.substring(commandLength));
                             return;

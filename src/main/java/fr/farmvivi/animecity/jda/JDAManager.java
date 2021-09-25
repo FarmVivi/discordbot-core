@@ -10,7 +10,7 @@ public class JDAManager {
     public static final String BOT_TOKEN_PROD = "ODg5MjQwMTIxNTEyMTk0MDQ4.YUeXZg.7XEk-LE0_7PK1xtrGx1vNlPqVy8";
     public static final String BOT_TOKEN_DEV = "ODkwNDgxMTk2MTAwOTExMTM1.YUwbPQ.KTJ3usPstSalNW6HJfXzQ-pJYbY";
 
-    private static ShardManager shardManager = buildShard();
+    private static final ShardManager shardManager = buildShard();
 
     public static ShardManager getShardManager() {
         return shardManager;
@@ -23,8 +23,7 @@ public class JDAManager {
             else
                 return DefaultShardManagerBuilder.createDefault(BOT_TOKEN_DEV).build();
         } catch (LoginException e) {
-            Bot.logger.info("Impossible de build le Shard !");
-            e.printStackTrace();
+            Bot.logger.error("Impossible de build le Shard !", e);
         }
         return null;
     }

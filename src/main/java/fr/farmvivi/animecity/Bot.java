@@ -18,8 +18,8 @@ public class Bot {
 
     public static final Logger logger = LoggerFactory.getLogger(name);
 
-    private CommandsManager commandsManager;
-    private MusicController musicController = new MusicController();
+    private final CommandsManager commandsManager = new CommandsManager();
+    private final MusicController musicController = new MusicController();
 
     public Bot() {
         logger.info("Démarrage de " + name + " (V" + version + ") (Prod: " + production + ") en cours...");
@@ -32,7 +32,6 @@ public class Bot {
         logger.info("System.getProperty('sun.arch.data.model') == '" + System.getProperty("sun.arch.data.model") + "'");
 
         JDAManager.getShardManager();
-        commandsManager = new CommandsManager();
         JDAManager.getShardManager().addEventListener(commandsManager);
         setDefaultActivity();
     }

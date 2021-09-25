@@ -44,16 +44,16 @@ public class MusicManager {
     }
 
     public void loadTrack(final TextChannel channel, final String source) {
-        MusicPlayer player = getPlayer(channel.getGuild());
+        final MusicPlayer player = getPlayer(channel.getGuild());
 
         channel.getGuild().getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
 
         if (source.startsWith("http") && source.contains("://")) {
             if (source.contains("open.spotify.com")) {
-                LinkConverter linkConverter = new LinkConverter();
+                final LinkConverter linkConverter = new LinkConverter();
                 try {
-                    List<String> songs = linkConverter.convert(source);
-                    for (String songName : songs)
+                    final List<String> songs = linkConverter.convert(source);
+                    for (final String songName : songs)
                         audioPlayerManager.loadItem("ytsearch: " + songName,
                                 new FunctionalResultHandler(null, playlist -> {
                                     channel.sendMessage("**" + playlist.getTracks().get(0).getInfo().title
@@ -73,10 +73,10 @@ public class MusicManager {
 
                     @Override
                     public void playlistLoaded(AudioPlaylist playlist) {
-                        StringBuilder builder = new StringBuilder();
+                        final StringBuilder builder = new StringBuilder();
                         builder.append("Ajout de la playlist **").append(playlist.getName()).append("\n");
 
-                        for (AudioTrack track : playlist.getTracks()) {
+                        for (final AudioTrack track : playlist.getTracks()) {
                             builder.append("\n **->** ").append(track.getInfo().title);
                             player.playTrack(track);
                         }

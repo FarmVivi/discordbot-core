@@ -19,8 +19,8 @@ public class LinkConverter {
     private String type;
 
     public ArrayList<String> convert(String link) throws ParseException, SpotifyWebApiException, IOException {
-        String[] firstSplit = link.split("/");
-        String[] secondSplit;
+        final String[] firstSplit = link.split("/");
+        final String[] secondSplit;
 
         if (firstSplit.length > 5) {
             secondSplit = firstSplit[6].split("\\?");
@@ -30,7 +30,7 @@ public class LinkConverter {
             this.type = firstSplit[3];
         }
         this.id = secondSplit[0];
-        ArrayList<String> listOfTracks = new ArrayList<>();
+        final ArrayList<String> listOfTracks = new ArrayList<>();
 
         if (type.contentEquals("track")) {
             listOfTracks.add(getArtistAndName(id));
@@ -39,13 +39,13 @@ public class LinkConverter {
 
         if (type.contentEquals("playlist")) {
             SpotifyManager.logger.info("Getting playlist tracks with id " + id);
-            GetPlaylistRequest playlistRequest = SpotifyManager.getSpotifyApi().getPlaylist(id).build();
-            Playlist playlist = playlistRequest.execute();
-            Paging<PlaylistTrack> playlistPaging = playlist.getTracks();
-            PlaylistTrack[] playlistTracks = playlistPaging.getItems();
+            final GetPlaylistRequest playlistRequest = SpotifyManager.getSpotifyApi().getPlaylist(id).build();
+            final Playlist playlist = playlistRequest.execute();
+            final Paging<PlaylistTrack> playlistPaging = playlist.getTracks();
+            final PlaylistTrack[] playlistTracks = playlistPaging.getItems();
 
             for (PlaylistTrack i : playlistTracks) {
-                Track track = (Track) i.getTrack();
+                final Track track = (Track) i.getTrack();
                 listOfTracks.add(formatArtistAndName(track));
             }
 
@@ -57,14 +57,14 @@ public class LinkConverter {
 
     private String getArtistAndName(String trackID) throws ParseException, SpotifyWebApiException, IOException {
         SpotifyManager.logger.info("Getting track with id " + trackID);
-        GetTrackRequest trackRequest = SpotifyManager.getSpotifyApi().getTrack(trackID).build();
-        Track track = trackRequest.execute();
+        final GetTrackRequest trackRequest = SpotifyManager.getSpotifyApi().getTrack(trackID).build();
+        final Track track = trackRequest.execute();
         return formatArtistAndName(track);
     }
 
     private String formatArtistAndName(Track track) {
         String artistNameAndTrackName = track.getName() + " - ";
-        ArtistSimplified[] artists = track.getArtists();
+        final ArtistSimplified[] artists = track.getArtists();
         for (ArtistSimplified i : artists)
             artistNameAndTrackName += i.getName() + " ";
         return artistNameAndTrackName;

@@ -12,7 +12,7 @@ public abstract class Command {
     protected boolean guildOnly = true;
     protected boolean adminOnly = false;
 
-    protected List<Command> subCommands = new ArrayList<>();
+    protected final List<Command> subCommands = new ArrayList<>();
 
     protected boolean execute(MessageReceivedEvent event, String content) {
         if (guildOnly && !event.isFromGuild()) {
@@ -25,15 +25,15 @@ public abstract class Command {
         } else if (subCommands.size() > 0 && content.length() > 0) {
             String cmd = content.split(" ")[0];
 
-            for (Command command : subCommands) {
-                List<String> cmds = new ArrayList<>();
+            for (final Command command : subCommands) {
+                final List<String> cmds = new ArrayList<>();
                 cmds.add(command.name);
                 if (command.aliases.length > 0)
-                    for (String tempCmd : command.aliases)
+                    for (final String tempCmd : command.aliases)
                         cmds.add(tempCmd);
                 if (cmds.contains(cmd.toLowerCase())) {
                     if (command.args.length() > 0) {
-                        int commandLength = cmd.length() + 1;
+                        final int commandLength = cmd.length() + 1;
                         if (content.length() > commandLength) {
                             command.execute(event, content.substring(commandLength));
                             return false;

@@ -61,18 +61,17 @@ public class TrackScheduler extends AudioEventAdapter {
             }, QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
         }
-        AudioTrack track = tracks.poll();
+        final AudioTrack track = tracks.poll();
         player.getAudioPlayer().startTrack(track, false);
         return track;
     }
 
     public synchronized void addTrackFirst(AudioTrack track) {
-        List<AudioTrack> remainingTracks = new ArrayList<>();
+        final List<AudioTrack> remainingTracks = new ArrayList<>();
         tracks.drainTo(remainingTracks);
         tracks.offer(track);
-        for (AudioTrack tmpTrack : remainingTracks) {
+        for (final AudioTrack tmpTrack : remainingTracks)
             tracks.offer(tmpTrack);
-        }
     }
 
     @Override
