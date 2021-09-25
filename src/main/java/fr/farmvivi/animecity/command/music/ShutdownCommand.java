@@ -15,7 +15,9 @@ public class ShutdownCommand extends Command {
     protected boolean execute(MessageReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
+
         Bot.getInstance().shutdown(event.getMessage());
+
         return true;
     }
 }

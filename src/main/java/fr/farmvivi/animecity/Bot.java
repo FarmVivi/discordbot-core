@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.farmvivi.animecity.command.CommandsManager;
 import fr.farmvivi.animecity.jda.JDAManager;
-import fr.farmvivi.animecity.music.MusicController;
+import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -19,7 +19,7 @@ public class Bot {
     public static final Logger logger = LoggerFactory.getLogger(name);
 
     private final CommandsManager commandsManager = new CommandsManager();
-    private final MusicController musicController = new MusicController();
+    private final MusicManager musicManager = new MusicManager();
 
     public Bot() {
         logger.info("Démarrage de " + name + " (V" + version + ") (Prod: " + production + ") en cours...");
@@ -46,11 +46,10 @@ public class Bot {
 
     public void shutdown(Message message) {
         new Thread(() -> {
-            logger.info("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")");
+            if (message != null)
+                logger.info("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")");
             JDAManager.getShardManager().removeEventListener(commandsManager);
-            message.getChannel().sendMessage("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")")
-                    .queue();
-            musicController.getMusicManager().getAudioPlayerManager().shutdown();
+            musicManager.getAudioPlayerManager().shutdown();
             JDAManager.getShardManager().shutdown();
         }).start();
     }
@@ -62,7 +61,7 @@ public class Bot {
             JDAManager.getShardManager().setActivity(Activity.playing("V" + version));
     }
 
-    public MusicController getMusicController() {
-        return musicController;
+    public MusicManager getMusicManager() {
+        return musicManager;
     }
 }
