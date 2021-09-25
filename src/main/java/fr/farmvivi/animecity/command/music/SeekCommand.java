@@ -48,7 +48,7 @@ public class SeekCommand extends Command {
             return false;
         }
 
-        final int startTime = TimeToIntCalculator.format(content);
+        final int startTime = TimeToIntCalculator.format(content) * 1000;
         final AudioTrack currentTrack = musicManager.getPlayer(guild).getAudioPlayer().getPlayingTrack();
         if (Long.valueOf(startTime) > currentTrack.getDuration()) {
             textChannel.sendMessage("**" + content + "** > TrackDuration").queue();
