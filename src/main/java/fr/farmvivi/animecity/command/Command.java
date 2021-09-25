@@ -15,7 +15,7 @@ public abstract class Command {
     protected List<Command> subCommands = new ArrayList<>();
 
     protected boolean execute(MessageReceivedEvent event, String content) {
-        if (guildOnly && event.getGuild() == null) {
+        if (guildOnly && !event.isFromGuild()) {
             event.getChannel().sendMessage("Cette commande peut seulement être exécuté sur un serveur discord.")
                     .queue();
             return false;
