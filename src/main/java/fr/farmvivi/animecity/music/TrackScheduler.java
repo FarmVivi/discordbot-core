@@ -88,7 +88,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         // A track started playing
         Bot.logger.info("Playing: " + track.getInfo().title + " | " + track.getInfo().uri);
-        JDAManager.getShardManager().setActivity(Activity.listening(track.getInfo().title));
+        JDAManager.getShardManager().setActivity(Activity.streaming(track.getInfo().title, track.getInfo().uri));
     }
 
     @Override
