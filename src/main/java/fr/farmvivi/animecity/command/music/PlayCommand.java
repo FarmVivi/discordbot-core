@@ -2,6 +2,7 @@ package fr.farmvivi.animecity.command.music;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -12,6 +13,8 @@ public class PlayCommand extends Command {
     public PlayCommand() {
         this.name = "play";
         this.aliases = new String[] { "p" };
+        this.category = CommandCategory.MUSIC;
+        this.description = "Ajoute une musique à la file d'attente";
         this.args = "<name>|<url>";
     }
 
@@ -44,7 +47,7 @@ public class PlayCommand extends Command {
 
         if (musicManager.getPlayer(guild).getAudioPlayer().isPaused()) {
             musicManager.getPlayer(guild).getAudioPlayer().setPaused(false);
-            textChannel.sendMessage("LECTURE !").queue();
+            textChannel.sendMessage("Lecture !").queue();
         }
 
         musicManager.loadTrack(textChannel, content);

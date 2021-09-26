@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -12,6 +13,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class ReplayCommand extends Command {
     public ReplayCommand() {
         this.name = "replay";
+        this.category = CommandCategory.MUSIC;
+        this.description = "Rejoue la musique en cours de lecture juste après";
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -13,6 +14,8 @@ public class ViewQueueCommand extends Command {
     public ViewQueueCommand() {
         this.name = "viewqueue";
         this.aliases = new String[] { "queue" };
+        this.category = CommandCategory.MUSIC;
+        this.description = "Affiche la file d'attente";
     }
 
     @Override
@@ -30,7 +33,7 @@ public class ViewQueueCommand extends Command {
         }
 
         final StringBuilder builder = new StringBuilder();
-        builder.append("**Queue** :\n");
+        builder.append("**Queue** :");
         for (final AudioTrack track : musicManager.getPlayer(guild).getListener().getTracks())
             builder.append("\n-> **").append(track.getInfo().title).append("**");
         textChannel.sendMessage(builder.toString()).queue();

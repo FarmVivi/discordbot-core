@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -13,6 +14,8 @@ public class SkipCommand extends Command {
     public SkipCommand() {
         this.name = "skip";
         this.aliases = new String[] { "fs" };
+        this.category = CommandCategory.MUSIC;
+        this.description = "Passe à la musique suivante";
     }
 
     @Override

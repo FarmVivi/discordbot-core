@@ -2,6 +2,7 @@ package fr.farmvivi.animecity.command.music;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import fr.farmvivi.animecity.otherclass.DetermineIsNumber;
 import net.dv8tion.jda.api.entities.Guild;
@@ -12,6 +13,8 @@ public class VolumeCommand extends Command {
     public VolumeCommand() {
         this.name = "volume";
         this.aliases = new String[] { "v" };
+        this.category = CommandCategory.MUSIC;
+        this.description = "Affiche ou change le volume si une valeur est précisée";
         this.args = "<volume>";
     }
 
@@ -31,7 +34,7 @@ public class VolumeCommand extends Command {
 
         final int volume;
 
-        if (content.length() > 0 && DetermineIsNumber.isInteger(content)) {
+        if (content.length() != 0 && DetermineIsNumber.isInteger(content)) {
             volume = Integer.valueOf(content);
         } else {
             textChannel.sendMessage(

@@ -17,7 +17,9 @@ import fr.farmvivi.animecity.command.music.SkipCommand;
 import fr.farmvivi.animecity.command.music.StopCommand;
 import fr.farmvivi.animecity.command.music.ViewQueueCommand;
 import fr.farmvivi.animecity.command.music.VolumeCommand;
+import fr.farmvivi.animecity.command.other.HelpCommand;
 import fr.farmvivi.animecity.command.other.ShutdownCommand;
+import fr.farmvivi.animecity.command.other.VersionCommand;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -26,7 +28,6 @@ public class CommandsManager extends ListenerAdapter {
     private final List<Command> commands = new ArrayList<>();
 
     public CommandsManager() {
-        commands.add(new ShutdownCommand());
         commands.add(new PlayCommand());
         commands.add(new SkipCommand());
         commands.add(new ClearCommand());
@@ -40,6 +41,10 @@ public class CommandsManager extends ListenerAdapter {
         commands.add(new SeekCommand());
         commands.add(new ReplayCommand());
         commands.add(new ViewQueueCommand());
+
+        commands.add(new HelpCommand());
+        commands.add(new VersionCommand());
+        commands.add(new ShutdownCommand());
     }
 
     @Override
@@ -56,11 +61,11 @@ public class CommandsManager extends ListenerAdapter {
             for (final Command command : commands) {
                 final List<String> cmds = new ArrayList<>();
                 cmds.add(command.name);
-                if (command.aliases.length > 0)
+                if (command.aliases.length != 0)
                     for (final String tempCmd : command.aliases)
                         cmds.add(tempCmd);
                 if (cmds.contains(cmd.toLowerCase())) {
-                    if (command.args.length() > 0) {
+                    if (command.args.length() != 0) {
                         final int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
                         if (message.length() > commandLength) {
                             command.execute(event, message.substring(commandLength));

@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -13,6 +14,8 @@ public class CurrentCommand extends Command {
     public CurrentCommand() {
         this.name = "current";
         this.aliases = new String[] { "np", "info" };
+        this.category = CommandCategory.MUSIC;
+        this.description = "Affiche la musique en cours de lecture";
     }
 
     @Override

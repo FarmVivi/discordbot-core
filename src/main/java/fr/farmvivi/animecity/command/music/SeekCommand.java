@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import fr.farmvivi.animecity.otherclass.TimeToIntCalculator;
 import net.dv8tion.jda.api.entities.Guild;
@@ -13,6 +14,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class SeekCommand extends Command {
     public SeekCommand() {
         this.name = "seek";
+        this.category = CommandCategory.MUSIC;
+        this.description = "Joue la musique a partir du temps donné";
         this.args = "<time>";
     }
 

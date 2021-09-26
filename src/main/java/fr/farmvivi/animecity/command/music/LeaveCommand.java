@@ -2,6 +2,7 @@ package fr.farmvivi.animecity.command.music;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
+import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -11,6 +12,8 @@ public class LeaveCommand extends Command {
     public LeaveCommand() {
         this.name = "leave";
         this.aliases = new String[] { "disconnect" };
+        this.category = CommandCategory.MUSIC;
+        this.description = "Déconnecte le bot du channel";
     }
 
     @Override
