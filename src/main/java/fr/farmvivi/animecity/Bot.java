@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.Activity;
 public class Bot {
     private static Bot instance;
 
-    public static final String version = "1.1.0.0";
+    public static final String version = "1.1.0.1";
     public static final String name = "AnimeCity";
     public static final boolean production = false;
 
@@ -59,9 +59,11 @@ public class Bot {
 
     public void setDefaultActivity() {
         if (production)
-            JDAManager.getShardManager().setActivity(Activity.playing("Prod - V" + version));
+            JDAManager.getShardManager()
+                    .setActivity(Activity.playing("V" + version + " | Prefix: " + configuration.cmdPrefix));
         else
-            JDAManager.getShardManager().setActivity(Activity.playing("V" + version));
+            JDAManager.getShardManager()
+                    .setActivity(Activity.playing("Dev - V" + version + " | Prefix: " + configuration.cmdPrefix));
     }
 
     public Configuration getConfiguration() {
