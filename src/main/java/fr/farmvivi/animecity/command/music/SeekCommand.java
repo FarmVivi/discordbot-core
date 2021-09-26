@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
-import fr.farmvivi.animecity.command.CommandsManager;
 import fr.farmvivi.animecity.music.MusicManager;
 import fr.farmvivi.animecity.otherclass.TimeToIntCalculator;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,10 +21,8 @@ public class SeekCommand extends Command {
         if (!super.execute(event, content))
             return false;
         if (args != null && content.length() == 0) {
-            event.getChannel()
-                    .sendMessage(
-                            "Utilisation de la commande: **" + CommandsManager.CMD_PREFIX + name + " " + args + "**")
-                    .queue();
+            event.getChannel().sendMessage("Utilisation de la commande: **"
+                    + Bot.getInstance().getConfiguration().cmdPrefix + name + " " + args + "**").queue();
             return false;
         }
 

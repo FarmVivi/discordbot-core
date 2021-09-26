@@ -2,7 +2,6 @@ package fr.farmvivi.animecity.command.music;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.Command;
-import fr.farmvivi.animecity.command.CommandsManager;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -21,10 +20,8 @@ public class PlayCommand extends Command {
         if (!super.execute(event, content))
             return false;
         if (args != null && content.length() == 0) {
-            event.getChannel()
-                    .sendMessage(
-                            "Utilisation de la commande: **" + CommandsManager.CMD_PREFIX + name + " " + args + "**")
-                    .queue();
+            event.getChannel().sendMessage("Utilisation de la commande: **"
+                    + Bot.getInstance().getConfiguration().cmdPrefix + name + " " + args + "**").queue();
             return false;
         }
 

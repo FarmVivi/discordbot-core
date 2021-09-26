@@ -1,5 +1,6 @@
 package fr.farmvivi.animecity;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -8,11 +9,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Configuration {
     public String jdaToken;
     public String spotifyId;
     public String spotifySecret;
+    public String cmdPrefix;
+    public List<Long> cmdAdmins;
     private JsonObject jsonConfiguration;
 
     public Configuration() {
@@ -48,6 +53,12 @@ public class Configuration {
         this.jdaToken = jsonConfiguration.get("jda-token").getAsString();
         this.spotifyId = jsonConfiguration.get("spotify-id").getAsString();
         this.spotifySecret = jsonConfiguration.get("spotify-token").getAsString();
+        this.cmdPrefix = jsonConfiguration.get("cmd-prefix").getAsString();
+        this.cmdAdmins = new ArrayList<>();
+        final JsonArray jsonArray = jsonConfiguration.get("cmd-admins").getAsJsonArray();
+        if (jsonArray != null)
+            for (int i = 0; i < jsonArray.size(); i++)
+                cmdAdmins.add(jsonArray.get(i).getAsLong());
     }
 
     public JsonObject getJsonConfiguration() {
@@ -62,6 +73,10 @@ public class Configuration {
         if (!object.has("spotify-id"))
             flag = false;
         if (!object.has("spotify-token"))
+            flag = false;
+        if (!object.has("cmd-prefix"))
+            flag = false;
+        if (!object.has("cmd-admins"))
             flag = false;
 
         return flag;

@@ -3,6 +3,7 @@ package fr.farmvivi.animecity.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.farmvivi.animecity.Bot;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public abstract class Command {
@@ -19,7 +20,8 @@ public abstract class Command {
             event.getChannel().sendMessage("Cette commande peut seulement être exécuté sur un serveur discord.")
                     .queue();
             return false;
-        } else if (adminOnly && !CommandsManager.ADMINS.contains(event.getAuthor().getIdLong())) {
+        } else if (adminOnly
+                && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
             event.getChannel().sendMessage("Vous n'avez pas la permission d'exécuter cette commande.").queue();
             return false;
         } else if (subCommands.size() > 0 && content.length() > 0) {

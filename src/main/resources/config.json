@@ -1,5 +1,7 @@
 {
     "jda-token": "",
     "spotify-id": "",
-    "spotify-token": ""
+    "spotify-token": "",
+    "cmd-prefix": "",
+    "cmd-admins": []
 }

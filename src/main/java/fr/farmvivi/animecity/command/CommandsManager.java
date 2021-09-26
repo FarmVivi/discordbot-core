@@ -3,6 +3,7 @@ package fr.farmvivi.animecity.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.command.music.ClearCommand;
 import fr.farmvivi.animecity.command.music.CurrentCommand;
 import fr.farmvivi.animecity.command.music.LeaveCommand;
@@ -22,14 +23,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandsManager extends ListenerAdapter {
-    public static final String CMD_PREFIX = "*";
-    public static final List<Long> ADMINS = new ArrayList<>();
-
     private final List<Command> commands = new ArrayList<>();
-
-    static {
-        ADMINS.add(177135083222859776L);
-    }
 
     public CommandsManager() {
         commands.add(new ShutdownCommand());
@@ -52,6 +46,7 @@ public class CommandsManager extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.isFromType(ChannelType.TEXT) || event.isFromType(ChannelType.PRIVATE)) {
             final String message = event.getMessage().getContentDisplay();
+            final String CMD_PREFIX = Bot.getInstance().getConfiguration().cmdPrefix;
 
             if (!message.startsWith(CMD_PREFIX))
                 return;
