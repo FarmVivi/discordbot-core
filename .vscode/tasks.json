@@ -10,7 +10,7 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "mvn clean compile exec:java",
+            "command": "mvn clean compile exec:exec",
             "group": "test"
         }
     ]

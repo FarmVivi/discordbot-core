@@ -16,8 +16,9 @@ import fr.farmvivi.animecity.Bot;
 public class SpotifyManager {
     public static final Logger logger = LoggerFactory.getLogger("Spotify");
 
-    private static final SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(Bot.SPOTIFY_CLIENT_ID)
-            .setClientSecret(Bot.SPOTIFY_CLIENT_SECRET).build();
+    private static final SpotifyApi spotifyApi = new SpotifyApi.Builder()
+            .setClientId(Bot.getInstance().getConfiguration().spotifyId)
+            .setClientSecret(Bot.getInstance().getConfiguration().spotifySecret).build();
 
     static {
         logger.info("Connecting to Spotify...");

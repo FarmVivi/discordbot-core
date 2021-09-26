@@ -15,7 +15,7 @@ public class JDAManager {
 
     private static ShardManager buildShard() {
         try {
-            return DefaultShardManagerBuilder.createDefault(Bot.JDA_TOKEN).build();
+            return DefaultShardManagerBuilder.createDefault(Bot.getInstance().getConfiguration().jdaToken).build();
         } catch (LoginException e) {
             Bot.logger.error("Impossible de build le Shard !", e);
         }

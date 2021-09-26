@@ -7,7 +7,6 @@ import fr.farmvivi.animecity.command.CommandsManager;
 import fr.farmvivi.animecity.jda.JDAManager;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Message;
 
 public class Bot {
     private static Bot instance;
@@ -18,12 +17,9 @@ public class Bot {
 
     public static final Logger logger = LoggerFactory.getLogger(name);
 
-    public static String JDA_TOKEN;
-    public static String SPOTIFY_CLIENT_ID;
-    public static String SPOTIFY_CLIENT_SECRET;
-
-    private final CommandsManager commandsManager = new CommandsManager();
-    private final MusicManager musicManager = new MusicManager();
+    private final Configuration configuration;
+    private final CommandsManager commandsManager;
+    private final MusicManager musicManager;
 
     public Bot(String[] args) {
         logger.info("Démarrage de " + name + " (V" + version + ") (Prod: " + production + ") en cours...");
@@ -35,23 +31,20 @@ public class Bot {
         logger.info("System.getProperty('java.vendor') == '" + System.getProperty("java.vendor") + "'");
         logger.info("System.getProperty('sun.arch.data.model') == '" + System.getProperty("sun.arch.data.model") + "'");
 
-        if (args.length < 3) {
-            logger.warn("Need at least 3 arguments to start.");
-            System.exit(1);
-            return;
-        }
+        instance = this;
 
-        JDA_TOKEN = args[0];
-        SPOTIFY_CLIENT_ID = args[1];
-        SPOTIFY_CLIENT_SECRET = args[2];
-
+        configuration = new Configuration();
         JDAManager.getShardManager();
+        commandsManager = new CommandsManager();
         JDAManager.getShardManager().addEventListener(commandsManager);
+        musicManager = new MusicManager();
         setDefaultActivity();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Shutdown asked!");
-            shutdown(null);
+            JDAManager.getShardManager().removeEventListener(commandsManager);
+            musicManager.getAudioPlayerManager().shutdown();
+            JDAManager.getShardManager().shutdown();
             logger.info("Bye!");
         }));
     }
@@ -64,21 +57,19 @@ public class Bot {
         Bot.instance = instance;
     }
 
-    public void shutdown(Message message) {
-        new Thread(() -> {
-            if (message != null)
-                logger.info("Shutdown... (requested by " + message.getAuthor().getAsTag() + ")");
-            JDAManager.getShardManager().removeEventListener(commandsManager);
-            musicManager.getAudioPlayerManager().shutdown();
-            JDAManager.getShardManager().shutdown();
-        }).start();
-    }
-
     public void setDefaultActivity() {
         if (production)
             JDAManager.getShardManager().setActivity(Activity.playing("Prod - V" + version));
         else
             JDAManager.getShardManager().setActivity(Activity.playing("V" + version));
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public CommandsManager getCommandsManager() {
+        return commandsManager;
     }
 
     public MusicManager getMusicManager() {
