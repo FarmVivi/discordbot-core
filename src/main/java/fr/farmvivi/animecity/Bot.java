@@ -18,10 +18,14 @@ public class Bot {
 
     public static final Logger logger = LoggerFactory.getLogger(name);
 
+    public static String JDA_TOKEN;
+    public static String SPOTIFY_CLIENT_ID;
+    public static String SPOTIFY_CLIENT_SECRET;
+
     private final CommandsManager commandsManager = new CommandsManager();
     private final MusicManager musicManager = new MusicManager();
 
-    public Bot() {
+    public Bot(String[] args) {
         logger.info("Démarrage de " + name + " (V" + version + ") (Prod: " + production + ") en cours...");
 
         logger.info("System.getProperty('os.name') == '" + System.getProperty("os.name") + "'");
@@ -31,9 +35,25 @@ public class Bot {
         logger.info("System.getProperty('java.vendor') == '" + System.getProperty("java.vendor") + "'");
         logger.info("System.getProperty('sun.arch.data.model') == '" + System.getProperty("sun.arch.data.model") + "'");
 
+        if (args.length < 3) {
+            logger.warn("Need at least 3 arguments to start.");
+            System.exit(1);
+            return;
+        }
+
+        JDA_TOKEN = args[0];
+        SPOTIFY_CLIENT_ID = args[1];
+        SPOTIFY_CLIENT_SECRET = args[2];
+
         JDAManager.getShardManager();
         JDAManager.getShardManager().addEventListener(commandsManager);
         setDefaultActivity();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Shutdown asked!");
+            shutdown(null);
+            logger.info("Bye!");
+        }));
     }
 
     public static Bot getInstance() {

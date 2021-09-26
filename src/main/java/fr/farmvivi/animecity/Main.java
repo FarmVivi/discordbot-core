@@ -7,6 +7,6 @@ public class Main {
     // https://web.archive.org/web/20210911150725/https://rythm.fm/docs/features#player
     // TODO Commande help
     public static void main(String[] args) {
-        Bot.setInstance(new Bot());
+        Bot.setInstance(new Bot(args));
     }
 }

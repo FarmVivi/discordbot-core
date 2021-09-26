@@ -11,13 +11,13 @@ import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.farmvivi.animecity.Bot;
+
 public class SpotifyManager {
-    public static final String CLIENT_ID = "029c2603ac3d4850ba355bbf4668649d";
-    public static final String CLIENT_SECRET = "04a8b243a7234200bd3e6bf686907c6c";
     public static final Logger logger = LoggerFactory.getLogger("Spotify");
 
-    private static final SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(CLIENT_ID)
-            .setClientSecret(CLIENT_SECRET).build();
+    private static final SpotifyApi spotifyApi = new SpotifyApi.Builder().setClientId(Bot.SPOTIFY_CLIENT_ID)
+            .setClientSecret(Bot.SPOTIFY_CLIENT_SECRET).build();
 
     static {
         logger.info("Connecting to Spotify...");
