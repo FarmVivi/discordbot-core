@@ -31,6 +31,7 @@ public class MusicManager {
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         // Local source
         AudioSourceManagers.registerLocalSource(audioPlayerManager);
+        audioPlayerManager.getConfiguration().setFilterHotSwapEnabled(true);
     }
 
     public synchronized MusicPlayer getPlayer(Guild guild) {

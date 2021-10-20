@@ -1,5 +1,6 @@
 package fr.farmvivi.animecity.music;
 
+import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
@@ -9,6 +10,7 @@ public class MusicPlayer {
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
     private final Guild guild;
+    private EqualizerFactory equalizer;
 
     private boolean loopQueueMode = false;
     private boolean loopMode = false;
@@ -17,6 +19,7 @@ public class MusicPlayer {
     public MusicPlayer(AudioPlayer audioPlayer, Guild guild) {
         this.audioPlayer = audioPlayer;
         this.guild = guild;
+        this.equalizer = new EqualizerFactory();
         trackScheduler = new TrackScheduler(this);
         audioPlayer.addListener(trackScheduler);
     }
@@ -27,6 +30,10 @@ public class MusicPlayer {
 
     public Guild getGuild() {
         return guild;
+    }
+
+    public EqualizerFactory getEqualizer() {
+        return equalizer;
     }
 
     public TrackScheduler getListener() {
@@ -49,6 +56,8 @@ public class MusicPlayer {
         this.loopQueueMode = false;
         this.loopMode = false;
         this.shuffleMode = false;
+        audioPlayer.setFilterFactory(null);
+        this.equalizer = new EqualizerFactory();
     }
 
     public void setLoopQueueMode(boolean loopQueueMode) {

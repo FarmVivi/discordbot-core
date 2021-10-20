@@ -18,6 +18,9 @@ import fr.farmvivi.animecity.command.music.SkipCommand;
 import fr.farmvivi.animecity.command.music.StopCommand;
 import fr.farmvivi.animecity.command.music.ViewQueueCommand;
 import fr.farmvivi.animecity.command.music.VolumeCommand;
+import fr.farmvivi.animecity.command.music.equalizer.EqHighBassCommand;
+import fr.farmvivi.animecity.command.music.equalizer.EqStartCommand;
+import fr.farmvivi.animecity.command.music.equalizer.EqStopCommand;
 import fr.farmvivi.animecity.command.other.HelpCommand;
 import fr.farmvivi.animecity.command.other.ShutdownCommand;
 import fr.farmvivi.animecity.command.other.VersionCommand;
@@ -43,6 +46,9 @@ public class CommandsManager extends ListenerAdapter {
         commands.add(new SeekCommand());
         commands.add(new ReplayCommand());
         commands.add(new ViewQueueCommand());
+        commands.add(new EqStartCommand());
+        commands.add(new EqStopCommand());
+        commands.add(new EqHighBassCommand());
 
         commands.add(new HelpCommand());
         commands.add(new VersionCommand());
