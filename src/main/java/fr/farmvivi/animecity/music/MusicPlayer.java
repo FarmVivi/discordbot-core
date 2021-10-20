@@ -12,6 +12,7 @@ public class MusicPlayer {
 
     private boolean loopQueueMode = false;
     private boolean loopMode = false;
+    private boolean shuffleMode = false;
 
     public MusicPlayer(AudioPlayer audioPlayer, Guild guild) {
         this.audioPlayer = audioPlayer;
@@ -58,5 +59,13 @@ public class MusicPlayer {
 
     public boolean isLoopMode() {
         return loopMode;
+    }
+
+    public void setShuffleMode(boolean shuffleMode) {
+        this.shuffleMode = shuffleMode;
+    }
+
+    public boolean isShuffleMode() {
+        return shuffleMode;
     }
 }

@@ -2,6 +2,7 @@ package fr.farmvivi.animecity.music;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -61,7 +62,19 @@ public class TrackScheduler extends AudioEventAdapter {
             }, QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
         }
-        final AudioTrack track = tracks.poll();
+        final AudioTrack track;
+        if (player.isShuffleMode()) {
+            final List<AudioTrack> remainingTracks = new ArrayList<>();
+            tracks.drainTo(remainingTracks);
+            final Random random = new Random();
+            track = remainingTracks.get(random.nextInt(remainingTracks.size()));
+            remainingTracks.remove(track);
+            if (!remainingTracks.isEmpty())
+                for (final AudioTrack tmpTrack : remainingTracks)
+                    tracks.offer(tmpTrack);
+        } else {
+            track = tracks.poll();
+        }
         player.getAudioPlayer().startTrack(track, false);
         return track;
     }
