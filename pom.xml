@@ -5,13 +5,13 @@
 
   <groupId>fr.farmvivi.animecity</groupId>
   <artifactId>animecity</artifactId>
-  <version>1.1.0.2-SNAPSHOT</version>
+  <version>1.1.0.3-SNAPSHOT</version>
 
   <name>animecity</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.source>16</maven.compiler.source>
     <maven.compiler.target>16</maven.compiler.target>
     <project.mainClass>fr.farmvivi.animecity.Main</project.mainClass>
     <project.workingDirectory>run</project.workingDirectory>
