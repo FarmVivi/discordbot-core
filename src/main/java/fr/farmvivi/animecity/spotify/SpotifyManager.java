@@ -34,7 +34,7 @@ public class SpotifyManager {
     }
 
     public static boolean timeToRenew() {
-        return renewedTime + clientCredentials.getExpiresIn() > getCurrentTime() - 10;
+        return renewedTime + clientCredentials.getExpiresIn() < getCurrentTime() - 10;
     }
 
     public static void refreshToken() {
