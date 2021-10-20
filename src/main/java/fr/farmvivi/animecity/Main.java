@@ -6,7 +6,6 @@ public class Main {
     // TODO Add features
     // https://web.archive.org/web/20210911150725/https://rythm.fm/docs/features#player
     // TODO Add shuffle command
-    // TODO Fix spotify token expired
     public static void main(String[] args) {
         new Bot(args);
     }

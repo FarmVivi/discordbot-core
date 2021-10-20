@@ -20,20 +20,34 @@ public class SpotifyManager {
             .setClientId(Bot.getInstance().getConfiguration().spotifyId)
             .setClientSecret(Bot.getInstance().getConfiguration().spotifySecret).build();
 
-    static {
+    private static ClientCredentials clientCredentials;
+    private static long renewedTime;
+
+    public static synchronized SpotifyApi getSpotifyApi() {
+        if (spotifyApi.getAccessToken() == null || timeToRenew())
+            refreshToken();
+        return spotifyApi;
+    }
+
+    public static long getCurrentTime() {
+        return System.currentTimeMillis() / 1000;
+    }
+
+    public static boolean timeToRenew() {
+        return renewedTime + clientCredentials.getExpiresIn() > getCurrentTime() - 10;
+    }
+
+    public static void refreshToken() {
         logger.info("Connecting to Spotify...");
         try {
             final ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
-            final ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+            clientCredentials = clientCredentialsRequest.execute();
+            renewedTime = getCurrentTime();
 
             // Set access token for further "spotifyApi" object usage
             spotifyApi.setAccessToken(clientCredentials.getAccessToken());
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             logger.error("Error connecting to Spotify", e);
         }
-    }
-
-    public static SpotifyApi getSpotifyApi() {
-        return spotifyApi;
     }
 }
