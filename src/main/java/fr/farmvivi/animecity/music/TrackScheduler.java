@@ -54,6 +54,7 @@ public class TrackScheduler extends AudioEventAdapter {
                 @Override
                 public void run() {
                     if (player.getGuild().getAudioManager().getConnectedChannel() != null) {
+                        player.resetToDefaultSettings();
                         Bot.logger.info("Quit channel "
                                 + player.getGuild().getAudioManager().getConnectedChannel().getName() + "...");
                         player.getGuild().getAudioManager().closeAudioConnection();

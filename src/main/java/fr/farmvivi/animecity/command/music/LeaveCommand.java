@@ -32,6 +32,8 @@ public class LeaveCommand extends Command {
 
         musicManager.getPlayer(guild).getListener().getTracks().clear();
         musicManager.getPlayer(guild).skipTrack();
+        musicManager.getPlayer(guild).resetToDefaultSettings();
+        Bot.logger.info("Quit channel " + guild.getAudioManager().getConnectedChannel().getName() + "...");
         guild.getAudioManager().closeAudioConnection();
 
         textChannel.sendMessage("Déconnecté.").queue();

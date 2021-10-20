@@ -45,6 +45,12 @@ public class MusicPlayer {
         return trackScheduler.nextTrack();
     }
 
+    public void resetToDefaultSettings() {
+        this.loopQueueMode = false;
+        this.loopMode = false;
+        this.shuffleMode = false;
+    }
+
     public void setLoopQueueMode(boolean loopQueueMode) {
         this.loopQueueMode = loopQueueMode;
     }
