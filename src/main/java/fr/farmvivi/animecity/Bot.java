@@ -22,7 +22,7 @@ public class Bot {
     private final MusicManager musicManager;
 
     public Bot(String[] args) {
-        logger.info("Démarrage de " + name + " (V" + version + ") (Prod: " + production + ") en cours...");
+        logger.info("Démarrage de " + name + " v" + version + ") (Prod: " + production + ") en cours...");
 
         logger.info("System.getProperty('os.name') == '" + System.getProperty("os.name") + "'");
         logger.info("System.getProperty('os.version') == '" + System.getProperty("os.version") + "'");
