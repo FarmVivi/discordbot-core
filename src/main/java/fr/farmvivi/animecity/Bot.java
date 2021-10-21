@@ -60,10 +60,10 @@ public class Bot {
     public void setDefaultActivity() {
         if (production)
             JDAManager.getShardManager()
-                    .setActivity(Activity.playing("V" + version + " | Prefix: " + configuration.cmdPrefix));
+                    .setActivity(Activity.playing("v" + version + " | Prefix: " + configuration.cmdPrefix));
         else
             JDAManager.getShardManager()
-                    .setActivity(Activity.playing("Dev - V" + version + " | Prefix: " + configuration.cmdPrefix));
+                    .setActivity(Activity.playing("Dev - v" + version + " | Prefix: " + configuration.cmdPrefix));
     }
 
     public Configuration getConfiguration() {
