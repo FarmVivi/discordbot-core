@@ -1,11 +1,5 @@
 package fr.farmvivi.animecity;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import fr.farmvivi.animecity.radio.Radio;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,14 +8,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 public class Configuration {
     public String jdaToken;
     public String spotifyId;
     public String spotifySecret;
     public String cmdPrefix;
     public List<Long> cmdAdmins;
-    public boolean radioMode;
-    public List<Radio> radios;
+    public boolean radioEnabled;
+    public long radioGuildID;
+    public long radioChannelID;
+    public String radioPlaylistURL;
     private JsonObject jsonConfiguration;
 
     public Configuration() {
@@ -59,10 +59,13 @@ public class Configuration {
         this.spotifySecret = jsonConfiguration.get("spotify-token").getAsString();
         this.cmdPrefix = jsonConfiguration.get("cmd-prefix").getAsString();
         this.cmdAdmins = new ArrayList<>();
-        final JsonArray jsonArray = jsonConfiguration.get("cmd-admins").getAsJsonArray();
-        if (jsonArray != null)
-            for (int i = 0; i < jsonArray.size(); i++)
-                cmdAdmins.add(jsonArray.get(i).getAsLong());
+        final JsonArray adminsJsonArray = jsonConfiguration.get("cmd-admins").getAsJsonArray();
+        for (int i = 0; i < adminsJsonArray.size(); i++)
+            cmdAdmins.add(adminsJsonArray.get(i).getAsLong());
+        this.radioEnabled = jsonConfiguration.get("radio-enabled").getAsBoolean();
+        this.radioGuildID = jsonConfiguration.get("radio-guild-id").getAsLong();
+        this.radioChannelID = jsonConfiguration.get("radio-channel-id").getAsLong();
+        this.radioPlaylistURL = jsonConfiguration.get("radio-playlist-url").getAsString();
     }
 
     public JsonObject getJsonConfiguration() {
@@ -82,9 +85,13 @@ public class Configuration {
             flag = false;
         if (!object.has("cmd-admins"))
             flag = false;
-        if (!object.has("enableRadioMode"))
+        if (!object.has("radio-enabled"))
             flag = false;
-        if (!object.has("radios"))
+        if (!object.has("radio-guild-id"))
+            flag = false;
+        if (!object.has("radio-channel-id"))
+            flag = false;
+        if (!object.has("radio-playlist-url"))
             flag = false;
 
         return flag;

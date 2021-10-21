@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import fr.farmvivi.animecity.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 
 public class MusicPlayer {
@@ -60,10 +59,7 @@ public class MusicPlayer {
         this.loopQueueMode = false;
         this.loopMode = false;
         this.shuffleMode = false;
-        if (Bot.getInstance().getConfiguration().radioMode)
-            audioPlayer.setVolume(DEFAULT_RADIO_VOLUME);
-        else
-            audioPlayer.setVolume(DEFAULT_VOICE_VOLUME);
+        audioPlayer.setVolume(DEFAULT_VOICE_VOLUME);
         audioPlayer.setFilterFactory(null);
         this.equalizer = new EqualizerFactory();
     }

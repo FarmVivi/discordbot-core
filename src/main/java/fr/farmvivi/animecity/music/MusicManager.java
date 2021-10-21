@@ -44,10 +44,14 @@ public class MusicManager {
         return audioPlayerManager;
     }
 
-    public void loadTrack(final TextChannel channel, final String source) {
-        final MusicPlayer player = getPlayer(channel.getGuild());
+    public void loadTrack(final Guild guild, final String source) {
+        this.loadTrack(guild, source, null);
+    }
 
-        channel.getGuild().getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
+    public void loadTrack(final Guild guild, final String source, final TextChannel textChannel) {
+        final MusicPlayer player = getPlayer(guild);
+
+        guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
 
         if (source.startsWith("http") && source.contains("://")) {
             if (source.contains("open.spotify.com")) {
@@ -57,8 +61,9 @@ public class MusicManager {
                     for (final String songName : songs)
                         audioPlayerManager.loadItem("ytsearch: " + songName,
                                 new FunctionalResultHandler(null, playlist -> {
-                                    channel.sendMessage("**" + playlist.getTracks().get(0).getInfo().title
-                                            + "** ajouté à la file d'attente.").queue();
+                                    if (textChannel != null)
+                                        textChannel.sendMessage("**" + playlist.getTracks().get(0).getInfo().title
+                                                + "** ajouté à la file d'attente.").queue();
                                     player.playTrack(playlist.getTracks().get(0));
                                 }, null, null));
                 } catch (ParseException | SpotifyWebApiException | IOException e) {
@@ -68,7 +73,9 @@ public class MusicManager {
                 audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
                     @Override
                     public void trackLoaded(AudioTrack track) {
-                        channel.sendMessage("**" + track.getInfo().title + "** ajouté à la file d'attente.").queue();
+                        if (textChannel != null)
+                            textChannel.sendMessage("**" + track.getInfo().title + "** ajouté à la file d'attente.")
+                                    .queue();
                         player.playTrack(track);
                     }
 
@@ -82,27 +89,34 @@ public class MusicManager {
                             player.playTrack(track);
                         }
 
-                        channel.sendMessage(builder.toString()).queue();
+                        if (textChannel != null)
+                            textChannel.sendMessage(builder.toString()).queue();
                     }
 
                     @Override
                     public void noMatches() {
                         // Notify the user that we've got nothing
-                        channel.sendMessage("La piste " + source + " n'a pas été trouvé.").queue();
+                        if (textChannel != null)
+                            textChannel.sendMessage("La piste " + source + " n'a pas été trouvé.").queue();
                     }
 
                     @Override
                     public void loadFailed(FriendlyException throwable) {
                         // Notify the user that everything exploded
-                        channel.sendMessage("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").")
-                                .queue();
+                        if (textChannel != null)
+                            textChannel
+                                    .sendMessage(
+                                            "Impossible de jouer la piste (raison: " + throwable.getMessage() + ").")
+                                    .queue();
                     }
                 });
             }
         } else {
             audioPlayerManager.loadItem("ytsearch: " + source, new FunctionalResultHandler(null, playlist -> {
-                channel.sendMessage(
-                        "**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.").queue();
+                if (textChannel != null)
+                    textChannel.sendMessage(
+                            "**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.")
+                            .queue();
                 player.playTrack(playlist.getTracks().get(0));
             }, null, null));
         }

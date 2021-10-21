@@ -42,10 +42,7 @@ public class PlayCommand extends Command {
             Bot.logger.info("Join channel " + voiceChannel.getName() + "...");
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
-            if (Bot.getInstance().getConfiguration().radioMode)
-                musicManager.getPlayer(guild).getAudioPlayer().setVolume(MusicPlayer.DEFAULT_RADIO_VOLUME);
-            else
-                musicManager.getPlayer(guild).getAudioPlayer().setVolume(MusicPlayer.DEFAULT_VOICE_VOLUME);
+            musicManager.getPlayer(guild).getAudioPlayer().setVolume(MusicPlayer.DEFAULT_VOICE_VOLUME);
         }
 
         if (musicManager.getPlayer(guild).getAudioPlayer().isPaused()) {
@@ -53,7 +50,7 @@ public class PlayCommand extends Command {
             textChannel.sendMessage("Lecture !").queue();
         }
 
-        musicManager.loadTrack(textChannel, content);
+        musicManager.loadTrack(textChannel.getGuild(), content, textChannel);
 
         return true;
     }

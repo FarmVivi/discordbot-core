@@ -4,6 +4,8 @@
     "spotify-token": "",
     "cmd-prefix": "",
     "cmd-admins": [],
-    "enableRadioMode": "false",
-    "radios": []
+    "radio-enabled": false,
+    "radio-guild-id": 0,
+    "radio-channel-id": 0,
+    "radio-playlist-url": ""
 }
