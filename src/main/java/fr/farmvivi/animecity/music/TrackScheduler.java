@@ -114,7 +114,7 @@ public class TrackScheduler extends AudioEventAdapter {
                 return;
             }
             if (this.player.isLoopQueueMode()) {
-                this.player.playTrack(track.makeClone());
+                tracks.offer(track.makeClone());
             }
             nextTrack();
         }
