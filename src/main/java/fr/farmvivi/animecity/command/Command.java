@@ -22,9 +22,10 @@ public abstract class Command {
             event.getChannel().sendMessage("Cette commande peut seulement être exécuté sur un serveur discord.")
                     .queue();
             return false;
-        } else if (adminOnly
+        } else if ((adminOnly || Bot.getInstance().getConfiguration().radioMode)
                 && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
-            event.getChannel().sendMessage("Vous n'avez pas la permission d'exécuter cette commande.").queue();
+            if (!Bot.getInstance().getConfiguration().radioMode)
+                event.getChannel().sendMessage("Vous n'avez pas la permission d'exécuter cette commande.").queue();
             return false;
         } else if (subCommands.size() != 0 && content.length() != 0) {
             String cmd = content.split(" ")[0];

@@ -42,7 +42,10 @@ public class PlayCommand extends Command {
             Bot.logger.info("Join channel " + voiceChannel.getName() + "...");
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
-            musicManager.getPlayer(guild).getAudioPlayer().setVolume(MusicPlayer.DEFAULT_VOLUME);
+            if (Bot.getInstance().getConfiguration().radioMode)
+                musicManager.getPlayer(guild).getAudioPlayer().setVolume(MusicPlayer.DEFAULT_RADIO_VOLUME);
+            else
+                musicManager.getPlayer(guild).getAudioPlayer().setVolume(MusicPlayer.DEFAULT_VOICE_VOLUME);
         }
 
         if (musicManager.getPlayer(guild).getAudioPlayer().isPaused()) {

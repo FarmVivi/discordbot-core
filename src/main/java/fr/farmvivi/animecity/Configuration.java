@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import fr.farmvivi.animecity.radio.Radio;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,6 +20,8 @@ public class Configuration {
     public String spotifySecret;
     public String cmdPrefix;
     public List<Long> cmdAdmins;
+    public boolean radioMode;
+    public List<Radio> radios;
     private JsonObject jsonConfiguration;
 
     public Configuration() {
@@ -77,6 +81,10 @@ public class Configuration {
         if (!object.has("cmd-prefix"))
             flag = false;
         if (!object.has("cmd-admins"))
+            flag = false;
+        if (!object.has("enableRadioMode"))
+            flag = false;
+        if (!object.has("radios"))
             flag = false;
 
         return flag;

@@ -3,5 +3,7 @@
     "spotify-id": "",
     "spotify-token": "",
     "cmd-prefix": "",
-    "cmd-admins": []
+    "cmd-admins": [],
+    "enableRadioMode": "false",
+    "radios": []
 }
