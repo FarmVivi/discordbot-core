@@ -60,7 +60,8 @@ public class MusicManager {
 
         guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
 
-        if (source.startsWith("http") && source.contains("://")) {
+        if ((source.startsWith("http") && source.contains("://")) || source.startsWith("/")
+                || source.startsWith("./")) {
             if (source.contains("open.spotify.com")) {
                 final LinkConverter linkConverter = new LinkConverter();
                 try {
