@@ -55,9 +55,9 @@ public class Bot {
 
         if (configuration.radioEnabled) {
             try {
-                TimeUnit.SECONDS.sleep(15);
+                JDAManager.getShardManager().getShards().get(0).awaitReady();
             } catch (InterruptedException e) {
-                logger.error("wait failed", e);
+                logger.error("Interrupted", e);
             }
             setupRadio();
         }
