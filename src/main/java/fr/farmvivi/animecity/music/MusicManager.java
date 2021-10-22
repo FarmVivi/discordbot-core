@@ -16,6 +16,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 
 import org.apache.hc.core5.http.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.spotify.LinkConverter;
@@ -23,6 +25,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class MusicManager {
+    private static final Logger logger = LoggerFactory.getLogger(MusicManager.class);
+
+    public static final int DEFAULT_VOICE_VOLUME = 1;
+    public static final int DEFAULT_RADIO_VOLUME = 25;
+
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
     private final Map<String, MusicPlayer> players = new HashMap<>();
 
@@ -98,6 +105,8 @@ public class MusicManager {
                         // Notify the user that we've got nothing
                         if (textChannel != null)
                             textChannel.sendMessage("La piste " + source + " n'a pas été trouvé.").queue();
+                        else
+                            logger.warn("La piste " + source + " n'a pas été trouvé.");
                     }
 
                     @Override
@@ -108,6 +117,8 @@ public class MusicManager {
                                     .sendMessage(
                                             "Impossible de jouer la piste (raison: " + throwable.getMessage() + ").")
                                     .queue();
+                        else
+                            logger.warn("Impossible de jouer la piste.", throwable);
                     }
                 });
             }

@@ -1,5 +1,10 @@
 package fr.farmvivi.animecity;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +19,7 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 public class Bot {
     private static Bot instance;
 
-    public static final String version = "1.3.0.0";
+    public static final String version = "1.3.1.0";
     public static final String name = "AnimeCity";
     public static final boolean production = false;
 
@@ -89,11 +94,28 @@ public class Bot {
         guild.getAudioManager().setAutoReconnect(true);
 
         final MusicPlayer musicPlayer = musicManager.getPlayer(guild);
-        musicPlayer.getAudioPlayer().setVolume(MusicPlayer.DEFAULT_RADIO_VOLUME);
+        musicPlayer.getAudioPlayer().setVolume(MusicManager.DEFAULT_RADIO_VOLUME);
         musicPlayer.setLoopQueueMode(true);
         musicPlayer.setShuffleMode(true);
 
-        musicManager.loadTrack(guild, configuration.radioPlaylistURL);
+        if ((configuration.radioPlaylistURL.startsWith("/") || configuration.radioPlaylistURL.startsWith("./")
+                && configuration.radioPlaylistURL.endsWith(".m3u"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(new File(configuration.radioPlaylistURL)))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("http")) {
+                        musicManager.loadTrack(guild, line);
+                    } else {
+                        String musicFile = configuration.radioPlaylistURL.substring(0,
+                                configuration.radioPlaylistURL.lastIndexOf("/") + 1) + line;
+                        logger.info("Adding radio track: " + musicFile);
+                        musicManager.loadTrack(guild, musicFile);
+                    }
+                }
+            } catch (IOException ex) {
+                logger.error("Exception", ex);
+            }
+        }
     }
 
     public void setDefaultActivity() {

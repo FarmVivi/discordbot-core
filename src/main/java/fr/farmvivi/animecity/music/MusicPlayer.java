@@ -7,9 +7,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
 
 public class MusicPlayer {
-    public static final int DEFAULT_VOICE_VOLUME = 1;
-    public static final int DEFAULT_RADIO_VOLUME = 25;
-
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
     private final Guild guild;
@@ -59,7 +56,7 @@ public class MusicPlayer {
         this.loopQueueMode = false;
         this.loopMode = false;
         this.shuffleMode = false;
-        audioPlayer.setVolume(DEFAULT_VOICE_VOLUME);
+        audioPlayer.setVolume(MusicManager.DEFAULT_VOICE_VOLUME);
         audioPlayer.setFilterFactory(null);
         this.equalizer = new EqualizerFactory();
     }
