@@ -56,7 +56,16 @@ public class MusicManager {
         this.loadTrack(guild, source, null);
     }
 
+    public void loadTrack(final Guild guild, final String source, final boolean playNow) {
+        this.loadTrack(guild, source, null, playNow);
+    }
+
     public void loadTrack(final Guild guild, final String source, final TextChannel textChannel) {
+        this.loadTrack(guild, source, textChannel, false);
+    }
+
+    public void loadTrack(final Guild guild, final String source, final TextChannel textChannel,
+            final boolean playNow) {
         final MusicPlayer player = getPlayer(guild);
 
         guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
@@ -73,7 +82,7 @@ public class MusicManager {
                                     if (textChannel != null)
                                         textChannel.sendMessage("**" + playlist.getTracks().get(0).getInfo().title
                                                 + "** ajouté à la file d'attente.").queue();
-                                    player.playTrack(playlist.getTracks().get(0));
+                                    player.playTrack(playlist.getTracks().get(0), playNow);
                                 }, null, null));
                 } catch (ParseException | SpotifyWebApiException | IOException e) {
                     Bot.logger.error("Unable to get tracks from " + source, e);
@@ -85,7 +94,7 @@ public class MusicManager {
                         if (textChannel != null)
                             textChannel.sendMessage("**" + track.getInfo().title + "** ajouté à la file d'attente.")
                                     .queue();
-                        player.playTrack(track);
+                        player.playTrack(track, playNow);
                     }
 
                     @Override
@@ -95,7 +104,7 @@ public class MusicManager {
 
                         for (final AudioTrack track : playlist.getTracks()) {
                             builder.append("\n-> **").append(track.getInfo().title).append("**");
-                            player.playTrack(track);
+                            player.playTrack(track, playNow);
                         }
 
                         if (textChannel != null)
@@ -130,7 +139,7 @@ public class MusicManager {
                     textChannel.sendMessage(
                             "**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.")
                             .queue();
-                player.playTrack(playlist.getTracks().get(0));
+                player.playTrack(playlist.getTracks().get(0), playNow);
             }, null, null));
         }
     }

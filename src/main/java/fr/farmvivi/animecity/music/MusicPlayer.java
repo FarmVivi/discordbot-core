@@ -45,7 +45,11 @@ public class MusicPlayer {
     }
 
     public synchronized void playTrack(AudioTrack track) {
-        trackScheduler.queue(track);
+        this.playTrack(track, false);
+    }
+
+    public synchronized void playTrack(AudioTrack track, boolean playNow) {
+        trackScheduler.queue(track, playNow);
     }
 
     public synchronized AudioTrack skipTrack() {

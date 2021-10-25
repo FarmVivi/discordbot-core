@@ -39,10 +39,17 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void queue(AudioTrack track) {
+        this.queue(track, false);
+    }
+
+    public void queue(AudioTrack track, boolean playNow) {
         if (quitTask != null && !quitTask.isDone())
             quitTask.cancel(true);
         if (!player.getAudioPlayer().startTrack(track, true))
-            tracks.offer(track);
+            if (playNow)
+                addTrackFirst(track);
+            else
+                tracks.offer(track);
     }
 
     public AudioTrack nextTrack() {
