@@ -9,6 +9,7 @@ import fr.farmvivi.animecity.command.music.CurrentCommand;
 import fr.farmvivi.animecity.command.music.LeaveCommand;
 import fr.farmvivi.animecity.command.music.LoopCommand;
 import fr.farmvivi.animecity.command.music.LoopQueueCommand;
+import fr.farmvivi.animecity.command.music.NextCommand;
 import fr.farmvivi.animecity.command.music.PauseCommand;
 import fr.farmvivi.animecity.command.music.PlayCommand;
 import fr.farmvivi.animecity.command.music.ReplayCommand;
@@ -34,6 +35,7 @@ public class CommandsManager extends ListenerAdapter {
     public CommandsManager() {
         commands.add(new PlayCommand());
         commands.add(new SkipCommand());
+        commands.add(new NextCommand());
         commands.add(new ClearCommand());
         commands.add(new CurrentCommand());
         commands.add(new StopCommand());

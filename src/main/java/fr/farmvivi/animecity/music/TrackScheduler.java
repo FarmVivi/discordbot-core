@@ -47,6 +47,14 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public AudioTrack nextTrack() {
+        return this.nextTrack(true);
+    }
+
+    public AudioTrack nextTrack(boolean delete) {
+        if (!delete && player.getAudioPlayer().getPlayingTrack() != null) {
+            AudioTrack currentTrack = player.getAudioPlayer().getPlayingTrack();
+            this.queue(currentTrack);
+        }
         if (tracks.isEmpty()) {
             player.getAudioPlayer().stopTrack();
             Bot.getInstance().setDefaultActivity();

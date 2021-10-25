@@ -49,7 +49,11 @@ public class MusicPlayer {
     }
 
     public synchronized AudioTrack skipTrack() {
-        return trackScheduler.nextTrack();
+        return this.skipTrack(true);
+    }
+
+    public synchronized AudioTrack skipTrack(boolean delete) {
+        return trackScheduler.nextTrack(delete);
     }
 
     public void resetToDefaultSettings() {
