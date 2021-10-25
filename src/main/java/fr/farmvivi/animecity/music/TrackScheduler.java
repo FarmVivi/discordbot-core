@@ -21,7 +21,6 @@ import fr.farmvivi.animecity.jda.JDAManager;
 import net.dv8tion.jda.api.entities.Activity;
 
 public class TrackScheduler extends AudioEventAdapter {
-    private static final Random RAND = new Random();
     private final BlockingQueue<AudioTrack> tracks = new LinkedBlockingQueue<>();
     private final MusicPlayer player;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -75,7 +74,13 @@ public class TrackScheduler extends AudioEventAdapter {
         if (player.isShuffleMode()) {
             final List<AudioTrack> remainingTracks = new ArrayList<>();
             tracks.drainTo(remainingTracks);
-            track = remainingTracks.get(RAND.nextInt(remainingTracks.size()));
+            final Random random = new Random();
+            if (player.isLoopQueueMode())
+                // Get random track on the 50% first part of the list
+                track = remainingTracks.get(random.nextInt(remainingTracks.size() / 2));
+            else
+                // Get random track on the entire list
+                track = remainingTracks.get(random.nextInt(remainingTracks.size()));
             remainingTracks.remove(track);
             if (!remainingTracks.isEmpty())
                 for (final AudioTrack tmpTrack : remainingTracks)
