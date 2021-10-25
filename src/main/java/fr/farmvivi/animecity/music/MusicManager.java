@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 public class MusicManager {
     private static final Logger logger = LoggerFactory.getLogger(MusicManager.class);
 
+    public static final int QUIT_TIMEOUT = 900;
     public static final int DEFAULT_VOICE_VOLUME = 1;
     public static final int DEFAULT_RADIO_VOLUME = 25;
 

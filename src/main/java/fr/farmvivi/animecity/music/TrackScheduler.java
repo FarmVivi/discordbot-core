@@ -21,7 +21,6 @@ import fr.farmvivi.animecity.jda.JDAManager;
 import net.dv8tion.jda.api.entities.Activity;
 
 public class TrackScheduler extends AudioEventAdapter {
-    private static final int QUIT_TIMEOUT = 900;
     private final BlockingQueue<AudioTrack> tracks = new LinkedBlockingQueue<>();
     private final MusicPlayer player;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -68,7 +67,7 @@ public class TrackScheduler extends AudioEventAdapter {
                         player.getGuild().getAudioManager().closeAudioConnection();
                     }
                 }
-            }, QUIT_TIMEOUT, TimeUnit.SECONDS);
+            }, MusicManager.QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
         }
         final AudioTrack track;
