@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 public class Bot {
     private static Bot instance;
 
-    public static final String version = "1.3.3.0";
+    public static final String version = "1.3.3.1";
     public static final String name = "AnimeCity";
     public static final boolean production = false;
 

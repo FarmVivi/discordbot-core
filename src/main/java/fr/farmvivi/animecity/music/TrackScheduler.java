@@ -59,7 +59,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public AudioTrack nextTrack(boolean delete) {
         if (!delete && player.getAudioPlayer().getPlayingTrack() != null) {
             AudioTrack currentTrack = player.getAudioPlayer().getPlayingTrack();
-            this.queue(currentTrack);
+            this.queue(currentTrack.makeClone());
         }
         if (tracks.isEmpty()) {
             player.getAudioPlayer().stopTrack();
