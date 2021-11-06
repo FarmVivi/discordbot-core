@@ -11,10 +11,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>16</maven.compiler.source>
-    <maven.compiler.target>16</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <project.mainClass>fr.farmvivi.animecity.Main</project.mainClass>
-    <project.workingDirectory>run</project.workingDirectory>
   </properties>
 
   <repositories>
@@ -118,7 +117,7 @@
             <classpath />
             <argument>${project.mainClass}</argument>
           </arguments>
-          <workingDirectory>${project.basedir}${file.separator}${project.workingDirectory}</workingDirectory>
+          <workingDirectory>${project.basedir}</workingDirectory>
         </configuration>
       </plugin>
     </plugins>
