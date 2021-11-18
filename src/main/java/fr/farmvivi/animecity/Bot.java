@@ -13,7 +13,7 @@ public class Bot {
 
     public static final String version = "1.3.3.2";
     public static final String name = "AnimeCity";
-    public static final boolean production = true;
+    public static final boolean production = false;
 
     public static final Logger logger = LoggerFactory.getLogger(name);
 
