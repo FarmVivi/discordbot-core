@@ -1,0 +1,8 @@
+Dockerfile
+target/
+
+# Ignore .git folder
+.git
+
+# Ignore dev file cotaining sensible data
+dev.sh

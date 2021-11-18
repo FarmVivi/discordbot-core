@@ -44,5 +44,8 @@ buildNumber.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
-#working directory with credentials file
-run/
+# Ignore dev file cotaining sensible data
+dev.sh
+
+# Ignore DevSpace cache and log folder
+.devspace/

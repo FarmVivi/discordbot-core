@@ -1,27 +1,19 @@
 package fr.farmvivi.animecity;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.farmvivi.animecity.command.CommandsManager;
 import fr.farmvivi.animecity.jda.JDAManager;
 import fr.farmvivi.animecity.music.MusicManager;
-import fr.farmvivi.animecity.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 
 public class Bot {
     private static Bot instance;
 
-    public static final String version = "1.3.3.1";
+    public static final String version = "1.3.3.2";
     public static final String name = "AnimeCity";
-    public static final boolean production = false;
+    public static final boolean production = true;
 
     public static final Logger logger = LoggerFactory.getLogger(name);
 
@@ -55,15 +47,6 @@ public class Bot {
             JDAManager.getShardManager().shutdown();
             logger.info("Bye!");
         }));
-
-        if (configuration.radioEnabled) {
-            try {
-                JDAManager.getShardManager().getShards().get(0).awaitReady();
-            } catch (InterruptedException e) {
-                logger.error("Interrupted", e);
-            }
-            setupRadio();
-        }
     }
 
     public static Bot getInstance() {
@@ -74,7 +57,7 @@ public class Bot {
         Bot.instance = instance;
     }
 
-    public void setupRadio() {
+/*     public void setupRadio() {
         final Guild guild = JDAManager.getShardManager().getGuildById(configuration.radioGuildID);
         if (guild == null) {
             logger.error("Guild not found !");
@@ -116,7 +99,7 @@ public class Bot {
                 logger.error("Exception", ex);
             }
         }
-    }
+    } */
 
     public void setDefaultActivity() {
         if (production)

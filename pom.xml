@@ -5,7 +5,7 @@
 
   <groupId>fr.farmvivi.animecity</groupId>
   <artifactId>animecity</artifactId>
-  <version>1.3.3.1-SNAPSHOT</version>
+  <version>1.3.3.2</version>
 
   <name>animecity</name>
 
@@ -41,7 +41,7 @@
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>4.3.0_334</version>
+      <version>4.3.0_346</version>
     </dependency>
 
     <dependency>
