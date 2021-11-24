@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.Activity;
 public class Bot {
     private static Bot instance;
 
-    public static final String version = "1.3.3.2";
+    public static final String version = "1.3.4.2";
     public static final String name = "AnimeCity";
     public static final boolean production = false;
 
@@ -56,50 +56,6 @@ public class Bot {
     public static void setInstance(Bot instance) {
         Bot.instance = instance;
     }
-
-/*     public void setupRadio() {
-        final Guild guild = JDAManager.getShardManager().getGuildById(configuration.radioGuildID);
-        if (guild == null) {
-            logger.error("Guild not found !");
-            System.exit(1);
-            return;
-        }
-
-        final VoiceChannel voiceChannel = guild.getVoiceChannelById(configuration.radioChannelID);
-        if (voiceChannel == null) {
-            logger.error("Channel not found !");
-            System.exit(1);
-            return;
-        }
-
-        Bot.logger.info("Join channel " + voiceChannel.getName() + "...");
-        guild.getAudioManager().openAudioConnection(voiceChannel);
-        guild.getAudioManager().setAutoReconnect(true);
-
-        final MusicPlayer musicPlayer = musicManager.getPlayer(guild);
-        musicPlayer.getAudioPlayer().setVolume(MusicManager.DEFAULT_RADIO_VOLUME);
-        musicPlayer.setLoopQueueMode(true);
-        musicPlayer.setShuffleMode(true);
-
-        if ((configuration.radioPlaylistURL.startsWith("/") || configuration.radioPlaylistURL.startsWith("./")
-                && configuration.radioPlaylistURL.endsWith(".m3u"))) {
-            try (BufferedReader br = new BufferedReader(new FileReader(new File(configuration.radioPlaylistURL)))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if (line.startsWith("http")) {
-                        musicManager.loadTrack(guild, line);
-                    } else {
-                        String musicFile = configuration.radioPlaylistURL.substring(0,
-                                configuration.radioPlaylistURL.lastIndexOf("/") + 1) + line;
-                        logger.info("Adding radio track: " + musicFile);
-                        musicManager.loadTrack(guild, musicFile);
-                    }
-                }
-            } catch (IOException ex) {
-                logger.error("Exception", ex);
-            }
-        }
-    } */
 
     public void setDefaultActivity() {
         if (production)

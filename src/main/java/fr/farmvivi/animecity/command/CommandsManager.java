@@ -13,6 +13,7 @@ import fr.farmvivi.animecity.command.music.NextCommand;
 import fr.farmvivi.animecity.command.music.NowCommand;
 import fr.farmvivi.animecity.command.music.PauseCommand;
 import fr.farmvivi.animecity.command.music.PlayCommand;
+import fr.farmvivi.animecity.command.music.RadioCommand;
 import fr.farmvivi.animecity.command.music.ReplayCommand;
 import fr.farmvivi.animecity.command.music.SeekCommand;
 import fr.farmvivi.animecity.command.music.ShuffleCommand;
@@ -53,6 +54,8 @@ public class CommandsManager extends ListenerAdapter {
         commands.add(new EqStartCommand());
         commands.add(new EqStopCommand());
         commands.add(new EqHighBassCommand());
+        if (!Bot.getInstance().getConfiguration().radioPath.equalsIgnoreCase(""))
+            commands.add(new RadioCommand());
 
         commands.add(new HelpCommand());
         commands.add(new VersionCommand());

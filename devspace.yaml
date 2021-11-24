@@ -28,7 +28,7 @@ dev:
     uploadExcludePaths:
     - Dockerfile
     - target/
-    - dev.sh
+    - dev.txt
 
   # `dev.terminal` tells DevSpace to open a terminal as a last step during `devspace dev`
   terminal:

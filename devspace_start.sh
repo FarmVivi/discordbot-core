@@ -1,6 +1,4 @@
 #!/bin/bash
-bash ./dev.sh
-
 set +e  # Continue on errors
 
 # Remove http blocker

@@ -5,4 +5,4 @@ target/
 .git
 
 # Ignore dev file cotaining sensible data
-dev.sh
+dev.txt

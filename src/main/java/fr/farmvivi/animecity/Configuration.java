@@ -10,6 +10,7 @@ public class Configuration {
     public String spotifySecret;
     public String cmdPrefix;
     public List<Long> cmdAdmins;
+    public String radioPath;
 
     public Configuration() {
         try {
@@ -33,6 +34,7 @@ public class Configuration {
         this.cmdAdmins = new ArrayList<>();
         for (String admin : Arrays.asList(System.getenv("BOT_CMD_ADMINS").split(";")))
             cmdAdmins.add(Long.parseLong(admin));
+        this.radioPath = System.getenv("RADIO_PATH");
     }
 
     public boolean validateConfiguration() {
@@ -45,6 +47,8 @@ public class Configuration {
         if (System.getenv("BOT_CMD_PREFIX") == null)
             return false;
         if (System.getenv("BOT_CMD_ADMINS") == null)
+            return false;
+        if (System.getenv("RADIO_PATH") == null)
             return false;
 
         return true;

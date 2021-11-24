@@ -32,7 +32,7 @@ CMD ["./build.sh", "run"]
 FROM gcr.io/distroless/java:11 as production
 
 # Environnement variables
-ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" BOT_CMD_PREFIX="" BOT_CMD_ADMINS=""
+ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" BOT_CMD_PREFIX="" BOT_CMD_ADMINS="" RADIO_PATH=""
 
 # Copy application binary from build/dev stage to the distroless container
 COPY --from=build /app/target/main.jar /
