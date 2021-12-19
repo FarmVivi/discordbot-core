@@ -2,13 +2,10 @@
 # Build stage will be used:
 # - for building the application for production
 # - as target for development (see devspace.yaml)
-FROM maven:3-openjdk-11 as build
+FROM maven:3-openjdk-11-slim as build
 
 # Create project directory (workdir)
 WORKDIR /app
-
-# Remove http blocker
-COPY settings.xml /usr/share/maven/conf/
 
 # Install maven dependency packages
 COPY pom.xml .

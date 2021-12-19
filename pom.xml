@@ -18,9 +18,9 @@
 
   <repositories>
     <repository>
-      <id>home</id>
-      <name>home</name>
-      <url>http://nexus.kubernetes.home/repository/maven-releases/</url>
+      <id>farmvivi</id>
+      <name>farmvivi</name>
+      <url>https://nexus.farmvivi.fr/repository/maven-releases/</url>
     </repository>
 
     <repository>
@@ -37,7 +37,7 @@
   </repositories>
 
   <dependencies>
-    <!-- http://nexus.kubernetes.home/ -->
+    <!-- https://nexus.farmvivi.fr/ -->
     <dependency>
       <groupId>net.wytrem</groupId>
       <artifactId>wylog</artifactId>

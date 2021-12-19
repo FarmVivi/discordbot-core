@@ -1,9 +1,6 @@
 #!/bin/bash
 set +e  # Continue on errors
 
-# Remove http blocker
-cp settings.xml /usr/share/maven/conf/settings.xml
-
 echo "Installing maven dependencies"
 mvn -T 1C install
 
