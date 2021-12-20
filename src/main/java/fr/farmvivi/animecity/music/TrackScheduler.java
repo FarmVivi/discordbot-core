@@ -64,13 +64,14 @@ public class TrackScheduler extends AudioEventAdapter {
         if (tracks.isEmpty()) {
             player.getAudioPlayer().stopTrack();
             Bot.getInstance().setDefaultActivity();
-            quitTask = scheduler.schedule(new Runnable() {
-                @Override
-                public void run() {
-                    if (player.getGuild().getAudioManager().getConnectedChannel() != null)
-                        player.getGuild().getAudioManager().closeAudioConnection();
-                }
-            }, MusicManager.QUIT_TIMEOUT, TimeUnit.SECONDS);
+            if (player.getGuild().getAudioManager().getConnectedChannel() != null)
+                quitTask = scheduler.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (player.getGuild().getAudioManager().getConnectedChannel() != null)
+                            player.getGuild().getAudioManager().closeAudioConnection();
+                    }
+                }, MusicManager.QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
         }
         final AudioTrack track;
