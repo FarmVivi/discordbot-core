@@ -44,12 +44,14 @@
       <version>2.0</version>
     </dependency>
 
+    <!-- https://github.com/DV8FromTheWorld/JDA -->
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>4.3.0_346</version>
+      <version>5.0.0-alpha.2</version>
     </dependency>
 
+    <!-- https://github.com/sedmelluq/lavaplayer -->
     <dependency>
       <groupId>com.sedmelluq</groupId>
       <artifactId>lavaplayer</artifactId>
@@ -67,14 +69,7 @@
     <dependency>
       <groupId>se.michaelthelin.spotify</groupId>
       <artifactId>spotify-web-api-java</artifactId>
-      <version>6.5.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.jagrosh</groupId>
-      <artifactId>jda-utilities</artifactId>
-      <version>3.0.5</version>
-      <type>pom</type>
+      <version>6.5.6</version>
     </dependency>
   </dependencies>
 

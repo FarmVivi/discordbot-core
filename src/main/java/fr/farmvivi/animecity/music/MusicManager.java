@@ -13,7 +13,6 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
@@ -23,6 +22,7 @@ import fr.farmvivi.animecity.Bot;
 import fr.farmvivi.animecity.spotify.LinkConverter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 public class MusicManager {
     private static final Logger logger = LoggerFactory.getLogger(MusicManager.class);

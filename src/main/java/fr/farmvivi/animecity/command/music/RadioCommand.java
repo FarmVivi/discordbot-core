@@ -13,9 +13,9 @@ import fr.farmvivi.animecity.command.Command;
 import fr.farmvivi.animecity.command.CommandCategory;
 import fr.farmvivi.animecity.music.MusicManager;
 import fr.farmvivi.animecity.music.MusicPlayer;
+import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RadioCommand extends Command {
@@ -37,7 +37,7 @@ public class RadioCommand extends Command {
         final Guild guild = textChannel.getGuild();
 
         if (!guild.getAudioManager().isConnected()) {
-            final VoiceChannel voiceChannel = guild.getMember(event.getAuthor()).getVoiceState().getChannel();
+            final AudioChannel voiceChannel = guild.getMember(event.getAuthor()).getVoiceState().getChannel();
             if (voiceChannel == null) {
                 textChannel.sendMessage("Vous devez être connecté à un salon vocal.").queue();
                 return false;
