@@ -49,4 +49,5 @@ dev.txt
 
 # Ignore DevSpace cache and log folder
 .devspace/
+# Ignore DevSpace config
 devspace.yaml
