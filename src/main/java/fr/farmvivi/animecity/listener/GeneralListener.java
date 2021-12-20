@@ -11,9 +11,11 @@ public class GeneralListener extends ListenerAdapter {
         if (event.getChannelJoined() == null &&
                 event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
             Bot.logger.info("Leaved channel " + event.getChannelLeft().getName());
-            Bot.getInstance().setDefaultActivity();
             MusicPlayer musicPlayer = Bot.getInstance().getMusicManager().getPlayer(event.getGuild());
+            musicPlayer.getListener().getTracks().clear();
+            musicPlayer.skipTrack();
             musicPlayer.resetToDefaultSettings();
+            Bot.getInstance().setDefaultActivity();
         }
     }
 }

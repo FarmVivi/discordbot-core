@@ -38,10 +38,10 @@ public class PlayCommand extends Command {
                 textChannel.sendMessage("Vous devez être connecté à un salon vocal.").queue();
                 return false;
             }
-            Bot.logger.info("Join channel " + voiceChannel.getName() + "...");
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
             musicManager.getPlayer(guild).getAudioPlayer().setVolume(MusicManager.DEFAULT_VOICE_VOLUME);
+            Bot.logger.info("Joined channel " + voiceChannel.getName());
         }
 
         if (musicManager.getPlayer(guild).getAudioPlayer().isPaused()) {
