@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 
 import fr.farmvivi.animecity.command.CommandsManager;
 import fr.farmvivi.animecity.jda.JDAManager;
+import fr.farmvivi.animecity.listener.GeneralListener;
 import fr.farmvivi.animecity.music.MusicManager;
 import net.dv8tion.jda.api.entities.Activity;
 
 public class Bot {
     private static Bot instance;
 
-    public static final String version = "1.3.4.2";
+    public static final String version = "1.3.4.3";
     public static final String name = "AnimeCity";
     public static final boolean production = false;
 
@@ -37,6 +38,7 @@ public class Bot {
         JDAManager.getShardManager();
         commandsManager = new CommandsManager();
         JDAManager.getShardManager().addEventListener(commandsManager);
+        JDAManager.getShardManager().addEventListener(new GeneralListener());
         musicManager = new MusicManager();
         setDefaultActivity();
 

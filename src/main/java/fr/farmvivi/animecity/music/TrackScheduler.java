@@ -67,12 +67,8 @@ public class TrackScheduler extends AudioEventAdapter {
             quitTask = scheduler.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    if (player.getGuild().getAudioManager().getConnectedChannel() != null) {
-                        player.resetToDefaultSettings();
-                        Bot.logger.info("Quit channel "
-                                + player.getGuild().getAudioManager().getConnectedChannel().getName() + "...");
+                    if (player.getGuild().getAudioManager().getConnectedChannel() != null)
                         player.getGuild().getAudioManager().closeAudioConnection();
-                    }
                 }
             }, MusicManager.QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
