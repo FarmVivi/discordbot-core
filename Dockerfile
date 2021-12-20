@@ -24,15 +24,17 @@ CMD ["./build.sh", "run"]
 
 
 ################ Production ################
-# Creates a minimal image for production using distroless base image
-# More info here: https://github.com/GoogleContainerTools/distroless
-FROM gcr.io/distroless/java:11 as production
+# Creates a minimal image for production
+FROM adoptopenjdk/openjdk11:alpine-jre as production
 
 # Environnement variables
 ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" BOT_CMD_PREFIX="" BOT_CMD_ADMINS="" RADIO_PATH=""
 
-# Copy application binary from build/dev stage to the distroless container
-COPY --from=build /app/target/main.jar /
+# Create directory for application binary
+RUN mkdir /opt/app
+
+# Copy application binary from build/dev stage to the production container
+COPY --from=build /app/target/main.jar /opt/app
 
 # Container start command for production
-CMD ["/main.jar"]
+CMD ["java", "-jar", "/opt/app/main.jar"]
