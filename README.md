@@ -1,1 +1,1 @@
-# Discord bots for AnimeCity server
+# Discord bot for any server

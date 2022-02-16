@@ -3,17 +3,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>fr.farmvivi.animecity</groupId>
-  <artifactId>animecity</artifactId>
-  <version>1.3.4.3-SNAPSHOT</version>
+  <groupId>fr.farmvivi.discordbot</groupId>
+  <artifactId>discordbot</artifactId>
+  <version>1.4.0.0-SNAPSHOT</version>
 
-  <name>animecity</name>
+  <name>discord-bot</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
-    <project.mainClass>fr.farmvivi.animecity.Main</project.mainClass>
+    <project.mainClass>fr.farmvivi.discordbot.Main</project.mainClass>
   </properties>
 
   <repositories>
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>5.0.0-alpha.2</version>
+      <version>5.0.0-alpha.5</version>
     </dependency>
 
     <!-- https://github.com/sedmelluq/lavaplayer -->
@@ -62,7 +62,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.32</version>
+      <version>1.7.36</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/se.michaelthelin.spotify/spotify-web-api-java -->

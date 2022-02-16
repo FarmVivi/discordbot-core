@@ -10,7 +10,7 @@ rm -f target/*.jar
 mvn compile package
 
 # Rename jar file
-cp target/animecity-*.jar target/main.jar
+cp target/discordbot-*.jar target/main.jar
 
 # Start application if `run` argument is passed
 if [ $1 = "run" ]; then
