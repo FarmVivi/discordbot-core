@@ -3,14 +3,20 @@ package fr.farmvivi.discordbot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.farmvivi.discordbot.command.CommandsManager;
 import fr.farmvivi.discordbot.jda.JDAManager;
-import fr.farmvivi.discordbot.listener.GeneralListener;
-import fr.farmvivi.discordbot.music.MusicManager;
+import fr.farmvivi.discordbot.module.ModulesManager;
 import net.dv8tion.jda.api.entities.Activity;
 
 public class Bot {
     private static Bot instance;
+
+    public static Bot getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(Bot instance) {
+        Bot.instance = instance;
+    }
 
     public static final String version = "1.4.0.0";
     public static final String name = "DiscordBot";
@@ -19,8 +25,7 @@ public class Bot {
     public static final Logger logger = LoggerFactory.getLogger(name);
 
     private final Configuration configuration;
-    private final CommandsManager commandsManager;
-    private final MusicManager musicManager;
+    private final ModulesManager modulesManager;
 
     public Bot(String[] args) {
         logger.info("Démarrage de " + name + " v" + version + ") (Prod: " + production + ") en cours...");
@@ -35,48 +40,39 @@ public class Bot {
         instance = this;
 
         configuration = new Configuration();
-        JDAManager.getShardManager();
-        commandsManager = new CommandsManager();
-        JDAManager.getShardManager().addEventListener(commandsManager);
-        JDAManager.getShardManager().addEventListener(new GeneralListener());
-        musicManager = new MusicManager();
+        modulesManager = new ModulesManager(this);
+
+        modulesManager.loadModules();
+
         setDefaultActivity();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("Shutdown asked!");
-            JDAManager.getShardManager().removeEventListener(commandsManager);
-            musicManager.getAudioPlayerManager().shutdown();
+
+            modulesManager.unloadModules();
+
             JDAManager.getShardManager().shutdown();
+
             logger.info("Bye!");
         }));
     }
 
-    public static Bot getInstance() {
-        return instance;
-    }
-
-    public static void setInstance(Bot instance) {
-        Bot.instance = instance;
-    }
-
-    public void setDefaultActivity() {
+    public static void setDefaultActivity() {
         if (production)
             JDAManager.getShardManager()
-                    .setActivity(Activity.playing("v" + version + " | Prefix: " + configuration.cmdPrefix));
+                    .setActivity(Activity
+                            .playing("v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
         else
             JDAManager.getShardManager()
-                    .setActivity(Activity.playing("Dev - v" + version + " | Prefix: " + configuration.cmdPrefix));
+                    .setActivity(Activity.playing(
+                            "Dev - v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
     }
 
     public Configuration getConfiguration() {
         return configuration;
     }
 
-    public CommandsManager getCommandsManager() {
-        return commandsManager;
-    }
-
-    public MusicManager getMusicManager() {
-        return musicManager;
+    public ModulesManager getModulesManager() {
+        return modulesManager;
     }
 }

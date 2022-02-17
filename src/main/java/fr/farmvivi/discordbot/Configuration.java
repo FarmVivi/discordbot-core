@@ -11,6 +11,7 @@ public class Configuration {
     public String cmdPrefix;
     public List<Long> cmdAdmins;
     public String radioPath;
+    public List<String> features;
 
     public Configuration() {
         try {
@@ -30,11 +31,14 @@ public class Configuration {
         this.jdaToken = System.getenv("DISCORD_TOKEN");
         this.spotifyId = System.getenv("SPOTIFY_ID");
         this.spotifySecret = System.getenv("SPOTIFY_TOKEN");
-        this.cmdPrefix = System.getenv("BOT_CMD_PREFIX");
+        this.cmdPrefix = System.getenv("CMD_PREFIX");
         this.cmdAdmins = new ArrayList<>();
-        for (String admin : Arrays.asList(System.getenv("BOT_CMD_ADMINS").split(";")))
+        for (String admin : Arrays.asList(System.getenv("CMD_ADMINS").split(";")))
             cmdAdmins.add(Long.parseLong(admin));
         this.radioPath = System.getenv("RADIO_PATH");
+        this.features = new ArrayList<>();
+        for (String feature : Arrays.asList(System.getenv("FEATURES").split(";")))
+            features.add(feature);
     }
 
     public boolean validateConfiguration() {
@@ -44,11 +48,13 @@ public class Configuration {
             return false;
         if (System.getenv("SPOTIFY_TOKEN") == null)
             return false;
-        if (System.getenv("BOT_CMD_PREFIX") == null)
+        if (System.getenv("CMD_PREFIX") == null)
             return false;
-        if (System.getenv("BOT_CMD_ADMINS") == null)
+        if (System.getenv("CMD_ADMINS") == null)
             return false;
         if (System.getenv("RADIO_PATH") == null)
+            return false;
+        if (System.getenv("FEATURES") == null)
             return false;
 
         return true;
