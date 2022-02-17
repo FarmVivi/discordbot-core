@@ -117,8 +117,6 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         // A track started playing
-        this.player.getMusicModule().getLogger()
-                .info("Playing: " + track.getInfo().title + " | " + track.getInfo().uri);
         if (!this.player.isLoopQueueMode())
             JDAManager.getShardManager().setActivity(Activity.streaming(track.getInfo().title, track.getInfo().uri));
     }

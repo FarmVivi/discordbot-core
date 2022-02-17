@@ -43,7 +43,6 @@ public class RadioCommand extends Command {
                 textChannel.sendMessage("Vous devez être connecté à un salon vocal.").queue();
                 return false;
             }
-            musicModule.getLogger().info("Join channel " + voiceChannel.getName() + "...");
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
         }

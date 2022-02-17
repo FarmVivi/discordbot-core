@@ -15,7 +15,6 @@ public class MusicListener extends ListenerAdapter {
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
         if (event.getChannelJoined() == null &&
                 event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
-            musicModule.getLogger().info("Leaved channel " + event.getChannelLeft().getName());
             MusicPlayer musicPlayer = musicModule.getPlayer(event.getGuild());
             musicPlayer.getListener().getTracks().clear();
             musicPlayer.skipTrack();

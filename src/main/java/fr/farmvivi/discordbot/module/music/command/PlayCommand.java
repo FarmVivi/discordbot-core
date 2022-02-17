@@ -46,7 +46,6 @@ public class PlayCommand extends Command {
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
             musicModule.getPlayer(guild).getAudioPlayer().setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
-            musicModule.getLogger().info("Joined channel " + voiceChannel.getName());
         }
 
         if (musicModule.getPlayer(guild).getAudioPlayer().isPaused()) {
