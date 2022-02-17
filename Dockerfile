@@ -28,7 +28,7 @@ CMD ["./build.sh", "run"]
 FROM adoptopenjdk/openjdk11:alpine-jre as production
 
 # Environnement variables
-ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" BOT_CMD_PREFIX="" BOT_CMD_ADMINS="" RADIO_PATH=""
+ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" CMD_PREFIX="" CMD_ADMINS="" RADIO_PATH="" FEATURES="MUSIC"
 
 # Create directory for application binary
 RUN mkdir /opt/app
