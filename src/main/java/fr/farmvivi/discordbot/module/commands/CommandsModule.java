@@ -1,7 +1,9 @@
 package fr.farmvivi.discordbot.module.commands;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.jda.JDAManager;
@@ -12,14 +14,16 @@ import fr.farmvivi.discordbot.module.commands.command.ShutdownCommand;
 import fr.farmvivi.discordbot.module.commands.command.VersionCommand;
 
 public class CommandsModule extends Module {
+    private final Modules module;
     private final Bot bot;
     private final CommandsListener commandsListener;
 
-    private final List<Command> commands = new ArrayList<>();
+    private final Map<Modules, List<Command>> commands = new HashMap<Modules, List<Command>>();
 
     public CommandsModule(Modules module, Bot bot) {
         super(module);
 
+        this.module = module;
         this.bot = bot;
         this.commandsListener = new CommandsListener(this, bot.getConfiguration());
     }
@@ -28,9 +32,9 @@ public class CommandsModule extends Module {
     public void enable() {
         super.enable();
 
-        registerCommand(new HelpCommand(this, bot.getConfiguration()));
-        registerCommand(new VersionCommand());
-        registerCommand(new ShutdownCommand());
+        registerCommand(module, new HelpCommand(this, bot.getConfiguration()));
+        registerCommand(module, new VersionCommand());
+        registerCommand(module, new ShutdownCommand());
 
         JDAManager.getShardManager().addEventListener(commandsListener);
     }
@@ -39,18 +43,37 @@ public class CommandsModule extends Module {
     public void disable() {
         super.disable();
 
-        // TODO Unregister commands
+        unregisterCommands(module);
 
         JDAManager.getShardManager().removeEventListener(commandsListener);
     }
 
-    public void registerCommand(Command command) {
+    public void registerCommand(Modules module, Command command) {
         logger.info("Registering command " + command.getName() + "...");
 
-        commands.add(command);
+        if (!commands.containsKey(module))
+            commands.put(module, new ArrayList<Command>());
+
+        List<Command> moduleCommands = commands.get(module);
+
+        moduleCommands.add(command);
+    }
+
+    public void unregisterCommands(Modules module) {
+        commands.remove(module);
+    }
+
+    public List<Command> getCommands(Modules module) {
+        return commands.get(module);
     }
 
     public List<Command> getCommands() {
+        List<Command> commands = new ArrayList<Command>();
+
+        for (List<Command> moduleCommands : this.commands.values()) {
+            commands.addAll(moduleCommands);
+        }
+
         return commands;
     }
 }

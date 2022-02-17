@@ -52,6 +52,7 @@ public class MusicModule extends Module {
     public static final int DEFAULT_VOICE_VOLUME = 5;
     public static final int DEFAULT_RADIO_VOLUME = 25;
 
+    private final Modules module;
     private final Bot bot;
     private final MusicListener musicListener;
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
@@ -60,6 +61,7 @@ public class MusicModule extends Module {
     public MusicModule(Modules module, Bot bot) {
         super(module);
 
+        this.module = module;
         this.bot = bot;
         this.musicListener = new MusicListener(this);
 
@@ -79,28 +81,28 @@ public class MusicModule extends Module {
 
         Configuration botConfig = bot.getConfiguration();
 
-        commandsModule.registerCommand(new PlayCommand(this, botConfig));
-        commandsModule.registerCommand(new NowCommand(this, botConfig));
-        commandsModule.registerCommand(new SkipCommand(this));
-        commandsModule.registerCommand(new NextCommand(this));
-        commandsModule.registerCommand(new ClearCommand(this));
-        commandsModule.registerCommand(new CurrentCommand(this));
-        commandsModule.registerCommand(new StopCommand(this));
-        commandsModule.registerCommand(new LeaveCommand());
-        commandsModule.registerCommand(new PauseCommand(this));
-        commandsModule.registerCommand(new LoopQueueCommand(this));
-        commandsModule.registerCommand(new LoopCommand(this));
-        commandsModule.registerCommand(new ShuffleCommand(this));
-        commandsModule.registerCommand(new VolumeCommand(this));
-        commandsModule.registerCommand(new SeekCommand(this, botConfig));
-        commandsModule.registerCommand(new ReplayCommand(this));
-        commandsModule.registerCommand(new ViewQueueCommand(this));
-        commandsModule.registerCommand(new EqStartCommand(this));
-        commandsModule.registerCommand(new EqStopCommand(this));
-        commandsModule.registerCommand(new EqHighBassCommand(this));
+        commandsModule.registerCommand(module, new PlayCommand(this, botConfig));
+        commandsModule.registerCommand(module, new NowCommand(this, botConfig));
+        commandsModule.registerCommand(module, new SkipCommand(this));
+        commandsModule.registerCommand(module, new NextCommand(this));
+        commandsModule.registerCommand(module, new ClearCommand(this));
+        commandsModule.registerCommand(module, new CurrentCommand(this));
+        commandsModule.registerCommand(module, new StopCommand(this));
+        commandsModule.registerCommand(module, new LeaveCommand());
+        commandsModule.registerCommand(module, new PauseCommand(this));
+        commandsModule.registerCommand(module, new LoopQueueCommand(this));
+        commandsModule.registerCommand(module, new LoopCommand(this));
+        commandsModule.registerCommand(module, new ShuffleCommand(this));
+        commandsModule.registerCommand(module, new VolumeCommand(this));
+        commandsModule.registerCommand(module, new SeekCommand(this, botConfig));
+        commandsModule.registerCommand(module, new ReplayCommand(this));
+        commandsModule.registerCommand(module, new ViewQueueCommand(this));
+        commandsModule.registerCommand(module, new EqStartCommand(this));
+        commandsModule.registerCommand(module, new EqStopCommand(this));
+        commandsModule.registerCommand(module, new EqHighBassCommand(this));
 
         if (!botConfig.radioPath.equalsIgnoreCase(""))
-            commandsModule.registerCommand(new RadioCommand(this, botConfig));
+            commandsModule.registerCommand(module, new RadioCommand(this, botConfig));
 
         JDAManager.getShardManager().addEventListener(musicListener);
     }
@@ -109,7 +111,10 @@ public class MusicModule extends Module {
     public void disable() {
         super.disable();
 
-        // TODO Unregister commands
+        CommandsModule commandsModule = (CommandsModule) bot.getModulesManager()
+                .getModule(Modules.COMMANDS);
+
+        commandsModule.unregisterCommands(module);
 
         JDAManager.getShardManager().removeEventListener(musicListener);
 
