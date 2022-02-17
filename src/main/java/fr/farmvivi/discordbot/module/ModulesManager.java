@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.music.MusicModule;
+import fr.farmvivi.discordbot.module.test.TestModule;
 
 public class ModulesManager {
     public static final Logger logger = LoggerFactory.getLogger(ModulesManager.class);
@@ -58,6 +59,9 @@ public class ModulesManager {
             case MUSIC:
                 module = new MusicModule(moduleType, bot);
                 break;
+            case TEST:
+                module = new TestModule(moduleType, bot);
+                break;
             default:
                 return;
         }
@@ -73,11 +77,10 @@ public class ModulesManager {
         logger.info("Unloading modules...");
 
         while (!modules.isEmpty()) {
-            for (Modules module : modules.keySet()) {
+            for (Modules module : modules.keySet().toArray(new Modules[modules.size()])) {
                 try {
                     unloadModule(module);
                 } catch (UnloadModuleException e) {
-                    logger.error("Unable to unload module " + module.getName(), e);
                 }
             }
         }
@@ -86,7 +89,7 @@ public class ModulesManager {
     }
 
     public void unloadModule(Modules moduleType) throws UnloadModuleException {
-        for (Modules mod : modules.keySet()) {
+        for (Modules mod : modules.keySet().toArray(new Modules[modules.size()])) {
             if (!mod.equals(moduleType))
                 for (Modules dependency : mod.getRequiredModules())
                     if (dependency.equals(moduleType))
@@ -94,7 +97,7 @@ public class ModulesManager {
                                 "Cannot unload module because module " + mod + " depend on it...");
         }
 
-        logger.info("Disabling " + moduleType.getName() + " module...");
+        logger.info("Unloading " + moduleType.getName() + " module...");
         modules.remove(moduleType).disable();
     }
 

@@ -3,7 +3,8 @@ package fr.farmvivi.discordbot.module;
 public enum Modules {
     COMMANDS("Commands"),
     MUSIC("Music", COMMANDS),
-    CHANNEL_RENAME("Channels Renames");
+    CHANNEL_RENAME("Channels Renames"),
+    TEST("Test", COMMANDS);
 
     private final String name;
     private final Modules[] requiredModules;
