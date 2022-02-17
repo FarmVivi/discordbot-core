@@ -13,6 +13,8 @@ public class MusicListener extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+        super.onGuildVoiceLeave(event);
+
         if (event.getChannelJoined() == null &&
                 event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
             MusicPlayer musicPlayer = musicModule.getPlayer(event.getGuild());

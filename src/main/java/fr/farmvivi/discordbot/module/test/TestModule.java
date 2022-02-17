@@ -28,5 +28,7 @@ public class TestModule extends Module {
     @Override
     public void disable() {
         super.disable();
+
+        // TODO Unreister commands
     }
 }

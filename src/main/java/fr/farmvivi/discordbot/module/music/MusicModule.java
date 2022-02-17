@@ -109,6 +109,8 @@ public class MusicModule extends Module {
     public void disable() {
         super.disable();
 
+        // TODO Unregister commands
+
         JDAManager.getShardManager().removeEventListener(musicListener);
 
         audioPlayerManager.shutdown();

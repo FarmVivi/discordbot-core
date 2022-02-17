@@ -19,6 +19,8 @@ public class CommandsListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        super.onMessageReceived(event);
+
         if (event.isFromType(ChannelType.TEXT) || event.isFromType(ChannelType.PRIVATE)) {
             String message = event.getMessage().getContentDisplay();
             String CMD_PREFIX = botConfig.cmdPrefix;
