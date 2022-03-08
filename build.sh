@@ -10,9 +10,9 @@ rm -f target/*.jar
 mvn compile package
 
 # Rename jar file
-cp target/discordbot-*.jar target/main.jar
+cp target/discordbot-*.jar target/discordbot.jar
 
 # Start application if `run` argument is passed
 if [ $1 = "run" ]; then
-  java -jar target/main.jar
+  java -jar target/discordbot.jar
 fi

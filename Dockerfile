@@ -34,7 +34,7 @@ ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" CMD_PREFIX="" CMD_ADMINS="" 
 RUN mkdir /opt/app
 
 # Copy application binary from build/dev stage to the production container
-COPY --from=build /app/target/main.jar /opt/app
+COPY --from=build /app/target/discordbot.jar /opt/app
 
 # Container start command for production
-CMD ["java", "-jar", "/opt/app/main.jar"]
+CMD ["java", "-jar", "/opt/app/discordbot.jar"]

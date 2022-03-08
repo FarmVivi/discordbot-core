@@ -20,7 +20,6 @@ public class Bot {
 
     public static final String version = "1.4.0.0";
     public static final String name = "DiscordBot";
-    public static final boolean production = false;
 
     public static final Logger logger = LoggerFactory.getLogger(name);
 
@@ -28,7 +27,7 @@ public class Bot {
     private final ModulesManager modulesManager;
 
     public Bot(String[] args) {
-        logger.info("Démarrage de " + name + " v" + version + ") (Prod: " + production + ") en cours...");
+        logger.info("Démarrage de " + name + " v" + version + " en cours...");
 
         logger.info("System.getProperty('os.name') == '" + System.getProperty("os.name") + "'");
         logger.info("System.getProperty('os.version') == '" + System.getProperty("os.version") + "'");
@@ -58,14 +57,9 @@ public class Bot {
     }
 
     public static void setDefaultActivity() {
-        if (production)
-            JDAManager.getShardManager()
-                    .setActivity(Activity
-                            .playing("v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
-        else
-            JDAManager.getShardManager()
-                    .setActivity(Activity.playing(
-                            "Dev - v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
+        JDAManager.getShardManager()
+                .setActivity(Activity
+                        .playing("v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
     }
 
     public Configuration getConfiguration() {

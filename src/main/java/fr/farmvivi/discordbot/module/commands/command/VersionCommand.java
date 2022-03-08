@@ -21,8 +21,9 @@ public class VersionCommand extends Command {
         if (!super.execute(event, content))
             return false;
 
-        event.getChannel().sendMessage(Bot.name + " (**v" + Bot.version + "**) (Prod: " + Bot.production
-                + ") :\n-> JDA (**v" + JDAInfo.VERSION + "**)\n-> LavaPlayer (**v" + PlayerLibrary.VERSION + "**)")
+        event.getChannel().sendMessage(Bot.name + " **v" + Bot.version + "** :"
+                + "\n-> JDA **v" + JDAInfo.VERSION + "**"
+                + "\n-> LavaPlayer **v" + PlayerLibrary.VERSION + "**")
                 .queue();
 
         return true;
