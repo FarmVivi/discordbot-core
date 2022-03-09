@@ -33,7 +33,7 @@ public class NextCommand extends Command {
             return false;
         }
 
-        AudioTrack track = musicModule.getPlayer(guild).skipTrack(false);
+        AudioTrack track = musicModule.getPlayer(guild).nextTrack();
         if (track == null)
             textChannel.sendMessage("Plus aucune musique à jouer.").queue();
         else

@@ -160,7 +160,11 @@ public class MusicModule extends Module {
                                     if (textChannel != null)
                                         textChannel.sendMessage("**" + playlist.getTracks().get(0).getInfo().title
                                                 + "** ajouté à la file d'attente.").queue();
-                                    player.playTrack(playlist.getTracks().get(0), playNow);
+
+                                    if (playNow)
+                                        player.playTrackNow(playlist.getTracks().get(0));
+                                    else
+                                        player.playTrack(playlist.getTracks().get(0));
                                 }, null, null));
                 } catch (ParseException | SpotifyWebApiException | IOException e) {
                     logger.error("Unable to get tracks from " + source, e);
@@ -172,7 +176,11 @@ public class MusicModule extends Module {
                         if (textChannel != null)
                             textChannel.sendMessage("**" + track.getInfo().title + "** ajouté à la file d'attente.")
                                     .queue();
-                        player.playTrack(track, playNow);
+
+                        if (playNow)
+                            player.playTrackNow(track);
+                        else
+                            player.playTrack(track);
                     }
 
                     @Override
@@ -182,7 +190,11 @@ public class MusicModule extends Module {
 
                         for (AudioTrack track : playlist.getTracks()) {
                             builder.append("\n-> **").append(track.getInfo().title).append("**");
-                            player.playTrack(track, playNow);
+
+                            if (playNow)
+                                player.playTrackNow(track);
+                            else
+                                player.playTrack(track);
                         }
 
                         if (textChannel != null)
@@ -217,7 +229,11 @@ public class MusicModule extends Module {
                     textChannel.sendMessage(
                             "**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.")
                             .queue();
-                player.playTrack(playlist.getTracks().get(0), playNow);
+
+                if (playNow)
+                    player.playTrackNow(playlist.getTracks().get(0));
+                else
+                    player.playTrack(playlist.getTracks().get(0));
             }, null, null));
         }
     }

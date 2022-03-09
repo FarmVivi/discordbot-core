@@ -50,19 +50,27 @@ public class MusicPlayer {
         return new AudioPlayerSendHandler(audioPlayer);
     }
 
-    public synchronized void playTrack(AudioTrack track) {
+    public void playTrackNow(AudioTrack track) {
+        this.playTrack(track, true);
+    }
+
+    public void playTrack(AudioTrack track) {
         this.playTrack(track, false);
     }
 
-    public synchronized void playTrack(AudioTrack track, boolean playNow) {
+    private synchronized void playTrack(AudioTrack track, boolean playNow) {
         trackScheduler.queue(track, playNow);
     }
 
-    public synchronized AudioTrack skipTrack() {
+    public AudioTrack nextTrack() {
+        return this.skipTrack(false);
+    }
+
+    public AudioTrack skipTrack() {
         return this.skipTrack(true);
     }
 
-    public synchronized AudioTrack skipTrack(boolean delete) {
+    private synchronized AudioTrack skipTrack(boolean delete) {
         return trackScheduler.nextTrack(delete);
     }
 
