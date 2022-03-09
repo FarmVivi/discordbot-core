@@ -18,6 +18,7 @@ public class MusicListener extends ListenerAdapter {
         if (event.getChannelJoined() == null &&
                 event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
             MusicPlayer musicPlayer = musicModule.getPlayer(event.getGuild());
+            musicPlayer.getAudioPlayer().setPaused(false);
             musicPlayer.getListener().getTracks().clear();
             musicPlayer.skipTrack();
             musicPlayer.resetToDefaultSettings();
