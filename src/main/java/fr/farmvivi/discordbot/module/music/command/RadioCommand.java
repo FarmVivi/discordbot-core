@@ -93,8 +93,5 @@ public class RadioCommand extends Command {
                 musicModule.getLogger().error("Exception", ex);
             }
         }
-
-        // Next track to randomize first track played
-        musicPlayer.nextTrack();
     }
 }
