@@ -68,6 +68,7 @@ public class RadioCommand extends Command {
     private void playRadio(Guild guild, String uri) {
         MusicPlayer musicPlayer = musicModule.getPlayer(guild);
 
+        musicPlayer.getAudioPlayer().setPaused(false);
         musicPlayer.getListener().getTracks().clear();
         musicPlayer.skipTrack();
 
