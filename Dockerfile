@@ -32,7 +32,10 @@ FROM gcr.io/distroless/java17 as production
 ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" CMD_PREFIX="" CMD_ADMINS="" RADIO_PATH="" FEATURES="MUSIC"
 
 # Copy application binary from build/dev stage to the production container
-COPY --from=build /app/target/discordbot.jar /
+COPY --from=build /app/target/discordbot.jar /app
+
+# Create project directory (workdir)
+WORKDIR /app
 
 # Container start command for production
-CMD ["/discordbot.jar"]
+CMD ["discordbot.jar"]
