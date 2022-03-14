@@ -1,3 +1,12 @@
+################ Dev ################
+# Build stage will be used:
+# - as target for development (see devspace.yaml)
+FROM maven:3-openjdk-17 as dev
+
+# Create project directory (workdir)
+WORKDIR /app
+
+
 ################ Build & Dev ################
 # Build stage will be used:
 # - for building the application for production
