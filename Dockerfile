@@ -2,7 +2,7 @@
 # Build stage will be used:
 # - for building the application for production
 # - as target for development (see devspace.yaml)
-FROM maven:3-openjdk-11-slim as build
+FROM maven:3-openjdk-17-slim as build
 
 # Create project directory (workdir)
 WORKDIR /app
@@ -24,17 +24,15 @@ CMD ["./build.sh", "run"]
 
 
 ################ Production ################
-# Creates a minimal image for production
-FROM adoptopenjdk/openjdk11:alpine-jre as production
+# Creates a minimal image for production using distroless base image
+# More info here: https://github.com/GoogleContainerTools/distroless
+FROM gcr.io/distroless/java17 as production
 
 # Environnement variables
 ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" CMD_PREFIX="" CMD_ADMINS="" RADIO_PATH="" FEATURES="MUSIC"
 
-# Create directory for application binary
-RUN mkdir /opt/app
-
 # Copy application binary from build/dev stage to the production container
-COPY --from=build /app/target/discordbot.jar /opt/app
+COPY --from=build /app/target/discordbot.jar /
 
 # Container start command for production
-CMD ["java", "-jar", "/opt/app/discordbot.jar"]
+CMD ["/discordbot.jar"]
