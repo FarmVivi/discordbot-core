@@ -10,17 +10,13 @@ public abstract class Module {
     protected boolean enabled = false;
 
     public Module(Modules module) {
-        logger = LoggerFactory.getLogger(module.getName().replace(" ", "") + "Module");
         this.module = module;
+        this.logger = LoggerFactory.getLogger(module.getName().replace(" ", "") + "Module");
     }
 
-    public void enable() {
+    public abstract void enable();
 
-    }
-
-    public void disable() {
-
-    }
+    public abstract void disable();
 
     public Logger getLogger() {
         return logger;

@@ -30,8 +30,6 @@ public class CommandsModule extends Module {
 
     @Override
     public void enable() {
-        super.enable();
-
         registerCommand(module, new HelpCommand(this, bot.getConfiguration()));
         registerCommand(module, new VersionCommand());
         registerCommand(module, new ShutdownCommand());
@@ -41,8 +39,6 @@ public class CommandsModule extends Module {
 
     @Override
     public void disable() {
-        super.disable();
-
         unregisterCommands(module);
 
         JDAManager.getShardManager().removeEventListener(commandsListener);
