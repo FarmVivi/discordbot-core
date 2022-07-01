@@ -38,7 +38,7 @@ CMD ["./build.sh", "run"]
 FROM gcr.io/distroless/java17 as production
 
 # Environnement variables
-ENV DISCORD_TOKEN="" SPOTIFY_ID="" SPOTIFY_TOKEN="" CMD_PREFIX="" CMD_ADMINS="" RADIO_PATH="" FEATURES="MUSIC"
+ENV DISCORD_TOKEN="" DISCORD_SPOTIFY_ID="" DISCORD_SPOTIFY_TOKEN="" DISCORD_CMD_PREFIX="" DISCORD_CMD_ADMINS="" DISCORD_RADIO_PATH="" DISCORD_FEATURES="MUSIC"
 
 # Create project directory (workdir)
 WORKDIR /app
