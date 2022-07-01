@@ -65,7 +65,7 @@ public class Configuration {
         for (String admin : getValues("CMD_ADMINS"))
             cmdAdmins.add(Long.parseLong(admin));
         this.radioPath = getValue("RADIO_PATH");
-        this.features = List.of("FEATURES");
+        this.features = List.of(getValues("FEATURES"));
     }
 
     public String getValue(String key) throws ValueNotFoundException {

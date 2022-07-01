@@ -14,7 +14,7 @@ public class Bot {
         return instance;
     }
 
-    public static final String version = "1.4.3";
+    public static final String version = "1.4.4";
     public static final String name = "DiscordBot";
 
     public static final Logger logger = LoggerFactory.getLogger(name);
