@@ -15,7 +15,7 @@ public class NowCommand extends Command {
 
     public NowCommand(MusicModule musicModule, Configuration botConfig) {
         this.name = "now";
-        this.aliases = new String[] { "n" };
+        this.aliases = new String[]{"n"};
         this.category = CommandCategory.MUSIC;
         this.description = "Ajoute une musique en haut de la file d'attente";
         this.args = "<name>|<url>";

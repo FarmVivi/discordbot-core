@@ -1,10 +1,5 @@
 package fr.farmvivi.discordbot.module.music;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -13,39 +8,26 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
-import org.apache.hc.core5.http.ParseException;
-
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.Module;
 import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
-import fr.farmvivi.discordbot.module.music.command.ClearCommand;
-import fr.farmvivi.discordbot.module.music.command.CurrentCommand;
-import fr.farmvivi.discordbot.module.music.command.LeaveCommand;
-import fr.farmvivi.discordbot.module.music.command.LoopCommand;
-import fr.farmvivi.discordbot.module.music.command.LoopQueueCommand;
-import fr.farmvivi.discordbot.module.music.command.NextCommand;
-import fr.farmvivi.discordbot.module.music.command.NowCommand;
-import fr.farmvivi.discordbot.module.music.command.PauseCommand;
-import fr.farmvivi.discordbot.module.music.command.PlayCommand;
-import fr.farmvivi.discordbot.module.music.command.RadioCommand;
-import fr.farmvivi.discordbot.module.music.command.ReplayCommand;
-import fr.farmvivi.discordbot.module.music.command.SeekCommand;
-import fr.farmvivi.discordbot.module.music.command.ShuffleCommand;
-import fr.farmvivi.discordbot.module.music.command.SkipCommand;
-import fr.farmvivi.discordbot.module.music.command.StopCommand;
-import fr.farmvivi.discordbot.module.music.command.ViewQueueCommand;
-import fr.farmvivi.discordbot.module.music.command.VolumeCommand;
+import fr.farmvivi.discordbot.module.music.command.*;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqHighBassCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStartCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStopCommand;
 import fr.farmvivi.discordbot.module.music.spotify.LinkConverter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MusicModule extends Module {
     public static final int QUIT_TIMEOUT = 900;
@@ -221,7 +203,7 @@ public class MusicModule extends Module {
             audioPlayerManager.loadItem("ytsearch: " + source, new FunctionalResultHandler(null, playlist -> {
                 if (textChannel != null)
                     textChannel.sendMessage(
-                            "**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.")
+                                    "**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.")
                             .queue();
 
                 if (playNow)

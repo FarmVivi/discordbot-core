@@ -22,11 +22,11 @@ public abstract class Module {
         return logger;
     }
 
-    protected void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public boolean isEnabled() {
         return enabled;
+    }
+
+    protected void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

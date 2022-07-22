@@ -1,35 +1,28 @@
 package fr.farmvivi.discordbot.module.music.spotify;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
-import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 
-import org.apache.hc.core5.http.ParseException;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class LinkConverter {
-    private String id;
-    private String type;
-
     public ArrayList<String> convert(String link) throws ParseException, SpotifyWebApiException, IOException {
         final String[] firstSplit = link.split("/");
         final String[] secondSplit;
 
+        String type;
         if (firstSplit.length > 5) {
             secondSplit = firstSplit[6].split("\\?");
-            this.type = firstSplit[5];
+            type = firstSplit[5];
         } else {
             secondSplit = firstSplit[4].split("\\?");
-            this.type = firstSplit[3];
+            type = firstSplit[3];
         }
-        this.id = secondSplit[0];
+        String id = secondSplit[0];
         final ArrayList<String> listOfTracks = new ArrayList<>();
 
         if (type.contentEquals("track")) {
@@ -63,10 +56,10 @@ public class LinkConverter {
     }
 
     private String formatArtistAndName(Track track) {
-        String artistNameAndTrackName = track.getName() + " - ";
+        StringBuilder artistNameAndTrackName = new StringBuilder(track.getName() + " - ");
         final ArtistSimplified[] artists = track.getArtists();
         for (ArtistSimplified i : artists)
-            artistNameAndTrackName += i.getName() + " ";
-        return artistNameAndTrackName;
+            artistNameAndTrackName.append(i.getName()).append(" ");
+        return artistNameAndTrackName.toString();
     }
 }

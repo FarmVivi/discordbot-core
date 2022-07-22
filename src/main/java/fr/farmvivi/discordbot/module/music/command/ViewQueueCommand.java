@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.music.MusicModule;
@@ -14,7 +13,7 @@ public class ViewQueueCommand extends Command {
 
     public ViewQueueCommand(MusicModule musicModule) {
         this.name = "viewqueue";
-        this.aliases = new String[] { "queue" };
+        this.aliases = new String[]{"queue"};
         this.category = CommandCategory.MUSIC;
         this.description = "Affiche la file d'attente";
 

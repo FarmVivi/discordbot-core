@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.music.MusicModule;
@@ -14,7 +13,7 @@ public class CurrentCommand extends Command {
 
     public CurrentCommand(MusicModule musicModule) {
         this.name = "current";
-        this.aliases = new String[] { "np", "info" };
+        this.aliases = new String[]{"np", "info"};
         this.category = CommandCategory.MUSIC;
         this.description = "Affiche la musique en cours de lecture";
 
@@ -35,8 +34,7 @@ public class CurrentCommand extends Command {
         }
 
         AudioTrack track = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
-        textChannel
-                .sendMessage("Musique en cours de lecture: **" + track.getInfo().title + "** | " + track.getInfo().uri)
+        textChannel.sendMessage("Musique en cours de lecture: **" + track.getInfo().title + "** | " + track.getInfo().uri)
                 .queue();
 
         return true;

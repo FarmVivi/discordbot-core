@@ -3,7 +3,6 @@ package fr.farmvivi.discordbot.module.music;
 import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import net.dv8tion.jda.api.entities.Guild;
 
 public class MusicPlayer {
@@ -83,27 +82,27 @@ public class MusicPlayer {
         this.equalizer = new EqualizerFactory();
     }
 
-    public void setLoopQueueMode(boolean loopQueueMode) {
-        this.loopQueueMode = loopQueueMode;
-    }
-
     public boolean isLoopQueueMode() {
         return loopQueueMode;
     }
 
-    public void setLoopMode(boolean loopMode) {
-        this.loopMode = loopMode;
+    public void setLoopQueueMode(boolean loopQueueMode) {
+        this.loopQueueMode = loopQueueMode;
     }
 
     public boolean isLoopMode() {
         return loopMode;
     }
 
-    public void setShuffleMode(boolean shuffleMode) {
-        this.shuffleMode = shuffleMode;
+    public void setLoopMode(boolean loopMode) {
+        this.loopMode = loopMode;
     }
 
     public boolean isShuffleMode() {
         return shuffleMode;
+    }
+
+    public void setShuffleMode(boolean shuffleMode) {
+        this.shuffleMode = shuffleMode;
     }
 }

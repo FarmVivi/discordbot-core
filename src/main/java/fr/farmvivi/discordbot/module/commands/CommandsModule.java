@@ -1,10 +1,5 @@
 package fr.farmvivi.discordbot.module.commands;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.Module;
@@ -13,12 +8,17 @@ import fr.farmvivi.discordbot.module.commands.command.HelpCommand;
 import fr.farmvivi.discordbot.module.commands.command.ShutdownCommand;
 import fr.farmvivi.discordbot.module.commands.command.VersionCommand;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class CommandsModule extends Module {
     private final Modules module;
     private final Bot bot;
     private final CommandsListener commandsListener;
 
-    private final Map<Modules, List<Command>> commands = new HashMap<Modules, List<Command>>();
+    private final Map<Modules, List<Command>> commands = new HashMap<>();
 
     public CommandsModule(Modules module, Bot bot) {
         super(module);
@@ -48,7 +48,7 @@ public class CommandsModule extends Module {
         logger.info("Registering command " + command.getName() + "...");
 
         if (!commands.containsKey(module))
-            commands.put(module, new ArrayList<Command>());
+            commands.put(module, new ArrayList<>());
 
         List<Command> moduleCommands = commands.get(module);
 
@@ -64,7 +64,7 @@ public class CommandsModule extends Module {
     }
 
     public List<Command> getCommands() {
-        List<Command> commands = new ArrayList<Command>();
+        List<Command> commands = new ArrayList<>();
 
         for (List<Command> moduleCommands : this.commands.values()) {
             commands.addAll(moduleCommands);

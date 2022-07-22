@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
@@ -48,19 +47,19 @@ public class SeekCommand extends Command {
             return false;
         }
 
-        if (!TimeToIntCalculator.isFormated(content)) {
+        if (!TimeToIntCalculator.isFormatted(content)) {
             textChannel.sendMessage("Format de temps à utiliser: **jours:heures:minutes:secondes**").queue();
             return false;
         }
 
         int startTime = TimeToIntCalculator.format(content) * 1000;
         AudioTrack currentTrack = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
-        if (Long.valueOf(startTime) > currentTrack.getDuration()) {
+        if ((long) startTime > currentTrack.getDuration()) {
             textChannel.sendMessage("**" + content + "** > TrackDuration").queue();
             return false;
         }
 
-        musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().setPosition(Long.valueOf(startTime));
+        musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().setPosition(startTime);
         textChannel.sendMessage("Seek to **" + content + "**").queue();
 
         return true;

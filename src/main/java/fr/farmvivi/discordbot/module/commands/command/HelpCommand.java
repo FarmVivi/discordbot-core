@@ -1,13 +1,13 @@
 package fr.farmvivi.discordbot.module.commands.command;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HelpCommand extends Command {
     private final CommandsModule commandsModule;
@@ -33,12 +33,12 @@ public class HelpCommand extends Command {
             if (!strBuilders.containsKey(cmd.getCategory()))
                 strBuilders.put(cmd.getCategory(), new StringBuilder("**" + cmd.getCategory().getName() + "** :"));
             StringBuilder builder = strBuilders.get(cmd.getCategory());
-            builder.append("\n->" + formatCmdHelp(cmd));
+            builder.append("\n->").append(formatCmdHelp(cmd));
         }
 
         StringBuilder finalBuilder = new StringBuilder();
         for (StringBuilder strBuilder : strBuilders.values())
-            finalBuilder.append(strBuilder.toString() + "\n\n");
+            finalBuilder.append(strBuilder.toString()).append("\n\n");
         String message = finalBuilder.toString();
         event.getChannel().sendMessage(message.subSequence(0, message.length() - 2)).queue();
 
@@ -47,10 +47,10 @@ public class HelpCommand extends Command {
 
     private String formatCmdHelp(Command command) {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("** " + botConfig.cmdPrefix + command.getName());
+        stringBuilder.append("** ").append(botConfig.cmdPrefix).append(command.getName());
         if (command.getArgs().length() != 0)
-            stringBuilder.append(" " + command.getArgs());
-        stringBuilder.append(" **| " + command.getDescription());
+            stringBuilder.append(" ").append(command.getArgs());
+        stringBuilder.append(" **| ").append(command.getDescription());
         return stringBuilder.toString();
     }
 }

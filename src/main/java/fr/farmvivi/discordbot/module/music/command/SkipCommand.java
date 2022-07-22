@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.music.MusicModule;
@@ -14,7 +13,7 @@ public class SkipCommand extends Command {
 
     public SkipCommand(MusicModule musicModule) {
         this.name = "skip";
-        this.aliases = new String[] { "fs" };
+        this.aliases = new String[]{"fs"};
         this.category = CommandCategory.MUSIC;
         this.description = "Passe à la musique suivante";
 

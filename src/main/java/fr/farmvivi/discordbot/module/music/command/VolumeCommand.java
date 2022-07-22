@@ -12,7 +12,7 @@ public class VolumeCommand extends Command {
 
     public VolumeCommand(MusicModule musicModule) {
         this.name = "volume";
-        this.aliases = new String[] { "v" };
+        this.aliases = new String[]{"v"};
         this.category = CommandCategory.MUSIC;
         this.description = "Affiche ou change le volume si une valeur est précisée";
         this.args = "<volume>";
@@ -38,7 +38,7 @@ public class VolumeCommand extends Command {
             volume = Integer.parseInt(content);
         } catch (NumberFormatException e) {
             textChannel.sendMessage(
-                    "Le volume actuel est à **" + musicModule.getPlayer(guild).getAudioPlayer().getVolume() + "%**.")
+                            "Le volume actuel est à **" + musicModule.getPlayer(guild).getAudioPlayer().getVolume() + "%**.")
                     .queue();
             return true;
         }

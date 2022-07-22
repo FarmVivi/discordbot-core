@@ -1,22 +1,22 @@
 package fr.farmvivi.discordbot.module;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.test.TestModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class ModulesManager {
     public static final Logger logger = LoggerFactory.getLogger(ModulesManager.class);
 
     private final Bot bot;
 
-    private final Map<Modules, Module> modules = new HashMap<Modules, Module>();
+    private final Map<Modules, Module> modules = new HashMap<>();
 
     public ModulesManager(Bot bot) {
         this.bot = bot;
@@ -77,10 +77,11 @@ public class ModulesManager {
         logger.info("Unloading modules...");
 
         while (!modules.isEmpty()) {
-            for (Modules module : modules.keySet().toArray(new Modules[modules.size()])) {
+            // New list to avoid ConcurrentException
+            for (Modules module : new LinkedList<>(modules.keySet())) {
                 try {
                     unloadModule(module);
-                } catch (UnloadModuleException e) {
+                } catch (UnloadModuleException ignored) {
                 }
             }
         }
@@ -89,7 +90,8 @@ public class ModulesManager {
     }
 
     public void unloadModule(Modules moduleType) throws UnloadModuleException {
-        for (Modules mod : modules.keySet().toArray(new Modules[modules.size()])) {
+        // New list to avoid ConcurrentException
+        for (Modules mod : new LinkedList<>(modules.keySet())) {
             if (!mod.equals(moduleType))
                 for (Modules dependency : mod.getRequiredModules())
                     if (dependency.equals(moduleType))

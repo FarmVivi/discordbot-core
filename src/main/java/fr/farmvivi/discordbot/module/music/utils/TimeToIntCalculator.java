@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.module.music.utils;
 
 public class TimeToIntCalculator {
-    public static boolean isFormated(String time) {
+    public static boolean isFormatted(String time) {
         String[] numbers = time.split(":");
         for (String number : numbers)
             try {
@@ -15,23 +15,22 @@ public class TimeToIntCalculator {
 
     public static int format(String time) {
         String[] numbers = time.split(":");
-        switch (numbers.length) {
-            case 1:
+        return switch (numbers.length) {
+            case 1 ->
                 // return seconds
-                return Integer.valueOf(numbers[0]);
-            case 2:
+                    Integer.parseInt(numbers[0]);
+            case 2 ->
                 // return 60 * minutes + seconds
-                return 60 * Integer.valueOf(numbers[0]) + Integer.valueOf(numbers[1]);
-            case 3:
+                    60 * Integer.parseInt(numbers[0]) + Integer.parseInt(numbers[1]);
+            case 3 ->
                 // return 60 * heures + 60 * minutes + seconds
-                return 60 * Integer.valueOf(numbers[0]) + 60 * Integer.valueOf(numbers[1])
-                        + Integer.valueOf(numbers[2]);
-            case 4:
+                    60 * Integer.parseInt(numbers[0]) + 60 * Integer.parseInt(numbers[1])
+                            + Integer.parseInt(numbers[2]);
+            case 4 ->
                 // return 24 * jours + 60 * heures + 60 * minutes + seconds
-                return 24 * Integer.valueOf(numbers[0]) + 60 * Integer.valueOf(numbers[1])
-                        + 60 * Integer.valueOf(numbers[2]) + Integer.valueOf(numbers[3]);
-            default:
-                return 0;
-        }
+                    24 * Integer.parseInt(numbers[0]) + 60 * Integer.parseInt(numbers[1])
+                            + 60 * Integer.parseInt(numbers[2]) + Integer.parseInt(numbers[3]);
+            default -> 0;
+        };
     }
 }

@@ -1,17 +1,15 @@
 package fr.farmvivi.discordbot.module.music.spotify;
 
-import java.io.IOException;
-
+import fr.farmvivi.discordbot.Bot;
+import org.apache.hc.core5.http.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
-import org.apache.hc.core5.http.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.farmvivi.discordbot.Bot;
+import java.io.IOException;
 
 public class SpotifyManager {
     public static final Logger logger = LoggerFactory.getLogger(SpotifyManager.class);

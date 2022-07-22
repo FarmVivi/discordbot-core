@@ -8,8 +8,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EqHighBassCommand extends Command {
-    private static final float[] BASS_BOOST = { 0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f,
-            -0.1f, -0.1f, -0.1f, -0.1f, -0.1f };
+    private static final float[] BASS_BOOST = {0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f};
 
     private final MusicModule musicModule;
 
@@ -36,7 +35,7 @@ public class EqHighBassCommand extends Command {
         }
 
         try {
-            Float diff = Float.parseFloat(content);
+            float diff = Float.parseFloat(content);
             for (int i = 0; i < BASS_BOOST.length; i++)
                 musicModule.getPlayer(guild).getEqualizer().setGain(i, BASS_BOOST[i] + diff);
 

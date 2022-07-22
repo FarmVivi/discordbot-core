@@ -1,10 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
@@ -14,6 +9,11 @@ import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class RadioCommand extends Command {
     private final MusicModule musicModule;
@@ -50,15 +50,21 @@ public class RadioCommand extends Command {
         if (content.equalsIgnoreCase("") || content.equalsIgnoreCase("list"))
             displayRadio(textChannel);
         else
-            playRadio(guild, botConfig.radioPath + "/" + content + ".m3u");
+            playRadio(guild, botConfig.radioPath + File.separator + content + ".m3u");
 
         return true;
     }
 
     private void displayRadio(TextChannel textChannel) {
+        File directory = new File(botConfig.radioPath);
+        if (!directory.exists()) {
+            textChannel.sendMessage("Une erreur est survenue").queue();
+            return;
+        }
+
         StringBuilder builder = new StringBuilder("Radio:");
 
-        for (File file : new File(botConfig.radioPath).listFiles())
+        for (File file : directory.listFiles())
             if (file.getName().endsWith(".m3u"))
                 builder.append("\n- **").append(file.getName().replace(".m3u", "")).append("**");
 
@@ -77,14 +83,14 @@ public class RadioCommand extends Command {
         musicPlayer.setLoopQueueMode(true);
         musicPlayer.setShuffleMode(true);
 
-        if ((uri.startsWith("/") || uri.startsWith("./") && uri.endsWith(".m3u"))) {
-            try (BufferedReader br = new BufferedReader(new FileReader(new File(uri)))) {
+        if (uri.endsWith(".m3u")) {
+            try (BufferedReader br = new BufferedReader(new FileReader(uri))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     if (line.startsWith("http")) {
                         musicModule.loadTrack(guild, line);
                     } else {
-                        String musicFile = uri.substring(0, uri.lastIndexOf("/") + 1) + line;
+                        String musicFile = uri.substring(0, uri.lastIndexOf(File.separator) + 1) + line;
                         musicModule.getLogger().info("Adding radio track: " + musicFile);
                         musicModule.loadTrack(guild, musicFile);
                     }

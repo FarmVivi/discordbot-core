@@ -3,6 +3,7 @@ package fr.farmvivi.discordbot.module.music;
 import fr.farmvivi.discordbot.Bot;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 public class MusicListener extends ListenerAdapter {
     private final MusicModule musicModule;
@@ -12,7 +13,7 @@ public class MusicListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+    public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
         super.onGuildVoiceLeave(event);
 
         if (event.getChannelJoined() == null &&

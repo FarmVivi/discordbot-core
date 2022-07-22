@@ -12,7 +12,7 @@ public class PauseCommand extends Command {
 
     public PauseCommand(MusicModule musicModule) {
         this.name = "pause";
-        this.aliases = new String[] { "resume" };
+        this.aliases = new String[]{"resume"};
         this.category = CommandCategory.MUSIC;
         this.description = "Met en pause la musique (et inversement)";
 

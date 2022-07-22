@@ -1,41 +1,31 @@
 package fr.farmvivi.discordbot.module.music;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.jda.JDAManager;
 import net.dv8tion.jda.api.entities.Activity;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class TrackScheduler extends AudioEventAdapter {
-    private final BlockingQueue<AudioTrack> tracks = new LinkedBlockingQueue<>();
+    private final LinkedList<AudioTrack> tracks = new LinkedList<>();
     private final MusicPlayer player;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> quitTask;
 
     public TrackScheduler(MusicPlayer player) {
         this.player = player;
-    }
-
-    public BlockingQueue<AudioTrack> getTracks() {
-        return tracks;
-    }
-
-    public int getTrackSize() {
-        return tracks.size();
     }
 
     public void queue(AudioTrack track) {
@@ -46,10 +36,11 @@ public class TrackScheduler extends AudioEventAdapter {
         if (quitTask != null && !quitTask.isDone())
             quitTask.cancel(true);
         if (!player.getAudioPlayer().startTrack(track, true))
-            if (playNow)
+            if (playNow) {
                 addTrackFirst(track);
-            else
+            } else {
                 tracks.offer(track);
+            }
     }
 
     public AudioTrack nextTrack() {
@@ -65,19 +56,16 @@ public class TrackScheduler extends AudioEventAdapter {
             player.getAudioPlayer().stopTrack();
             Bot.setDefaultActivity();
             if (player.getGuild().getAudioManager().getConnectedChannel() != null)
-                quitTask = scheduler.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (player.getGuild().getAudioManager().getConnectedChannel() != null)
-                            player.getGuild().getAudioManager().closeAudioConnection();
-                    }
+                quitTask = scheduler.schedule(() -> {
+                    if (player.getGuild().getAudioManager().getConnectedChannel() != null)
+                        player.getGuild().getAudioManager().closeAudioConnection();
                 }, MusicModule.QUIT_TIMEOUT, TimeUnit.SECONDS);
             return null;
         }
         AudioTrack track;
         if (player.isShuffleMode()) {
-            List<AudioTrack> remainingTracks = new ArrayList<>();
-            tracks.drainTo(remainingTracks);
+            List<AudioTrack> remainingTracks = new ArrayList<>(tracks);
+            tracks.clear();
             Random random = new Random();
             if (player.isLoopQueueMode())
                 // Get random track on the 50% first part of the list
@@ -87,8 +75,7 @@ public class TrackScheduler extends AudioEventAdapter {
                 track = remainingTracks.get(random.nextInt(remainingTracks.size()));
             remainingTracks.remove(track);
             if (!remainingTracks.isEmpty())
-                for (AudioTrack tmpTrack : remainingTracks)
-                    tracks.offer(tmpTrack);
+                tracks.addAll(remainingTracks);
         } else {
             track = tracks.poll();
         }
@@ -97,11 +84,7 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public synchronized void addTrackFirst(AudioTrack track) {
-        List<AudioTrack> remainingTracks = new ArrayList<>();
-        tracks.drainTo(remainingTracks);
-        tracks.offer(track);
-        for (AudioTrack tmpTrack : remainingTracks)
-            tracks.offer(tmpTrack);
+        tracks.addFirst(track);
     }
 
     @Override
@@ -156,5 +139,13 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         // Audio track has been unable to provide us any audio, might want to just start
         // a new track
+    }
+
+    public LinkedList<AudioTrack> getTracks() {
+        return tracks;
+    }
+
+    public int getTrackSize() {
+        return tracks.size();
     }
 }

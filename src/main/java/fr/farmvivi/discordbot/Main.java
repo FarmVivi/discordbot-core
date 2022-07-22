@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 
-        new Bot(args);
+        new Bot();
 
         long finish = System.currentTimeMillis();
 

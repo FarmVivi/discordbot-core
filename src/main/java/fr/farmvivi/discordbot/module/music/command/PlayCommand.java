@@ -15,7 +15,7 @@ public class PlayCommand extends Command {
 
     public PlayCommand(MusicModule musicModule, Configuration botConfig) {
         this.name = "play";
-        this.aliases = new String[] { "p" };
+        this.aliases = new String[]{"p"};
         this.category = CommandCategory.MUSIC;
         this.description = "Ajoute une musique à la file d'attente";
         this.args = "<name>|<url>";

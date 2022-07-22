@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class LeaveCommand extends Command {
     public LeaveCommand() {
         this.name = "leave";
-        this.aliases = new String[] { "disconnect" };
+        this.aliases = new String[]{"disconnect"};
         this.category = CommandCategory.MUSIC;
         this.description = "Déconnecte le bot du channel";
     }

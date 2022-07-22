@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.music.MusicModule;

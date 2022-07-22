@@ -1,28 +1,20 @@
 package fr.farmvivi.discordbot;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.ModulesManager;
 import net.dv8tion.jda.api.entities.Activity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Bot {
-    private static Bot instance;
-
-    public static Bot getInstance() {
-        return instance;
-    }
-
     public static final String version = "1.4.4";
     public static final String name = "DiscordBot";
-
     public static final Logger logger = LoggerFactory.getLogger(name);
-
+    private static Bot instance;
     private final Configuration configuration;
     private final ModulesManager modulesManager;
 
-    public Bot(String[] args) {
+    public Bot() {
         logger.info("Démarrage de " + name + " v" + version + " en cours...");
 
         logger.info("System.getProperty('os.name') == '" + System.getProperty("os.name") + "'");
@@ -50,6 +42,10 @@ public class Bot {
 
             logger.info("Bye!");
         }));
+    }
+
+    public static Bot getInstance() {
+        return instance;
     }
 
     public static void setDefaultActivity() {

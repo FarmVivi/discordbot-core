@@ -1,12 +1,14 @@
 package fr.farmvivi.discordbot.module.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.farmvivi.discordbot.Bot;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public abstract class Command {
+    protected final List<Command> subCommands = new ArrayList<>();
     protected String name = "null";
     protected String[] aliases = new String[0];
     protected CommandCategory category = CommandCategory.OTHER;
@@ -14,8 +16,6 @@ public abstract class Command {
     protected String args = "";
     protected boolean guildOnly = true;
     protected boolean adminOnly = false;
-
-    protected final List<Command> subCommands = new ArrayList<>();
 
     public boolean execute(MessageReceivedEvent event, String content) {
         if (guildOnly && !event.isFromGuild()) {
@@ -30,12 +30,11 @@ public abstract class Command {
             String cmd = content.split(" ")[0];
 
             for (Command command : subCommands) {
-                List<String> cmds = new ArrayList<>();
-                cmds.add(command.name);
+                List<String> commands = new ArrayList<>();
+                commands.add(command.name);
                 if (command.aliases.length != 0)
-                    for (String tempCmd : command.aliases)
-                        cmds.add(tempCmd);
-                if (cmds.contains(cmd.toLowerCase())) {
+                    Collections.addAll(commands, command.aliases);
+                if (commands.contains(cmd.toLowerCase())) {
                     if (command.args.length() != 0) {
                         int commandLength = cmd.length() + 1;
                         if (content.length() > commandLength) {
