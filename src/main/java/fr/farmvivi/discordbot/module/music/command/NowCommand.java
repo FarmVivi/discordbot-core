@@ -34,7 +34,7 @@ public class NowCommand extends Command {
             return false;
         }
 
-        TextChannel textChannel = event.getTextChannel();
+        TextChannel textChannel = event.getChannel().asTextChannel();
         Guild guild = textChannel.getGuild();
 
         if (!guild.getAudioManager().isConnected()) {

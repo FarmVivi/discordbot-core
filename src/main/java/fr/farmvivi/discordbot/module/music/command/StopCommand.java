@@ -23,7 +23,7 @@ public class StopCommand extends Command {
         if (!super.execute(event, content))
             return false;
 
-        TextChannel textChannel = event.getTextChannel();
+        TextChannel textChannel = event.getChannel().asTextChannel();
         Guild guild = textChannel.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {

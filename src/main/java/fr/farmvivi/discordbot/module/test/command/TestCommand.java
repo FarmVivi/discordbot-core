@@ -24,7 +24,7 @@ public class TestCommand extends Command {
         if (!super.execute(event, content))
             return false;
 
-        TextChannel textChannel = event.getTextChannel();
+        TextChannel textChannel = event.getChannel().asTextChannel();
         Guild guild = textChannel.getGuild();
 
         textChannel.sendMessage("Test").queue();
