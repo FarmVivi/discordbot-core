@@ -196,6 +196,9 @@ fabric.properties
 # Ignore dev file cotaining sensible data
 dev.txt
 
+# Ignore run directory containing configs
+run
+
 # Ignore DevSpace cache and log folder
 .devspace/
 # Ignore DevSpace config
