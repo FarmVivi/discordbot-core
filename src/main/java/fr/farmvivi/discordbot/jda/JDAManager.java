@@ -1,13 +1,13 @@
 package fr.farmvivi.discordbot.jda;
 
-import javax.security.auth.login.LoginException;
-
+import fr.farmvivi.discordbot.Bot;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.farmvivi.discordbot.Bot;
-import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
-import net.dv8tion.jda.api.sharding.ShardManager;
+import javax.security.auth.login.LoginException;
 
 public class JDAManager {
     public static final Logger logger = LoggerFactory.getLogger(JDAManager.class);
@@ -20,7 +20,8 @@ public class JDAManager {
 
     private static ShardManager buildShard() {
         try {
-            return DefaultShardManagerBuilder.createDefault(Bot.getInstance().getConfiguration().jdaToken).build();
+            return DefaultShardManagerBuilder.createDefault(Bot.getInstance().getConfiguration().jdaToken)
+                    .enableIntents(GatewayIntent.MESSAGE_CONTENT).build();
         } catch (LoginException e) {
             logger.error("Cannot build shard !", e);
         }
