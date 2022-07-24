@@ -6,10 +6,32 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Properties;
+
 public class Bot {
-    public static final String version = "1.4.4";
-    public static final String name = "DiscordBot";
-    public static final Logger logger = LoggerFactory.getLogger(name);
+    static {
+        Properties properties = new Properties();
+        try {
+            properties.load(Bot.class.getClassLoader().getResourceAsStream("project.properties"));
+        } catch (IOException e) {
+            System.out.println("ERROR: Cannot read properties file ! Using default values");
+            System.exit(1);
+        }
+
+        name = properties.getProperty("name");
+        version = properties.getProperty("version");
+        production = !Bot.version.contains("-SNAPSHOT");
+
+        logger = LoggerFactory.getLogger(Bot.name);
+    }
+
+    public static final String name;
+    public static final String version;
+    public static final boolean production;
+
+    public static final Logger logger;
+
     private static Bot instance;
     private final Configuration configuration;
     private final ModulesManager modulesManager;
@@ -49,9 +71,8 @@ public class Bot {
     }
 
     public static void setDefaultActivity() {
-        JDAManager.getShardManager()
-                .setActivity(Activity
-                        .playing("v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
+        JDAManager.getShardManager().setActivity(
+                Activity.playing("v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
     }
 
     public Configuration getConfiguration() {

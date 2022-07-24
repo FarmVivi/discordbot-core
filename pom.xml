@@ -8,7 +8,7 @@
     <artifactId>discordbot</artifactId>
     <version>1.4.4-SNAPSHOT</version>
 
-    <name>discord-bot</name>
+    <name>DiscordBot</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
