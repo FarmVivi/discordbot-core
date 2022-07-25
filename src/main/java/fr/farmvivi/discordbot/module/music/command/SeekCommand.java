@@ -4,33 +4,33 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.utils.TimeToIntCalculator;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class SeekCommand extends Command {
     private final MusicModule musicModule;
     private final Configuration botConfig;
 
     public SeekCommand(MusicModule musicModule, Configuration botConfig) {
-        this.name = "seek";
-        this.category = CommandCategory.MUSIC;
-        this.description = "Joue la musique a partir du temps donné";
-        this.args = "<time>";
+        super("seek", CommandCategory.MUSIC, "Joue la musique a partir du temps donné", new OptionData[]{
+                new OptionData(OptionType.INTEGER, "time", "Temps où lire le son")});
 
         this.musicModule = musicModule;
         this.botConfig = botConfig;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
-        if (args != null && content.length() == 0) {
+        if (this.getArgs().length > 0 && content.length() == 0) {
             event.getChannel().sendMessage("Utilisation de la commande: **"
-                    + botConfig.cmdPrefix + name + " " + args + "**").queue();
+                    + botConfig.cmdPrefix + this.getName() + " " + this.getArgsAsString() + "**").queue();
             return false;
         }
 

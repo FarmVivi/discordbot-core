@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.module.commands;
 
 import fr.farmvivi.discordbot.Bot;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,21 +9,41 @@ import java.util.List;
 
 public abstract class Command {
     protected final List<Command> subCommands = new ArrayList<>();
-    protected String name = "null";
-    protected String[] aliases = new String[0];
-    protected CommandCategory category = CommandCategory.OTHER;
-    protected String description = "";
-    protected String args = "";
+
+    private final String name;
+    private final CommandCategory category;
+    private final String description;
+    private final OptionData[] args;
+    private final String[] aliases;
+
     protected boolean guildOnly = true;
     protected boolean adminOnly = false;
 
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public Command(String name, CommandCategory category, String description) {
+        this(name, category, description, new OptionData[0], new String[0]);
+    }
+
+    public Command(String name, CommandCategory category, String description, String[] aliases) {
+        this(name, category, description, new OptionData[0], aliases);
+    }
+
+    public Command(String name, CommandCategory category, String description, OptionData[] args) {
+        this(name, category, description, args, new String[0]);
+    }
+
+    public Command(String name, CommandCategory category, String description, OptionData[] args, String[] aliases) {
+        this.name = name;
+        this.category = category;
+        this.description = description;
+        this.args = args;
+        this.aliases = aliases;
+    }
+
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (guildOnly && !event.isFromGuild()) {
-            event.getChannel().sendMessage("Cette commande peut seulement être exécuté sur un serveur discord.")
-                    .queue();
+            event.getChannel().sendMessage("Cette commande peut seulement être exécuté sur un serveur discord.").queue();
             return false;
-        } else if (adminOnly
-                && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
+        } else if (adminOnly && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
             event.getChannel().sendMessage("Vous n'avez pas la permission d'exécuter cette commande.").queue();
             return false;
         } else if (subCommands.size() != 0 && content.length() != 0) {
@@ -35,7 +55,7 @@ public abstract class Command {
                 if (command.aliases.length != 0)
                     Collections.addAll(commands, command.aliases);
                 if (commands.contains(cmd.toLowerCase())) {
-                    if (command.args.length() != 0) {
+                    if (command.args.length != 0) {
                         int commandLength = cmd.length() + 1;
                         if (content.length() > commandLength) {
                             command.execute(event, content.substring(commandLength));
@@ -66,8 +86,16 @@ public abstract class Command {
         return description;
     }
 
-    public String getArgs() {
+    public OptionData[] getArgs() {
         return args;
+    }
+
+    public String getArgsAsString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (OptionData option : getArgs()) {
+            stringBuilder.append(" ").append(option.getName());
+        }
+        return stringBuilder.toString().replaceFirst(" ", "");
     }
 
     public boolean isGuildOnly() {

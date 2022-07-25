@@ -7,6 +7,8 @@ import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.commands.command.HelpCommand;
 import fr.farmvivi.discordbot.module.commands.command.ShutdownCommand;
 import fr.farmvivi.discordbot.module.commands.command.VersionCommand;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,14 +36,14 @@ public class CommandsModule extends Module {
         registerCommand(module, new VersionCommand());
         registerCommand(module, new ShutdownCommand());
 
-        JDAManager.getShardManager().addEventListener(commandsListener);
+        JDAManager.getJDA().addEventListener(commandsListener);
     }
 
     @Override
     public void disable() {
         unregisterCommands(module);
 
-        JDAManager.getShardManager().removeEventListener(commandsListener);
+        JDAManager.getJDA().removeEventListener(commandsListener);
     }
 
     public void registerCommand(Modules module, Command command) {
@@ -53,6 +55,14 @@ public class CommandsModule extends Module {
         List<Command> moduleCommands = commands.get(module);
 
         moduleCommands.add(command);
+
+        // Registering command to Discord API
+        SlashCommandData commandData = Commands.slash(command.getName(), command.getDescription());
+        if (command.getArgs().length > 0) {
+            commandData.addOptions(command.getArgs());
+        }
+        commandData.setGuildOnly(command.isGuildOnly());
+        JDAManager.getJDA().upsertCommand(commandData).queue();
     }
 
     public void unregisterCommands(Modules module) {

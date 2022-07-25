@@ -2,24 +2,22 @@ package fr.farmvivi.discordbot.module.music.command;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class LoopCommand extends Command {
     private final MusicModule musicModule;
 
     public LoopCommand(MusicModule musicModule) {
-        this.name = "loop";
-        this.category = CommandCategory.MUSIC;
-        this.description = "Met en boucle la musique en cours de lecture";
+        super("loop", CommandCategory.MUSIC, "Met en boucle la musique en cours de lecture");
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

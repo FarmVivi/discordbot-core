@@ -83,7 +83,7 @@ public class MusicModule extends Module {
         if (!botConfig.radioPath.equalsIgnoreCase(""))
             commandsModule.registerCommand(module, new RadioCommand(this, botConfig));
 
-        JDAManager.getShardManager().addEventListener(musicListener);
+        JDAManager.getJDA().addEventListener(musicListener);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class MusicModule extends Module {
 
         commandsModule.unregisterCommands(module);
 
-        JDAManager.getShardManager().removeEventListener(musicListener);
+        JDAManager.getJDA().removeEventListener(musicListener);
 
         audioPlayerManager.shutdown();
     }

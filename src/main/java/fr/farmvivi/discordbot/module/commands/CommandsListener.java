@@ -2,8 +2,10 @@ package fr.farmvivi.discordbot.module.commands;
 
 import fr.farmvivi.discordbot.Configuration;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -20,6 +22,35 @@ public class CommandsListener extends ListenerAdapter {
     }
 
     @Override
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        StringBuilder options = new StringBuilder();
+        for (OptionMapping option : event.getOptions()) {
+            options.append(" ").append(option.getAsString());
+        }
+        String content = options.toString().replaceFirst(" ", "");
+
+        String cmd = event.getName();
+
+        CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(
+                event.getChannel(),
+                event.getChannelType(),
+                event.getUser(),
+                cmd,
+                event.isFromGuild());
+
+        for (Command command : commandsModule.getCommands()) {
+            if (command.getName().equalsIgnoreCase(cmd)) {
+                if (command.getArgs().length != 0 && !content.isBlank()) {
+                    command.execute(commandReceivedEvent, content);
+                    return;
+                }
+                command.execute(commandReceivedEvent, "");
+                return;
+            }
+        }
+    }
+
+    @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         super.onMessageReceived(event);
 
@@ -32,20 +63,27 @@ public class CommandsListener extends ListenerAdapter {
 
             String cmd = message.substring(CMD_PREFIX.length()).split(" ")[0];
 
+            CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(
+                    event.getChannel(),
+                    event.getChannelType(),
+                    event.getAuthor(),
+                    cmd,
+                    event.isFromGuild());
+
             for (Command command : commandsModule.getCommands()) {
                 List<String> commands = new ArrayList<>();
-                commands.add(command.name);
-                if (command.aliases.length != 0)
-                    Collections.addAll(commands, command.aliases);
+                commands.add(command.getName());
+                if (command.getAliases().length != 0)
+                    Collections.addAll(commands, command.getAliases());
                 if (commands.contains(cmd.toLowerCase())) {
-                    if (command.args.length() != 0) {
+                    if (command.getArgs().length != 0) {
                         int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
                         if (message.length() > commandLength) {
-                            command.execute(event, message.substring(commandLength));
+                            command.execute(commandReceivedEvent, message.substring(commandLength));
                             return;
                         }
                     }
-                    command.execute(event, "");
+                    command.execute(commandReceivedEvent, "");
                     return;
                 }
             }

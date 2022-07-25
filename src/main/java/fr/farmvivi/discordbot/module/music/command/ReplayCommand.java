@@ -3,24 +3,22 @@ package fr.farmvivi.discordbot.module.music.command;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ReplayCommand extends Command {
     private final MusicModule musicModule;
 
     public ReplayCommand(MusicModule musicModule) {
-        this.name = "replay";
-        this.category = CommandCategory.MUSIC;
-        this.description = "Rejoue la musique en cours de lecture juste après";
+        super("replay", CommandCategory.MUSIC, "Rejoue la musique en cours de lecture juste après");
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

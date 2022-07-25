@@ -2,25 +2,22 @@ package fr.farmvivi.discordbot.module.music.command;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class PauseCommand extends Command {
     private final MusicModule musicModule;
 
     public PauseCommand(MusicModule musicModule) {
-        this.name = "pause";
-        this.aliases = new String[]{"resume"};
-        this.category = CommandCategory.MUSIC;
-        this.description = "Met en pause la musique (et inversement)";
+        super("pause", CommandCategory.MUSIC, "Met en pause la musique (et inversement)", new String[]{"resume"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

@@ -2,24 +2,22 @@ package fr.farmvivi.discordbot.module.music.command.equalizer;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EqStopCommand extends Command {
     private final MusicModule musicModule;
 
     public EqStopCommand(MusicModule musicModule) {
-        this.name = "eqstop";
-        this.category = CommandCategory.MUSIC;
-        this.description = "Arrête le tunage de la musique";
+        super("eqstop", CommandCategory.MUSIC, "Arrête le tunage de la musique");
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

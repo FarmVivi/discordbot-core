@@ -3,12 +3,14 @@ package fr.farmvivi.discordbot.module.music.command;
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,17 +22,15 @@ public class RadioCommand extends Command {
     private final Configuration botConfig;
 
     public RadioCommand(MusicModule musicModule, Configuration botConfig) {
-        this.name = "radio";
-        this.category = CommandCategory.MUSIC;
-        this.description = "Lance le bot en mode radio";
-        this.args = "<radio>|<list>";
+        super("radio", CommandCategory.MUSIC, "Lance le bot en mode radio", new OptionData[]{
+                new OptionData(OptionType.STRING, "radioname_or_list", "Nom de la radio ou 'list' pour lister les radios")});
 
         this.musicModule = musicModule;
         this.botConfig = botConfig;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

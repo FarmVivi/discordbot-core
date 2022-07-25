@@ -3,8 +3,8 @@ package fr.farmvivi.discordbot.module.commands.command;
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +14,8 @@ public class HelpCommand extends Command {
     private final Configuration botConfig;
 
     public HelpCommand(CommandsModule commandsModule, Configuration botConfig) {
-        this.name = "help";
-        this.category = CommandCategory.OTHER;
-        this.description = "Affiche toutes les commandes";
+        super("help", CommandCategory.OTHER, "Affiche toutes les commandes");
+
         this.guildOnly = false;
 
         this.commandsModule = commandsModule;
@@ -24,7 +23,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 
@@ -48,8 +47,8 @@ public class HelpCommand extends Command {
     private String formatCmdHelp(Command command) {
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("** ").append(botConfig.cmdPrefix).append(command.getName());
-        if (command.getArgs().length() != 0)
-            stringBuilder.append(" ").append(command.getArgs());
+        if (command.getArgs().length != 0)
+            stringBuilder.append(" ").append(command.getArgsAsString());
         stringBuilder.append(" **| ").append(command.getDescription());
         return stringBuilder.toString();
     }

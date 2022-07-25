@@ -2,26 +2,25 @@ package fr.farmvivi.discordbot.module.music.command;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class VolumeCommand extends Command {
     private final MusicModule musicModule;
 
     public VolumeCommand(MusicModule musicModule) {
-        this.name = "volume";
-        this.aliases = new String[]{"v"};
-        this.category = CommandCategory.MUSIC;
-        this.description = "Affiche ou change le volume si une valeur est précisée";
-        this.args = "<volume>";
+        super("volume", CommandCategory.MUSIC, "Affiche ou change le volume si une valeur est précisée", new OptionData[]{
+                new OptionData(OptionType.INTEGER, "volume", "Volume compris entre 0 et 100%")}, new String[]{"v"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

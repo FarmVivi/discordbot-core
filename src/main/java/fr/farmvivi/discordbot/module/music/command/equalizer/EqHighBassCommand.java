@@ -2,10 +2,12 @@ package fr.farmvivi.discordbot.module.music.command.equalizer;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class EqHighBassCommand extends Command {
     private static final float[] BASS_BOOST = {0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f};
@@ -13,16 +15,14 @@ public class EqHighBassCommand extends Command {
     private final MusicModule musicModule;
 
     public EqHighBassCommand(MusicModule musicModule) {
-        this.name = "eqhighbass";
-        this.category = CommandCategory.MUSIC;
-        this.description = "Arrête le tunage de la musique";
-        this.args = "<level>";
+        super("eqhighbass", CommandCategory.MUSIC, "Arrête le tunage de la musique", new OptionData[]{
+                new OptionData(OptionType.NUMBER, "level", "Niveau de basses")});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

@@ -3,25 +3,22 @@ package fr.farmvivi.discordbot.module.music.command;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SkipCommand extends Command {
     private final MusicModule musicModule;
 
     public SkipCommand(MusicModule musicModule) {
-        this.name = "skip";
-        this.aliases = new String[]{"fs"};
-        this.category = CommandCategory.MUSIC;
-        this.description = "Passe à la musique suivante";
+        super("skip", CommandCategory.MUSIC, "Passe à la musique suivante", new String[]{"fs"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

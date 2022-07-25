@@ -2,20 +2,17 @@ package fr.farmvivi.discordbot.module.music.command;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class LeaveCommand extends Command {
     public LeaveCommand() {
-        this.name = "leave";
-        this.aliases = new String[]{"disconnect"};
-        this.category = CommandCategory.MUSIC;
-        this.description = "Déconnecte le bot du channel";
+        super("leave", CommandCategory.MUSIC, "Déconnecte le bot du channel", new String[]{"disconnect", "quit"});
     }
 
     @Override
-    public boolean execute(MessageReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content) {
         if (!super.execute(event, content))
             return false;
 

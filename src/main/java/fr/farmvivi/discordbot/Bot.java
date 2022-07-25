@@ -60,7 +60,7 @@ public class Bot {
 
             modulesManager.unloadModules();
 
-            JDAManager.getShardManager().shutdown();
+            JDAManager.getJDA().shutdown();
 
             logger.info("Bye!");
         }));
@@ -71,7 +71,7 @@ public class Bot {
     }
 
     public static void setDefaultActivity() {
-        JDAManager.getShardManager().setActivity(
+        JDAManager.getJDA().getPresence().setActivity(
                 Activity.playing("v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
     }
 
