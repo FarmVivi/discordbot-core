@@ -23,7 +23,7 @@ public class JDAManager {
             return JDABuilder.createDefault(Bot.getInstance().getConfiguration().jdaToken)
                     .enableIntents(GatewayIntent.MESSAGE_CONTENT).build();
         } catch (LoginException e) {
-            logger.error("Cannot build shard !", e);
+            logger.error("Cannot build JDA !", e);
         }
 
         return null;

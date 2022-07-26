@@ -42,12 +42,16 @@ public class CommandsListener extends ListenerAdapter {
             if (command.getName().equalsIgnoreCase(cmd)) {
                 if (command.getArgs().length != 0 && !content.isBlank()) {
                     command.execute(commandReceivedEvent, content);
+                    event.reply(":thumbsup:").setEphemeral(true).queue();
                     return;
                 }
                 command.execute(commandReceivedEvent, "");
+                event.reply(":thumbsup:").setEphemeral(true).queue();
                 return;
             }
         }
+
+        event.reply(":thumbsdown:").setEphemeral(true).queue();
     }
 
     @Override
