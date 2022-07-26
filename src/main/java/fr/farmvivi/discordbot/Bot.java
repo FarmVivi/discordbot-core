@@ -48,6 +48,8 @@ public class Bot {
 
         instance = this;
 
+        configuration = new Configuration();
+
         try {
             logger.info("Connecting to Discord API");
             JDAManager.getJDA().awaitReady();
@@ -55,7 +57,6 @@ public class Bot {
             logger.error("Cannot connect to Discord API", e);
         }
 
-        configuration = new Configuration();
         modulesManager = new ModulesManager(this);
 
         modulesManager.loadModules();
