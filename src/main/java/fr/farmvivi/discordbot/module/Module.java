@@ -7,26 +7,46 @@ public abstract class Module {
     protected final Logger logger;
     protected final Modules module;
 
-    protected boolean enabled = false;
+    protected ModulePhase status = ModulePhase.LOADED;
 
     public Module(Modules module) {
         this.module = module;
         this.logger = LoggerFactory.getLogger(module.getName().replace(" ", "") + "Module");
     }
 
-    public abstract void enable();
+    public void onPreEnable() {
 
-    public abstract void disable();
+    }
+
+    public void onPreDisable() {
+
+    }
+
+    public void onEnable() {
+
+    }
+
+    public void onDisable() {
+
+    }
+
+    public void onPostEnable() {
+
+    }
+
+    public void onPostDisable() {
+
+    }
 
     public Logger getLogger() {
         return logger;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public ModulePhase getStatus() {
+        return status;
     }
 
-    protected void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setStatus(ModulePhase status) {
+        this.status = status;
     }
 }

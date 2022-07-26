@@ -29,52 +29,143 @@ public class ModulesManager {
             if (moduleName.length() == 0)
                 continue;
 
-            Modules module;
             try {
-                module = Modules.valueOf(moduleName);
+                Modules moduleType = Modules.valueOf(moduleName);
+                loadModule(moduleType);
             } catch (IllegalArgumentException e) {
                 logger.warn("Module " + moduleName + " not found");
-                continue;
             }
-
-            loadModule(module);
         }
 
-        logger.info("Modules loaded");
+        logger.info("Pre enabling modules...");
+        changeStatuses(ModulePhase.PRE_ENABLE);
+
+        logger.info("Enabling modules...");
+        changeStatuses(ModulePhase.ENABLE);
+
+        logger.info("Post enabling modules...");
+        changeStatuses(ModulePhase.POST_ENABLE);
+
+        logger.info("Enabled modules...");
+        changeStatuses(ModulePhase.ENABLED);
+
+        logger.info("Modules enabled");
     }
 
-    public void loadModule(Modules moduleType) {
-        for (Modules requiredModule : moduleType.getRequiredModules())
-            loadModule(requiredModule);
-
-        if (modules.containsKey(moduleType))
+    private void loadModule(Modules moduleType) {
+        if (modules.containsKey(moduleType)) {
             return;
+        }
 
-        Module module;
-
-        switch (moduleType) {
-            case COMMANDS:
-                module = new CommandsModule(moduleType, bot);
-                break;
-            case MUSIC:
-                module = new MusicModule(moduleType, bot);
-                break;
-            case TEST:
-                module = new TestModule(moduleType, bot);
-                break;
-            default:
-                return;
+        for (Modules requiredModule : moduleType.getRequiredModules()) {
+            loadModule(requiredModule);
         }
 
         logger.info("Loading " + moduleType.getName() + " module...");
-        module.enable();
-        module.setEnabled(true);
 
+        Module module;
+        switch (moduleType) {
+            case COMMANDS -> module = new CommandsModule(moduleType, bot);
+            case MUSIC -> module = new MusicModule(moduleType, bot);
+            case TEST -> module = new TestModule(moduleType, bot);
+            default -> {
+                logger.error("Module " + moduleType + " has no implementation !");
+                System.exit(4);
+                return;
+            }
+        }
         modules.put(moduleType, module);
+    }
+
+    private void changeStatuses(ModulePhase newStatus) {
+        for (Modules moduleType : modules.keySet()) {
+            changeStatus(moduleType, newStatus);
+        }
+    }
+
+    private void changeStatus(Modules moduleType, ModulePhase newStatus) {
+        Module module = modules.get(moduleType);
+
+        if (module.getStatus().equals(newStatus)) {
+            return;
+        }
+
+        for (Modules requiredModule : moduleType.getRequiredModules()) {
+            changeStatus(requiredModule, newStatus);
+        }
+
+        switch (newStatus) {
+            case PRE_ENABLE -> {
+                if (module.getStatus().equals(ModulePhase.LOADED)) {
+                    logger.info("Pre enabling " + moduleType.getName() + " module...");
+                    module.onPreEnable();
+                    module.setStatus(ModulePhase.PRE_ENABLE);
+                }
+            }
+            case ENABLE -> {
+                if (module.getStatus().equals(ModulePhase.PRE_ENABLE)) {
+                    logger.info("Enabling " + moduleType.getName() + " module...");
+                    module.onEnable();
+                    module.setStatus(ModulePhase.ENABLE);
+                }
+            }
+            case POST_ENABLE -> {
+                if (module.getStatus().equals(ModulePhase.ENABLE)) {
+                    logger.info("Post enabling " + moduleType.getName() + " module...");
+                    module.onPostEnable();
+                    module.setStatus(ModulePhase.POST_ENABLE);
+                }
+            }
+            case ENABLED -> {
+                if (module.getStatus().equals(ModulePhase.POST_ENABLE)) {
+                    logger.info("Enabled " + moduleType.getName() + " module...");
+                    module.setStatus(ModulePhase.ENABLED);
+                }
+            }
+            case PRE_DISABLE -> {
+                if (module.getStatus().equals(ModulePhase.ENABLED)) {
+                    logger.info("Pre disabling " + moduleType.getName() + " module...");
+                    module.onPreDisable();
+                    module.setStatus(ModulePhase.PRE_DISABLE);
+                }
+            }
+            case DISABLE -> {
+                if (module.getStatus().equals(ModulePhase.PRE_DISABLE)) {
+                    logger.info("Disabling " + moduleType.getName() + " module...");
+                    module.onDisable();
+                    module.setStatus(ModulePhase.DISABLE);
+                }
+            }
+            case POST_DISABLE -> {
+                if (module.getStatus().equals(ModulePhase.DISABLE)) {
+                    logger.info("Post disabling " + moduleType.getName() + " module...");
+                    module.onPostDisable();
+                    module.setStatus(ModulePhase.POST_DISABLE);
+                }
+            }
+            case DISABLED -> {
+                if (module.getStatus().equals(ModulePhase.POST_DISABLE)) {
+                    logger.info("Disabled " + moduleType.getName() + " module...");
+                    module.setStatus(ModulePhase.DISABLED);
+                }
+            }
+        }
     }
 
     public void unloadModules() {
         logger.info("Unloading modules...");
+
+        logger.info("Pre disabling modules...");
+        changeStatuses(ModulePhase.PRE_DISABLE);
+
+        logger.info("Disabling modules...");
+        changeStatuses(ModulePhase.DISABLE);
+
+        logger.info("Post disabling modules...");
+        changeStatuses(ModulePhase.POST_DISABLE);
+
+        logger.info("Disabled modules...");
+        changeStatuses(ModulePhase.DISABLED);
 
         while (!modules.isEmpty()) {
             // New list to avoid ConcurrentException
@@ -86,10 +177,10 @@ public class ModulesManager {
             }
         }
 
-        logger.info("Modules unloaded");
+        logger.info("Modules disabled");
     }
 
-    public void unloadModule(Modules moduleType) throws UnloadModuleException {
+    private void unloadModule(Modules moduleType) throws UnloadModuleException {
         // New list to avoid ConcurrentException
         for (Modules mod : new LinkedList<>(modules.keySet())) {
             if (!mod.equals(moduleType))
@@ -100,7 +191,7 @@ public class ModulesManager {
         }
 
         logger.info("Unloading " + moduleType.getName() + " module...");
-        modules.remove(moduleType).disable();
+        modules.remove(moduleType);
     }
 
     public Module getModule(Modules moduleType) {

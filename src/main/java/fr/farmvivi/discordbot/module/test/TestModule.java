@@ -18,14 +18,18 @@ public class TestModule extends Module {
     }
 
     @Override
-    public void enable() {
+    public void onEnable() {
+        super.onEnable();
+
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
         commandsModule.registerCommand(module, new TestCommand(this));
     }
 
     @Override
-    public void disable() {
+    public void onDisable() {
+        super.onDisable();
+
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
         commandsModule.unregisterCommands(module);

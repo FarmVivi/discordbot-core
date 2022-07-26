@@ -9,6 +9,7 @@ import fr.farmvivi.discordbot.module.commands.command.ShutdownCommand;
 import fr.farmvivi.discordbot.module.commands.command.VersionCommand;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +32,9 @@ public class CommandsModule extends Module {
     }
 
     @Override
-    public void enable() {
+    public void onEnable() {
+        super.onEnable();
+
         registerCommand(module, new HelpCommand(this, bot.getConfiguration()));
         registerCommand(module, new VersionCommand());
         registerCommand(module, new ShutdownCommand());
@@ -40,10 +43,34 @@ public class CommandsModule extends Module {
     }
 
     @Override
-    public void disable() {
+    public void onDisable() {
+        super.onDisable();
+
         unregisterCommands(module);
 
         JDAManager.getJDA().removeEventListener(commandsListener);
+    }
+
+    @Override
+    public void onPostEnable() {
+        super.onPostEnable();
+
+        logger.info("Registering commands to Discord API...");
+
+        CommandListUpdateAction commandListUpdateAction = JDAManager.getJDA().updateCommands();
+
+        for (Command command : getCommands()) {
+            // Registering command to Discord API
+            SlashCommandData commandData = Commands.slash(command.getName(), command.getDescription());
+            if (command.getArgs().length > 0) {
+                commandData.addOptions(command.getArgs());
+            }
+            commandData.setGuildOnly(command.isGuildOnly());
+            logger.info("Registering " + command.getName() + " commands to Discord API...");
+            commandListUpdateAction.addCommands(commandData);
+        }
+
+        commandListUpdateAction.queue();
     }
 
     public void registerCommand(Modules module, Command command) {
@@ -55,14 +82,6 @@ public class CommandsModule extends Module {
         List<Command> moduleCommands = commands.get(module);
 
         moduleCommands.add(command);
-
-        // Registering command to Discord API
-        SlashCommandData commandData = Commands.slash(command.getName(), command.getDescription());
-        if (command.getArgs().length > 0) {
-            commandData.addOptions(command.getArgs());
-        }
-        commandData.setGuildOnly(command.isGuildOnly());
-        JDAManager.getJDA().upsertCommand(commandData).queue();
     }
 
     public void unregisterCommands(Modules module) {

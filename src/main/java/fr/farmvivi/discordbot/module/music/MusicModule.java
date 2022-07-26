@@ -55,7 +55,9 @@ public class MusicModule extends Module {
     }
 
     @Override
-    public void enable() {
+    public void onEnable() {
+        super.onEnable();
+
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
         Configuration botConfig = bot.getConfiguration();
@@ -87,7 +89,9 @@ public class MusicModule extends Module {
     }
 
     @Override
-    public void disable() {
+    public void onDisable() {
+        super.onDisable();
+
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
         commandsModule.unregisterCommands(module);
