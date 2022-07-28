@@ -23,7 +23,7 @@ public class RadioCommand extends Command {
 
     public RadioCommand(MusicModule musicModule, Configuration botConfig) {
         super("radio", CommandCategory.MUSIC, "Joue une playlist préchargée", new OptionData[]{
-                new OptionData(OptionType.STRING, "nom", "Nom de la radio")});
+                new OptionData(OptionType.STRING, "playlist", "Nom de la playlist")});
 
         this.musicModule = musicModule;
         this.botConfig = botConfig;
@@ -46,10 +46,12 @@ public class RadioCommand extends Command {
             guild.getAudioManager().setAutoReconnect(true);
         }
 
-        if (content.equalsIgnoreCase("") || content.equalsIgnoreCase("list"))
+        if (content.equalsIgnoreCase("") || content.equalsIgnoreCase("list")) {
             displayRadio(reply);
-        else
+        } else {
             playRadio(guild, botConfig.radioPath + File.separator + content + ".m3u");
+            reply.append("Playlist **").append(content).append("** en cours de lecture.");
+        }
 
         return true;
     }
@@ -61,7 +63,7 @@ public class RadioCommand extends Command {
             return;
         }
 
-        StringBuilder builder = new StringBuilder("Radio:");
+        StringBuilder builder = new StringBuilder("Playlists :");
 
         for (File file : directory.listFiles())
             if (file.getName().endsWith(".m3u"))
