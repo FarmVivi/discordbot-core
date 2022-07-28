@@ -2,10 +2,10 @@ package fr.farmvivi.discordbot.module.music.command;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
@@ -13,22 +13,21 @@ public class VolumeCommand extends Command {
     private final MusicModule musicModule;
 
     public VolumeCommand(MusicModule musicModule) {
-        super("volume", CommandCategory.MUSIC, "Affiche ou change le volume si une valeur est précisée", new OptionData[]{
-                new OptionData(OptionType.INTEGER, "volume", "Volume compris entre 0 et 100%")}, new String[]{"v"});
+        super("volume", CommandCategory.MUSIC, "Change le volume de la musique", new OptionData[]{
+                new OptionData(OptionType.INTEGER, "volume", "Nouveau volume")}, new String[]{"v"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
+            reply.append("Aucune musique en cours de lecture.");
             return false;
         }
 
@@ -36,17 +35,15 @@ public class VolumeCommand extends Command {
         try {
             volume = Integer.parseInt(content);
         } catch (NumberFormatException e) {
-            textChannel.sendMessage(
-                            "Le volume actuel est à **" + musicModule.getPlayer(guild).getAudioPlayer().getVolume() + "%**.")
-                    .queue();
+            reply.append("Le volume actuel est à **").append(String.valueOf(musicModule.getPlayer(guild).getAudioPlayer().getVolume())).append("%**.");
             return true;
         }
 
         if (volume > 0 && volume <= 100) {
             musicModule.getPlayer(guild).getAudioPlayer().setVolume(volume);
-            textChannel.sendMessage("Volume mis à **" + volume + "%**.").queue();
+            reply.append("Volume mis à **").append(String.valueOf(volume)).append("%**.");
         } else {
-            textChannel.sendMessage("Le volume doit être compris entre **1%** et **100%**.").queue();
+            reply.append("Le volume doit être compris entre **1%** et **100%**.");
             return false;
         }
 

@@ -32,21 +32,32 @@ public class CommandsListener extends ListenerAdapter {
         String cmd = event.getName();
 
         CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(
+                event.getGuild(),
                 event.getChannel(),
                 event.getChannelType(),
                 event.getUser(),
                 cmd,
                 event.isFromGuild());
 
+        CommandMessageBuilder reply = new CommandMessageBuilder(event);
+
         for (Command command : commandsModule.getCommands()) {
             if (command.getName().equalsIgnoreCase(cmd)) {
                 if (command.getArgs().length != 0 && !content.isBlank()) {
-                    command.execute(commandReceivedEvent, content);
-                    event.reply(":thumbsup:").setEphemeral(true).queue();
+                    command.execute(commandReceivedEvent, content, reply);
+                    if (reply.isDiffer()) {
+                        event.deferReply(true).queue();
+                    } else {
+                        event.reply(reply.build()).setEphemeral(true).queue();
+                    }
                     return;
                 }
-                command.execute(commandReceivedEvent, "");
-                event.reply(":thumbsup:").setEphemeral(true).queue();
+                command.execute(commandReceivedEvent, "", reply);
+                if (reply.isDiffer()) {
+                    event.deferReply(true).queue();
+                } else {
+                    event.reply(reply.build()).setEphemeral(true).queue();
+                }
                 return;
             }
         }
@@ -68,11 +79,15 @@ public class CommandsListener extends ListenerAdapter {
             String cmd = message.substring(CMD_PREFIX.length()).split(" ")[0];
 
             CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(
+                    event.getGuild(),
                     event.getChannel(),
                     event.getChannelType(),
                     event.getAuthor(),
                     cmd,
                     event.isFromGuild());
+
+            CommandMessageBuilder reply = new CommandMessageBuilder(event);
+            reply.append("> **Cette commande est obsolète !** Veuillez utiliser les commandes en commençant par un **/**\n\n");
 
             for (Command command : commandsModule.getCommands()) {
                 List<String> commands = new ArrayList<>();
@@ -83,11 +98,17 @@ public class CommandsListener extends ListenerAdapter {
                     if (command.getArgs().length != 0) {
                         int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
                         if (message.length() > commandLength) {
-                            command.execute(commandReceivedEvent, message.substring(commandLength));
+                            command.execute(commandReceivedEvent, message.substring(commandLength), reply);
+                            if (!reply.isDiffer()) {
+                                event.getMessage().reply(reply.build()).queue();
+                            }
                             return;
                         }
                     }
-                    command.execute(commandReceivedEvent, "");
+                    command.execute(commandReceivedEvent, "", reply);
+                    if (!reply.isDiffer()) {
+                        event.getMessage().reply(reply.build()).queue();
+                    }
                     return;
                 }
             }

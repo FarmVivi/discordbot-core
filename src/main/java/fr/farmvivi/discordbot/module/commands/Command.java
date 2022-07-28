@@ -39,12 +39,12 @@ public abstract class Command {
         this.aliases = aliases;
     }
 
-    public boolean execute(CommandReceivedEvent event, String content) {
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
         if (guildOnly && !event.isFromGuild()) {
-            event.getChannel().sendMessage("Cette commande peut seulement être exécuté sur un serveur discord.").queue();
+            reply.append("Cette commande peut seulement être exécuté sur un serveur discord.");
             return false;
         } else if (adminOnly && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
-            event.getChannel().sendMessage("Vous n'avez pas la permission d'exécuter cette commande.").queue();
+            reply.append("Vous n'avez pas la permission d'exécuter cette commande.");
             return false;
         } else if (subCommands.size() != 0 && content.length() != 0) {
             String cmd = content.split(" ")[0];
@@ -58,11 +58,11 @@ public abstract class Command {
                     if (command.args.length != 0) {
                         int commandLength = cmd.length() + 1;
                         if (content.length() > commandLength) {
-                            command.execute(event, content.substring(commandLength));
+                            command.execute(event, content.substring(commandLength), reply);
                             return false;
                         }
                     }
-                    command.execute(event, "");
+                    command.execute(event, "", reply);
                     return false;
                 }
             }

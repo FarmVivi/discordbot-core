@@ -2,39 +2,38 @@ package fr.farmvivi.discordbot.module.music.command;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class ShuffleCommand extends Command {
     private final MusicModule musicModule;
 
     public ShuffleCommand(MusicModule musicModule) {
-        super("shuffle", CommandCategory.MUSIC, "Joue la musique aléatoirement");
+        super("shuffle", CommandCategory.MUSIC, "Joue une musique aléatoire de la file d'attente");
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
+            reply.append("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).isShuffleMode()) {
             musicModule.getPlayer(guild).setShuffleMode(false);
-            textChannel.sendMessage("**Shuffle** désactivé.").queue();
+            reply.append("**Shuffle** désactivé.");
         } else {
             musicModule.getPlayer(guild).setShuffleMode(true);
-            textChannel.sendMessage("**Shuffle** activé.").queue();
+            reply.append("**Shuffle** activé.");
         }
 
         return true;

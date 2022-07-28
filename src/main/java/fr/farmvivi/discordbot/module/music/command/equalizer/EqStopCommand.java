@@ -2,35 +2,34 @@ package fr.farmvivi.discordbot.module.music.command.equalizer;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class EqStopCommand extends Command {
     private final MusicModule musicModule;
 
     public EqStopCommand(MusicModule musicModule) {
-        super("eqstop", CommandCategory.MUSIC, "Arrête le tunage de la musique");
+        super("eqstop", CommandCategory.MUSIC, "Désactive le modificateur audio");
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
+            reply.append("Aucune musique en cours de lecture.");
             return false;
         }
 
         musicModule.getPlayer(guild).getAudioPlayer().setFilterFactory(null);
-        textChannel.sendMessage("**Equalizer** désactivé.").queue();
+        reply.append("**Equalizer** désactivé.");
 
         return true;
     }

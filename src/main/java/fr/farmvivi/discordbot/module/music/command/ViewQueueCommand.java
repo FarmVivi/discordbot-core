@@ -3,10 +3,10 @@ package fr.farmvivi.discordbot.module.music.command;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class ViewQueueCommand extends Command {
     private final MusicModule musicModule;
@@ -18,15 +18,14 @@ public class ViewQueueCommand extends Command {
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
-            textChannel.sendMessage("Il n'y a pas de musique dans la file d'attente.").queue();
+            reply.append("Il n'y a pas de musique dans la file d'attente.");
             return true;
         }
 
@@ -34,7 +33,7 @@ public class ViewQueueCommand extends Command {
         builder.append("**Queue** :");
         for (AudioTrack track : musicModule.getPlayer(guild).getListener().getTracks())
             builder.append("\n-> **").append(track.getInfo().title).append("**");
-        textChannel.sendMessage(builder.toString()).queue();
+        reply.append(builder.toString());
 
         return true;
     }

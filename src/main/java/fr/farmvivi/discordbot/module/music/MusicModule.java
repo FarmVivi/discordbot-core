@@ -13,6 +13,7 @@ import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.Module;
 import fr.farmvivi.discordbot.module.Modules;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.music.command.*;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqHighBassCommand;
@@ -20,7 +21,6 @@ import fr.farmvivi.discordbot.module.music.command.equalizer.EqStartCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStopCommand;
 import fr.farmvivi.discordbot.module.music.spotify.LinkConverter;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
@@ -119,32 +119,40 @@ public class MusicModule extends Module {
         this.loadTrack(guild, source, null, playNow);
     }
 
-    public void loadTrack(Guild guild, String source, TextChannel textChannel) {
-        this.loadTrack(guild, source, textChannel, false);
+    public void loadTrack(Guild guild, String source, CommandMessageBuilder reply) {
+        this.loadTrack(guild, source, reply, false);
     }
 
-    public void loadTrack(Guild guild, String source, TextChannel textChannel, boolean playNow) {
+    public void loadTrack(Guild guild, String source, CommandMessageBuilder reply, boolean playNow) {
         MusicPlayer player = getPlayer(guild);
 
         guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
 
-        if ((source.startsWith("http") && source.contains("://")) || source.startsWith("/")
-                || source.startsWith("./")) {
+        if (reply != null) {
+            reply.setDiffer(true);
+        }
+
+        if ((source.startsWith("http") && source.contains("://")) || source.startsWith("/") || source.startsWith("./")) {
             if (source.contains("open.spotify.com")) {
                 LinkConverter linkConverter = new LinkConverter();
                 try {
                     List<String> songs = linkConverter.convert(source);
+                    if (reply != null) {
+                        reply.setDiffer(false);
+                        if (songs.isEmpty()) {
+                            reply.append("> _Erreur : Lien non supporté_");
+                        } else {
+                            reply.append("**").append(source).append("** ajouté à la file d'attente.");
+                        }
+                    }
                     for (String songName : songs)
                         audioPlayerManager.loadItem("ytsearch: " + songName,
                                 new FunctionalResultHandler(null, playlist -> {
-                                    if (textChannel != null)
-                                        textChannel.sendMessage("**" + playlist.getTracks().get(0).getInfo().title
-                                                + "** ajouté à la file d'attente.").queue();
-
-                                    if (playNow)
+                                    if (playNow) {
                                         player.playTrackNow(playlist.getTracks().get(0));
-                                    else
+                                    } else {
                                         player.playTrack(playlist.getTracks().get(0));
+                                    }
                                 }, null, null));
                 } catch (ParseException | SpotifyWebApiException | IOException e) {
                     logger.error("Unable to get tracks from " + source, e);
@@ -153,14 +161,16 @@ public class MusicModule extends Module {
                 audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
                     @Override
                     public void trackLoaded(AudioTrack track) {
-                        if (textChannel != null)
-                            textChannel.sendMessage("**" + track.getInfo().title + "** ajouté à la file d'attente.")
-                                    .queue();
+                        if (reply != null) {
+                            reply.append("**").append(track.getInfo().title).append("** ajouté à la file d'attente.");
+                            reply.replyNow();
+                        }
 
-                        if (playNow)
+                        if (playNow) {
                             player.playTrackNow(track);
-                        else
+                        } else {
                             player.playTrack(track);
+                        }
                     }
 
                     @Override
@@ -171,49 +181,54 @@ public class MusicModule extends Module {
                         for (AudioTrack track : playlist.getTracks()) {
                             builder.append("\n-> **").append(track.getInfo().title).append("**");
 
-                            if (playNow)
+                            if (playNow) {
                                 player.playTrackNow(track);
-                            else
+                            } else {
                                 player.playTrack(track);
+                            }
                         }
 
-                        if (textChannel != null)
-                            textChannel.sendMessage(builder.toString()).queue();
+                        if (reply != null) {
+                            reply.append(builder.toString());
+                            reply.replyNow();
+                        }
                     }
 
                     @Override
                     public void noMatches() {
                         // Notify the user that we've got nothing
-                        if (textChannel != null)
-                            textChannel.sendMessage("La piste " + source + " n'a pas été trouvé.").queue();
-                        else
+                        if (reply != null) {
+                            reply.append("La piste ").append(source).append(" n'a pas été trouvé.");
+                            reply.replyNow();
+                        } else {
                             logger.warn("La piste " + source + " n'a pas été trouvé.");
+                        }
                     }
 
                     @Override
                     public void loadFailed(FriendlyException throwable) {
                         // Notify the user that everything exploded
-                        if (textChannel != null)
-                            textChannel
-                                    .sendMessage(
-                                            "Impossible de jouer la piste (raison: " + throwable.getMessage() + ").")
-                                    .queue();
-                        else
+                        if (reply != null) {
+                            reply.append("Impossible de jouer la piste (raison: ").append(throwable.getMessage()).append(").");
+                            reply.replyNow();
+                        } else {
                             logger.warn("Impossible de jouer la piste.", throwable);
+                        }
                     }
                 });
             }
         } else {
             audioPlayerManager.loadItem("ytsearch: " + source, new FunctionalResultHandler(null, playlist -> {
-                if (textChannel != null)
-                    textChannel.sendMessage(
-                                    "**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.")
-                            .queue();
+                if (reply != null) {
+                    reply.append("**").append(playlist.getTracks().get(0).getInfo().title).append("** ajouté à la file d'attente.");
+                    reply.replyNow();
+                }
 
-                if (playNow)
+                if (playNow) {
                     player.playTrackNow(playlist.getTracks().get(0));
-                else
+                } else {
                     player.playTrack(playlist.getTracks().get(0));
+                }
             }, null, null));
         }
     }

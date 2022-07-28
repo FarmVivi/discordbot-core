@@ -3,10 +3,10 @@ package fr.farmvivi.discordbot.module.music.command;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class SkipCommand extends Command {
     private final MusicModule musicModule;
@@ -18,23 +18,22 @@ public class SkipCommand extends Command {
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
+            reply.append("Aucune musique en cours de lecture.");
             return false;
         }
 
         AudioTrack track = musicModule.getPlayer(guild).skipTrack();
         if (track == null)
-            textChannel.sendMessage("Plus aucune musique à jouer.").queue();
+            reply.append("Plus aucune musique à jouer.");
         else
-            textChannel.sendMessage("Musique suivante: **" + track.getInfo().title + "**").queue();
+            reply.append("Musique suivante: **").append(track.getInfo().title).append("**");
 
         return true;
     }

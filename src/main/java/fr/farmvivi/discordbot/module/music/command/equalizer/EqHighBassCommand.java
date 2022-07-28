@@ -2,10 +2,10 @@ package fr.farmvivi.discordbot.module.music.command.equalizer;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
@@ -15,22 +15,21 @@ public class EqHighBassCommand extends Command {
     private final MusicModule musicModule;
 
     public EqHighBassCommand(MusicModule musicModule) {
-        super("eqhighbass", CommandCategory.MUSIC, "Arrête le tunage de la musique", new OptionData[]{
-                new OptionData(OptionType.NUMBER, "level", "Niveau de basses")});
+        super("eqhighbass", CommandCategory.MUSIC, "Ajuste le niveau de basses du modificateur audio", new OptionData[]{
+                new OptionData(OptionType.NUMBER, "niveau", "Niveau de basses")});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
+            reply.append("Aucune musique en cours de lecture.");
             return false;
         }
 
@@ -39,11 +38,11 @@ public class EqHighBassCommand extends Command {
             for (int i = 0; i < BASS_BOOST.length; i++)
                 musicModule.getPlayer(guild).getEqualizer().setGain(i, BASS_BOOST[i] + diff);
 
-            textChannel.sendMessage("**Equalizer - High Bass** de " + diff + " activé.").queue();
+            reply.append("**Equalizer - High Bass** de ").append(String.valueOf(diff)).append(" activé.");
 
             return true;
         } catch (NumberFormatException err) {
-            textChannel.sendMessage("Valeur non valide.").queue();
+            reply.append("Valeur non valide.");
             return false;
         }
     }

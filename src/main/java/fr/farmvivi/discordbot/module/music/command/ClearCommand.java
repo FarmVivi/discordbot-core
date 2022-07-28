@@ -2,40 +2,39 @@ package fr.farmvivi.discordbot.module.music.command;
 
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class ClearCommand extends Command {
     private final MusicModule musicModule;
 
     public ClearCommand(MusicModule musicModule) {
-        super("clear", CommandCategory.MUSIC, "Supprime la file d'attente");
+        super("clear", CommandCategory.MUSIC, "Vide la file d'attente");
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            textChannel.sendMessage("Aucune musique en cours de lecture.").queue();
+            reply.append("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
-            textChannel.sendMessage("Il n'y a pas de musique dans la file d'attente.").queue();
+            reply.append("Il n'y a pas de musique dans la file d'attente.");
             return false;
         }
 
         musicModule.getPlayer(guild).getListener().getTracks().clear();
-        textChannel.sendMessage("La liste d'attente à été vidé.").queue();
+        reply.append("La liste d'attente à été vidé.");
 
         return true;
     }

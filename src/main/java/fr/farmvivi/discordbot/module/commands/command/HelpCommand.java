@@ -1,10 +1,7 @@
 package fr.farmvivi.discordbot.module.commands.command;
 
 import fr.farmvivi.discordbot.Configuration;
-import fr.farmvivi.discordbot.module.commands.Command;
-import fr.farmvivi.discordbot.module.commands.CommandCategory;
-import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
-import fr.farmvivi.discordbot.module.commands.CommandsModule;
+import fr.farmvivi.discordbot.module.commands.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +20,8 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
         Map<CommandCategory, StringBuilder> strBuilders = new HashMap<>();
@@ -39,7 +36,7 @@ public class HelpCommand extends Command {
         for (StringBuilder strBuilder : strBuilders.values())
             finalBuilder.append(strBuilder.toString()).append("\n\n");
         String message = finalBuilder.toString();
-        event.getChannel().sendMessage(message.subSequence(0, message.length() - 2)).queue();
+        reply.append(message.subSequence(0, message.length() - 2));
 
         return true;
     }

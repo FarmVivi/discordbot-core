@@ -3,12 +3,12 @@ package fr.farmvivi.discordbot.module.music.command;
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
+import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
@@ -22,25 +22,24 @@ public class RadioCommand extends Command {
     private final Configuration botConfig;
 
     public RadioCommand(MusicModule musicModule, Configuration botConfig) {
-        super("radio", CommandCategory.MUSIC, "Lance le bot en mode radio", new OptionData[]{
-                new OptionData(OptionType.STRING, "radioname_or_list", "Nom de la radio ou 'list' pour lister les radios")});
+        super("radio", CommandCategory.MUSIC, "Joue une playlist préchargée", new OptionData[]{
+                new OptionData(OptionType.STRING, "nom", "Nom de la radio")});
 
         this.musicModule = musicModule;
         this.botConfig = botConfig;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content) {
-        if (!super.execute(event, content))
+    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
+        if (!super.execute(event, content, reply))
             return false;
 
-        TextChannel textChannel = event.getChannel().asTextChannel();
-        Guild guild = textChannel.getGuild();
+        Guild guild = event.getGuild();
 
         if (!guild.getAudioManager().isConnected()) {
             AudioChannel voiceChannel = guild.getMember(event.getAuthor()).getVoiceState().getChannel();
             if (voiceChannel == null) {
-                textChannel.sendMessage("Vous devez être connecté à un salon vocal.").queue();
+                reply.append("Vous devez être connecté à un salon vocal.");
                 return false;
             }
             guild.getAudioManager().openAudioConnection(voiceChannel);
@@ -48,17 +47,17 @@ public class RadioCommand extends Command {
         }
 
         if (content.equalsIgnoreCase("") || content.equalsIgnoreCase("list"))
-            displayRadio(textChannel);
+            displayRadio(reply);
         else
             playRadio(guild, botConfig.radioPath + File.separator + content + ".m3u");
 
         return true;
     }
 
-    private void displayRadio(TextChannel textChannel) {
+    private void displayRadio(CommandMessageBuilder reply) {
         File directory = new File(botConfig.radioPath);
         if (!directory.exists()) {
-            textChannel.sendMessage("Une erreur est survenue").queue();
+            reply.append("Une erreur est survenue");
             return;
         }
 
@@ -68,7 +67,7 @@ public class RadioCommand extends Command {
             if (file.getName().endsWith(".m3u"))
                 builder.append("\n- **").append(file.getName().replace(".m3u", "")).append("**");
 
-        textChannel.sendMessage(builder.toString()).queue();
+        reply.append(builder.toString());
     }
 
     private void playRadio(Guild guild, String uri) {
