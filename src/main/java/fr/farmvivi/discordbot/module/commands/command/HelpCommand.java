@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.commands.command;
 
-import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.*;
 
 import java.util.HashMap;
@@ -8,15 +7,13 @@ import java.util.Map;
 
 public class HelpCommand extends Command {
     private final CommandsModule commandsModule;
-    private final Configuration botConfig;
 
-    public HelpCommand(CommandsModule commandsModule, Configuration botConfig) {
+    public HelpCommand(CommandsModule commandsModule) {
         super("help", CommandCategory.OTHER, "Affiche toutes les commandes");
 
         this.guildOnly = false;
 
         this.commandsModule = commandsModule;
-        this.botConfig = botConfig;
     }
 
     @Override
@@ -45,7 +42,7 @@ public class HelpCommand extends Command {
 
     private String formatCmdHelp(Command command) {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("** ").append(botConfig.cmdPrefix).append(command.getName());
+        stringBuilder.append("** /").append(command.getName());
         if (command.getArgs().length != 0)
             stringBuilder.append(" ").append(command.getArgsAsString());
         stringBuilder.append(" **| ").append(command.getDescription());

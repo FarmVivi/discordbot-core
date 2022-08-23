@@ -35,7 +35,7 @@ public class CommandsModule extends Module {
     public void onEnable() {
         super.onEnable();
 
-        registerCommand(module, new HelpCommand(this, bot.getConfiguration()));
+        registerCommand(module, new HelpCommand(this));
         registerCommand(module, new VersionCommand());
         registerCommand(module, new ShutdownCommand());
 
