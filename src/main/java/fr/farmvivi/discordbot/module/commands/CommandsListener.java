@@ -87,7 +87,7 @@ public class CommandsListener extends ListenerAdapter {
 
             CommandMessageBuilder reply = new CommandMessageBuilder(event);
             reply.append("> **Cette commande est obsolète !**\n")
-                    .append("> Veuillez utiliser les commandes en commençant par un **/** au lieu de **").append(botConfig.cmdPrefix).append("** !")
+                    .append("> Veuillez utiliser les commandes en commençant par **/** au lieu de **").append(botConfig.cmdPrefix).append("** !")
                     .append("\n")
                     .append("\n");
 
