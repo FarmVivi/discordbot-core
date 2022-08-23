@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
@@ -14,14 +13,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class SeekCommand extends Command {
     private final MusicModule musicModule;
-    private final Configuration botConfig;
 
-    public SeekCommand(MusicModule musicModule, Configuration botConfig) {
+    public SeekCommand(MusicModule musicModule) {
         super("seek", CommandCategory.MUSIC, "Joue la musique a partir du temps donné", new OptionData[]{
                 new OptionData(OptionType.INTEGER, "temps", "Temps à partir duquel lire la musique")});
 
         this.musicModule = musicModule;
-        this.botConfig = botConfig;
     }
 
     @Override
@@ -29,8 +26,7 @@ public class SeekCommand extends Command {
         if (!super.execute(event, content, reply))
             return false;
         if (this.getArgs().length > 0 && content.length() == 0) {
-            reply.append("Utilisation de la commande: **")
-                    .append(botConfig.cmdPrefix).append(this.getName()).append(" ").append(this.getArgsAsString()).append("**");
+            reply.append("Utilisation de la commande: **/").append(this.getName()).append(" ").append(this.getArgsAsString()).append("**");
             return false;
         }
 

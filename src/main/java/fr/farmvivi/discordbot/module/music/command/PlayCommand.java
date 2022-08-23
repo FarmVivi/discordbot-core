@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
@@ -13,14 +12,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class PlayCommand extends Command {
     private final MusicModule musicModule;
-    private final Configuration botConfig;
 
-    public PlayCommand(MusicModule musicModule, Configuration botConfig) {
+    public PlayCommand(MusicModule musicModule) {
         super("play", CommandCategory.MUSIC, "Ajoute une musique à la file d'attente", new OptionData[]{
                 new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente")}, new String[]{"p"});
 
         this.musicModule = musicModule;
-        this.botConfig = botConfig;
     }
 
     @Override
@@ -28,8 +25,7 @@ public class PlayCommand extends Command {
         if (!super.execute(event, content, reply))
             return false;
         if (this.getArgs().length > 0 && content.length() == 0) {
-            reply.append("Utilisation de la commande: **")
-                    .append(botConfig.cmdPrefix).append(this.getName()).append(" ").append(this.getArgsAsString()).append("**");
+            reply.append("Utilisation de la commande: **/").append(this.getName()).append(" ").append(this.getArgsAsString()).append("**");
             return false;
         }
 

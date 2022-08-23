@@ -57,6 +57,8 @@ public class RadioCommand extends Command {
     }
 
     private void displayRadio(CommandMessageBuilder reply) {
+        reply.setEphemeral(true);
+
         File directory = new File(botConfig.radioPath);
         if (!directory.exists()) {
             reply.append("Une erreur est survenue");

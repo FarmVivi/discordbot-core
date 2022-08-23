@@ -62,8 +62,8 @@ public class MusicModule extends Module {
 
         Configuration botConfig = bot.getConfiguration();
 
-        commandsModule.registerCommand(module, new PlayCommand(this, botConfig));
-        commandsModule.registerCommand(module, new NowCommand(this, botConfig));
+        commandsModule.registerCommand(module, new PlayCommand(this));
+        commandsModule.registerCommand(module, new NowCommand(this));
         commandsModule.registerCommand(module, new SkipCommand(this));
         commandsModule.registerCommand(module, new NextCommand(this));
         commandsModule.registerCommand(module, new ClearCommand(this));
@@ -75,7 +75,7 @@ public class MusicModule extends Module {
         commandsModule.registerCommand(module, new LoopCommand(this));
         commandsModule.registerCommand(module, new ShuffleCommand(this));
         commandsModule.registerCommand(module, new VolumeCommand(this));
-        commandsModule.registerCommand(module, new SeekCommand(this, botConfig));
+        commandsModule.registerCommand(module, new SeekCommand(this));
         commandsModule.registerCommand(module, new ReplayCommand(this));
         commandsModule.registerCommand(module, new ViewQueueCommand(this));
         commandsModule.registerCommand(module, new EqStartCommand(this));
@@ -141,6 +141,7 @@ public class MusicModule extends Module {
                         reply.setDiffer(false);
                         if (songs.isEmpty()) {
                             reply.append("> _Erreur : Lien non supporté_");
+                            reply.setEphemeral(true);
                         } else {
                             reply.append("**").append(source).append("** ajouté à la file d'attente.");
                         }
@@ -199,6 +200,7 @@ public class MusicModule extends Module {
                         // Notify the user that we've got nothing
                         if (reply != null) {
                             reply.append("La piste ").append(source).append(" n'a pas été trouvé.");
+                            reply.setEphemeral(true);
                             reply.replyNow();
                         } else {
                             logger.warn("La piste " + source + " n'a pas été trouvé.");
@@ -210,6 +212,7 @@ public class MusicModule extends Module {
                         // Notify the user that everything exploded
                         if (reply != null) {
                             reply.append("Impossible de jouer la piste (raison: ").append(throwable.getMessage()).append(").");
+                            reply.setEphemeral(true);
                             reply.replyNow();
                         } else {
                             logger.warn("Impossible de jouer la piste.", throwable);

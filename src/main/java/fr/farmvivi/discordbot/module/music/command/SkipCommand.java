@@ -30,10 +30,11 @@ public class SkipCommand extends Command {
         }
 
         AudioTrack track = musicModule.getPlayer(guild).skipTrack();
-        if (track == null)
+        if (track == null) {
             reply.append("Plus aucune musique à jouer.");
-        else
+        } else {
             reply.append("Musique suivante: **").append(track.getInfo().title).append("**");
+        }
 
         return true;
     }

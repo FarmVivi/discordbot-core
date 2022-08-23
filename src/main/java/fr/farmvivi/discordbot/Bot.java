@@ -79,8 +79,7 @@ public class Bot {
     }
 
     public static void setDefaultActivity() {
-        JDAManager.getJDA().getPresence().setActivity(
-                Activity.playing("v" + version + " | Prefix: " + Bot.getInstance().getConfiguration().cmdPrefix));
+        JDAManager.getJDA().getPresence().setActivity(Activity.playing("v" + version));
     }
 
     public Configuration getConfiguration() {

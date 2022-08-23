@@ -46,10 +46,14 @@ public class CommandsListener extends ListenerAdapter {
 
         for (Command command : commandsModule.getCommands()) {
             if (command.getName().equalsIgnoreCase(cmd)) {
+                String cmdContent = "";
                 if (command.getArgs().length != 0 && !content.isBlank()) {
-                    command.execute(commandReceivedEvent, content, reply);
-                } else {
-                    command.execute(commandReceivedEvent, "", reply);
+                    cmdContent = content;
+                }
+
+                boolean success = command.execute(commandReceivedEvent, cmdContent, reply);
+                if (!success) {
+                    reply.setEphemeral(true);
                 }
 
                 if (reply.isDiffer()) {
@@ -104,7 +108,12 @@ public class CommandsListener extends ListenerAdapter {
                             content = message.substring(commandLength);
                         }
                     }
-                    command.execute(commandReceivedEvent, content, reply);
+
+                    boolean success = command.execute(commandReceivedEvent, content, reply);
+                    if (!success) {
+                        reply.setEphemeral(true);
+                    }
+
                     if (!reply.isDiffer()) {
                         Message originalMessage = event.getMessage();
                         MessageAction messageAction = originalMessage.reply(reply.build());
