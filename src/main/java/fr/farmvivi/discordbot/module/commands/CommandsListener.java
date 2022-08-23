@@ -45,24 +45,20 @@ public class CommandsListener extends ListenerAdapter {
             if (command.getName().equalsIgnoreCase(cmd)) {
                 if (command.getArgs().length != 0 && !content.isBlank()) {
                     command.execute(commandReceivedEvent, content, reply);
-                    if (reply.isDiffer()) {
-                        event.deferReply(true).queue();
-                    } else {
-                        event.reply(reply.build()).setEphemeral(true).queue();
-                    }
-                    return;
-                }
-                command.execute(commandReceivedEvent, "", reply);
-                if (reply.isDiffer()) {
-                    event.deferReply(true).queue();
                 } else {
-                    event.reply(reply.build()).setEphemeral(true).queue();
+                    command.execute(commandReceivedEvent, "", reply);
+                }
+
+                if (reply.isDiffer()) {
+                    event.deferReply().queue();
+                } else {
+                    event.reply(reply.build()).queue();
                 }
                 return;
             }
         }
 
-        event.reply(":thumbsdown:").setEphemeral(true).queue();
+        event.reply("> Une erreur est survenue, la commande est inconnue :confused:").setEphemeral(true).queue();
     }
 
     @Override
@@ -87,7 +83,10 @@ public class CommandsListener extends ListenerAdapter {
                     event.isFromGuild());
 
             CommandMessageBuilder reply = new CommandMessageBuilder(event);
-            reply.append("> **Cette commande est obsolète !** Veuillez utiliser les commandes en commençant par un **/**\n\n");
+            reply.append("> **Cette commande est obsolète !**\n")
+                    .append("> Veuillez utiliser les commandes en commençant par un **/** au lieu de **").append(botConfig.cmdPrefix).append("** !")
+                    .append("\n")
+                    .append("\n");
 
             for (Command command : commandsModule.getCommands()) {
                 List<String> commands = new ArrayList<>();
