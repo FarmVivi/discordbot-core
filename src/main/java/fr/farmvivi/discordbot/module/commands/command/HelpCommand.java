@@ -38,6 +38,8 @@ public class HelpCommand extends Command {
         String message = finalBuilder.toString();
         reply.append(message.subSequence(0, message.length() - 2));
 
+        reply.setEphemeral(true);
+
         return true;
     }
 

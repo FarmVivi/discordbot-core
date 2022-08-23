@@ -24,6 +24,8 @@ public class VersionCommand extends Command {
                 .append("\n-> JDA **v").append(JDAInfo.VERSION).append("**")
                 .append("\n-> LavaPlayer **v").append(PlayerLibrary.VERSION).append("**");
 
+        reply.setEphemeral(true);
+
         return true;
     }
 }

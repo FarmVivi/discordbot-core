@@ -2,15 +2,18 @@ package fr.farmvivi.discordbot.module.commands;
 
 import fr.farmvivi.discordbot.Configuration;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class CommandsListener extends ListenerAdapter {
     private final CommandsModule commandsModule;
@@ -50,9 +53,9 @@ public class CommandsListener extends ListenerAdapter {
                 }
 
                 if (reply.isDiffer()) {
-                    event.deferReply().queue();
+                    event.deferReply(reply.isEphemeral()).queue();
                 } else {
-                    event.reply(reply.build()).queue();
+                    event.reply(reply.build()).setEphemeral(reply.isEphemeral()).queue();
                 }
                 return;
             }
@@ -94,19 +97,23 @@ public class CommandsListener extends ListenerAdapter {
                 if (command.getAliases().length != 0)
                     Collections.addAll(commands, command.getAliases());
                 if (commands.contains(cmd.toLowerCase())) {
+                    String content = "";
                     if (command.getArgs().length != 0) {
                         int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
                         if (message.length() > commandLength) {
-                            command.execute(commandReceivedEvent, message.substring(commandLength), reply);
-                            if (!reply.isDiffer()) {
-                                event.getMessage().reply(reply.build()).queue();
-                            }
-                            return;
+                            content = message.substring(commandLength);
                         }
                     }
-                    command.execute(commandReceivedEvent, "", reply);
+                    command.execute(commandReceivedEvent, content, reply);
                     if (!reply.isDiffer()) {
-                        event.getMessage().reply(reply.build()).queue();
+                        Message originalMessage = event.getMessage();
+                        MessageAction messageAction = originalMessage.reply(reply.build());
+                        if (reply.isEphemeral()) {
+                            messageAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
+                            originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
+                        } else {
+                            messageAction.queue();
+                        }
                     }
                     return;
                 }
