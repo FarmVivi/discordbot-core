@@ -1,5 +1,8 @@
 package fr.farmvivi.discordbot.module.music;
 
+import com.github.topislavalinkplugins.topissourcemanagers.applemusic.AppleMusicSourceManager;
+import com.github.topislavalinkplugins.topissourcemanagers.spotify.SpotifyConfig;
+import com.github.topislavalinkplugins.topissourcemanagers.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -19,14 +22,9 @@ import fr.farmvivi.discordbot.module.music.command.*;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqHighBassCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStartCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStopCommand;
-import fr.farmvivi.discordbot.module.music.spotify.LinkConverter;
 import net.dv8tion.jda.api.entities.Guild;
-import org.apache.hc.core5.http.ParseException;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MusicModule extends Module {
@@ -46,17 +44,40 @@ public class MusicModule extends Module {
         this.module = module;
         this.bot = bot;
         this.musicListener = new MusicListener(this);
+    }
+
+    @Override
+    public void onPreEnable() {
+        super.onPreEnable();
+
+        logger.info("Registering audio sources...");
 
         // Remote sources
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         // Local source
         AudioSourceManagers.registerLocalSource(audioPlayerManager);
         audioPlayerManager.getConfiguration().setFilterHotSwapEnabled(true);
+
+        // Spotify source provider
+        // create a new config
+        SpotifyConfig spotifyConfig = new SpotifyConfig();
+        spotifyConfig.setClientId(bot.getConfiguration().spotifyId);
+        spotifyConfig.setClientSecret(bot.getConfiguration().spotifySecret);
+        spotifyConfig.setCountryCode("FR");
+
+        // create a new SpotifySourceManager with the default providers, SpotifyConfig and AudioPlayerManager and register it
+        audioPlayerManager.registerSourceManager(new SpotifySourceManager(null, spotifyConfig, audioPlayerManager));
+
+        // Apple Music source provider
+        // create a new AppleMusicSourceManager with the standard providers, countrycode and AudioPlayerManager and register it
+        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, "fr", audioPlayerManager));
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
+
+        logger.info("Registering commands...");
 
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
@@ -84,6 +105,13 @@ public class MusicModule extends Module {
 
         if (!botConfig.radioPath.equalsIgnoreCase(""))
             commandsModule.registerCommand(module, new RadioCommand(this, botConfig));
+    }
+
+    @Override
+    public void onPostEnable() {
+        super.onPostEnable();
+
+        logger.info("Registering event listener...");
 
         JDAManager.getJDA().addEventListener(musicListener);
     }
@@ -133,40 +161,28 @@ public class MusicModule extends Module {
         }
 
         if ((source.startsWith("http") && source.contains("://")) || source.startsWith("/") || source.startsWith("./")) {
-            if (source.contains("open.spotify.com")) {
-                LinkConverter linkConverter = new LinkConverter();
-                try {
-                    List<String> songs = linkConverter.convert(source);
+            audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
+                @Override
+                public void trackLoaded(AudioTrack track) {
                     if (reply != null) {
-                        reply.setDiffer(false);
-                        if (songs == null) {
-                            reply.addContent("> _Erreur : Lien non supporté_");
-                            reply.setEphemeral(true);
-                            return;
-                        }
-
-                        reply.addContent("**" + source + "** ajouté à la file d'attente.");
+                        reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
+                        reply.replyNow();
                     }
-                    for (String songName : songs)
-                        audioPlayerManager.loadItem("ytmsearch:" + songName,
-                                new FunctionalResultHandler(null, playlist -> {
-                                    if (playNow) {
-                                        player.playTrackNow(playlist.getTracks().get(0));
-                                    } else {
-                                        player.playTrack(playlist.getTracks().get(0));
-                                    }
-                                }, null, null));
-                } catch (ParseException | SpotifyWebApiException | IOException e) {
-                    logger.error("Unable to get tracks from " + source, e);
+
+                    if (playNow) {
+                        player.playTrackNow(track);
+                    } else {
+                        player.playTrack(track);
+                    }
                 }
-            } else {
-                audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
-                    @Override
-                    public void trackLoaded(AudioTrack track) {
-                        if (reply != null) {
-                            reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
-                            reply.replyNow();
-                        }
+
+                @Override
+                public void playlistLoaded(AudioPlaylist playlist) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("Ajout de la playlist **").append(playlist.getName()).append("** :");
+
+                    for (AudioTrack track : playlist.getTracks()) {
+                        builder.append("\n-> **").append(track.getInfo().title).append("**");
 
                         if (playNow) {
                             player.playTrackNow(track);
@@ -175,52 +191,36 @@ public class MusicModule extends Module {
                         }
                     }
 
-                    @Override
-                    public void playlistLoaded(AudioPlaylist playlist) {
-                        StringBuilder builder = new StringBuilder();
-                        builder.append("Ajout de la playlist **").append(playlist.getName()).append("** :");
-
-                        for (AudioTrack track : playlist.getTracks()) {
-                            builder.append("\n-> **").append(track.getInfo().title).append("**");
-
-                            if (playNow) {
-                                player.playTrackNow(track);
-                            } else {
-                                player.playTrack(track);
-                            }
-                        }
-
-                        if (reply != null) {
-                            reply.addContent(builder.toString());
-                            reply.replyNow();
-                        }
+                    if (reply != null) {
+                        reply.addContent(builder.toString());
+                        reply.replyNow();
                     }
+                }
 
-                    @Override
-                    public void noMatches() {
-                        // Notify the user that we've got nothing
-                        if (reply != null) {
-                            reply.addContent("La piste " + source + " n'a pas été trouvé.");
-                            reply.setEphemeral(true);
-                            reply.replyNow();
-                        } else {
-                            logger.warn("La piste " + source + " n'a pas été trouvé.");
-                        }
+                @Override
+                public void noMatches() {
+                    // Notify the user that we've got nothing
+                    if (reply != null) {
+                        reply.addContent("La piste " + source + " n'a pas été trouvé.");
+                        reply.setEphemeral(true);
+                        reply.replyNow();
+                    } else {
+                        logger.warn("La piste " + source + " n'a pas été trouvé.");
                     }
+                }
 
-                    @Override
-                    public void loadFailed(FriendlyException throwable) {
-                        // Notify the user that everything exploded
-                        if (reply != null) {
-                            reply.addContent("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").");
-                            reply.setEphemeral(true);
-                            reply.replyNow();
-                        } else {
-                            logger.warn("Impossible de jouer la piste.", throwable);
-                        }
+                @Override
+                public void loadFailed(FriendlyException throwable) {
+                    // Notify the user that everything exploded
+                    if (reply != null) {
+                        reply.addContent("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").");
+                        reply.setEphemeral(true);
+                        reply.replyNow();
+                    } else {
+                        logger.warn("Impossible de jouer la piste.", throwable);
                     }
-                });
-            }
+                }
+            });
         } else {
             audioPlayerManager.loadItem("ytmsearch:" + source, new FunctionalResultHandler(null, playlist -> {
                 if (reply != null) {
