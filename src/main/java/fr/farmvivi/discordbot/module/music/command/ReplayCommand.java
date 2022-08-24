@@ -25,7 +25,7 @@ public class ReplayCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
@@ -34,7 +34,7 @@ public class ReplayCommand extends Command {
             return false;
 
         musicModule.getPlayer(guild).getListener().addTrackFirst(currentTrack.makeClone());
-        reply.append("La piste **").append(currentTrack.getInfo().title).append("** va être rejoué");
+        reply.addContent("La piste **" + currentTrack.getInfo().title + "** va être rejoué");
 
         return true;
     }

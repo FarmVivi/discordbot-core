@@ -24,16 +24,16 @@ public class PauseCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).getAudioPlayer().isPaused()) {
             musicModule.getPlayer(guild).getAudioPlayer().setPaused(false);
-            reply.append("Lecture !");
+            reply.addContent("Lecture !");
         } else {
             musicModule.getPlayer(guild).getAudioPlayer().setPaused(true);
-            reply.append("Pause !");
+            reply.addContent("Pause !");
         }
 
         return true;

@@ -33,7 +33,7 @@ public class HelpCommand extends Command {
         for (StringBuilder strBuilder : strBuilders.values())
             finalBuilder.append(strBuilder.toString()).append("\n\n");
         String message = finalBuilder.toString();
-        reply.append(message.subSequence(0, message.length() - 2));
+        reply.addContent(message.substring(0, message.length() - 2));
 
         reply.setEphemeral(true);
 

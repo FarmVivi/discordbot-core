@@ -26,36 +26,36 @@ public class SeekCommand extends Command {
         if (!super.execute(event, content, reply))
             return false;
         if (this.getArgs().length > 0 && content.length() == 0) {
-            reply.append("Utilisation de la commande: **/").append(this.getName()).append(" ").append(this.getArgsAsString()).append("**");
+            reply.addContent("Utilisation de la commande: **/" + this.getName() + " " + this.getArgsAsString() + "**");
             return false;
         }
 
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (!musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().isSeekable()) {
-            reply.append("Cette piste n'est pas seekable.");
+            reply.addContent("Cette piste n'est pas seekable.");
             return false;
         }
 
         if (!TimeToIntCalculator.isFormatted(content)) {
-            reply.append("Format de temps à utiliser: **jours:heures:minutes:secondes**");
+            reply.addContent("Format de temps à utiliser: **jours:heures:minutes:secondes**");
             return false;
         }
 
         int startTime = TimeToIntCalculator.format(content) * 1000;
         AudioTrack currentTrack = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
         if ((long) startTime > currentTrack.getDuration()) {
-            reply.append("**").append(content).append("** > TrackDuration");
+            reply.addContent("**" + content + "** > TrackDuration");
             return false;
         }
 
         musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().setPosition(startTime);
-        reply.append("Seek to **").append(content).append("**");
+        reply.addContent("Seek to **" + content + "**");
 
         return true;
     }

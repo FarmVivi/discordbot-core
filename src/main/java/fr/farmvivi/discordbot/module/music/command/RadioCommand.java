@@ -39,7 +39,7 @@ public class RadioCommand extends Command {
         if (!guild.getAudioManager().isConnected()) {
             AudioChannel voiceChannel = guild.getMember(event.getAuthor()).getVoiceState().getChannel();
             if (voiceChannel == null) {
-                reply.append("Vous devez être connecté à un salon vocal.");
+                reply.addContent("Vous devez être connecté à un salon vocal.");
                 return false;
             }
             guild.getAudioManager().openAudioConnection(voiceChannel);
@@ -50,7 +50,7 @@ public class RadioCommand extends Command {
             displayRadio(reply);
         } else {
             playRadio(guild, botConfig.radioPath + File.separator + content + ".m3u");
-            reply.append("Playlist **").append(content).append("** en cours de lecture.");
+            reply.addContent("Playlist **" + content + "** en cours de lecture.");
         }
 
         return true;
@@ -61,7 +61,7 @@ public class RadioCommand extends Command {
 
         File directory = new File(botConfig.radioPath);
         if (!directory.exists()) {
-            reply.append("Une erreur est survenue");
+            reply.addContent("Une erreur est survenue");
             return;
         }
 
@@ -71,7 +71,7 @@ public class RadioCommand extends Command {
             if (file.getName().endsWith(".m3u"))
                 builder.append("\n- **").append(file.getName().replace(".m3u", "")).append("**");
 
-        reply.append(builder.toString());
+        reply.addContent(builder.toString());
     }
 
     private void playRadio(Guild guild, String uri) {

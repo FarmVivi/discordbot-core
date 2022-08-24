@@ -24,14 +24,14 @@ public class StopCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         musicModule.getPlayer(guild).getListener().getTracks().clear();
         musicModule.getPlayer(guild).skipTrack();
 
-        reply.append("La musique a été stoppée.");
+        reply.addContent("La musique a été stoppée.");
 
         return true;
     }

@@ -41,10 +41,10 @@ public abstract class Command {
 
     public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
         if (guildOnly && !event.isFromGuild()) {
-            reply.append("Cette commande peut seulement être exécuté sur un serveur discord.");
+            reply.addContent("Cette commande peut seulement être exécuté sur un serveur discord.");
             return false;
         } else if (adminOnly && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
-            reply.append("Vous n'avez pas la permission d'exécuter cette commande.");
+            reply.addContent("Vous n'avez pas la permission d'exécuter cette commande.");
             return false;
         } else if (subCommands.size() != 0 && content.length() != 0) {
             String cmd = content.split(" ")[0];

@@ -24,16 +24,16 @@ public class LoopQueueCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).isLoopQueueMode()) {
             musicModule.getPlayer(guild).setLoopQueueMode(false);
-            reply.append("**Loop queue** désactivé.");
+            reply.addContent("**Loop queue** désactivé.");
         } else {
             musicModule.getPlayer(guild).setLoopQueueMode(true);
-            reply.append("**Loop queue** activé.");
+            reply.addContent("**Loop queue** activé.");
         }
 
         return true;

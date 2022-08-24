@@ -25,14 +25,14 @@ public class EqStartCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         MusicPlayer musicPlayer = musicModule.getPlayer(guild);
         musicPlayer.getAudioPlayer().setFrameBufferDuration(500);
         musicPlayer.getAudioPlayer().setFilterFactory(musicPlayer.getEqualizer());
-        reply.append("**Equalizer** activé.");
+        reply.addContent("**Equalizer** activé.");
 
         return true;
     }

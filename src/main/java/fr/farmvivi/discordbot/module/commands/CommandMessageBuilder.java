@@ -1,17 +1,17 @@
 package fr.farmvivi.discordbot.module.commands;
 
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-public class CommandMessageBuilder extends MessageBuilder {
+public class CommandMessageBuilder extends MessageCreateBuilder {
     private final Event event;
 
     private boolean differ = false;
@@ -43,20 +43,20 @@ public class CommandMessageBuilder extends MessageBuilder {
         if (differ) {
             differ = false;
             if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
-                WebhookMessageUpdateAction<Message> messageWebhookMessageUpdateAction = slashCommandInteractionEvent.getHook().editOriginal(this.build());
+                WebhookMessageEditAction<Message> messageWebhookMessageEditAction = slashCommandInteractionEvent.getHook().editOriginal(this.getContent());
                 if (isEphemeral()) {
-                    messageWebhookMessageUpdateAction.delay(1, TimeUnit.MINUTES).flatMap(Predicate.not(Message::isEphemeral), Message::delete).queue();
+                    messageWebhookMessageEditAction.delay(1, TimeUnit.MINUTES).flatMap(Predicate.not(Message::isEphemeral), Message::delete).queue();
                 } else {
-                    messageWebhookMessageUpdateAction.queue();
+                    messageWebhookMessageEditAction.queue();
                 }
             } else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
                 Message originalMessage = messageReceivedEvent.getMessage();
-                MessageAction messageAction = originalMessage.reply(this.build());
+                MessageCreateAction messageCreateAction = originalMessage.reply(this.build());
                 if (isEphemeral()) {
-                    messageAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
+                    messageCreateAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
                     originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
                 } else {
-                    messageAction.queue();
+                    messageCreateAction.queue();
                 }
             }
         }

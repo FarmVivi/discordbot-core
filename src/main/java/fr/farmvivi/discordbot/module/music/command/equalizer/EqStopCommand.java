@@ -24,12 +24,12 @@ public class EqStopCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         musicModule.getPlayer(guild).getAudioPlayer().setFilterFactory(null);
-        reply.append("**Equalizer** désactivé.");
+        reply.addContent("**Equalizer** désactivé.");
 
         return true;
     }

@@ -25,15 +25,15 @@ public class NextCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         AudioTrack track = musicModule.getPlayer(guild).nextTrack();
         if (track == null) {
-            reply.append("Plus aucune musique à jouer.");
+            reply.addContent("Plus aucune musique à jouer.");
         } else {
-            reply.append("Musique suivante: **").append(track.getInfo().title).append("**");
+            reply.addContent("Musique suivante: **" + track.getInfo().title + "**");
         }
 
         return true;

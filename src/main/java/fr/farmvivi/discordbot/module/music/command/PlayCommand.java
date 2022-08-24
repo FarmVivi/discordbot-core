@@ -25,7 +25,7 @@ public class PlayCommand extends Command {
         if (!super.execute(event, content, reply))
             return false;
         if (this.getArgs().length > 0 && content.length() == 0) {
-            reply.append("Utilisation de la commande: **/").append(this.getName()).append(" ").append(this.getArgsAsString()).append("**");
+            reply.addContent("Utilisation de la commande: **/" + this.getName() + " " + this.getArgsAsString() + "**");
             return false;
         }
 
@@ -34,7 +34,7 @@ public class PlayCommand extends Command {
         if (!guild.getAudioManager().isConnected()) {
             AudioChannel voiceChannel = guild.getMember(event.getAuthor()).getVoiceState().getChannel();
             if (voiceChannel == null) {
-                reply.append("Vous devez être connecté à un salon vocal.");
+                reply.addContent("Vous devez être connecté à un salon vocal.");
                 return false;
             }
             guild.getAudioManager().openAudioConnection(voiceChannel);
@@ -44,7 +44,7 @@ public class PlayCommand extends Command {
 
         if (musicModule.getPlayer(guild).getAudioPlayer().isPaused()) {
             musicModule.getPlayer(guild).getAudioPlayer().setPaused(false);
-            reply.append("Lecture !");
+            reply.addContent("Lecture !");
         }
 
         musicModule.loadTrack(guild, content, reply);

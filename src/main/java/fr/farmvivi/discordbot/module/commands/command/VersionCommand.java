@@ -20,9 +20,9 @@ public class VersionCommand extends Command {
         if (!super.execute(event, content, reply))
             return false;
 
-        reply.append(Bot.name).append(" **v").append(Bot.version).append("** :")
-                .append("\n-> JDA **v").append(JDAInfo.VERSION).append("**")
-                .append("\n-> LavaPlayer **v").append(PlayerLibrary.VERSION).append("**");
+        reply.addContent(Bot.name + " **v" + Bot.version + "** :"
+                + "\n-> JDA **v" + JDAInfo.VERSION + "**"
+                + "\n-> LavaPlayer **v" + PlayerLibrary.VERSION + "**");
 
         reply.setEphemeral(true);
 

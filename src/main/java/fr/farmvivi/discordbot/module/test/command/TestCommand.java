@@ -22,7 +22,7 @@ public class TestCommand extends Command {
         if (!super.execute(event, content, reply))
             return false;
 
-        reply.append("Test");
+        reply.addContent("Test");
 
         return true;
     }

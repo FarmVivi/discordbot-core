@@ -27,7 +27,7 @@ public class VolumeCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
@@ -35,15 +35,15 @@ public class VolumeCommand extends Command {
         try {
             volume = Integer.parseInt(content);
         } catch (NumberFormatException e) {
-            reply.append("Le volume actuel est à **").append(String.valueOf(musicModule.getPlayer(guild).getAudioPlayer().getVolume())).append("%**.");
+            reply.addContent("Le volume actuel est à **" + musicModule.getPlayer(guild).getAudioPlayer().getVolume() + "%**.");
             return true;
         }
 
         if (volume > 0 && volume <= 100) {
             musicModule.getPlayer(guild).getAudioPlayer().setVolume(volume);
-            reply.append("Volume mis à **").append(String.valueOf(volume)).append("%**.");
+            reply.addContent("Volume mis à **" + volume + "%**.");
         } else {
-            reply.append("Le volume doit être compris entre **1%** et **100%**.");
+            reply.addContent("Le volume doit être compris entre **1%** et **100%**.");
             return false;
         }
 

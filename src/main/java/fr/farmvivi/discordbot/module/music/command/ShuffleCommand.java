@@ -24,16 +24,16 @@ public class ShuffleCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).isShuffleMode()) {
             musicModule.getPlayer(guild).setShuffleMode(false);
-            reply.append("**Shuffle** désactivé.");
+            reply.addContent("**Shuffle** désactivé.");
         } else {
             musicModule.getPlayer(guild).setShuffleMode(true);
-            reply.append("**Shuffle** activé.");
+            reply.addContent("**Shuffle** activé.");
         }
 
         return true;

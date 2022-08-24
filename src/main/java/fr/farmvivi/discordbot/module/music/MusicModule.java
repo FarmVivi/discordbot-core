@@ -140,12 +140,12 @@ public class MusicModule extends Module {
                     if (reply != null) {
                         reply.setDiffer(false);
                         if (songs == null) {
-                            reply.append("> _Erreur : Lien non supporté_");
+                            reply.addContent("> _Erreur : Lien non supporté_");
                             reply.setEphemeral(true);
                             return;
                         }
 
-                        reply.append("**").append(source).append("** ajouté à la file d'attente.");
+                        reply.addContent("**" + source + "** ajouté à la file d'attente.");
                     }
                     for (String songName : songs)
                         audioPlayerManager.loadItem("ytsearch: " + songName,
@@ -164,7 +164,7 @@ public class MusicModule extends Module {
                     @Override
                     public void trackLoaded(AudioTrack track) {
                         if (reply != null) {
-                            reply.append("**").append(track.getInfo().title).append("** ajouté à la file d'attente.");
+                            reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
                             reply.replyNow();
                         }
 
@@ -191,7 +191,7 @@ public class MusicModule extends Module {
                         }
 
                         if (reply != null) {
-                            reply.append(builder.toString());
+                            reply.addContent(builder.toString());
                             reply.replyNow();
                         }
                     }
@@ -200,7 +200,7 @@ public class MusicModule extends Module {
                     public void noMatches() {
                         // Notify the user that we've got nothing
                         if (reply != null) {
-                            reply.append("La piste ").append(source).append(" n'a pas été trouvé.");
+                            reply.addContent("La piste " + source + " n'a pas été trouvé.");
                             reply.setEphemeral(true);
                             reply.replyNow();
                         } else {
@@ -212,7 +212,7 @@ public class MusicModule extends Module {
                     public void loadFailed(FriendlyException throwable) {
                         // Notify the user that everything exploded
                         if (reply != null) {
-                            reply.append("Impossible de jouer la piste (raison: ").append(throwable.getMessage()).append(").");
+                            reply.addContent("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").");
                             reply.setEphemeral(true);
                             reply.replyNow();
                         } else {
@@ -224,7 +224,7 @@ public class MusicModule extends Module {
         } else {
             audioPlayerManager.loadItem("ytsearch: " + source, new FunctionalResultHandler(null, playlist -> {
                 if (reply != null) {
-                    reply.append("**").append(playlist.getTracks().get(0).getInfo().title).append("** ajouté à la file d'attente.");
+                    reply.addContent("**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.");
                     reply.replyNow();
                 }
 

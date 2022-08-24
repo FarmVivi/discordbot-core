@@ -20,10 +20,10 @@ public class LeaveCommand extends Command {
 
         if (guild.getAudioManager().isConnected()) {
             guild.getAudioManager().closeAudioConnection();
-            reply.append("Déconnecté.");
+            reply.addContent("Déconnecté.");
             return true;
         } else {
-            reply.append("Le bot n'est pas connecté à un salon vocal.");
+            reply.addContent("Le bot n'est pas connecté à un salon vocal.");
             return false;
         }
     }

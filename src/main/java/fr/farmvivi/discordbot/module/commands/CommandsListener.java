@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -90,10 +90,10 @@ public class CommandsListener extends ListenerAdapter {
                     event.isFromGuild());
 
             CommandMessageBuilder reply = new CommandMessageBuilder(event);
-            reply.append("> **Cette commande est obsolète !**\n")
-                    .append("> Veuillez utiliser les commandes en commençant par **/** au lieu de **").append(botConfig.cmdPrefix).append("** !")
-                    .append("\n")
-                    .append("\n");
+            reply.addContent("> **Cette commande est obsolète !**\n"
+                    + "> Veuillez utiliser les commandes en commençant par **/** au lieu de **" + botConfig.cmdPrefix + "** !"
+                    + "\n"
+                    + "\n");
 
             for (Command command : commandsModule.getCommands()) {
                 List<String> commands = new ArrayList<>();
@@ -116,7 +116,7 @@ public class CommandsListener extends ListenerAdapter {
 
                     if (!reply.isDiffer()) {
                         Message originalMessage = event.getMessage();
-                        MessageAction messageAction = originalMessage.reply(reply.build());
+                        MessageCreateAction messageAction = originalMessage.reply(reply.build());
                         if (reply.isEphemeral()) {
                             messageAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
                             originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);

@@ -24,17 +24,17 @@ public class ClearCommand extends Command {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.append("Aucune musique en cours de lecture.");
+            reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
-            reply.append("Il n'y a pas de musique dans la file d'attente.");
+            reply.addContent("Il n'y a pas de musique dans la file d'attente.");
             return false;
         }
 
         musicModule.getPlayer(guild).getListener().getTracks().clear();
-        reply.append("La liste d'attente à été vidé.");
+        reply.addContent("La liste d'attente à été vidé.");
 
         return true;
     }
