@@ -18,9 +18,11 @@ public class LinkConverter {
         if (firstSplit.length > 5) {
             secondSplit = firstSplit[6].split("\\?");
             type = firstSplit[5];
-        } else {
+        } else if (firstSplit.length == 5) {
             secondSplit = firstSplit[4].split("\\?");
             type = firstSplit[3];
+        } else {
+            return null;
         }
         String id = secondSplit[0];
         final ArrayList<String> listOfTracks = new ArrayList<>();

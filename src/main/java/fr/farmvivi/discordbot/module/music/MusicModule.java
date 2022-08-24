@@ -139,12 +139,13 @@ public class MusicModule extends Module {
                     List<String> songs = linkConverter.convert(source);
                     if (reply != null) {
                         reply.setDiffer(false);
-                        if (songs.isEmpty()) {
+                        if (songs == null) {
                             reply.append("> _Erreur : Lien non supporté_");
                             reply.setEphemeral(true);
-                        } else {
-                            reply.append("**").append(source).append("** ajouté à la file d'attente.");
+                            return;
                         }
+
+                        reply.append("**").append(source).append("** ajouté à la file d'attente.");
                     }
                     for (String songName : songs)
                         audioPlayerManager.loadItem("ytsearch: " + songName,
