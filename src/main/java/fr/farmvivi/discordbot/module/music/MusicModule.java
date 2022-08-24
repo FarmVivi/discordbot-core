@@ -6,7 +6,6 @@ import com.github.topislavalinkplugins.topissourcemanagers.spotify.SpotifySource
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.FunctionalResultHandler;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -160,14 +159,28 @@ public class MusicModule extends Module {
             reply.setDiffer(true);
         }
 
-        if ((source.startsWith("http") && source.contains("://")) || source.startsWith("/") || source.startsWith("./")) {
-            audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
-                @Override
-                public void trackLoaded(AudioTrack track) {
-                    if (reply != null) {
-                        reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
-                        reply.replyNow();
-                    }
+        audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
+            @Override
+            public void trackLoaded(AudioTrack track) {
+                if (reply != null) {
+                    reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
+                    reply.replyNow();
+                }
+
+                if (playNow) {
+                    player.playTrackNow(track);
+                } else {
+                    player.playTrack(track);
+                }
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("Ajout de la playlist **").append(playlist.getName()).append("** :");
+
+                for (AudioTrack track : playlist.getTracks()) {
+                    builder.append("\n-> **").append(track.getInfo().title).append("**");
 
                     if (playNow) {
                         player.playTrackNow(track);
@@ -176,64 +189,35 @@ public class MusicModule extends Module {
                     }
                 }
 
-                @Override
-                public void playlistLoaded(AudioPlaylist playlist) {
-                    StringBuilder builder = new StringBuilder();
-                    builder.append("Ajout de la playlist **").append(playlist.getName()).append("** :");
-
-                    for (AudioTrack track : playlist.getTracks()) {
-                        builder.append("\n-> **").append(track.getInfo().title).append("**");
-
-                        if (playNow) {
-                            player.playTrackNow(track);
-                        } else {
-                            player.playTrack(track);
-                        }
-                    }
-
-                    if (reply != null) {
-                        reply.addContent(builder.toString());
-                        reply.replyNow();
-                    }
-                }
-
-                @Override
-                public void noMatches() {
-                    // Notify the user that we've got nothing
-                    if (reply != null) {
-                        reply.addContent("La piste " + source + " n'a pas été trouvé.");
-                        reply.setEphemeral(true);
-                        reply.replyNow();
-                    } else {
-                        logger.warn("La piste " + source + " n'a pas été trouvé.");
-                    }
-                }
-
-                @Override
-                public void loadFailed(FriendlyException throwable) {
-                    // Notify the user that everything exploded
-                    if (reply != null) {
-                        reply.addContent("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").");
-                        reply.setEphemeral(true);
-                        reply.replyNow();
-                    } else {
-                        logger.warn("Impossible de jouer la piste.", throwable);
-                    }
-                }
-            });
-        } else {
-            audioPlayerManager.loadItem("ytmsearch:" + source, new FunctionalResultHandler(null, playlist -> {
                 if (reply != null) {
-                    reply.addContent("**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.");
+                    reply.addContent(builder.toString());
                     reply.replyNow();
                 }
+            }
 
-                if (playNow) {
-                    player.playTrackNow(playlist.getTracks().get(0));
+            @Override
+            public void noMatches() {
+                // Notify the user that we've got nothing
+                if (reply != null) {
+                    reply.addContent("La piste " + source + " n'a pas été trouvé.");
+                    reply.setEphemeral(true);
+                    reply.replyNow();
                 } else {
-                    player.playTrack(playlist.getTracks().get(0));
+                    logger.warn("La piste " + source + " n'a pas été trouvé.");
                 }
-            }, null, null));
-        }
+            }
+
+            @Override
+            public void loadFailed(FriendlyException throwable) {
+                // Notify the user that everything exploded
+                if (reply != null) {
+                    reply.addContent("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").");
+                    reply.setEphemeral(true);
+                    reply.replyNow();
+                } else {
+                    logger.warn("Impossible de jouer la piste.", throwable);
+                }
+            }
+        });
     }
 }
