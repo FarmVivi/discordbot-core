@@ -148,7 +148,7 @@ public class MusicModule extends Module {
                         reply.addContent("**" + source + "** ajouté à la file d'attente.");
                     }
                     for (String songName : songs)
-                        audioPlayerManager.loadItem("ytsearch: " + songName,
+                        audioPlayerManager.loadItem("ytmsearch:" + songName,
                                 new FunctionalResultHandler(null, playlist -> {
                                     if (playNow) {
                                         player.playTrackNow(playlist.getTracks().get(0));
@@ -222,7 +222,7 @@ public class MusicModule extends Module {
                 });
             }
         } else {
-            audioPlayerManager.loadItem("ytsearch: " + source, new FunctionalResultHandler(null, playlist -> {
+            audioPlayerManager.loadItem("ytmsearch:" + source, new FunctionalResultHandler(null, playlist -> {
                 if (reply != null) {
                     reply.addContent("**" + playlist.getTracks().get(0).getInfo().title + "** ajouté à la file d'attente.");
                     reply.replyNow();
