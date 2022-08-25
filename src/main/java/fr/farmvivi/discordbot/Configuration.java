@@ -3,6 +3,7 @@ package fr.farmvivi.discordbot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.neovisionaries.i18n.CountryCode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,8 +17,7 @@ public class Configuration {
     private static final String ENV_PREFIX = "DISCORD_";
 
     public String jdaToken;
-    public String spotifyId;
-    public String spotifySecret;
+    public CountryCode countryCode;
     public String cmdPrefix;
     public List<Long> cmdAdmins;
     public String radioPath;
@@ -58,8 +58,7 @@ public class Configuration {
 
     private void loadDefaultConfiguration() throws ValueNotFoundException {
         this.jdaToken = getValue("TOKEN");
-        this.spotifyId = getValue("SPOTIFY_ID");
-        this.spotifySecret = getValue("SPOTIFY_TOKEN");
+        this.countryCode = CountryCode.getByCodeIgnoreCase(getValue("COUNTRY"));
         this.cmdPrefix = getValue("CMD_PREFIX");
         this.cmdAdmins = new ArrayList<>();
         for (String admin : getValues("CMD_ADMINS"))
