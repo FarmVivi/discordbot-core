@@ -33,8 +33,10 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void queue(AudioTrack track, boolean playNow) {
-        if (quitTask != null && !quitTask.isDone())
+        if (quitTask != null) {
             quitTask.cancel(true);
+            quitTask = null;
+        }
         if (!player.getAudioPlayer().startTrack(track, true))
             if (playNow) {
                 addTrackFirst(track);
