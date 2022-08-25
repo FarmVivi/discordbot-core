@@ -93,7 +93,7 @@ public abstract class Command {
     public String getArgsAsString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (OptionData option : getArgs()) {
-            stringBuilder.append(" ").append(option.getName());
+            stringBuilder.append(" <").append(option.getName()).append(">");
         }
         return stringBuilder.toString().replaceFirst(" ", "");
     }
