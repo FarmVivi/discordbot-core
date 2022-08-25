@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
@@ -8,11 +7,11 @@ import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 
-public class ViewQueueCommand extends Command {
+public class ClearQueueCommand extends Command {
     private final MusicModule musicModule;
 
-    public ViewQueueCommand(MusicModule musicModule) {
-        super("viewqueue", CommandCategory.MUSIC, "Affiche la file d'attente", new String[]{"queue"});
+    public ClearQueueCommand(MusicModule musicModule) {
+        super("clear-queue", CommandCategory.MUSIC, "Vide la file d'attente", new String[]{"clear", "clearqueue"});
 
         this.musicModule = musicModule;
     }
@@ -24,16 +23,18 @@ public class ViewQueueCommand extends Command {
 
         Guild guild = event.getGuild();
 
-        if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
-            reply.addContent("Il n'y a pas de musique dans la file d'attente.");
-            return true;
+        if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
+            reply.addContent("Aucune musique en cours de lecture.");
+            return false;
         }
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("**Queue** :");
-        for (AudioTrack track : musicModule.getPlayer(guild).getListener().getTracks())
-            builder.append("\n-> **").append(track.getInfo().title).append("**");
-        reply.addContent(builder.toString());
+        if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
+            reply.addContent("Il n'y a pas de musique dans la file d'attente.");
+            return false;
+        }
+
+        musicModule.getPlayer(guild).getListener().getTracks().clear();
+        reply.addContent("La liste d'attente à été vidé.");
 
         return true;
     }

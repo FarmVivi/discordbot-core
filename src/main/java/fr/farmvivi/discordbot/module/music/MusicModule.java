@@ -142,7 +142,7 @@ public class MusicModule extends Module {
         commandsModule.registerCommand(module, new NowCommand(this));
         commandsModule.registerCommand(module, new SkipCommand(this));
         commandsModule.registerCommand(module, new NextCommand(this));
-        commandsModule.registerCommand(module, new ClearCommand(this));
+        commandsModule.registerCommand(module, new ClearQueueCommand(this));
         commandsModule.registerCommand(module, new CurrentCommand(this));
         commandsModule.registerCommand(module, new StopCommand(this));
         commandsModule.registerCommand(module, new LeaveCommand());
@@ -153,7 +153,7 @@ public class MusicModule extends Module {
         commandsModule.registerCommand(module, new VolumeCommand(this));
         commandsModule.registerCommand(module, new SeekCommand(this));
         commandsModule.registerCommand(module, new ReplayCommand(this));
-        commandsModule.registerCommand(module, new ViewQueueCommand(this));
+        commandsModule.registerCommand(module, new QueueCommand(this));
         commandsModule.registerCommand(module, new EqStartCommand(this));
         commandsModule.registerCommand(module, new EqStopCommand(this));
         commandsModule.registerCommand(module, new EqHighBassCommand(this));
