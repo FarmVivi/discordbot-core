@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class ModulesManager {
-    public static final Logger logger = LoggerFactory.getLogger(ModulesManager.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
 
     private final Bot bot;
 
