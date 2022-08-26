@@ -38,17 +38,6 @@ public class CommandsModule extends Module {
         registerCommand(module, new HelpCommand(this));
         registerCommand(module, new VersionCommand());
         registerCommand(module, new ShutdownCommand());
-
-        JDAManager.getJDA().addEventListener(commandsListener);
-    }
-
-    @Override
-    public void onDisable() {
-        super.onDisable();
-
-        unregisterCommands(module);
-
-        JDAManager.getJDA().removeEventListener(commandsListener);
     }
 
     @Override
@@ -71,6 +60,26 @@ public class CommandsModule extends Module {
         }
 
         commandListUpdateAction.queue();
+
+        logger.info("Registering event listener...");
+
+        JDAManager.getJDA().addEventListener(commandsListener);
+    }
+
+    @Override
+    public void onPreDisable() {
+        super.onPreDisable();
+
+        logger.info("Unregistering event listener...");
+
+        JDAManager.getJDA().removeEventListener(commandsListener);
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        unregisterCommands(module);
     }
 
     public void registerCommand(Modules module, Command command) {

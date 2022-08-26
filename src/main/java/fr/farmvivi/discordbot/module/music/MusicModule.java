@@ -172,14 +172,21 @@ public class MusicModule extends Module {
     }
 
     @Override
+    public void onPreDisable() {
+        super.onPreDisable();
+
+        logger.info("Unregistering event listener...");
+
+        JDAManager.getJDA().removeEventListener(musicListener);
+    }
+
+    @Override
     public void onDisable() {
         super.onDisable();
 
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
         commandsModule.unregisterCommands(module);
-
-        JDAManager.getJDA().removeEventListener(musicListener);
 
         audioPlayerManager.shutdown();
     }
