@@ -26,6 +26,7 @@ import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.music.command.*;
+import fr.farmvivi.discordbot.module.music.command.effects.*;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqHighBassCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStartCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStopCommand;
@@ -160,6 +161,16 @@ public class MusicModule extends Module {
 
         if (!botConfig.radioPath.equalsIgnoreCase(""))
             commandsModule.registerCommand(module, new RadioCommand(this, botConfig));
+
+        commandsModule.registerCommand(module, new EffectCommand(this));
+        commandsModule.registerCommand(module, new KaraokeCommand(this));
+        commandsModule.registerCommand(module, new DistortionCommand(this));
+        commandsModule.registerCommand(module, new LowPassCommand(this));
+        commandsModule.registerCommand(module, new RotationCommand(this));
+        commandsModule.registerCommand(module, new TimeScaleCommand(this));
+        commandsModule.registerCommand(module, new TremoloCommand(this));
+        commandsModule.registerCommand(module, new VibratoCommand(this));
+        commandsModule.registerCommand(module, new Volume2Command(this));
     }
 
     @Override
