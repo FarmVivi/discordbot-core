@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.module.commands;
 
 import fr.farmvivi.discordbot.Configuration;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -28,9 +28,9 @@ public class CommandsListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         StringBuilder options = new StringBuilder();
         for (OptionMapping option : event.getOptions()) {
-            options.append(" ").append(option.getAsString());
+            options.append(CommandsModule.COMMAND_ARGS_SEPARATOR).append(option.getAsString());
         }
-        String content = options.toString().replaceFirst(" ", "");
+        String content = options.toString().replaceFirst(CommandsModule.COMMAND_ARGS_SEPARATOR, "");
 
         String cmd = event.getName();
 

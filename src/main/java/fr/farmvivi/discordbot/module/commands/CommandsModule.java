@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandsModule extends Module {
-    private final Modules module;
+    public static final String COMMAND_ARGS_SEPARATOR = ";";
+
     private final Bot bot;
     private final CommandsListener commandsListener;
 
     private final Map<Modules, List<Command>> commands = new HashMap<>();
 
-    public CommandsModule(Modules module, Bot bot) {
-        super(module);
+    public CommandsModule(Bot bot) {
+        super(Modules.COMMANDS);
 
-        this.module = module;
         this.bot = bot;
         this.commandsListener = new CommandsListener(this, bot.getConfiguration());
     }

@@ -93,9 +93,9 @@ public abstract class Command {
     public String getArgsAsString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (OptionData option : getArgs()) {
-            stringBuilder.append(" <").append(option.getName()).append(">");
+            stringBuilder.append(CommandsModule.COMMAND_ARGS_SEPARATOR).append("<").append(option.getName()).append(">");
         }
-        return stringBuilder.toString().replaceFirst(" ", "");
+        return stringBuilder.toString().replaceFirst(CommandsModule.COMMAND_ARGS_SEPARATOR, "");
     }
 
     public boolean isGuildOnly() {

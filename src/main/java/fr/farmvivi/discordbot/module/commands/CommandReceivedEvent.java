@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.module.commands;
 
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 public class CommandReceivedEvent {
