@@ -40,16 +40,14 @@ public class MusicModule extends Module {
     public static final int DEFAULT_VOICE_VOLUME = 5;
     public static final int DEFAULT_RADIO_VOLUME = 25;
 
-    private final Modules module;
     private final Bot bot;
     private final MusicListener musicListener;
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
     private final Map<String, MusicPlayer> players = new HashMap<>();
 
-    public MusicModule(Modules module, Bot bot) {
-        super(module);
+    public MusicModule(Bot bot) {
+        super(Modules.MUSIC);
 
-        this.module = module;
         this.bot = bot;
         this.musicListener = new MusicListener(this);
     }
