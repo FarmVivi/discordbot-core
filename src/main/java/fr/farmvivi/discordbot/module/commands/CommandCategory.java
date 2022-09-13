@@ -1,7 +1,9 @@
 package fr.farmvivi.discordbot.module.commands;
 
 public enum CommandCategory {
-    MUSIC("Musique"), OTHER("Autres");
+    UTILS("Utilitaire"),
+    MUSIC("Musique"),
+    OTHER("Autres");
 
     private final String name;
 
