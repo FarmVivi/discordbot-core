@@ -65,9 +65,9 @@ public class ModulesManager {
 
         Module module;
         switch (moduleType) {
-            case COMMANDS -> module = new CommandsModule(moduleType, bot);
-            case MUSIC -> module = new MusicModule(moduleType, bot);
-            case TEST -> module = new TestModule(moduleType, bot);
+            case COMMANDS -> module = new CommandsModule(bot);
+            case MUSIC -> module = new MusicModule(bot);
+            case TEST -> module = new TestModule(bot);
             default -> {
                 logger.error("Module " + moduleType + " has no implementation !");
                 System.exit(4);
