@@ -7,27 +7,26 @@ import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
+import java.util.Map;
 
 public class PlayCommand extends Command {
     private final MusicModule musicModule;
 
     public PlayCommand(MusicModule musicModule) {
         super("play", CommandCategory.MUSIC, "Ajoute une musique à la file d'attente", new OptionData[]{
-                new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente")}, new String[]{"p"});
+                new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente", true)}, new String[]{"p"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
-        if (this.getArgs().length > 0 && content.length() == 0) {
-            reply.addContent("Utilisation de la commande: **/" + this.getName() + " " + this.getArgsAsString() + "**");
-            return false;
-        }
 
         Guild guild = event.getGuild();
 
@@ -47,7 +46,9 @@ public class PlayCommand extends Command {
             reply.addContent("Lecture !");
         }
 
-        musicModule.loadTrack(guild, content, reply);
+        String query = args.get("requête").getAsString();
+
+        musicModule.loadTrack(guild, query, reply);
 
         return true;
     }

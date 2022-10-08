@@ -6,8 +6,11 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
+import java.util.Map;
 
 public class EqHighBassCommand extends Command {
     private static final float[] BASS_BOOST = {0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f};
@@ -16,14 +19,14 @@ public class EqHighBassCommand extends Command {
 
     public EqHighBassCommand(MusicModule musicModule) {
         super("eqhighbass", CommandCategory.MUSIC, "Ajuste le niveau de basses du modificateur audio", new OptionData[]{
-                new OptionData(OptionType.NUMBER, "niveau", "Niveau de basses")});
+                new OptionData(OptionType.NUMBER, "niveau", "Niveau de basses", true)});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();
@@ -33,17 +36,13 @@ public class EqHighBassCommand extends Command {
             return false;
         }
 
-        try {
-            float diff = Float.parseFloat(content);
-            for (int i = 0; i < BASS_BOOST.length; i++)
-                musicModule.getPlayer(guild).getEqualizer().setGain(i, BASS_BOOST[i] + diff);
+        float level = Float.parseFloat(args.get("niveau").getAsString());
 
-            reply.addContent("**Equalizer - High Bass** de " + diff + " activé.");
+        for (int i = 0; i < BASS_BOOST.length; i++)
+            musicModule.getPlayer(guild).getEqualizer().setGain(i, BASS_BOOST[i] + level);
 
-            return true;
-        } catch (NumberFormatException err) {
-            reply.addContent("Valeur non valide.");
-            return false;
-        }
+        reply.addContent("**Equalizer - High Bass** de " + level + " activé.");
+
+        return true;
     }
 }

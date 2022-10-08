@@ -2,6 +2,8 @@ package fr.farmvivi.discordbot.module;
 
 public enum Modules {
     COMMANDS("Commands"),
+    GENERAL("General", COMMANDS),
+    GOULAG("Goulag", GENERAL, COMMANDS),
     MUSIC("Music", COMMANDS),
     TEST("Test", COMMANDS);
 

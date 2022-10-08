@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandsModule extends Module {
-    public static final String COMMAND_ARGS_SEPARATOR = ";";
-
     private final Bot bot;
     private final CommandsListener commandsListener;
 

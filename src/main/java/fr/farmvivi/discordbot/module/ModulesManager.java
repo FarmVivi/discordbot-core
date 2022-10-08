@@ -2,6 +2,8 @@ package fr.farmvivi.discordbot.module;
 
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
+import fr.farmvivi.discordbot.module.general.GeneralModule;
+import fr.farmvivi.discordbot.module.goulag.GoulagModule;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.test.TestModule;
 import org.slf4j.Logger;
@@ -66,6 +68,8 @@ public class ModulesManager {
         Module module;
         switch (moduleType) {
             case COMMANDS -> module = new CommandsModule(bot);
+            case GENERAL -> module = new GeneralModule(bot);
+            case GOULAG -> module = new GoulagModule(bot);
             case MUSIC -> module = new MusicModule(bot);
             case TEST -> module = new TestModule(bot);
             default -> {

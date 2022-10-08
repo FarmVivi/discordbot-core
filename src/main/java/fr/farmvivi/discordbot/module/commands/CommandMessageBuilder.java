@@ -43,20 +43,29 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         if (differ) {
             differ = false;
             if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
-                WebhookMessageEditAction<Message> messageWebhookMessageEditAction = slashCommandInteractionEvent.getHook().editOriginal(this.getContent());
-                if (isEphemeral()) {
-                    messageWebhookMessageEditAction.delay(1, TimeUnit.MINUTES).flatMap(Predicate.not(Message::isEphemeral), Message::delete).queue();
+                if (isEmpty()) {
+                    slashCommandInteractionEvent.getHook().deleteOriginal().queue();
                 } else {
-                    messageWebhookMessageEditAction.queue();
+                    WebhookMessageEditAction<Message> messageWebhookMessageEditAction = slashCommandInteractionEvent.getHook().editOriginal(this.getContent());
+                    if (isEphemeral()) {
+                        messageWebhookMessageEditAction.delay(1, TimeUnit.MINUTES).flatMap(Predicate.not(Message::isEphemeral), Message::delete).queue();
+                    } else {
+                        messageWebhookMessageEditAction.queue();
+                    }
                 }
             } else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
-                Message originalMessage = messageReceivedEvent.getMessage();
-                MessageCreateAction messageCreateAction = originalMessage.reply(this.build());
-                if (isEphemeral()) {
-                    messageCreateAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
+                if (!isEmpty()) {
+                    Message originalMessage = messageReceivedEvent.getMessage();
+                    MessageCreateAction messageCreateAction = originalMessage.reply(this.build());
+                    if (isEphemeral()) {
+                        messageCreateAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
+                        originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
+                    } else {
+                        messageCreateAction.queue();
+                    }
+                } else if (isEphemeral()) {
+                    Message originalMessage = messageReceivedEvent.getMessage();
                     originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
-                } else {
-                    messageCreateAction.queue();
                 }
             }
         }

@@ -7,6 +7,9 @@ import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import net.dv8tion.jda.api.JDAInfo;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import java.util.Map;
 
 public class VersionCommand extends Command {
     public VersionCommand() {
@@ -16,8 +19,8 @@ public class VersionCommand extends Command {
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         reply.addContent(Bot.name + " **v" + Bot.version + "** :"

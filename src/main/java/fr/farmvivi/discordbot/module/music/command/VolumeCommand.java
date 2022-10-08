@@ -6,22 +6,30 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
+import java.util.Map;
 
 public class VolumeCommand extends Command {
     private final MusicModule musicModule;
 
     public VolumeCommand(MusicModule musicModule) {
-        super("volume", CommandCategory.MUSIC, "Change le volume de la musique", new OptionData[]{
-                new OptionData(OptionType.INTEGER, "volume", "Nouveau volume")}, new String[]{"v"});
+        super("volume", CommandCategory.MUSIC, "Voir/Changer le volume de la musique", new String[]{"v"});
+
+        OptionData volumeOption = new OptionData(OptionType.INTEGER, "volume", "Nouveau volume", false);
+        volumeOption.setMinValue(0);
+        volumeOption.setMaxValue(100);
+
+        this.setArgs(new OptionData[]{volumeOption});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();
@@ -31,20 +39,12 @@ public class VolumeCommand extends Command {
             return false;
         }
 
-        int volume;
-        try {
-            volume = Integer.parseInt(content);
-        } catch (NumberFormatException e) {
-            reply.addContent("Le volume actuel est à **" + musicModule.getPlayer(guild).getAudioPlayer().getVolume() + "%**.");
-            return true;
-        }
-
-        if (volume > 0 && volume <= 100) {
+        if (args.containsKey("volume")) {
+            int volume = args.get("volume").getAsInt();
             musicModule.getPlayer(guild).getAudioPlayer().setVolume(volume);
-            reply.addContent("Volume mis à **" + volume + "%**.");
+            reply.addContent("Volume changé à **" + volume + "%**.");
         } else {
-            reply.addContent("Le volume doit être compris entre **1%** et **100%**.");
-            return false;
+            reply.addContent("Le volume actuel est de **" + musicModule.getPlayer(guild).getAudioPlayer().getVolume() + "%**.");
         }
 
         return true;
