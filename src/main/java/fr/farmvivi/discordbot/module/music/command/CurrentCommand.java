@@ -15,7 +15,9 @@ public class CurrentCommand extends Command {
     private final MusicModule musicModule;
 
     public CurrentCommand(MusicModule musicModule) {
-        super("current", CommandCategory.MUSIC, "Affiche la musique en cours de lecture", new String[]{"np", "info"});
+        super("current", CommandCategory.MUSIC, "Affiche la musique en cours de lecture");
+
+        this.setAliases(new String[]{"np", "info"});
 
         this.musicModule = musicModule;
     }

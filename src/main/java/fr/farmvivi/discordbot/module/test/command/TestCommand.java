@@ -15,7 +15,7 @@ public class TestCommand extends Command {
     public TestCommand(TestModule testModule) {
         super("test", CommandCategory.OTHER, "Commande de test");
 
-        this.adminOnly = true;
+        this.setAdminOnly(true);
 
         this.testModule = testModule;
     }

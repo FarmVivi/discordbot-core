@@ -8,6 +8,7 @@ import fr.farmvivi.discordbot.module.commands.command.HelpCommand;
 import fr.farmvivi.discordbot.module.commands.command.ShutdownCommand;
 import fr.farmvivi.discordbot.module.commands.command.VersionCommand;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
@@ -47,14 +48,24 @@ public class CommandsModule extends Module {
         CommandListUpdateAction commandListUpdateAction = JDAManager.getJDA().updateCommands();
 
         for (Command command : getCommands()) {
-            // Registering command to Discord API
+            // Registering command to Discord API<
             SlashCommandData commandData = Commands.slash(command.getName(), command.getDescription());
             if (command.getArgs().length > 0) {
-                commandData.addOptions(command.getArgs());
+                int requiredIndex = 0;
+                List<OptionData> options = new ArrayList<>();
+                for (OptionData option : command.getArgs()) {
+                    if (option.isRequired()) {
+                        options.add(requiredIndex, option);
+                        requiredIndex++;
+                    } else {
+                        options.add(option);
+                    }
+                }
+                commandData.addOptions(options);
             }
             commandData.setGuildOnly(command.isGuildOnly());
             logger.info("Registering " + command.getName() + " commands to Discord API...");
-            commandListUpdateAction.addCommands(commandData);
+            commandListUpdateAction = commandListUpdateAction.addCommands(commandData);
         }
 
         commandListUpdateAction.queue();

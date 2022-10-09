@@ -14,7 +14,9 @@ public class ClearQueueCommand extends Command {
     private final MusicModule musicModule;
 
     public ClearQueueCommand(MusicModule musicModule) {
-        super("clear-queue", CommandCategory.MUSIC, "Vide la file d'attente", new String[]{"clear", "clearqueue"});
+        super("clear-queue", CommandCategory.MUSIC, "Vide la file d'attente");
+
+        this.setAliases(new String[]{"clear", "clearqueue"});
 
         this.musicModule = musicModule;
     }

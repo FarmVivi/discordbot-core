@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.module.commands;
 
 import fr.farmvivi.discordbot.Bot;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Map;
@@ -10,30 +11,16 @@ public abstract class Command {
     private final String name;
     private final CommandCategory category;
     private final String description;
-    private OptionData[] args;
-    private final String[] aliases;
 
-    protected boolean guildOnly = true;
-    protected boolean adminOnly = false;
+    private OptionData[] args = new OptionData[0];
+    private String[] aliases = new String[0];
+    private boolean guildOnly = true;
+    private boolean adminOnly = false;
 
     public Command(String name, CommandCategory category, String description) {
-        this(name, category, description, new OptionData[0], new String[0]);
-    }
-
-    public Command(String name, CommandCategory category, String description, String[] aliases) {
-        this(name, category, description, new OptionData[0], aliases);
-    }
-
-    public Command(String name, CommandCategory category, String description, OptionData[] args) {
-        this(name, category, description, args, new String[0]);
-    }
-
-    public Command(String name, CommandCategory category, String description, OptionData[] args, String[] aliases) {
         this.name = name;
         this.category = category;
         this.description = description;
-        this.args = args;
-        this.aliases = aliases;
     }
 
     public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
@@ -49,10 +36,6 @@ public abstract class Command {
 
     public String getName() {
         return name;
-    }
-
-    public String[] getAliases() {
-        return aliases;
     }
 
     public CommandCategory getCategory() {
@@ -71,6 +54,14 @@ public abstract class Command {
         this.args = args;
     }
 
+    public String[] getAliases() {
+        return aliases;
+    }
+
+    protected void setAliases(String[] aliases) {
+        this.aliases = aliases;
+    }
+
     public String getArgsAsString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (OptionData option : getArgs()) {
@@ -78,7 +69,7 @@ public abstract class Command {
             if (!option.isRequired()) {
                 stringBuilder.append("*");
             }
-            stringBuilder.append("<").append(option.getName()).append(">");
+            stringBuilder.append("<").append(option.getName()).append(" : ").append(typeToString(option.getType())).append(">");
             if (!option.isRequired()) {
                 stringBuilder.append("*");
             }
@@ -86,11 +77,36 @@ public abstract class Command {
         return stringBuilder.toString().replaceFirst(" ", "");
     }
 
+    private String typeToString(OptionType type) {
+        return switch (type) {
+            case STRING -> "texte";
+            case INTEGER -> "nombre entier";
+            case BOOLEAN -> "booléen";
+            case USER -> "utilisateur";
+            case ROLE -> "rôle";
+            case CHANNEL -> "salon";
+            case MENTIONABLE -> "rôle ou utilisateur";
+            case SUB_COMMAND -> "sous-commande";
+            case SUB_COMMAND_GROUP -> "groupe de sous-commandes";
+            case NUMBER -> "nombre réel";
+            case ATTACHMENT -> "fichier";
+            case UNKNOWN -> "inconnu";
+        };
+    }
+
     public boolean isGuildOnly() {
         return guildOnly;
     }
 
+    protected void setGuildOnly(boolean guildOnly) {
+        this.guildOnly = guildOnly;
+    }
+
     public boolean isAdminOnly() {
         return adminOnly;
+    }
+
+    protected void setAdminOnly(boolean adminOnly) {
+        this.adminOnly = adminOnly;
     }
 }

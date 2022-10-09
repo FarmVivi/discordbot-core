@@ -17,8 +17,12 @@ public class PlayCommand extends Command {
     private final MusicModule musicModule;
 
     public PlayCommand(MusicModule musicModule) {
-        super("play", CommandCategory.MUSIC, "Ajoute une musique à la file d'attente", new OptionData[]{
-                new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente", true)}, new String[]{"p"});
+        super("play", CommandCategory.MUSIC, "Ajoute une musique à la file d'attente");
+
+        OptionData requestOption = new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente", true);
+
+        this.setArgs(new OptionData[]{requestOption});
+        this.setAliases(new String[]{"p"});
 
         this.musicModule = musicModule;
     }

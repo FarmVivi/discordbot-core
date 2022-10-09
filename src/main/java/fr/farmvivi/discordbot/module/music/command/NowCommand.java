@@ -17,8 +17,12 @@ public class NowCommand extends Command {
     private final MusicModule musicModule;
 
     public NowCommand(MusicModule musicModule) {
-        super("now", CommandCategory.MUSIC, "Ajoute une musique en haut de la file d'attente", new OptionData[]{
-                new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente", true)}, new String[]{"n"});
+        super("now", CommandCategory.MUSIC, "Ajoute une musique en haut de la file d'attente");
+
+        OptionData requestOption = new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente", true);
+
+        this.setArgs(new OptionData[]{requestOption});
+        this.setAliases(new String[]{"n"});
 
         this.musicModule = musicModule;
     }

@@ -19,12 +19,12 @@ public class PollCommand extends Command {
     public PollCommand() {
         super("poll", CommandCategory.UTILS, "Faire un sondage");
 
-        OptionData questionOption = new OptionData(OptionType.STRING, "question", "Question du sondage", true);
-        OptionData response1Option = new OptionData(OptionType.STRING, "réponse1", "Option 1", true);
-        OptionData response2Option = new OptionData(OptionType.STRING, "réponse2", "Option 2", true);
         OptionData respondentOption = new OptionData(OptionType.ROLE, "répondants", "Les personnes qui peuvent répondre au sondage", false);
         OptionData timeoutOption = new OptionData(OptionType.INTEGER, "durée", "La durée du sondage en secondes", false);
         timeoutOption.setMinValue(30);
+        OptionData questionOption = new OptionData(OptionType.STRING, "question", "Question du sondage", true);
+        OptionData response1Option = new OptionData(OptionType.STRING, "réponse1", "Option 1", true);
+        OptionData response2Option = new OptionData(OptionType.STRING, "réponse2", "Option 2", true);
         OptionData response3Option = new OptionData(OptionType.STRING, "réponse3", "Option 3", false);
         OptionData response4Option = new OptionData(OptionType.STRING, "réponse4", "Option 4", false);
         OptionData response5Option = new OptionData(OptionType.STRING, "réponse5", "Option 5", false);
@@ -34,7 +34,7 @@ public class PollCommand extends Command {
         OptionData response9Option = new OptionData(OptionType.STRING, "réponse9", "Option 9", false);
         OptionData response10Option = new OptionData(OptionType.STRING, "réponse10", "Option 10", false);
 
-        this.setArgs(new OptionData[]{questionOption, response1Option, response2Option, respondentOption, timeoutOption, response3Option, response4Option, response5Option, response6Option, response7Option, response8Option, response9Option, response10Option});
+        this.setArgs(new OptionData[]{respondentOption, timeoutOption, questionOption, response1Option, response2Option, response3Option, response4Option, response5Option, response6Option, response7Option, response8Option, response9Option, response10Option});
     }
 
     @Override

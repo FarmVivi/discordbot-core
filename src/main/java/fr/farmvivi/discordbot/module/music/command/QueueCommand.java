@@ -15,7 +15,9 @@ public class QueueCommand extends Command {
     private final MusicModule musicModule;
 
     public QueueCommand(MusicModule musicModule) {
-        super("queue", CommandCategory.MUSIC, "Affiche la file d'attente", new String[]{"viewqueue", "view-queue"});
+        super("queue", CommandCategory.MUSIC, "Affiche la file d'attente");
+
+        this.setAliases(new String[]{"viewqueue", "view-queue"});
 
         this.musicModule = musicModule;
     }

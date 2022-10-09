@@ -24,8 +24,11 @@ public class RadioCommand extends Command {
     private final Configuration botConfig;
 
     public RadioCommand(MusicModule musicModule, Configuration botConfig) {
-        super("radio", CommandCategory.MUSIC, "Affiche/Joue une playlist préchargée", new OptionData[]{
-                new OptionData(OptionType.STRING, "playlist", "Nom de la playlist", false)});
+        super("radio", CommandCategory.MUSIC, "Affiche/Joue une playlist préchargée");
+
+        OptionData playlistOption = new OptionData(OptionType.STRING, "playlist", "Nom de la playlist", false);
+
+        this.setArgs(new OptionData[]{playlistOption});
 
         this.musicModule = musicModule;
         this.botConfig = botConfig;

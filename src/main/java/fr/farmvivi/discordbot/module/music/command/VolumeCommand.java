@@ -16,13 +16,14 @@ public class VolumeCommand extends Command {
     private final MusicModule musicModule;
 
     public VolumeCommand(MusicModule musicModule) {
-        super("volume", CommandCategory.MUSIC, "Voir/Changer le volume de la musique", new String[]{"v"});
+        super("volume", CommandCategory.MUSIC, "Voir/Changer le volume de la musique");
 
         OptionData volumeOption = new OptionData(OptionType.INTEGER, "volume", "Nouveau volume", false);
         volumeOption.setMinValue(0);
         volumeOption.setMaxValue(100);
 
         this.setArgs(new OptionData[]{volumeOption});
+        this.setAliases(new String[]{"v"});
 
         this.musicModule = musicModule;
     }

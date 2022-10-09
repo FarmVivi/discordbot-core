@@ -18,8 +18,11 @@ public class EqHighBassCommand extends Command {
     private final MusicModule musicModule;
 
     public EqHighBassCommand(MusicModule musicModule) {
-        super("eqhighbass", CommandCategory.MUSIC, "Ajuste le niveau de basses du modificateur audio", new OptionData[]{
-                new OptionData(OptionType.NUMBER, "niveau", "Niveau de basses", true)});
+        super("eqhighbass", CommandCategory.MUSIC, "Ajuste le niveau de basses du modificateur audio");
+
+        OptionData levelOption = new OptionData(OptionType.NUMBER, "niveau", "Niveau de basses", true);
+
+        this.setArgs(new OptionData[]{levelOption});
 
         this.musicModule = musicModule;
     }

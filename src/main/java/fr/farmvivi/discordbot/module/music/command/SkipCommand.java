@@ -15,7 +15,9 @@ public class SkipCommand extends Command {
     private final MusicModule musicModule;
 
     public SkipCommand(MusicModule musicModule) {
-        super("skip", CommandCategory.MUSIC, "Passe à la musique suivante", new String[]{"fs"});
+        super("skip", CommandCategory.MUSIC, "Passe à la musique suivante");
+
+        this.setAliases(new String[]{"fs"});
 
         this.musicModule = musicModule;
     }

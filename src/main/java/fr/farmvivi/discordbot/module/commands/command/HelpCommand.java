@@ -12,7 +12,7 @@ public class HelpCommand extends Command {
     public HelpCommand(CommandsModule commandsModule) {
         super("help", CommandCategory.OTHER, "Affiche toutes les commandes");
 
-        this.guildOnly = false;
+        this.setGuildOnly(false);
 
         this.commandsModule = commandsModule;
     }
@@ -27,7 +27,7 @@ public class HelpCommand extends Command {
             if (!strBuilders.containsKey(cmd.getCategory()))
                 strBuilders.put(cmd.getCategory(), new StringBuilder("**" + cmd.getCategory().getName() + "** :"));
             StringBuilder builder = strBuilders.get(cmd.getCategory());
-            builder.append("\n->").append(formatCmdHelp(cmd));
+            builder.append("\n> ").append(formatCmdHelp(cmd));
         }
 
         StringBuilder finalBuilder = new StringBuilder();
@@ -43,7 +43,7 @@ public class HelpCommand extends Command {
 
     private String formatCmdHelp(Command command) {
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("** /").append(command.getName());
+        stringBuilder.append("**/").append(command.getName());
         if (command.getArgs().length != 0)
             stringBuilder.append(" ").append(command.getArgsAsString());
         stringBuilder.append(" **| ").append(command.getDescription());

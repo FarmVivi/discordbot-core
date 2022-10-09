@@ -22,9 +22,11 @@ public class GoulagCommand extends Command {
     private GoulagPoll currentPoll;
 
     public GoulagCommand(long respondentRoleId, long goulagRoleId, long pollTimeout, int minimumVotes) {
-        super("goulag", CommandCategory.FUN, "Faire un sondage pour mettre quelqu'un au goulag", new OptionData[]{
-                new OptionData(OptionType.USER, "malfaisant", "Malfaisant à mettre au goulag", true),
-        });
+        super("goulag", CommandCategory.FUN, "Faire un sondage pour mettre quelqu'un au goulag");
+
+        OptionData userOption = new OptionData(OptionType.USER, "malfaisant", "Malfaisant à mettre au goulag", true);
+
+        this.setArgs(new OptionData[]{userOption});
 
         this.respondentRoleId = respondentRoleId;
         this.goulagRoleId = goulagRoleId;

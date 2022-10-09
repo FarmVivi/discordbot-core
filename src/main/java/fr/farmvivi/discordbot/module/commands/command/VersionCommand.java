@@ -15,7 +15,7 @@ public class VersionCommand extends Command {
     public VersionCommand() {
         super("version", CommandCategory.OTHER, "Affiche la version du bot");
 
-        this.guildOnly = false;
+        this.setGuildOnly(false);
     }
 
     @Override

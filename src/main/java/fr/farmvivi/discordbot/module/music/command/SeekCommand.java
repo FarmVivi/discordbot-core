@@ -18,8 +18,11 @@ public class SeekCommand extends Command {
     private final MusicModule musicModule;
 
     public SeekCommand(MusicModule musicModule) {
-        super("seek", CommandCategory.MUSIC, "Joue la musique a partir du temps donné", new OptionData[]{
-                new OptionData(OptionType.INTEGER, "temps", "Temps à partir duquel lire la musique", true)});
+        super("seek", CommandCategory.MUSIC, "Joue la musique a partir du temps donné");
+
+        OptionData timeOption = new OptionData(OptionType.INTEGER, "temps", "Temps à partir duquel lire la musique", true);
+
+        this.setArgs(new OptionData[]{timeOption});
 
         this.musicModule = musicModule;
     }

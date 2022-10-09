@@ -11,7 +11,9 @@ import java.util.Map;
 
 public class LeaveCommand extends Command {
     public LeaveCommand() {
-        super("leave", CommandCategory.MUSIC, "Déconnecte le bot du salon audio", new String[]{"disconnect", "quit"});
+        super("leave", CommandCategory.MUSIC, "Déconnecte le bot du salon audio");
+
+        this.setAliases(new String[]{"disconnect", "quit"});
     }
 
     @Override

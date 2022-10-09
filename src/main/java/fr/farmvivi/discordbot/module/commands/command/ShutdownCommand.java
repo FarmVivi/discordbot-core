@@ -12,8 +12,8 @@ public class ShutdownCommand extends Command {
     public ShutdownCommand() {
         super("shutdown", CommandCategory.OTHER, "Éteint le bot");
 
-        this.guildOnly = false;
-        this.adminOnly = true;
+        this.setGuildOnly(false);
+        this.setAdminOnly(true);
     }
 
     @Override

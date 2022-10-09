@@ -14,7 +14,9 @@ public class PauseCommand extends Command {
     private final MusicModule musicModule;
 
     public PauseCommand(MusicModule musicModule) {
-        super("pause", CommandCategory.MUSIC, "Met en pause la musique", new String[]{"resume"});
+        super("pause", CommandCategory.MUSIC, "Met en pause la musique");
+
+        this.setAliases(new String[]{"resume"});
 
         this.musicModule = musicModule;
     }
