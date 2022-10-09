@@ -15,6 +15,9 @@ public class JDAManager {
     private static JDA buildJDA() {
         return JDABuilder.createDefault(Bot.getInstance().getConfiguration().jdaToken)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .enableIntents(GatewayIntent.GUILD_MESSAGE_REACTIONS)
+                .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
                 .build();
     }
 }

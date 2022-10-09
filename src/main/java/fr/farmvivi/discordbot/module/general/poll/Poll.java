@@ -84,8 +84,10 @@ public abstract class Poll {
             if (timeout != -1) {
                 assert restAction != null;
                 restAction = restAction.delay(timeout, TimeUnit.SECONDS).flatMap(message1 -> {
-                    sendResults();
                     pollManager.unregisterPoll(this);
+                    List<PollResponse> responses = new ArrayList<>(this.responses.values());
+                    responses.sort(new PollResponseComparator());
+                    finishPoll(responses);
                     return message.delete();
                 });
             }
@@ -93,7 +95,14 @@ public abstract class Poll {
         }).queue();
     }
 
-    private void sendResults() {
+    public void finishPoll(List<PollResponse> responses) {
+        if (this.message == null) {
+            throw new IllegalStateException("Poll not sent");
+        }
+        sendResults(responses);
+    }
+
+    private void sendResults(List<PollResponse> responses) {
         if (message == null) {
             throw new IllegalStateException("Poll not sent");
         }
@@ -104,8 +113,6 @@ public abstract class Poll {
         }
         text.append("Résultats du sondage : **").append(this.question).append("**\n");
 
-        List<PollResponse> responses = new ArrayList<>(this.responses.values());
-        responses.sort(new PollResponseComparator());
         int previousPosition = 0;
         for (int i = 0; i < responses.size(); i++) {
             PollResponse pollResponse = responses.get(i);
