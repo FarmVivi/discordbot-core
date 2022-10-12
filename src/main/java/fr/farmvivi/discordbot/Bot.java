@@ -59,7 +59,13 @@ public class Bot {
 
         modulesManager = new ModulesManager(this);
 
-        modulesManager.loadModules();
+        try {
+            logger.info("Loading modules...");
+            modulesManager.loadModules();
+        } catch (Exception e) {
+            logger.error("Cannot load modules", e);
+            System.exit(1);
+        }
 
         setDefaultActivity();
 

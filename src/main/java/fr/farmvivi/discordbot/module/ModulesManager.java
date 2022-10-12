@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module;
 
 import fr.farmvivi.discordbot.Bot;
+import fr.farmvivi.discordbot.module.cnam.CnamModule;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.general.GeneralModule;
 import fr.farmvivi.discordbot.module.goulag.GoulagModule;
@@ -71,6 +72,7 @@ public class ModulesManager {
             case GENERAL -> module = new GeneralModule(bot);
             case GOULAG -> module = new GoulagModule(bot);
             case MUSIC -> module = new MusicModule(bot);
+            case CNAM -> module = new CnamModule(bot);
             case TEST -> module = new TestModule(bot);
             default -> {
                 logger.error("Module " + moduleType + " has no implementation !");

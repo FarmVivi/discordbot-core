@@ -1,0 +1,43 @@
+package fr.farmvivi.discordbot.module.cnam.database;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class DatabaseAccess {
+    private final DatabaseCredentials credentials;
+    private HikariDataSource hikariDataSource;
+
+    public DatabaseAccess(DatabaseCredentials credentials) {
+        this.credentials = credentials;
+    }
+
+    private void setupHikariCP() {
+        final HikariConfig hikariConfig = new HikariConfig();
+
+        hikariConfig.setMaximumPoolSize(10);
+        hikariConfig.setJdbcUrl(credentials.toURI());
+        hikariConfig.setUsername(credentials.getUser());
+        hikariConfig.setPassword(credentials.getPass());
+
+        this.hikariDataSource = new HikariDataSource(hikariConfig);
+    }
+
+    public void initPool() {
+        setupHikariCP();
+    }
+
+    public void closePool() {
+        this.hikariDataSource.close();
+    }
+
+    public Connection getConnection() throws SQLException {
+        if (this.hikariDataSource == null) {
+            System.out.println("Pas de connexion à la base de données, connexion...");
+            setupHikariCP();
+        }
+        return this.hikariDataSource.getConnection();
+    }
+}

@@ -5,6 +5,7 @@ public enum Modules {
     GENERAL("General", COMMANDS),
     GOULAG("Goulag", GENERAL, COMMANDS),
     MUSIC("Music", COMMANDS),
+    CNAM("Cnam", GOULAG),
     TEST("Test", COMMANDS);
 
     private final String name;
