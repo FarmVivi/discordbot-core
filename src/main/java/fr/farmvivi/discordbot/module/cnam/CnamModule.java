@@ -94,7 +94,13 @@ public class CnamModule extends Module {
 
         logger.info("Starting planning scrapper task...");
 
-        executorService.scheduleAtFixedRate(planningScrapperTask, 0, 1, TimeUnit.HOURS);
+        try {
+            int scrapperTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_SCRAPPER_TASK_DELAY"));
+
+            executorService.scheduleAtFixedRate(planningScrapperTask, 0, scrapperTaskDelay, TimeUnit.MINUTES);
+        } catch (Configuration.ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
