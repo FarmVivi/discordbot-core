@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -69,5 +70,16 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                 }
             }
         }
+    }
+
+    @NotNull
+    @Override
+    public MessageCreateBuilder addContent(String content) {
+        // Limit message length
+        if (content.length() > Message.MAX_CONTENT_LENGTH) {
+            content = content.substring(0, Message.MAX_CONTENT_LENGTH - 3) + "...";
+        }
+
+        return super.addContent(content);
     }
 }
