@@ -12,6 +12,7 @@ import fr.farmvivi.discordbot.module.cnam.database.salle.SalleDAO;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
+import java.awt.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -48,6 +49,7 @@ public class PlanningDailyPrintTask implements Runnable {
             }
             Collections.sort(cours);
             EmbedBuilder embedBuilder = new EmbedBuilder();
+            embedBuilder.setColor(new Color(88, 101, 242));
             embedBuilder.setTitle("Planning du " + date.getDayOfWeek().getDisplayName(TextStyle.FULL, FRANCE) + " " + date.getDayOfMonth() + " " + date.getMonth().getDisplayName(TextStyle.FULL, FRANCE) + " " + date.getYear());
             Cours previousCours = null;
             for (Cours cours1 : cours) {
