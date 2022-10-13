@@ -106,27 +106,29 @@ public class CoursDAO extends DAO<Cours, Integer> {
         return null;
     }
 
-    public Cours selectByDateHeure(LocalDate date, LocalTime heureDebut, LocalTime heureFin) throws SQLException {
+    public List<Cours> selectByDate(LocalDate date) throws SQLException {
+        List<Cours> cours = new ArrayList<>();
+
         try (Connection connection = db.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM cours WHERE date_cours = ? AND debut_cours = ? AND fin_cours = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM cours WHERE date_cours = ?")) {
 
             statement.setDate(1, java.sql.Date.valueOf(date));
-            statement.setTime(2, java.sql.Time.valueOf(heureDebut));
-            statement.setTime(3, java.sql.Time.valueOf(heureFin));
             statement.executeQuery();
 
-            if (statement.getResultSet().next()) {
+            while (statement.getResultSet().next()) {
                 int id = statement.getResultSet().getInt("id_cours");
+                LocalTime heureDebut = statement.getResultSet().getTime("debut_cours").toLocalTime();
+                LocalTime heureFin = statement.getResultSet().getTime("fin_cours").toLocalTime();
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
                 int salleId = statement.getResultSet().getInt("id_salle");
                 String enseignementCode = statement.getResultSet().getString("code_enseignement");
 
-                return new Cours(id, date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode);
+                cours.add(new Cours(id, date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode));
             }
         }
 
-        return null;
+        return cours;
     }
 
     public Cours selectByDateBetweenHeure(LocalDate date, LocalTime heure) throws SQLException {
@@ -142,6 +144,29 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 int id = statement.getResultSet().getInt("id_cours");
                 LocalTime heureDebut = statement.getResultSet().getTime("debut_cours").toLocalTime();
                 LocalTime heureFin = statement.getResultSet().getTime("fin_cours").toLocalTime();
+                boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                int enseignantId = statement.getResultSet().getInt("id_enseignant");
+                int salleId = statement.getResultSet().getInt("id_salle");
+                String enseignementCode = statement.getResultSet().getString("code_enseignement");
+
+                return new Cours(id, date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode);
+            }
+        }
+
+        return null;
+    }
+
+    public Cours selectByDateHeure(LocalDate date, LocalTime heureDebut, LocalTime heureFin) throws SQLException {
+        try (Connection connection = db.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM cours WHERE date_cours = ? AND debut_cours = ? AND fin_cours = ?")) {
+
+            statement.setDate(1, java.sql.Date.valueOf(date));
+            statement.setTime(2, java.sql.Time.valueOf(heureDebut));
+            statement.setTime(3, java.sql.Time.valueOf(heureFin));
+            statement.executeQuery();
+
+            if (statement.getResultSet().next()) {
+                int id = statement.getResultSet().getInt("id_cours");
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
                 int salleId = statement.getResultSet().getInt("id_salle");

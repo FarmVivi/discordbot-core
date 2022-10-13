@@ -1,11 +1,13 @@
 package fr.farmvivi.discordbot.module.cnam.database.cours;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Objects;
 
-public class Cours {
+public class Cours implements Comparable<Cours> {
     private final int id;
     private final LocalDate date;
     private final LocalTime heureDebut;
@@ -60,6 +62,16 @@ public class Cours {
 
     public String getEnseignementCode() {
         return enseignementCode;
+    }
+
+    @Override
+    public int compareTo(@NotNull Cours o) {
+        // Comparaison par date puis par heure de début
+        int dateCompare = date.compareTo(o.date);
+        if (dateCompare == 0) {
+            return heureDebut.compareTo(o.heureDebut);
+        }
+        return dateCompare;
     }
 
     @Override

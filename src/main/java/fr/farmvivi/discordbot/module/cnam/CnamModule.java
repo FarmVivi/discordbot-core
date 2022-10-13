@@ -6,9 +6,13 @@ import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.Module;
 import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
+import fr.farmvivi.discordbot.module.cnam.task.PlanningDailyPrintTask;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningScrapperTask;
 import net.dv8tion.jda.api.JDA;
 
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -17,9 +21,10 @@ import java.util.concurrent.TimeUnit;
 public class CnamModule extends Module {
     private final Bot bot;
     private final DatabaseManager databaseManager;
-    private final ScheduledExecutorService executorService;
+    private final ScheduledExecutorService scheduler;
 
     private final PlanningScrapperTask planningScrapperTask;
+    private final PlanningDailyPrintTask planningDailyPrintTask;
 
     public CnamModule(Bot bot) {
         super(Modules.CNAM);
@@ -39,12 +44,19 @@ public class CnamModule extends Module {
             throw new RuntimeException(e);
         }
 
-        this.executorService = new ScheduledThreadPoolExecutor(1);
+        this.scheduler = new ScheduledThreadPoolExecutor(1);
         try {
             String planningCodeScolarite = configuration.getValue("CNAM_PLANNING_CODE_SCOLARITE");
             String planningUid = configuration.getValue("CNAM_PLANNING_UID");
 
             this.planningScrapperTask = new PlanningScrapperTask(planningCodeScolarite, planningUid, databaseManager.getDatabaseAccess());
+        } catch (Configuration.ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_LOGS_CHANNEL_ID");
+
+            this.planningDailyPrintTask = new PlanningDailyPrintTask(JDAManager.getJDA().getTextChannelById(planningLogsChannelId), databaseManager.getDatabaseAccess());
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -74,7 +86,7 @@ public class CnamModule extends Module {
 
             JDA jda = JDAManager.getJDA();
 
-            jda.addEventListener(new GoulagRemoverEventHandler(executorService, jda.getRoleById(goulagRoleId), databaseManager.getDatabaseAccess()));
+            jda.addEventListener(new GoulagRemoverEventHandler(scheduler, jda.getRoleById(goulagRoleId), databaseManager.getDatabaseAccess()));
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Failed to load goulag remover because Goulag module is not loaded");
         }
@@ -95,9 +107,27 @@ public class CnamModule extends Module {
         logger.info("Starting planning scrapper task...");
 
         try {
-            int scrapperTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_SCRAPPER_TASK_DELAY"));
+            int scrapperTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_SCRAPPER_DELAY"));
 
-            executorService.scheduleAtFixedRate(planningScrapperTask, 0, scrapperTaskDelay, TimeUnit.MINUTES);
+            scheduler.scheduleAtFixedRate(planningScrapperTask, 0, scrapperTaskDelay, TimeUnit.MINUTES);
+        } catch (Configuration.ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        logger.info("Starting planning daily print task...");
+
+        try {
+            int dailyPrintTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_DAILY_PRINT_HOUR"));
+
+            ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+            ZonedDateTime nextRun = now.withHour(dailyPrintTaskDelay).withMinute(0).withSecond(0);
+            if (now.compareTo(nextRun) > 0)
+                nextRun = nextRun.plusDays(1);
+
+            Duration duration = Duration.between(now, nextRun);
+            long initialDelay = duration.getSeconds();
+
+            scheduler.scheduleAtFixedRate(planningDailyPrintTask, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS);
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -109,15 +139,15 @@ public class CnamModule extends Module {
 
         logger.info("Stopping planning scrapper...");
 
-        executorService.shutdown();
+        scheduler.shutdown();
         try {
-            executorService.awaitTermination(30, TimeUnit.SECONDS);
+            scheduler.awaitTermination(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (!executorService.isTerminated()) {
+        if (!scheduler.isTerminated()) {
             logger.warn("Planning scrapper didn't stop in time, forcing shutdown");
-            executorService.shutdownNow();
+            scheduler.shutdownNow();
         }
 
         logger.info("Closing planning scrapper...");
