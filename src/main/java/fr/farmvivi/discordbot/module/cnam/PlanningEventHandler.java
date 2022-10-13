@@ -15,10 +15,10 @@ import fr.farmvivi.discordbot.module.cnam.events.salle.SalleRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class PlanningListenerHandler implements PlanningListener {
+public class PlanningEventHandler implements PlanningListener {
     private final TextChannel channel;
 
-    public PlanningListenerHandler(TextChannel channel) {
+    public PlanningEventHandler(TextChannel channel) {
         this.channel = channel;
     }
 

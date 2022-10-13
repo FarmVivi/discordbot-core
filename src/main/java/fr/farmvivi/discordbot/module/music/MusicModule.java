@@ -41,7 +41,7 @@ public class MusicModule extends Module {
     public static final int DEFAULT_RADIO_VOLUME = 25;
 
     private final Bot bot;
-    private final MusicListener musicListener;
+    private final MusicEventHandler musicEventHandler;
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
     private final Map<String, MusicPlayer> players = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class MusicModule extends Module {
         super(Modules.MUSIC);
 
         this.bot = bot;
-        this.musicListener = new MusicListener(this);
+        this.musicEventHandler = new MusicEventHandler(this);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class MusicModule extends Module {
 
         logger.info("Registering event listener...");
 
-        JDAManager.getJDA().addEventListener(musicListener);
+        JDAManager.getJDA().addEventListener(musicEventHandler);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class MusicModule extends Module {
 
         logger.info("Unregistering event listener...");
 
-        JDAManager.getJDA().removeEventListener(musicListener);
+        JDAManager.getJDA().removeEventListener(musicEventHandler);
     }
 
     @Override

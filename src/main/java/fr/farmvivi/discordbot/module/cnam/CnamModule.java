@@ -6,6 +6,8 @@ import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.Module;
 import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
+import fr.farmvivi.discordbot.module.cnam.task.PlanningScrapperTask;
+import net.dv8tion.jda.api.JDA;
 
 import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
@@ -68,9 +70,19 @@ public class CnamModule extends Module {
         logger.info("Registering listeners...");
 
         try {
+            long goulagRoleId = Long.parseLong(bot.getConfiguration().getValue("GOULAG_ROLE"));
+
+            JDA jda = JDAManager.getJDA();
+
+            jda.addEventListener(new GoulagRemoverEventHandler(executorService, jda.getRoleById(goulagRoleId), databaseManager.getDatabaseAccess()));
+        } catch (Configuration.ValueNotFoundException e) {
+            logger.warn("Failed to load goulag remover because Goulag module is not loaded");
+        }
+
+        try {
             String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_LOGS_CHANNEL_ID");
 
-            planningScrapperTask.registerListener(new PlanningListenerHandler(JDAManager.getJDA().getTextChannelById(planningLogsChannelId)));
+            planningScrapperTask.registerListener(new PlanningEventHandler(JDAManager.getJDA().getTextChannelById(planningLogsChannelId)));
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -80,7 +92,7 @@ public class CnamModule extends Module {
     public void onPostEnable() {
         super.onPostEnable();
 
-        logger.info("Starting planning scrapper...");
+        logger.info("Starting planning scrapper task...");
 
         executorService.scheduleAtFixedRate(planningScrapperTask, 0, 1, TimeUnit.HOURS);
     }

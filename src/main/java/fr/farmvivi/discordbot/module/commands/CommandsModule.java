@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class CommandsModule extends Module {
     private final Bot bot;
-    private final CommandsListener commandsListener;
+    private final CommandsEventHandler commandsEventHandler;
 
     private final Map<Modules, List<Command>> commands = new HashMap<>();
 
@@ -27,7 +27,7 @@ public class CommandsModule extends Module {
         super(Modules.COMMANDS);
 
         this.bot = bot;
-        this.commandsListener = new CommandsListener(this, bot.getConfiguration());
+        this.commandsEventHandler = new CommandsEventHandler(this, bot.getConfiguration());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class CommandsModule extends Module {
 
         logger.info("Registering event listener...");
 
-        JDAManager.getJDA().addEventListener(commandsListener);
+        JDAManager.getJDA().addEventListener(commandsEventHandler);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class CommandsModule extends Module {
 
         logger.info("Unregistering event listener...");
 
-        JDAManager.getJDA().removeEventListener(commandsListener);
+        JDAManager.getJDA().removeEventListener(commandsEventHandler);
     }
 
     @Override

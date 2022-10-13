@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.module.cnam;
+package fr.farmvivi.discordbot.module.cnam.task;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
@@ -353,7 +353,7 @@ public class PlanningScrapperTask implements Runnable {
                                 // Sinon si le cours n'est pas enregistré dans la base de données
                             } else {
                                 // On recherche un cours similaire
-                                Cours searchCours = coursDAO.selectByDateHeure(date, heureDebut);
+                                Cours searchCours = coursDAO.selectByDateHeure(date, heureDebut, heureFin);
 
                                 // Si un cours similaire est trouvé, on le met à jour
                                 if (searchCours != null) {

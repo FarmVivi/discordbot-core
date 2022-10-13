@@ -13,7 +13,7 @@ import fr.farmvivi.discordbot.module.cnam.events.salle.SalleCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
 
-public class PlanningAdapter implements PlanningListener {
+public class PlanningListenerAdapter implements PlanningListener {
     @Override
     public void onSalleCreate(SalleCreateEvent event) {
 

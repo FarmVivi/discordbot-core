@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-public class MusicListener extends ListenerAdapter {
+public class MusicEventHandler extends ListenerAdapter {
     private final MusicModule musicModule;
 
-    public MusicListener(MusicModule musicModule) {
+    public MusicEventHandler(MusicModule musicModule) {
         this.musicModule = musicModule;
     }
 

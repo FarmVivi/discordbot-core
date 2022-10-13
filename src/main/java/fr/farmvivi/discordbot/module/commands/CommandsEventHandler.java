@@ -20,11 +20,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class CommandsListener extends ListenerAdapter {
+public class CommandsEventHandler extends ListenerAdapter {
     private final CommandsModule commandsModule;
     private final Configuration botConfig;
 
-    public CommandsListener(CommandsModule commandsModule, Configuration botConfig) {
+    public CommandsEventHandler(CommandsModule commandsModule, Configuration botConfig) {
         this.commandsModule = commandsModule;
         this.botConfig = botConfig;
     }
