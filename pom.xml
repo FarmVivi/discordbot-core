@@ -6,7 +6,7 @@
 
     <groupId>fr.farmvivi.discordbot</groupId>
     <artifactId>discordbot</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.0-SNAPSHOT</version>
 
     <name>DiscordBot</name>
 
