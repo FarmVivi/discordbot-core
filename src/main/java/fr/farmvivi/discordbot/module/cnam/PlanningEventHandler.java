@@ -22,7 +22,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.awt.*;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 
 public class PlanningEventHandler implements PlanningListener {
     private final TextChannel channel;
@@ -121,6 +123,8 @@ public class PlanningEventHandler implements PlanningListener {
 
     private EmbedBuilder buildCoursEmbed(EmbedBuilder baseEmbed, Cours cours, Salle salle, Enseignant enseignant, Enseignement enseignement) {
         String description = "De **" + cours.getHeureDebut() + "** à **" + cours.getHeureFin() + "** (" + calculDuree(cours.getHeureDebut(), cours.getHeureFin()) + ") avec " + enseignant.getPrenom() + " " + enseignant.getNom() + " en " + salle.getNom();
+
+        baseEmbed.setTitle(baseEmbed.build().getTitle() + " le " + cours.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE) + " " + cours.getDate().getDayOfMonth() + " " + cours.getDate().getMonth().getDisplayName(TextStyle.FULL, Locale.FRANCE) + " " + cours.getDate().getYear());
 
         return baseEmbed.addField(enseignement.getNom(), description, false);
     }
