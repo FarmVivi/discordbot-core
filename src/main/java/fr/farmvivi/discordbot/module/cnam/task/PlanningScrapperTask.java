@@ -358,7 +358,7 @@ public class PlanningScrapperTask implements Runnable {
                                 // Si un cours similaire est trouvé, on le met à jour
                                 if (searchCours != null) {
                                     for (PlanningListener listener : listeners) {
-                                        listener.onCoursUpdate(new CoursUpdateEvent(searchCours, cours));
+                                        listener.onCoursUpdate(new CoursUpdateEvent(searchCours, cours, salle, enseignant, enseignement));
                                     }
                                     cours = new Cours(searchCours.getId(), cours.getDate(), cours.getHeureDebut(), cours.getHeureFin(), cours.isPresentiel(), cours.getEnseignantId(), cours.getSalleId(), cours.getEnseignementCode());
                                     coursDAO.update(cours);
@@ -367,7 +367,7 @@ public class PlanningScrapperTask implements Runnable {
                                     // Sinon si aucun cours similaire n'est trouvé, on en crée un nouveau
                                 } else {
                                     for (PlanningListener listener : listeners) {
-                                        listener.onCoursCreate(new CoursCreateEvent(cours));
+                                        listener.onCoursCreate(new CoursCreateEvent(cours, salle, enseignant, enseignement));
                                     }
                                     cours = coursDAO.create(cours);
                                 }
@@ -419,6 +419,15 @@ public class PlanningScrapperTask implements Runnable {
             // Suppression des éléments non utilisés
 
             try {
+                // Cours
+                bddCourss.removeAll(courss);
+                for (Cours cours : bddCourss) {
+                    for (PlanningListener listener : listeners) {
+                        listener.onCoursRemove(new CoursRemoveEvent(cours, salleDAO.selectById(cours.getSalleId()), enseignantDAO.selectById(cours.getEnseignantId()), enseignementDAO.selectById(cours.getEnseignementCode())));
+                    }
+                    coursDAO.delete(cours);
+                }
+
                 // Salles
                 bddSalles.removeAll(salles);
                 for (Salle salle : bddSalles) {
@@ -444,15 +453,6 @@ public class PlanningScrapperTask implements Runnable {
                         listener.onEnseignementRemove(new EnseignementRemoveEvent(enseignement));
                     }
                     enseignementDAO.delete(enseignement);
-                }
-
-                // Cours
-                bddCourss.removeAll(courss);
-                for (Cours cours : bddCourss) {
-                    for (PlanningListener listener : listeners) {
-                        listener.onCoursRemove(new CoursRemoveEvent(cours));
-                    }
-                    coursDAO.delete(cours);
                 }
             } catch (SQLException e) {
                 logger.error("Erreur lors de la suppression des éléments non utilisés", e);
