@@ -38,12 +38,13 @@ public class Salle {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Salle salle = (Salle) o;
-        return Objects.equals(nom, salle.nom) && Objects.equals(adresse, salle.adresse);
+        Salle that = (Salle) o;
+        if (id == that.id) return true;
+        return Objects.equals(nom, that.nom) && Objects.equals(adresse, that.adresse);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nom, adresse);
+        return Objects.hash(id, nom, adresse);
     }
 }

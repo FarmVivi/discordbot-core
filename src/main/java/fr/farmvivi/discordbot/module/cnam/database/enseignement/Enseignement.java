@@ -29,7 +29,8 @@ public class Enseignement {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Enseignement that = (Enseignement) o;
-        return Objects.equals(code, that.code) && Objects.equals(nom, that.nom);
+        if (nom.equals(that.nom)) return true;
+        return Objects.equals(nom, that.nom);
     }
 
     @Override

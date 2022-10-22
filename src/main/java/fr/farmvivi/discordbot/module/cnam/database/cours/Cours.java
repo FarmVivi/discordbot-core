@@ -84,11 +84,12 @@ public class Cours implements Comparable<Cours> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cours cours = (Cours) o;
+        if (id == cours.id) return true;
         return presentiel == cours.presentiel && enseignantId == cours.enseignantId && salleId == cours.salleId && Objects.equals(date, cours.date) && Objects.equals(heureDebut, cours.heureDebut) && Objects.equals(heureFin, cours.heureFin) && Objects.equals(enseignementCode, cours.enseignementCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode);
+        return Objects.hash(id, date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode);
     }
 }

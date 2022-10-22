@@ -39,11 +39,12 @@ public class Enseignant {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Enseignant that = (Enseignant) o;
+        if (id == that.id) return true;
         return Objects.equals(nom, that.nom) && Objects.equals(prenom, that.prenom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nom, prenom);
+        return Objects.hash(id, nom, prenom);
     }
 }
