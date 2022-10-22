@@ -21,6 +21,10 @@ public class DatabaseAccess {
         hikariConfig.setJdbcUrl(credentials.toURI());
         hikariConfig.setUsername(credentials.getUser());
         hikariConfig.setPassword(credentials.getPass());
+        hikariConfig.setMaxLifetime(600000L);
+        hikariConfig.setIdleTimeout(300000L);
+        hikariConfig.setLeakDetectionThreshold(300000L);
+        hikariConfig.setConnectionTimeout(10000L);
 
         this.hikariDataSource = new HikariDataSource(hikariConfig);
     }
