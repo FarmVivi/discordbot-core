@@ -38,9 +38,9 @@ public class Salle {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Salle that = (Salle) o;
-        if (id == that.id) return true;
-        return Objects.equals(nom, that.nom) && Objects.equals(adresse, that.adresse);
+        Salle salle = (Salle) o;
+        if (id != -1 && id == salle.id) return true;
+        return Objects.equals(nom, salle.nom) && Objects.equals(adresse, salle.adresse);
     }
 
     @Override

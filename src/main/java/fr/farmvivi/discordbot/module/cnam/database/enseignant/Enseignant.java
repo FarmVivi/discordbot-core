@@ -38,9 +38,9 @@ public class Enseignant {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Enseignant that = (Enseignant) o;
-        if (id == that.id) return true;
-        return Objects.equals(nom, that.nom) && Objects.equals(prenom, that.prenom);
+        Enseignant enseignant = (Enseignant) o;
+        if (id != -1 && id == enseignant.id) return true;
+        return Objects.equals(nom, enseignant.nom) && Objects.equals(prenom, enseignant.prenom);
     }
 
     @Override
