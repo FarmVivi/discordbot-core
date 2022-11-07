@@ -121,7 +121,7 @@ public class MusicModule extends Module {
         audioPlayerManager.registerSourceManager(new LocalAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
 
         // Search source provider
-        audioPlayerManager.registerSourceManager(new SearchSourceManager(youtubeAudioSourceManager, "ytmsearch:"));
+        audioPlayerManager.registerSourceManager(new SearchSourceManager(youtubeAudioSourceManager, "ytsearch:"));
 
         audioPlayerManager.getConfiguration().setFilterHotSwapEnabled(true);
     }
