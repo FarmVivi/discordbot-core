@@ -6,7 +6,7 @@ import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
-import fr.farmvivi.discordbot.module.music.utils.TimeToIntCalculator;
+import fr.farmvivi.discordbot.module.music.utils.TimeParser;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,7 +20,7 @@ public class SeekCommand extends Command {
     public SeekCommand(MusicModule musicModule) {
         super("seek", CommandCategory.MUSIC, "Joue la musique a partir du temps donné");
 
-        OptionData timeOption = new OptionData(OptionType.INTEGER, "temps", "Temps à partir duquel lire la musique", true);
+        OptionData timeOption = new OptionData(OptionType.STRING, "temps", "Temps à partir duquel lire la musique", true);
 
         this.setArgs(new OptionData[]{timeOption});
 
@@ -46,20 +46,21 @@ public class SeekCommand extends Command {
 
         String time = args.get("temps").getAsString();
 
-        if (!TimeToIntCalculator.isFormatted(time)) {
+        if (!TimeParser.isFormatted(time)) {
             reply.addContent("Format de temps à utiliser: **jours:heures:minutes:secondes**");
             return false;
         }
 
-        int startTime = TimeToIntCalculator.format(time) * 1000;
+        int startTime = TimeParser.convertStringToInt(time) * 1000;
+        time = TimeParser.convertIntToString(startTime / 1000);
         AudioTrack currentTrack = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
         if ((long) startTime > currentTrack.getDuration()) {
-            reply.addContent("**" + args + "** > TrackDuration");
+            reply.addContent("**" + time + "** > durée de la piste (**" + TimeParser.convertIntToString((int) currentTrack.getDuration() / 1000) + "**)");
             return false;
         }
 
         musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().setPosition(startTime);
-        reply.addContent("Seek to **" + args + "**");
+        reply.addContent("Seek to **" + time + "**");
 
         return true;
     }
