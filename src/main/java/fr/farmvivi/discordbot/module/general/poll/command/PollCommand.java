@@ -22,6 +22,7 @@ public class PollCommand extends Command {
         OptionData respondentOption = new OptionData(OptionType.ROLE, "répondants", "Les personnes qui peuvent répondre au sondage", false);
         OptionData timeoutOption = new OptionData(OptionType.INTEGER, "durée", "La durée du sondage en secondes", false);
         timeoutOption.setMinValue(30);
+        OptionData showVotesInResultOption = new OptionData(OptionType.BOOLEAN, "montrer_votes", "Montrer ce que les personnes ont voté", false);
         OptionData questionOption = new OptionData(OptionType.STRING, "question", "Question du sondage", true);
         OptionData response1Option = new OptionData(OptionType.STRING, "réponse1", "Option 1", true);
         OptionData response2Option = new OptionData(OptionType.STRING, "réponse2", "Option 2", true);
@@ -34,7 +35,7 @@ public class PollCommand extends Command {
         OptionData response9Option = new OptionData(OptionType.STRING, "réponse9", "Option 9", false);
         OptionData response10Option = new OptionData(OptionType.STRING, "réponse10", "Option 10", false);
 
-        this.setArgs(new OptionData[]{respondentOption, timeoutOption, questionOption, response1Option, response2Option, response3Option, response4Option, response5Option, response6Option, response7Option, response8Option, response9Option, response10Option});
+        this.setArgs(new OptionData[]{respondentOption, timeoutOption, showVotesInResultOption, questionOption, response1Option, response2Option, response3Option, response4Option, response5Option, response6Option, response7Option, response8Option, response9Option, response10Option});
     }
 
     @Override
@@ -50,7 +51,10 @@ public class PollCommand extends Command {
             return false;
         }
 
+        // Question
         String question = args.get("question").getAsString();
+
+        // Réponses
         List<String> responses = new LinkedList<>();
         responses.add(args.get("réponse1").getAsString());
         responses.add(args.get("réponse2").getAsString());
@@ -71,16 +75,24 @@ public class PollCommand extends Command {
         if (args.containsKey("réponse10"))
             responses.add(args.get("réponse10").getAsString());
 
+        // Durée du sondage
         long timeout = -1;
         if (args.containsKey("durée"))
             timeout = args.get("durée").getAsLong();
-        SimplePool pool;
+
+        // Montrer les votes
+        boolean showVotesInResult = false;
+        if (args.containsKey("montrer_votes"))
+            showVotesInResult = args.get("montrer_votes").getAsBoolean();
+
+        // Rôles qui peuvent répondre
+        Role role = null;
         if (args.containsKey("répondants")) {
-            Role role = args.get("répondants").getAsRole();
-            pool = new SimplePool(role, timeout, question, responses.toArray(new String[0]));
-        } else {
-            pool = new SimplePool(timeout, question, responses.toArray(new String[0]));
+            role = args.get("répondants").getAsRole();
         }
+
+        // Création et envoi du sondage
+        SimplePool pool = new SimplePool(role, timeout, showVotesInResult, question, responses.toArray(new String[0]));
         pool.sendPoll(channel);
 
         reply.setEphemeral(true);

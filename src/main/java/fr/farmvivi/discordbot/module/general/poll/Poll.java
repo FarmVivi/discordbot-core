@@ -23,18 +23,6 @@ public abstract class Poll {
 
     private Message message;
 
-    public Poll(String question, String... responses) {
-        this(null, question, responses);
-    }
-
-    public Poll(long timeout, String question, String... responses) {
-        this(null, timeout, question, responses);
-    }
-
-    public Poll(Role role, String question, String... responses) {
-        this(role, -1, question, responses);
-    }
-
     public Poll(Role role, long timeout, String question, String... responses) {
         this.role = role;
         this.timeout = timeout;
@@ -99,45 +87,6 @@ public abstract class Poll {
         if (this.message == null) {
             throw new IllegalStateException("Poll not sent");
         }
-        sendResults(responses);
-    }
-
-    private void sendResults(List<PollResponse> responses) {
-        if (message == null) {
-            throw new IllegalStateException("Poll not sent");
-        }
-
-        StringBuilder text = new StringBuilder();
-        if (role != null) {
-            text.append(role.getAsMention()).append(" ");
-        }
-        text.append("Résultats du sondage : **").append(this.question).append("**\n");
-
-        int previousPosition = 0;
-        for (int i = 0; i < responses.size(); i++) {
-            PollResponse pollResponse = responses.get(i);
-            int position = i + 1;
-            if (i != 0) {
-                PollResponse previousPollResponse = responses.get(i - 1);
-                if (pollResponse.getUsers().size() == previousPollResponse.getUsers().size()) {
-                    position = previousPosition;
-                }
-            }
-            text.append("\n");
-            if (position == 1) {
-                text.append(":first_place:");
-            } else if (position == 2) {
-                text.append(":second_place:");
-            } else if (position == 3) {
-                text.append(":third_place:");
-            } else {
-                text.append(":medal:");
-            }
-            text.append(" ").append(pollResponse.getResponse()).append(" (").append(pollResponse.getUsers().size()).append(" vote").append((pollResponse.getUsers().size() == 1) ? "" : "s").append(")");
-            previousPosition = position;
-        }
-
-        message.getChannel().sendMessage(text.toString()).queue();
     }
 
     public String getQuestion() {

@@ -27,9 +27,7 @@ public class GoulagPoll extends Poll {
 
     @Override
     public void finishPoll(List<PollResponse> responses) {
-        if (this.getMessage() == null) {
-            throw new IllegalStateException("Poll not sent");
-        }
+        super.finishPoll(responses);
 
         PollResponse yesResponse = null;
         PollResponse noResponse = null;
