@@ -274,8 +274,10 @@ public class CommandsEventHandler extends ListenerAdapter {
     }
 
     private void parseBoolean(OptionData option, DataObject dataObject, String argValue) throws CommandOptionParseTypeException {
-        if (argValue.equalsIgnoreCase("true") || argValue.equalsIgnoreCase("false")) {
-            dataObject.put("value", Boolean.parseBoolean(argValue));
+        if (argValue.equalsIgnoreCase("true") || argValue.equalsIgnoreCase("oui") || argValue.equalsIgnoreCase("yes")) {
+            dataObject.put("value", true);
+        } else if (argValue.equalsIgnoreCase("false") || argValue.equalsIgnoreCase("non") || argValue.equalsIgnoreCase("no")) {
+            dataObject.put("value", false);
         } else {
             throw new CommandOptionParseTypeException("doit être un booléen !");
         }
