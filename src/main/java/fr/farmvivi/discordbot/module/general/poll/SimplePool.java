@@ -54,7 +54,7 @@ public class SimplePool extends Poll {
                     .append((pollResponse.getUsers().size() == 1) ? "" : "s")
                     .append(")");
 
-            if (showVotesInResult) {
+            if (showVotesInResult && pollResponse.getUsers().size() > 0) {
                 text.append(" : ");
                 int j = 0;
                 for (long userId : pollResponse.getUsers()) {
