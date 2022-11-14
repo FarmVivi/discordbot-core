@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -35,10 +36,12 @@ public class GoulagRemoverEventHandler extends ListenerAdapter {
             LocalTime time = LocalTime.now();
 
             try {
-                Cours cours = coursDAO.selectByDateBetweenHeure(date, time);
-                if (cours == null) {
+                List<Cours> courss = coursDAO.selectAllByDateBetweenHeure(date, time);
+                if (courss.isEmpty()) {
                     event.getGuild().removeRoleFromMember(member, role).queue();
                 } else {
+                    Cours cours = courss.get(0);
+
                     // Schedule task to remove role from member after the end of the cours
                     GoulagRemoverTask task = new GoulagRemoverTask(role, member);
                     scheduler.schedule(task, cours.getHeureFin().toSecondOfDay() - time.toSecondOfDay(), TimeUnit.SECONDS);

@@ -352,8 +352,17 @@ public class PlanningScrapperTask implements Runnable {
 
                                 // Sinon si le cours n'est pas enregistré dans la base de données
                             } else {
-                                // On recherche un cours similaire
-                                Cours searchCours = coursDAO.selectByDateHeure(date, heureDebut, heureFin);
+                                // On recherche les cours similaires
+                                List<Cours> searchCourss = coursDAO.selectAllByDateHeure(date, heureDebut, heureFin);
+                                Cours searchCours = null;
+
+                                // On recherche un cours ayant le même enseignement
+                                for (Cours searchCoursTemp : searchCourss) {
+                                    if (searchCoursTemp.getEnseignementCode().equals(enseignement.getCode())) {
+                                        searchCours = searchCoursTemp;
+                                        break;
+                                    }
+                                }
 
                                 // Si un cours similaire est trouvé, on le met à jour
                                 if (searchCours != null) {

@@ -43,7 +43,7 @@ public class PlanningDailyPrintTask implements Runnable {
         // Affichage du planning
         try {
             LocalDate date = LocalDate.now().plusDays(1);
-            List<Cours> cours = coursDAO.selectByDate(date);
+            List<Cours> cours = coursDAO.selectAllByDate(date);
             if (cours.isEmpty()) {
                 return;
             }
