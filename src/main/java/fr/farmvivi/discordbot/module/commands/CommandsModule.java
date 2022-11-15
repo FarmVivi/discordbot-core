@@ -48,7 +48,7 @@ public class CommandsModule extends Module {
         CommandListUpdateAction commandListUpdateAction = JDAManager.getJDA().updateCommands();
 
         for (Command command : getCommands()) {
-            // Registering command to Discord API<
+            // Registering command to Discord API
             SlashCommandData commandData = Commands.slash(command.getName(), command.getDescription());
             if (command.getArgs().length > 0) {
                 int requiredIndex = 0;
