@@ -12,10 +12,10 @@ public abstract class Command {
     private final CommandCategory category;
     private final String description;
 
-    private OptionData[] args = new OptionData[0];
-    private String[] aliases = new String[0];
     private boolean guildOnly = true;
     private boolean adminOnly = false;
+    private String[] aliases = new String[0];
+    private OptionData[] args = new OptionData[0];
 
     public Command(String name, CommandCategory category, String description) {
         this.name = name;
