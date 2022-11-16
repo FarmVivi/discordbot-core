@@ -34,34 +34,6 @@ public abstract class Command {
         return true;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public CommandCategory getCategory() {
-        return category;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public OptionData[] getArgs() {
-        return args;
-    }
-
-    protected void setArgs(OptionData[] args) {
-        this.args = args;
-    }
-
-    public String[] getAliases() {
-        return aliases;
-    }
-
-    protected void setAliases(String[] aliases) {
-        this.aliases = aliases;
-    }
-
     public String getArgsAsString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (OptionData option : getArgs()) {
@@ -94,6 +66,18 @@ public abstract class Command {
         };
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public CommandCategory getCategory() {
+        return category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     public boolean isGuildOnly() {
         return guildOnly;
     }
@@ -108,5 +92,21 @@ public abstract class Command {
 
     protected void setAdminOnly(boolean adminOnly) {
         this.adminOnly = adminOnly;
+    }
+
+    public String[] getAliases() {
+        return aliases;
+    }
+
+    protected void setAliases(String[] aliases) {
+        this.aliases = aliases;
+    }
+
+    public OptionData[] getArgs() {
+        return args;
+    }
+
+    protected void setArgs(OptionData[] args) {
+        this.args = args;
     }
 }
