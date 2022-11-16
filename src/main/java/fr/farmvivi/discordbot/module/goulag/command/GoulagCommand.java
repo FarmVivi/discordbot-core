@@ -27,6 +27,7 @@ public class GoulagCommand extends Command {
         OptionData userOption = new OptionData(OptionType.USER, "malfaisant", "Malfaisant à mettre au goulag", true);
 
         this.setArgs(new OptionData[]{userOption});
+        this.setGuildOnly(true);
 
         this.respondentRoleId = respondentRoleId;
         this.goulagRoleId = goulagRoleId;

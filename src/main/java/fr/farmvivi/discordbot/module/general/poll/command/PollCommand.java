@@ -36,6 +36,7 @@ public class PollCommand extends Command {
         OptionData response10Option = new OptionData(OptionType.STRING, "réponse10", "Option 10", false);
 
         this.setArgs(new OptionData[]{respondentOption, timeoutOption, showVotesInResultOption, questionOption, response1Option, response2Option, response3Option, response4Option, response5Option, response6Option, response7Option, response8Option, response9Option, response10Option});
+        this.setGuildOnly(true);
     }
 
     @Override
