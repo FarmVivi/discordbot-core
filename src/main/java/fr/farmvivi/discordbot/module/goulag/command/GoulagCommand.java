@@ -40,9 +40,17 @@ public class GoulagCommand extends Command {
             return false;
 
         Member malfaisant = args.get("malfaisant").getAsMember();
+        if (malfaisant == null) {
+            reply.addContent("> Une erreur est survenue lors de la récupération du malfaisant");
+            return false;
+        }
 
         Role respondentRole = event.getGuild().getRoleById(this.respondentRoleId);
         Role goulagRole = event.getGuild().getRoleById(this.goulagRoleId);
+        if (goulagRole == null) {
+            reply.addContent("> Une erreur est survenue, le rôle du goulag n'existe pas");
+            return false;
+        }
 
         if (malfaisant.getUser().isBot()) {
             reply.addContent("Tu ne peux pas mettre un bot au " + goulagRole.getAsMention() + " !");

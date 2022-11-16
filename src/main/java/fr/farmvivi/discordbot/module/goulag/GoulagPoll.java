@@ -53,7 +53,12 @@ public class GoulagPoll extends Poll {
         } else if (yes == no) {
             this.getMessage().getChannel().sendMessage("> Égalité ! Tiens-toi à carreau " + evil.getAsMention() + " ! (**" + yes + "** pour, **" + no + "** contre)").queue();
         } else {
-            this.getMessage().getChannel().sendMessage("> " + respondentRole.getAsMention() + ", " + evil.getAsMention() + " est envoyé au " + goulagRole.getAsMention() + " ! (**" + yes + "** pour, **" + no + "** contre)").and(this.getMessage().getChannel().sendMessage("https://tenor.com/view/pokemon-chammal-chamsin-metro-train-gif-23999164")).queue();
+            String goulagEnterMessage = "> ";
+            if (respondentRole != null) {
+                goulagEnterMessage += respondentRole.getAsMention() + ", ";
+            }
+            goulagEnterMessage += evil.getAsMention() + " est envoyé au " + goulagRole.getAsMention() + " ! (**" + yes + "** pour, **" + no + "** contre)";
+            this.getMessage().getChannel().sendMessage(goulagEnterMessage).and(this.getMessage().getChannel().sendMessage("https://tenor.com/view/pokemon-chammal-chamsin-metro-train-gif-23999164")).queue();
             for (Member member : this.getMessage().getGuild().getMembersWithRoles(goulagRole)) {
                 this.getMessage().getGuild().removeRoleFromMember(member, goulagRole).queue();
                 this.getMessage().getChannel().sendMessage("> " + member.getAsMention() + " est libéré du " + goulagRole.getAsMention() + " !").queue();
