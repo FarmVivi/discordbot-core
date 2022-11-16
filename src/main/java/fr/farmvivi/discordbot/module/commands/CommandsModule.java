@@ -63,7 +63,11 @@ public class CommandsModule extends Module {
                 }
                 commandData.addOptions(options);
             }
+
+            // Attributes
             commandData.setGuildOnly(command.isGuildOnly());
+
+            // Adding command to Discord API
             logger.info("Registering " + command.getName() + " commands to Discord API...");
             commandListUpdateAction = commandListUpdateAction.addCommands(commandData);
         }
