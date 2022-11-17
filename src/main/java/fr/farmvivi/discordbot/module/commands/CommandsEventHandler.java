@@ -33,13 +33,7 @@ public class CommandsEventHandler extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         String cmd = event.getName();
 
-        CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(
-                event.getGuild(),
-                event.getChannel(),
-                event.getChannelType(),
-                event.getUser(),
-                cmd,
-                event.isFromGuild());
+        CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(event, cmd);
 
         CommandMessageBuilder reply = new CommandMessageBuilder(event);
 
@@ -82,13 +76,7 @@ public class CommandsEventHandler extends ListenerAdapter {
 
             String cmd = message.substring(CMD_PREFIX.length()).split(" ")[0];
 
-            CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(
-                    event.getGuild(),
-                    event.getChannel(),
-                    event.getChannelType(),
-                    event.getAuthor(),
-                    cmd,
-                    event.isFromGuild());
+            CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(event, cmd);
 
             CommandMessageBuilder reply = new CommandMessageBuilder(event);
             //reply.addContent("> **Cette commande est obsolète !**\n"
