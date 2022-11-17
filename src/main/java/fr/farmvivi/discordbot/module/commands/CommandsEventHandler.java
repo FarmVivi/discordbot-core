@@ -49,12 +49,14 @@ public class CommandsEventHandler extends ListenerAdapter {
                     reply.setEphemeral(true);
                 }
 
-                if (reply.isDiffer()) {
-                    event.deferReply(reply.isEphemeral()).queue();
-                } else if (reply.isEmpty()) {
-                    event.reply("OK").flatMap(InteractionHook::deleteOriginal).queue();
-                } else {
-                    event.reply(reply.build()).setEphemeral(reply.isEphemeral()).queue();
+                if (!event.isAcknowledged()) {
+                    if (reply.isDiffer()) {
+                        event.deferReply(reply.isEphemeral()).queue();
+                    } else if (reply.isEmpty()) {
+                        event.reply("OK").flatMap(InteractionHook::deleteOriginal).queue();
+                    } else {
+                        event.reply(reply.build()).setEphemeral(reply.isEphemeral()).queue();
+                    }
                 }
                 return;
             }
