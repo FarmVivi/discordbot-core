@@ -10,6 +10,7 @@ import fr.farmvivi.discordbot.module.commands.command.VersionCommand;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class CommandsModule extends Module {
         for (Command command : getCommands()) {
             // Registering command to Discord API
             SlashCommandData commandData = Commands.slash(command.getName(), command.getDescription());
+
+            // Adding options
             if (command.getArgs().length > 0) {
                 int requiredIndex = 0;
                 List<OptionData> options = new ArrayList<>();
