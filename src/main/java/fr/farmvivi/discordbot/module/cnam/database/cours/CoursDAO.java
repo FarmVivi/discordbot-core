@@ -159,6 +159,31 @@ public class CoursDAO extends DAO<Cours, Integer> {
         return cours;
     }
 
+    public List<Cours> selectAllByEnseignementEnseignant(String enseignementCode, int idEnseignant) throws SQLException {
+        List<Cours> cours = new ArrayList<>();
+
+        try (Connection connection = db.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM cours WHERE code_enseignement = ? AND id_enseignant = ?")) {
+
+            statement.setString(1, enseignementCode);
+            statement.setInt(2, idEnseignant);
+            statement.executeQuery();
+
+            while (statement.getResultSet().next()) {
+                int id = statement.getResultSet().getInt("id_cours");
+                LocalDate date = statement.getResultSet().getDate("date_cours").toLocalDate();
+                LocalTime heureDebut = statement.getResultSet().getTime("debut_cours").toLocalTime();
+                LocalTime heureFin = statement.getResultSet().getTime("fin_cours").toLocalTime();
+                boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                int salleId = statement.getResultSet().getInt("id_salle");
+
+                cours.add(new Cours(id, date, heureDebut, heureFin, presentiel, idEnseignant, salleId, enseignementCode));
+            }
+        }
+
+        return cours;
+    }
+
     @Override
     public Cours selectById(Integer id) throws SQLException {
         try (Connection connection = db.getConnection();

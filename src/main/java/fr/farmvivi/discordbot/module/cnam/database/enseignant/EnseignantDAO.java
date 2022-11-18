@@ -65,6 +65,28 @@ public class EnseignantDAO extends DAO<Enseignant, Integer> {
         return enseignants;
     }
 
+    public List<Enseignant> selectAllByEnseignement(String codeEnseignement) throws SQLException {
+        List<Enseignant> enseignants = new ArrayList<>();
+
+        try (Connection connection = db.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM enseignant WHERE id_enseignant IN (SELECT id_enseignant FROM cours WHERE code_enseignement = ?)")) {
+
+            statement.setString(1, codeEnseignement);
+
+            statement.executeQuery();
+
+            while (statement.getResultSet().next()) {
+                int id = statement.getResultSet().getInt("id_enseignant");
+                String nom = statement.getResultSet().getString("nom_enseignant");
+                String prenom = statement.getResultSet().getString("prenom_enseignant");
+
+                enseignants.add(new Enseignant(id, nom, prenom));
+            }
+        }
+
+        return enseignants;
+    }
+
     @Override
     public Enseignant selectById(Integer id) throws SQLException {
         try (Connection connection = db.getConnection();

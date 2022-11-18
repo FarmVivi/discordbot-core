@@ -5,9 +5,12 @@ import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.Module;
 import fr.farmvivi.discordbot.module.Modules;
+import fr.farmvivi.discordbot.module.cnam.command.AddDevoirCommand;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningDailyPrintTask;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningScrapperTask;
+import fr.farmvivi.discordbot.module.commands.CommandsModule;
+import fr.farmvivi.discordbot.module.forms.FormsModule;
 import net.dv8tion.jda.api.JDA;
 
 import java.time.Duration;
@@ -25,6 +28,8 @@ public class CnamModule extends Module {
 
     private final PlanningScrapperTask planningScrapperTask;
     private final PlanningDailyPrintTask planningDailyPrintTask;
+
+    private FormsModule formsModule;
 
     public CnamModule(Bot bot) {
         super(Modules.CNAM);
@@ -98,11 +103,19 @@ public class CnamModule extends Module {
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
+
+        logger.info("Registering commands...");
+
+        CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
+
+        commandsModule.registerCommand(module, new AddDevoirCommand(this));
     }
 
     @Override
     public void onPostEnable() {
         super.onPostEnable();
+
+        formsModule = (FormsModule) bot.getModulesManager().getModule(Modules.FORMS);
 
         logger.info("Starting planning scrapper task...");
 
@@ -159,6 +172,16 @@ public class CnamModule extends Module {
     public void onDisable() {
         super.onDisable();
 
+        logger.info("Unregistering commands...");
+
+        CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
+
+        commandsModule.unregisterCommands(module);
+
+        logger.info("Unregistering forms...");
+
+        formsModule.unregisterForms(module);
+
         logger.info("Disconnecting from database...");
 
         databaseManager.getDatabaseAccess().closePool();
@@ -166,5 +189,9 @@ public class CnamModule extends Module {
 
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public FormsModule getFormsModule() {
+        return formsModule;
     }
 }
