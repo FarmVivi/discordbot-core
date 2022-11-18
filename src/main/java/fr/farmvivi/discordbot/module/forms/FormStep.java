@@ -89,6 +89,15 @@ public abstract class FormStep {
         responseReceived = false;
     }
 
+    protected void skipStep(IReplyCallback event) {
+        questionSent = true;
+        responseReceived = true;
+
+        clean();
+
+        form.nextStep(event);
+    }
+
     protected abstract void clean();
 
     public Form getForm() {
