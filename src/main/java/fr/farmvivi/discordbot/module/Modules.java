@@ -2,10 +2,11 @@ package fr.farmvivi.discordbot.module;
 
 public enum Modules {
     COMMANDS("Commands"),
+    FORMS("Forms"),
     GENERAL("General", COMMANDS),
     GOULAG("Goulag", GENERAL, COMMANDS),
     MUSIC("Music", COMMANDS),
-    CNAM("Cnam", GOULAG),
+    CNAM("Cnam", GOULAG, COMMANDS, FORMS),
     TEST("Test", COMMANDS);
 
     private final String name;
