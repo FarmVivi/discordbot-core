@@ -16,12 +16,12 @@ public abstract class FormStep {
 
     synchronized void question(IReplyCallback event) {
         if (form.isCancelled()) {
-            event.reply("> Erreur : Le formulaire a été annulé.").queue();
+            event.reply("> Erreur : Le formulaire a été annulé.").setEphemeral(true).queue();
             return;
         }
 
         if (questionSent) {
-            event.reply("> Erreur : La question a déjà été envoyée.").queue();
+            event.reply("> Erreur : La question a déjà été envoyée.").setEphemeral(true).queue();
             return;
         }
 
@@ -39,7 +39,7 @@ public abstract class FormStep {
     protected abstract void handleQuestion(IReplyCallback event);
 
     protected void questionError(IReplyCallback event, String errorMessage) {
-        event.reply("> :x: " + errorMessage).queue();
+        event.reply("> :x: " + errorMessage).setEphemeral(true).queue();
 
         questionSent = false;
     }
@@ -47,21 +47,21 @@ public abstract class FormStep {
     synchronized void response(GenericInteractionCreateEvent event) {
         if (form.isCancelled()) {
             if (event instanceof IReplyCallback replyCallback) {
-                replyCallback.reply("> Erreur : Le formulaire a été annulé.").queue();
+                replyCallback.reply("> Erreur : Le formulaire a été annulé.").setEphemeral(true).queue();
             }
             return;
         }
 
         if (!questionSent) {
             if (event instanceof IReplyCallback replyCallback) {
-                replyCallback.reply("> Erreur : La question n'a pas encore été envoyée.").queue();
+                replyCallback.reply("> Erreur : La question n'a pas encore été envoyée.").setEphemeral(true).queue();
             }
             return;
         }
 
         if (responseReceived) {
             if (event instanceof IReplyCallback replyCallback) {
-                replyCallback.reply("> Erreur : La réponse a déjà été reçue.").queue();
+                replyCallback.reply("> Erreur : La réponse a déjà été reçue.").setEphemeral(true).queue();
             }
             return;
         }
@@ -83,7 +83,7 @@ public abstract class FormStep {
 
     protected void responseError(GenericInteractionCreateEvent event, String errorMessage) {
         if (event instanceof IReplyCallback replyCallback) {
-            replyCallback.reply("> :x: " + errorMessage).queue();
+            replyCallback.reply("> :x: " + errorMessage).setEphemeral(true).queue();
         }
 
         responseReceived = false;
