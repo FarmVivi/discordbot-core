@@ -118,7 +118,7 @@ public class CoursDAO extends DAO<Cours, Integer> {
             statement.setTime(3, java.sql.Time.valueOf(heure));
             statement.executeQuery();
 
-            if (statement.getResultSet().next()) {
+            while (statement.getResultSet().next()) {
                 int id = statement.getResultSet().getInt("id_cours");
                 LocalTime heureDebut = statement.getResultSet().getTime("debut_cours").toLocalTime();
                 LocalTime heureFin = statement.getResultSet().getTime("fin_cours").toLocalTime();
@@ -145,7 +145,7 @@ public class CoursDAO extends DAO<Cours, Integer> {
             statement.setTime(3, java.sql.Time.valueOf(heureFin));
             statement.executeQuery();
 
-            if (statement.getResultSet().next()) {
+            while (statement.getResultSet().next()) {
                 int id = statement.getResultSet().getInt("id_cours");
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
