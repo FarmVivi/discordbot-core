@@ -467,7 +467,7 @@ public class PlanningScrapperTask implements Runnable {
                 logger.error("Erreur lors de la suppression des éléments non utilisés", e);
             }
         } else {
-            System.out.println("No rows found !");
+            logger.warn("Aucune donnée trouvée !");
         }
 
         page.cleanUp();
