@@ -28,9 +28,21 @@ public abstract class FormStep {
         questionSent = true;
 
         handleQuestion(event);
+
+        if (!questionSent) {
+            clean();
+
+            form.nextStep(event);
+        }
     }
 
     protected abstract void handleQuestion(IReplyCallback event);
+
+    protected void questionError(IReplyCallback event, String errorMessage) {
+        event.reply("> :x: " + errorMessage).queue();
+
+        questionSent = false;
+    }
 
     synchronized void response(GenericInteractionCreateEvent event) {
         if (form.isCancelled()) {
@@ -69,6 +81,14 @@ public abstract class FormStep {
 
     protected abstract void handleResponse(GenericInteractionCreateEvent event);
 
+    protected void responseError(GenericInteractionCreateEvent event, String errorMessage) {
+        if (event instanceof IReplyCallback replyCallback) {
+            replyCallback.reply("> :x: " + errorMessage).queue();
+        }
+
+        responseReceived = false;
+    }
+
     protected abstract void clean();
 
     public Form getForm() {
@@ -87,16 +107,8 @@ public abstract class FormStep {
         return questionSent;
     }
 
-    protected void setQuestionSent(boolean questionSent) {
-        this.questionSent = questionSent;
-    }
-
     public boolean isResponseReceived() {
         return responseReceived;
-    }
-
-    protected void setResponseReceived(boolean responseReceived) {
-        this.responseReceived = responseReceived;
     }
 
     public String getDiscordID() {
