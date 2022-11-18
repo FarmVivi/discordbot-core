@@ -33,7 +33,7 @@ public class FormsEventHandler extends ListenerAdapter {
             }
         }
 
-        event.reply("> :x: Ce formulaire n'existe plus.").setEphemeral(true).queue();
+        event.reply("> :x: Le formulaire n'existe plus.").setEphemeral(true).queue();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class FormsEventHandler extends ListenerAdapter {
             }
         }
 
-        event.reply("> :x: Ce formulaire n'existe plus.").setEphemeral(true).queue();
+        event.reply("> :x: Le formulaire n'existe plus.").setEphemeral(true).queue();
     }
 
     @Override
@@ -75,7 +75,7 @@ public class FormsEventHandler extends ListenerAdapter {
             }
         }
 
-        event.reply("> :x: Ce formulaire n'existe plus.").setEphemeral(true).queue();
+        event.reply("> :x: Le formulaire n'existe plus.").setEphemeral(true).queue();
     }
 
     @Override
@@ -96,6 +96,6 @@ public class FormsEventHandler extends ListenerAdapter {
             }
         }
 
-        event.reply("> :x: Ce formulaire n'existe plus.").setEphemeral(true).queue();
+        event.reply("> :x: Le formulaire n'existe plus.").setEphemeral(true).queue();
     }
 }

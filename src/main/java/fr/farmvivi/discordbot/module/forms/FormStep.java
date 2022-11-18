@@ -25,9 +25,9 @@ public abstract class FormStep {
             return;
         }
 
-        handleQuestion(event);
-
         questionSent = true;
+
+        handleQuestion(event);
     }
 
     protected abstract void handleQuestion(IReplyCallback event);
@@ -54,9 +54,11 @@ public abstract class FormStep {
             return;
         }
 
+        responseReceived = true;
+
         handleResponse(event);
 
-        responseReceived = true;
+        clean();
 
         if (event instanceof IReplyCallback replyCallback) {
             form.nextStep(replyCallback);
@@ -85,8 +87,16 @@ public abstract class FormStep {
         return questionSent;
     }
 
+    protected void setQuestionSent(boolean questionSent) {
+        this.questionSent = questionSent;
+    }
+
     public boolean isResponseReceived() {
         return responseReceived;
+    }
+
+    protected void setResponseReceived(boolean responseReceived) {
+        this.responseReceived = responseReceived;
     }
 
     public String getDiscordID() {
