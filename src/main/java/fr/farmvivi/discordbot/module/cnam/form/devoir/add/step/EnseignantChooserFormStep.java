@@ -34,6 +34,16 @@ public class EnseignantChooserFormStep extends FormStep {
 
     @Override
     protected void handleQuestion(IReplyCallback event) {
+        if (enseignantList.size() == 1) {
+            try {
+                nextStep((GenericInteractionCreateEvent) event, enseignantList.get(0));
+                skipStep(event);
+            } catch (SQLException e) {
+                questionError(event, "Une erreur est survenue");
+            }
+            return;
+        }
+
         // Message
         MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 
@@ -86,13 +96,13 @@ public class EnseignantChooserFormStep extends FormStep {
                     // Annuler
                     form.cancel();
                 } else {
-                    responseError(event, "Une erreur est survenue");
+                    replyError(event, "Une erreur est survenue");
                 }
             } else {
-                responseError(event, "Une erreur est survenue");
+                replyError(event, "Une erreur est survenue");
             }
         } catch (SQLException e) {
-            responseError(event, "Une erreur est survenue");
+            replyError(event, "Une erreur est survenue");
         }
     }
 
@@ -118,7 +128,7 @@ public class EnseignantChooserFormStep extends FormStep {
         }
 
         if (coursList.isEmpty()) {
-            responseError(event, "Aucun cours n'a été trouvé pour cet enseignement");
+            replyError(event, "Aucun cours n'a été trouvé pour cet enseignement");
             return;
         }
 

@@ -131,7 +131,7 @@ public class CoursPourChooserFormStep extends FormStep {
                         DatePourConfirmFormStep datePourConfirmFormStep = new DatePourConfirmFormStep(form);
                         form.addStep(datePourConfirmFormStep);
                     } else {
-                        responseError(event, "Aucun cours n'est prévu dans les prochains jours");
+                        replyError(event, "Aucun cours n'est prévu dans les prochains jours");
                     }
                 }
                 // Choisir date
@@ -142,10 +142,10 @@ public class CoursPourChooserFormStep extends FormStep {
                 // Annuler
                 form.cancel();
             } else {
-                responseError(event, "Une erreur est survenue");
+                replyError(event, "Une erreur est survenue");
             }
         } else {
-            responseError(event, "Une erreur est survenue");
+            replyError(event, "Une erreur est survenue");
         }
     }
 

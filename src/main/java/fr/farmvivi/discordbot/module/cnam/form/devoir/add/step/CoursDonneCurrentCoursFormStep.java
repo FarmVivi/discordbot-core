@@ -99,14 +99,14 @@ public class CoursDonneCurrentCoursFormStep extends FormStep {
                         form.cancel();
                         break;
                     default:
-                        responseError(event, "Une erreur est survenue");
+                        replyError(event, "Une erreur est survenue");
                         break;
                 }
             } else {
-                responseError(event, "Une erreur est survenue");
+                replyError(event, "Une erreur est survenue");
             }
         } catch (SQLException e) {
-            responseError(event, "Une erreur est survenue");
+            replyError(event, "Une erreur est survenue");
         }
     }
 

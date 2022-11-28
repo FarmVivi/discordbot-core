@@ -51,10 +51,10 @@ public class DescriptionFormStep extends FormStep {
                 DevoirConfirmFormStep devoirConfirmFormStep = new DevoirConfirmFormStep(form);
                 form.addStep(devoirConfirmFormStep);
             } else {
-                responseError(event, "Une erreur est survenue");
+                replyError(event, "Une erreur est survenue");
             }
         } else {
-            responseError(event, "Une erreur est survenue");
+            replyError(event, "Une erreur est survenue");
         }
     }
 

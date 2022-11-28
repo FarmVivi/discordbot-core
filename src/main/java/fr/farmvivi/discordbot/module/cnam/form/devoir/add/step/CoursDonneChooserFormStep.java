@@ -92,10 +92,10 @@ public class CoursDonneChooserFormStep extends FormStep {
                 // Annuler
                 form.cancel();
             } else {
-                responseError(event, "Une erreur est survenue");
+                replyError(event, "Une erreur est survenue");
             }
         } else {
-            responseError(event, "Une erreur est survenue");
+            replyError(event, "Une erreur est survenue");
         }
     }
 

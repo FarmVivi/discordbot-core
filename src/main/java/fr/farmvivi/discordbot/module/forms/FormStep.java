@@ -81,11 +81,12 @@ public abstract class FormStep {
 
     protected abstract void handleResponse(GenericInteractionCreateEvent event);
 
-    protected void responseError(GenericInteractionCreateEvent event, String errorMessage) {
+    protected void replyError(GenericInteractionCreateEvent event, String errorMessage) {
         if (event instanceof IReplyCallback replyCallback) {
             replyCallback.reply("> :x: " + errorMessage).setEphemeral(true).queue();
         }
 
+        questionSent = false;
         responseReceived = false;
     }
 

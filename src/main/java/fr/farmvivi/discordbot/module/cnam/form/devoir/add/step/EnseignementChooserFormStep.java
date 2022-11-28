@@ -83,7 +83,7 @@ public class EnseignementChooserFormStep extends FormStep {
                     List<Enseignant> enseignantList = form.getEnseignantDAO().selectAllByEnseignement(enseignement.getCode());
 
                     if (enseignantList.isEmpty()) {
-                        responseError(event, "Aucun enseignant n'a été trouvé pour cet enseignement");
+                        replyError(event, "Aucun enseignant n'a été trouvé pour cet enseignement");
                         return;
                     }
 
@@ -99,13 +99,13 @@ public class EnseignementChooserFormStep extends FormStep {
                     // Annuler
                     form.cancel();
                 } else {
-                    responseError(event, "Une erreur est survenue");
+                    replyError(event, "Une erreur est survenue");
                 }
             } else {
-                responseError(event, "Une erreur est survenue");
+                replyError(event, "Une erreur est survenue");
             }
         } catch (SQLException e) {
-            responseError(event, "Une erreur est survenue");
+            replyError(event, "Une erreur est survenue");
         }
     }
 

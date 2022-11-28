@@ -109,17 +109,17 @@ public class DevoirConfirmFormStep extends FormStep {
                         form.addStep(descriptionFormStep);
                         break;
                     default:
-                        responseError(event, "Une erreur est survenue");
+                        replyError(event, "Une erreur est survenue");
                         break;
                 }
             } else if (customId.equals("2")) {
                 // Annuler
                 form.cancel();
             } else {
-                responseError(event, "Une erreur est survenue");
+                replyError(event, "Une erreur est survenue");
             }
         } else {
-            responseError(event, "Une erreur est survenue");
+            replyError(event, "Une erreur est survenue");
         }
     }
 
