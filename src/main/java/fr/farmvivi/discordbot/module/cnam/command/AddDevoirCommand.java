@@ -32,7 +32,7 @@ public class AddDevoirCommand extends Command {
             Form form = new AddDevoirForm(module);
             form.start(replyCallback);
         } else {
-            reply.addContent("Une erreur est survenue lors de l'éxécution de la commande.");
+            reply.addContent("Une erreur est survenue lors de l'exécution de la commande.");
             return false;
         }
 

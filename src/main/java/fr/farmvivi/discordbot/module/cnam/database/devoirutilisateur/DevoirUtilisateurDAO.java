@@ -112,8 +112,8 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
     }
 
     @Override
-    public DevoirUtilisateur selectById(Integer id) throws SQLException {
-        throw new UnsupportedOperationException();
+    public DevoirUtilisateur selectById(Integer id) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("DevoirUtilisateur cannot be selected by id, please use selectByIdDevoirAndIdUtilisateur instead !");
     }
 
     public DevoirUtilisateur selectByIdDevoirAndIdUtilisateur(int idDevoir, int idUtilisateur) throws SQLException {

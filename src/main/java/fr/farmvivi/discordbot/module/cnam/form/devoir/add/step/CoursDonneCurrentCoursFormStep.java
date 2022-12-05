@@ -74,7 +74,7 @@ public class CoursDonneCurrentCoursFormStep extends FormStep {
             if (event instanceof ButtonInteractionEvent interactionEvent) {
                 String customID = getCustomID(interactionEvent.getButton().getId());
                 switch (customID) {
-                    case "1-1":
+                    case "1-1" -> {
                         // Oui
                         if (coursList.size() == 1) {
                             form.setEnseignement(form.getEnseignementDAO().selectById(coursList.get(0).getEnseignementCode()));
@@ -88,19 +88,16 @@ public class CoursDonneCurrentCoursFormStep extends FormStep {
                             CoursDonneChooserFormStep coursDonneChooserFormStep = new CoursDonneChooserFormStep(form, coursList);
                             form.addStep(coursDonneChooserFormStep);
                         }
-                        break;
-                    case "1-2":
+                    }
+                    case "1-2" -> {
                         // Non
                         EnseignementChooserFormStep enseignementChooserFormStep = new EnseignementChooserFormStep(form);
                         form.addStep(enseignementChooserFormStep);
-                        break;
-                    case "2":
+                    }
+                    case "2" ->
                         // Annuler
-                        form.cancel();
-                        break;
-                    default:
-                        replyError(event, "Une erreur est survenue");
-                        break;
+                            form.cancel();
+                    default -> replyError(event, "Une erreur est survenue");
                 }
             } else {
                 replyError(event, "Une erreur est survenue");

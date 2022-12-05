@@ -252,7 +252,7 @@ public class MusicModule extends Module {
                         player.playTrack(track);
                     }
 
-                    // Sinon c'est que c'est une playlist normal
+                    // Sinon c'est que c'est une playlist normale
                 } else {
                     builder.append("Ajout de la playlist **").append(playlistName).append("** :");
 

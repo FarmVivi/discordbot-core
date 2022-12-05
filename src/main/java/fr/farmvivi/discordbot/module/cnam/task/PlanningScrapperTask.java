@@ -118,7 +118,6 @@ public class PlanningScrapperTask implements Runnable {
                 // Retrieve column elements
                 List<HtmlElement> cols = row.getByXPath("./*");
                 if (!cols.isEmpty()) {
-                    String jour = null;
                     LocalDate date = null;
                     LocalTime heureDebut = null;
                     LocalTime heureFin = null;
@@ -140,7 +139,6 @@ public class PlanningScrapperTask implements Runnable {
                                 if (text.length != 2) {
                                     continue rowsLoop;
                                 }
-                                jour = text[0];
                                 date = LocalDate.parse(text[1], new DateTimeFormatterBuilder().appendPattern("dd/MM/yyyy").toFormatter());
                             }
                             case 1 -> {
