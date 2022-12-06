@@ -4,32 +4,48 @@ import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.devoir.Devoir;
 import fr.farmvivi.discordbot.module.cnam.database.devoir.DevoirDAO;
+import fr.farmvivi.discordbot.module.cnam.database.devoirutilisateur.DevoirUtilisateur;
+import fr.farmvivi.discordbot.module.cnam.database.devoirutilisateur.DevoirUtilisateurDAO;
+import fr.farmvivi.discordbot.module.cnam.database.discorduser.DiscordUser;
+import fr.farmvivi.discordbot.module.cnam.database.discorduser.DiscordUserDAO;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.EnseignantDAO;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.EnseignementDAO;
+import fr.farmvivi.discordbot.module.cnam.database.utilisateur.Utilisateur;
+import fr.farmvivi.discordbot.module.cnam.database.utilisateur.UtilisateurDAO;
 import fr.farmvivi.discordbot.module.cnam.events.DevoirListener;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirUpdateEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveAllEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEmojiEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-public class DevoirEventHandler implements DevoirListener {
+public class DevoirEventHandler extends ListenerAdapter implements DevoirListener {
     private final TextChannel todoChannel;
     private final TextChannel alertChannel;
 
+    private final UtilisateurDAO utilisateurDAO;
+    private final DiscordUserDAO discordUserDAO;
     private final DevoirDAO devoirDAO;
+    private final DevoirUtilisateurDAO devoirUtilisateurDAO;
     private final CoursDAO coursDAO;
     private final EnseignementDAO enseignementDAO;
     private final EnseignantDAO enseignantDAO;
@@ -38,10 +54,118 @@ public class DevoirEventHandler implements DevoirListener {
         this.todoChannel = todoChannel;
         this.alertChannel = alertChannel;
 
+        this.utilisateurDAO = new UtilisateurDAO(module.getDatabaseManager().getDatabaseAccess());
+        this.discordUserDAO = new DiscordUserDAO(module.getDatabaseManager().getDatabaseAccess());
         this.devoirDAO = new DevoirDAO(module.getDatabaseManager().getDatabaseAccess());
+        this.devoirUtilisateurDAO = new DevoirUtilisateurDAO(module.getDatabaseManager().getDatabaseAccess());
         this.coursDAO = new CoursDAO(module.getDatabaseManager().getDatabaseAccess());
         this.enseignementDAO = new EnseignementDAO(module.getDatabaseManager().getDatabaseAccess());
         this.enseignantDAO = new EnseignantDAO(module.getDatabaseManager().getDatabaseAccess());
+    }
+
+    @Override
+    public void onMessageReactionAdd(MessageReactionAddEvent event) {
+        // Devoir
+        long messageId = event.getMessageIdLong();
+        Devoir devoir;
+        try {
+            devoir = devoirDAO.selectByDiscordMessageId(messageId);
+            if (devoir == null)
+                return;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Utilisateur
+        User user = event.getUser();
+        if (user == null || user.isBot())
+            return;
+
+        try {
+            DiscordUser discordUser = discordUserDAO.selectById(user.getIdLong());
+            if (discordUser == null) {
+                discordUser = discordUserDAO.create(new DiscordUser(user.getIdLong()));
+            }
+            Utilisateur utilisateur = utilisateurDAO.selectByDiscordId(discordUser.getId());
+            if (utilisateur == null) {
+                utilisateur = new Utilisateur();
+                utilisateur.setDiscordId(discordUser.getId());
+                utilisateur = utilisateurDAO.create(utilisateur);
+            }
+            DevoirUtilisateur devoirUtilisateur = devoirUtilisateurDAO.selectByIdDevoirAndIdUtilisateur(devoir.getId(), utilisateur.getId());
+            if (devoirUtilisateur == null) {
+                devoirUtilisateur = new DevoirUtilisateur(devoir.getId(), utilisateur.getId(), LocalDateTime.now());
+                devoirUtilisateurDAO.create(devoirUtilisateur);
+            }
+        } catch (SQLException e) {
+            event.getReaction().removeReaction(user).queue();
+        }
+    }
+
+    @Override
+    public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
+        // Devoir
+        long messageId = event.getMessageIdLong();
+        Devoir devoir;
+        try {
+            devoir = devoirDAO.selectByDiscordMessageId(messageId);
+            if (devoir == null)
+                return;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Utilisateur
+        User user = event.getUser();
+        if (user == null || user.isBot())
+            return;
+
+        try {
+            DiscordUser discordUser = discordUserDAO.selectById(user.getIdLong());
+            if (discordUser == null) {
+                discordUser = discordUserDAO.create(new DiscordUser(user.getIdLong()));
+            }
+            Utilisateur utilisateur = utilisateurDAO.selectByDiscordId(discordUser.getId());
+            if (utilisateur == null) {
+                utilisateur = new Utilisateur();
+                utilisateur.setDiscordId(discordUser.getId());
+                utilisateur = utilisateurDAO.create(utilisateur);
+            }
+            DevoirUtilisateur devoirUtilisateur = devoirUtilisateurDAO.selectByIdDevoirAndIdUtilisateur(devoir.getId(), utilisateur.getId());
+            if (devoirUtilisateur != null) {
+                devoirUtilisateurDAO.delete(devoirUtilisateur);
+            }
+        } catch (SQLException e) {
+            event.getReaction().removeReaction(user).queue();
+        }
+    }
+
+    @Override
+    public void onMessageReactionRemoveAll(MessageReactionRemoveAllEvent event) {
+        // Devoir
+        long messageId = event.getMessageIdLong();
+        Devoir devoir;
+        try {
+            devoir = devoirDAO.selectByDiscordMessageId(messageId);
+            if (devoir == null)
+                return;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        try {
+            devoirUtilisateurDAO.deleteByIdDevoir(devoir.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onMessageReactionRemoveEmoji(MessageReactionRemoveEmojiEvent event) {
+        super.onMessageReactionRemoveEmoji(event);
     }
 
     @Override

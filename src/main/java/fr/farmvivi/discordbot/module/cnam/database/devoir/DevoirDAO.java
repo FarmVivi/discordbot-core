@@ -182,4 +182,28 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
 
         return null;
     }
+
+    public Devoir selectByDiscordMessageId(long discordMessageId) throws SQLException {
+        try (Connection connection = db.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM devoir WHERE discord_message_id = ?")) {
+
+            statement.setLong(1, discordMessageId);
+            statement.executeQuery();
+
+            if (statement.getResultSet().next()) {
+                int id = statement.getResultSet().getInt("id_devoir");
+                LocalDate datePour = statement.getResultSet().getDate("date_pour").toLocalDate();
+                String description = statement.getResultSet().getString("description");
+                Boolean optionnel = statement.getResultSet().getBoolean("optionnel");
+                Integer idEnseignant = statement.getResultSet().getInt("id_enseignant");
+                String codeEnseignement = statement.getResultSet().getString("code_enseignement");
+                Integer idCoursPour = statement.getResultSet().getInt("id_cours_pour");
+                Integer idCoursDonne = statement.getResultSet().getInt("id_cours_donne");
+
+                return new Devoir(id, datePour, description, optionnel, discordMessageId, idEnseignant, codeEnseignement, idCoursPour, idCoursDonne);
+            }
+        }
+
+        return null;
+    }
 }

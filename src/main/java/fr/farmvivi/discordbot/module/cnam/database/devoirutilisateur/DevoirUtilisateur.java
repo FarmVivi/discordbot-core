@@ -1,15 +1,15 @@
 package fr.farmvivi.discordbot.module.cnam.database.devoirutilisateur;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Objects;
 
 public class DevoirUtilisateur {
     private final int idDevoir;
     private final int idUtilisateur;
-    private final LocalDate dateFait;
+    private final LocalDateTime dateFait;
 
-    public DevoirUtilisateur(int idDevoir, int idUtilisateur, LocalDate dateFait) {
+    public DevoirUtilisateur(int idDevoir, int idUtilisateur, LocalDateTime dateFait) {
         this.idDevoir = idDevoir;
         this.idUtilisateur = idUtilisateur;
         this.dateFait = dateFait;
@@ -23,7 +23,7 @@ public class DevoirUtilisateur {
         return idUtilisateur;
     }
 
-    public LocalDate getDateFait() {
+    public LocalDateTime getDateFait() {
         return dateFait;
     }
 

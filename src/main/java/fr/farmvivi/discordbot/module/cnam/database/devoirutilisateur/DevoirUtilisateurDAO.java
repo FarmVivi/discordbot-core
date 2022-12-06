@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +23,11 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
 
             int idDevoir = obj.getIdDevoir();
             int idUtilisateur = obj.getIdUtilisateur();
-            LocalDate dateFait = obj.getDateFait();
+            LocalDateTime dateFait = obj.getDateFait();
 
             statement.setInt(1, idDevoir);
             statement.setInt(2, idUtilisateur);
-            statement.setDate(3, java.sql.Date.valueOf(dateFait));
+            statement.setTimestamp(3, java.sql.Timestamp.valueOf(dateFait));
 
             int affectedRows = statement.executeUpdate();
 
@@ -46,9 +46,9 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
 
             int idDevoir = obj.getIdDevoir();
             int idUtilisateur = obj.getIdUtilisateur();
-            LocalDate dateFait = obj.getDateFait();
+            LocalDateTime dateFait = obj.getDateFait();
 
-            statement.setDate(1, java.sql.Date.valueOf(dateFait));
+            statement.setTimestamp(1, java.sql.Timestamp.valueOf(dateFait));
             statement.setInt(2, idDevoir);
             statement.setInt(3, idUtilisateur);
 
@@ -91,6 +91,16 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
         }
     }
 
+    public void deleteByIdDevoir(int idDevoir) throws SQLException {
+        try (Connection connection = db.getConnection();
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM devoir_utilisateur WHERE id_devoir = ?")) {
+
+            statement.setInt(1, idDevoir);
+
+            statement.executeUpdate();
+        }
+    }
+
     @Override
     public List<DevoirUtilisateur> selectAll() throws SQLException {
         List<DevoirUtilisateur> devoirsUtilisateur = new ArrayList<>();
@@ -102,7 +112,7 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
             while (resultSet.next()) {
                 int idDevoir = resultSet.getInt("id_devoir");
                 int idUtilisateur = resultSet.getInt("id_utilisateur");
-                LocalDate dateFait = resultSet.getDate("date_fait").toLocalDate();
+                LocalDateTime dateFait = resultSet.getTimestamp("date_fait").toLocalDateTime();
 
                 devoirsUtilisateur.add(new DevoirUtilisateur(idDevoir, idUtilisateur, dateFait));
             }
@@ -125,7 +135,7 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    LocalDate dateFait = resultSet.getDate("date_fait").toLocalDate();
+                    LocalDateTime dateFait = resultSet.getTimestamp("date_fait").toLocalDateTime();
 
                     return new DevoirUtilisateur(idDevoir, idUtilisateur, dateFait);
                 } else {
@@ -146,7 +156,7 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int idDevoir = resultSet.getInt("id_devoir");
-                    LocalDate dateFait = resultSet.getDate("date_fait").toLocalDate();
+                    LocalDateTime dateFait = resultSet.getTimestamp("date_fait").toLocalDateTime();
 
                     devoirsUtilisateur.add(new DevoirUtilisateur(idDevoir, idUtilisateur, dateFait));
                 }
@@ -167,7 +177,7 @@ public class DevoirUtilisateurDAO extends DAO<DevoirUtilisateur, Integer> {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int idUtilisateur = resultSet.getInt("id_utilisateur");
-                    LocalDate dateFait = resultSet.getDate("date_fait").toLocalDate();
+                    LocalDateTime dateFait = resultSet.getTimestamp("date_fait").toLocalDateTime();
 
                     devoirsUtilisateur.add(new DevoirUtilisateur(idDevoir, idUtilisateur, dateFait));
                 }
