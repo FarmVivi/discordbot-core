@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.cnam.command;
 
 import fr.farmvivi.discordbot.module.cnam.CnamModule;
+import fr.farmvivi.discordbot.module.cnam.DevoirEventHandler;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
@@ -14,13 +15,15 @@ import java.util.Map;
 
 public class AddDevoirCommand extends Command {
     private final CnamModule module;
+    private final DevoirEventHandler devoirEventHandler;
 
-    public AddDevoirCommand(CnamModule module) {
+    public AddDevoirCommand(CnamModule module, DevoirEventHandler devoirEventHandler) {
         super("add_devoir", CommandCategory.CNAM, "Ajouter un devoir");
 
         this.setGuildOnly(true);
 
         this.module = module;
+        this.devoirEventHandler = devoirEventHandler;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class AddDevoirCommand extends Command {
             return false;
 
         if (event.getOriginalEvent() instanceof IReplyCallback replyCallback) {
-            Form form = new AddDevoirForm(module);
+            Form form = new AddDevoirForm(module, devoirEventHandler);
             form.start(replyCallback);
         } else {
             reply.addContent("Une erreur est survenue lors de l'exécution de la commande.");

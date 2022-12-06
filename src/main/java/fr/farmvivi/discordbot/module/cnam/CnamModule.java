@@ -29,6 +29,8 @@ public class CnamModule extends Module {
     private final PlanningScrapperTask planningScrapperTask;
     private final PlanningDailyPrintTask planningDailyPrintTask;
 
+    private final DevoirEventHandler devoirEventHandler;
+
     private FormsModule formsModule;
 
     public CnamModule(Bot bot) {
@@ -59,9 +61,19 @@ public class CnamModule extends Module {
             throw new RuntimeException(e);
         }
         try {
-            String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_LOGS_CHANNEL_ID");
+            String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_DAILY_CHANNEL_ID");
 
             this.planningDailyPrintTask = new PlanningDailyPrintTask(JDAManager.getJDA().getTextChannelById(planningLogsChannelId), databaseManager.getDatabaseAccess());
+        } catch (Configuration.ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Devoirs
+        try {
+            String devoirTODOChannelId = bot.getConfiguration().getValue("CNAM_DEVOIRS_TODO_CHANNEL_ID");
+            String devoirAlertChannelId = bot.getConfiguration().getValue("CNAM_DEVOIRS_ALERT_CHANNEL_ID");
+
+            this.devoirEventHandler = new DevoirEventHandler(this, JDAManager.getJDA().getTextChannelById(devoirTODOChannelId), JDAManager.getJDA().getTextChannelById(devoirAlertChannelId));
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +120,7 @@ public class CnamModule extends Module {
 
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
-        commandsModule.registerCommand(module, new AddDevoirCommand(this));
+        commandsModule.registerCommand(module, new AddDevoirCommand(this, devoirEventHandler));
     }
 
     @Override

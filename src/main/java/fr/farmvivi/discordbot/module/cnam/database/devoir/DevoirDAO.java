@@ -16,10 +16,11 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
     @Override
     public Devoir create(Devoir obj) throws SQLException {
         try (Connection connection = db.getConnection();
-             PreparedStatement statement = connection.prepareStatement("INSERT INTO devoir (date_pour, description, discord_message_id, id_enseignant, code_enseignement, id_cours_pour, id_cours_donne) VALUES (?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO devoir (date_pour, description, optionnel, discord_message_id, id_enseignant, code_enseignement, id_cours_pour, id_cours_donne) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             LocalDate datePour = obj.getDatePour();
             String description = obj.getDescription();
+            Boolean optionnel = obj.isOptionnel();
             Long discordMessageId = obj.getDiscordMessageId();
             Integer idEnseignant = obj.getIdEnseignant();
             String codeEnseignement = obj.getCodeEnseignement();
@@ -28,19 +29,20 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
 
             statement.setDate(1, java.sql.Date.valueOf(datePour));
             statement.setString(2, description);
+            statement.setBoolean(3, optionnel);
             if (discordMessageId != null) {
-                statement.setLong(3, discordMessageId);
+                statement.setLong(4, discordMessageId);
             } else {
-                statement.setNull(3, Types.BIGINT);
+                statement.setNull(4, Types.BIGINT);
             }
-            statement.setInt(4, idEnseignant);
-            statement.setString(5, codeEnseignement);
+            statement.setInt(5, idEnseignant);
+            statement.setString(6, codeEnseignement);
             if (idCoursPour != null) {
-                statement.setInt(6, idCoursPour);
+                statement.setInt(7, idCoursPour);
             } else {
-                statement.setNull(6, Types.INTEGER);
+                statement.setNull(7, Types.INTEGER);
             }
-            statement.setInt(7, idCoursDonne);
+            statement.setInt(8, idCoursDonne);
 
             int affectedRows = statement.executeUpdate();
 
@@ -52,7 +54,7 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
                 if (generatedKeys.next()) {
                     int id = generatedKeys.getInt(1);
 
-                    return new Devoir(id, datePour, description, discordMessageId, idEnseignant, codeEnseignement, idCoursPour, idCoursDonne);
+                    return new Devoir(id, datePour, description, optionnel, discordMessageId, idEnseignant, codeEnseignement, idCoursPour, idCoursDonne);
                 } else {
                     throw new SQLException("Creating devoir failed, no ID obtained.");
                 }
@@ -63,10 +65,11 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
     @Override
     public boolean update(Devoir obj) throws SQLException {
         try (Connection connection = db.getConnection();
-             PreparedStatement statement = connection.prepareStatement("UPDATE devoir SET date_pour = ?, description = ?, discord_message_id = ?, id_enseignant = ?, code_enseignement = ?, id_cours_pour = ?, id_cours_donne = ? WHERE id_devoir = ?")) {
+             PreparedStatement statement = connection.prepareStatement("UPDATE devoir SET date_pour = ?, description = ?, optionnel = ?, discord_message_id = ?, id_enseignant = ?, code_enseignement = ?, id_cours_pour = ?, id_cours_donne = ? WHERE id_devoir = ?")) {
 
             LocalDate datePour = obj.getDatePour();
             String description = obj.getDescription();
+            Boolean optionnel = obj.isOptionnel();
             Long discordMessageId = obj.getDiscordMessageId();
             Integer idEnseignant = obj.getIdEnseignant();
             String codeEnseignement = obj.getCodeEnseignement();
@@ -76,20 +79,21 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
 
             statement.setDate(1, java.sql.Date.valueOf(datePour));
             statement.setString(2, description);
+            statement.setBoolean(3, optionnel);
             if (discordMessageId != null) {
-                statement.setLong(3, discordMessageId);
+                statement.setLong(4, discordMessageId);
             } else {
-                statement.setNull(3, Types.BIGINT);
+                statement.setNull(4, Types.BIGINT);
             }
-            statement.setInt(4, idEnseignant);
-            statement.setString(5, codeEnseignement);
+            statement.setInt(5, idEnseignant);
+            statement.setString(6, codeEnseignement);
             if (idCoursPour != null) {
-                statement.setInt(6, idCoursPour);
+                statement.setInt(7, idCoursPour);
             } else {
-                statement.setNull(6, Types.INTEGER);
+                statement.setNull(7, Types.INTEGER);
             }
-            statement.setInt(7, idCoursDonne);
-            statement.setInt(8, id);
+            statement.setInt(8, idCoursDonne);
+            statement.setInt(9, id);
 
             int rowsAffected = statement.executeUpdate();
 
@@ -140,13 +144,14 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
                 int id = resultSet.getInt("id_devoir");
                 LocalDate datePour = resultSet.getDate("date_pour").toLocalDate();
                 String description = resultSet.getString("description");
+                Boolean optionnel = resultSet.getBoolean("optionnel");
                 Long discordMessageId = resultSet.getLong("discord_message_id");
                 Integer idEnseignant = resultSet.getInt("id_enseignant");
                 String codeEnseignement = resultSet.getString("code_enseignement");
                 Integer idCoursPour = resultSet.getInt("id_cours_pour");
                 Integer idCoursDonne = resultSet.getInt("id_cours_donne");
 
-                devoirs.add(new Devoir(id, datePour, description, discordMessageId, idEnseignant, codeEnseignement, idCoursPour, idCoursDonne));
+                devoirs.add(new Devoir(id, datePour, description, optionnel, discordMessageId, idEnseignant, codeEnseignement, idCoursPour, idCoursDonne));
             }
         }
 
@@ -164,13 +169,14 @@ public class DevoirDAO extends DAO<Devoir, Integer> {
             if (statement.getResultSet().next()) {
                 LocalDate datePour = statement.getResultSet().getDate("date_pour").toLocalDate();
                 String description = statement.getResultSet().getString("description");
+                Boolean optionnel = statement.getResultSet().getBoolean("optionnel");
                 Long discordMessageId = statement.getResultSet().getLong("discord_message_id");
                 Integer idEnseignant = statement.getResultSet().getInt("id_enseignant");
                 String codeEnseignement = statement.getResultSet().getString("code_enseignement");
                 Integer idCoursPour = statement.getResultSet().getInt("id_cours_pour");
                 Integer idCoursDonne = statement.getResultSet().getInt("id_cours_donne");
 
-                return new Devoir(id, datePour, description, discordMessageId, idEnseignant, codeEnseignement, idCoursPour, idCoursDonne);
+                return new Devoir(id, datePour, description, optionnel, discordMessageId, idEnseignant, codeEnseignement, idCoursPour, idCoursDonne);
             }
         }
 

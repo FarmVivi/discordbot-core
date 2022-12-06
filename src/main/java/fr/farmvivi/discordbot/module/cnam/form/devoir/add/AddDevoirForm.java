@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.module.cnam.form.devoir.add;
 
 import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.cnam.CnamModule;
+import fr.farmvivi.discordbot.module.cnam.DevoirEventHandler;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.devoir.Devoir;
@@ -10,6 +11,7 @@ import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.EnseignantDAO;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.EnseignementDAO;
+import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.step.CoursDonneCurrentCoursFormStep;
 import fr.farmvivi.discordbot.module.forms.Form;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
@@ -19,6 +21,8 @@ import java.time.LocalDate;
 
 public class AddDevoirForm extends Form {
     private final CnamModule module;
+    private final DevoirEventHandler devoirEventHandler;
+
     private final DevoirDAO devoirDAO;
     private final CoursDAO coursDAO;
     private final EnseignementDAO enseignementDAO;
@@ -31,8 +35,9 @@ public class AddDevoirForm extends Form {
     private Enseignant enseignant;
     private String description;
 
-    public AddDevoirForm(CnamModule module) {
+    public AddDevoirForm(CnamModule module, DevoirEventHandler devoirEventHandler) {
         this.module = module;
+        this.devoirEventHandler = devoirEventHandler;
 
         // DAOs
         devoirDAO = new DevoirDAO(module.getDatabaseManager().getDatabaseAccess());
@@ -84,11 +89,12 @@ public class AddDevoirForm extends Form {
             return;
         }
 
-        Devoir devoir = new Devoir(datePour, description, enseignant.getId(), enseignement.getCode(), coursDonne.getId());
+        Devoir devoir = new Devoir(datePour, description, false, enseignant.getId(), enseignement.getCode(), coursDonne.getId());
         devoir.setIdCoursPour(coursPour != null ? coursPour.getId() : null);
 
         try {
-            devoirDAO.create(devoir);
+            devoir = devoirDAO.create(devoir);
+            devoirEventHandler.onDevoirCreate(new DevoirCreateEvent(devoir));
             event.reply("> :white_check_mark: Le devoir a été ajouté.").setEphemeral(true).queue();
         } catch (SQLException e) {
             event.reply("> :x: Une erreur est survenue lors de l'ajout du devoir.").setEphemeral(true).queue();
