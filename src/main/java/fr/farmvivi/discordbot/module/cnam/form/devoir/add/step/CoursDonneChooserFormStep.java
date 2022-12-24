@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.TextStyle;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +36,9 @@ public class CoursDonneChooserFormStep extends FormStep {
 
     @Override
     protected void handleQuestion(IReplyCallback event) {
+        // Sort by date desc
+        coursList.sort(Comparator.reverseOrder());
+
         // Message
         MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 
