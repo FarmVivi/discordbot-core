@@ -5,14 +5,14 @@ import java.util.Objects;
 
 public class Devoir {
     private final int id;
-    private final LocalDate datePour;
-    private final String description;
-    private final Boolean optionnel;
+    private LocalDate datePour;
+    private String description;
+    private Boolean optionnel;
     private Long discordMessageId;
-    private final Integer idEnseignant;
-    private final String codeEnseignement;
+    private Integer idEnseignant;
+    private String codeEnseignement;
     private Integer idCoursPour;
-    private final Integer idCoursDonne;
+    private Integer idCoursDonne;
 
     public Devoir(LocalDate datePour, String description, Boolean optionnel, Integer idEnseignant, String codeEnseignement, Integer idCoursDonne) {
         this(datePour, description, optionnel, null, idEnseignant, codeEnseignement, null, idCoursDonne);
@@ -42,12 +42,24 @@ public class Devoir {
         return datePour;
     }
 
+    public void setDatePour(LocalDate datePour) {
+        this.datePour = datePour;
+    }
+
     public String getDescription() {
         return description;
     }
 
-    public Boolean isOptionnel() {
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getOptionnel() {
         return optionnel;
+    }
+
+    public void setOptionnel(Boolean optionnel) {
+        this.optionnel = optionnel;
     }
 
     public Long getDiscordMessageId() {
@@ -62,8 +74,16 @@ public class Devoir {
         return idEnseignant;
     }
 
+    public void setIdEnseignant(Integer idEnseignant) {
+        this.idEnseignant = idEnseignant;
+    }
+
     public String getCodeEnseignement() {
         return codeEnseignement;
+    }
+
+    public void setCodeEnseignement(String codeEnseignement) {
+        this.codeEnseignement = codeEnseignement;
     }
 
     public Integer getIdCoursPour() {
@@ -76,6 +96,10 @@ public class Devoir {
 
     public Integer getIdCoursDonne() {
         return idCoursDonne;
+    }
+
+    public void setIdCoursDonne(Integer idCoursDonne) {
+        this.idCoursDonne = idCoursDonne;
     }
 
     @Override

@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class Salle {
     private final int id;
-    private final String nom;
-    private final String adresse;
+    private String nom;
+    private String adresse;
 
     public Salle(String nom, String adresse) {
         this(-1, nom, adresse);
@@ -25,8 +25,16 @@ public class Salle {
         return nom;
     }
 
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
     public String getAdresse() {
         return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 
     @Override

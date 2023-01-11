@@ -7,7 +7,7 @@ import java.util.Objects;
 public class DevoirUtilisateur {
     private final int idDevoir;
     private final int idUtilisateur;
-    private final LocalDateTime dateFait;
+    private LocalDateTime dateFait;
 
     public DevoirUtilisateur(int idDevoir, int idUtilisateur, LocalDateTime dateFait) {
         this.idDevoir = idDevoir;
@@ -25,6 +25,10 @@ public class DevoirUtilisateur {
 
     public LocalDateTime getDateFait() {
         return dateFait;
+    }
+
+    public void setDateFait(LocalDateTime dateFait) {
+        this.dateFait = dateFait;
     }
 
     @Override

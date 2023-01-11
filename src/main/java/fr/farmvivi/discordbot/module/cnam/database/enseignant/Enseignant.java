@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class Enseignant {
     private final int id;
-    private final String nom;
-    private final String prenom;
+    private String nom;
+    private String prenom;
 
     public Enseignant(String nom, String prenom) {
         this(-1, nom, prenom);
@@ -25,8 +25,16 @@ public class Enseignant {
         return nom;
     }
 
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
     public String getPrenom() {
         return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
     }
 
     @Override

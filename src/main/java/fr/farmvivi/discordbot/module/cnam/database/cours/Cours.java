@@ -9,13 +9,13 @@ import java.util.Objects;
 
 public class Cours implements Comparable<Cours> {
     private final int id;
-    private final LocalDate date;
-    private final LocalTime heureDebut;
-    private final LocalTime heureFin;
-    private final boolean presentiel;
-    private final int enseignantId;
-    private final int salleId;
-    private final String enseignementCode;
+    private LocalDate date;
+    private LocalTime heureDebut;
+    private LocalTime heureFin;
+    private boolean presentiel;
+    private int enseignantId;
+    private int salleId;
+    private String enseignementCode;
 
     public Cours(LocalDate date, LocalTime heureDebut, LocalTime heureFin, boolean presentiel, int enseignantId, int salleId, String enseignementCode) {
         this(-1, date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode);
@@ -40,28 +40,56 @@ public class Cours implements Comparable<Cours> {
         return date;
     }
 
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
     public LocalTime getHeureDebut() {
         return heureDebut;
+    }
+
+    public void setHeureDebut(LocalTime heureDebut) {
+        this.heureDebut = heureDebut;
     }
 
     public LocalTime getHeureFin() {
         return heureFin;
     }
 
+    public void setHeureFin(LocalTime heureFin) {
+        this.heureFin = heureFin;
+    }
+
     public boolean isPresentiel() {
         return presentiel;
+    }
+
+    public void setPresentiel(boolean presentiel) {
+        this.presentiel = presentiel;
     }
 
     public int getEnseignantId() {
         return enseignantId;
     }
 
+    public void setEnseignantId(int enseignantId) {
+        this.enseignantId = enseignantId;
+    }
+
     public int getSalleId() {
         return salleId;
     }
 
+    public void setSalleId(int salleId) {
+        this.salleId = salleId;
+    }
+
     public String getEnseignementCode() {
         return enseignementCode;
+    }
+
+    public void setEnseignementCode(String enseignementCode) {
+        this.enseignementCode = enseignementCode;
     }
 
     @Override

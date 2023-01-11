@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Enseignement {
     private final String code;
-    private final String nom;
+    private String nom;
 
     public Enseignement(String code, String nom) {
         this.code = code;
@@ -17,6 +17,10 @@ public class Enseignement {
 
     public String getNom() {
         return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     @Override
