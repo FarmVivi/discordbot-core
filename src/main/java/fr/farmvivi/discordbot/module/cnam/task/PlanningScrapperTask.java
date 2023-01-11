@@ -424,45 +424,75 @@ public class PlanningScrapperTask implements Runnable {
             }
 
             // Suppression des éléments non utilisés
-
-            try {
-                // Cours
-                bddCourss.removeAll(courss);
-                for (Cours cours : bddCourss) {
-                    for (PlanningListener listener : listeners) {
-                        listener.onCoursRemove(new CoursRemoveEvent(cours, salleDAO.selectById(cours.getSalleId()), enseignantDAO.selectById(cours.getEnseignantId()), enseignementDAO.selectById(cours.getEnseignementCode())));
+            // Cours
+            bddCourss.removeAll(courss);
+            for (Cours cours : bddCourss) {
+                for (PlanningListener listener : listeners) {
+                    // Envoi de l'événement
+                    try {
+                        Salle salleCours = salleDAO.selectById(cours.getSalleId());
+                        Enseignant enseignantCours = enseignantDAO.selectById(cours.getEnseignantId());
+                        Enseignement enseignementCours = enseignementDAO.selectById(cours.getEnseignementCode());
+                        listener.onCoursRemove(new CoursRemoveEvent(cours, salleCours, enseignantCours, enseignementCours));
+                    } catch (SQLException e) {
+                        logger.error("Erreur lors de la suppression d'un cours, impossible de récupérer les informations du cours \" " + cours + "\" pour déclencher l'événement", e);
                     }
+                }
+
+                // Suppression en base de données
+                try {
                     coursDAO.delete(cours);
+                } catch (SQLException e) {
+                    logger.error("Erreur lors de la suppression du cours " + cours.getId() + " \"" + cours + "\"", e);
+                }
+            }
+
+            // Salles
+            bddSalles.removeAll(salles);
+            for (Salle salle : bddSalles) {
+                // Envoi de l'événement
+                for (PlanningListener listener : listeners) {
+                    listener.onSalleRemove(new SalleRemoveEvent(salle));
                 }
 
-                // Salles
-                bddSalles.removeAll(salles);
-                for (Salle salle : bddSalles) {
-                    for (PlanningListener listener : listeners) {
-                        listener.onSalleRemove(new SalleRemoveEvent(salle));
-                    }
+                // Suppression en base de données
+                try {
                     salleDAO.delete(salle);
+                } catch (SQLException e) {
+                    logger.error("Erreur lors de la suppression de la salle " + salle.getId() + " \"" + salle + "\"", e);
+                }
+            }
+
+            // Enseignants
+            bddEnseignants.removeAll(enseignants);
+            for (Enseignant enseignant : bddEnseignants) {
+                // Envoi de l'événement
+                for (PlanningListener listener : listeners) {
+                    listener.onEnseignantRemove(new EnseignantRemoveEvent(enseignant));
                 }
 
-                // Enseignants
-                bddEnseignants.removeAll(enseignants);
-                for (Enseignant enseignant : bddEnseignants) {
-                    for (PlanningListener listener : listeners) {
-                        listener.onEnseignantRemove(new EnseignantRemoveEvent(enseignant));
-                    }
+                // Suppression en base de données
+                try {
                     enseignantDAO.delete(enseignant);
+                } catch (SQLException e) {
+                    logger.error("Erreur lors de la suppression de l'enseignant " + enseignant.getId() + " \"" + enseignant + "\"", e);
+                }
+            }
+
+            // Enseignements
+            bddEnseignements.removeAll(enseignements);
+            for (Enseignement enseignement : bddEnseignements) {
+                // Envoi de l'événement
+                for (PlanningListener listener : listeners) {
+                    listener.onEnseignementRemove(new EnseignementRemoveEvent(enseignement));
                 }
 
-                // Enseignements
-                bddEnseignements.removeAll(enseignements);
-                for (Enseignement enseignement : bddEnseignements) {
-                    for (PlanningListener listener : listeners) {
-                        listener.onEnseignementRemove(new EnseignementRemoveEvent(enseignement));
-                    }
+                // Suppression en base de données
+                try {
                     enseignementDAO.delete(enseignement);
+                } catch (SQLException e) {
+                    logger.error("Erreur lors de la suppression de l'enseignement " + enseignement.getCode() + " \"" + enseignement + "\"", e);
                 }
-            } catch (SQLException e) {
-                logger.error("Erreur lors de la suppression des éléments non utilisés", e);
             }
         } else {
             logger.warn("Aucune donnée trouvée !");
