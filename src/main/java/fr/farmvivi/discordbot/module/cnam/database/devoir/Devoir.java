@@ -54,7 +54,7 @@ public class Devoir {
         this.description = description;
     }
 
-    public Boolean getOptionnel() {
+    public Boolean isOptionnel() {
         return optionnel;
     }
 
