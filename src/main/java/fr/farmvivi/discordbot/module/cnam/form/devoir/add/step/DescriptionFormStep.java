@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
-import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -12,12 +13,14 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 
 public class DescriptionFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
 
-    public DescriptionFormStep(AddDevoirForm form) {
+    public DescriptionFormStep(Form form, DevoirForm devoirForm) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
     }
 
     @Override
@@ -26,8 +29,8 @@ public class DescriptionFormStep extends FormStep {
             TextInput.Builder descriptionInputBuilder = TextInput.create(getDiscordID("1-1"), "Travail à faire", TextInputStyle.PARAGRAPH);
             descriptionInputBuilder.setPlaceholder("Description du devoir à effectuer");
             descriptionInputBuilder.setMinLength(1);
-            if (form.getDescription() != null && !form.getDescription().isEmpty()) {
-                descriptionInputBuilder.setValue(form.getDescription());
+            if (devoirForm.getDescription() != null && !devoirForm.getDescription().isEmpty()) {
+                descriptionInputBuilder.setValue(devoirForm.getDescription());
             }
 
             Modal.Builder modalBuilder = Modal.create(getDiscordID("1"), "Description du devoir");
@@ -45,10 +48,10 @@ public class DescriptionFormStep extends FormStep {
             String customID = getCustomID(interactionEvent.getModalId());
             if (customID.equals("1")) {
                 ModalMapping description = interactionEvent.getValue(getDiscordID("1-1"));
-                form.setDescription(description.getAsString());
+                devoirForm.setDescription(description.getAsString());
 
                 // Go to next step
-                DevoirConfirmFormStep devoirConfirmFormStep = new DevoirConfirmFormStep(form);
+                DevoirConfirmFormStep devoirConfirmFormStep = new DevoirConfirmFormStep(form, devoirForm);
                 form.addStep(devoirConfirmFormStep);
             } else {
                 replyError(event, "Une erreur est survenue");

@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
-import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -14,14 +15,16 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 
 public class DatePourConfirmFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
 
     private InteractionHook tempHook;
 
-    public DatePourConfirmFormStep(AddDevoirForm form) {
+    public DatePourConfirmFormStep(Form form, DevoirForm devoirForm) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
     }
 
     @Override
@@ -30,13 +33,13 @@ public class DatePourConfirmFormStep extends FormStep {
         MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 
         // Message content
-        String date = form.getDatePour().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE);
-        date += " " + new DateTimeFormatterBuilder().appendPattern("d MMMM yyyy").toFormatter().format(form.getDatePour());
+        String date = devoirForm.getDatePour().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE);
+        date += " " + new DateTimeFormatterBuilder().appendPattern("d MMMM yyyy").toFormatter().format(devoirForm.getDatePour());
         messageBuilder.addContent("Le devoir devra être rendu pour le " + date);
 
-        if (form.getCoursPour() != null) {
-            String horaires = "de " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(form.getCoursPour().getHeureDebut());
-            horaires += " à " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(form.getCoursPour().getHeureFin());
+        if (devoirForm.getCoursPour() != null) {
+            String horaires = "de " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(devoirForm.getCoursPour().getHeureDebut());
+            horaires += " à " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(devoirForm.getCoursPour().getHeureFin());
             messageBuilder.addContent(" " + horaires);
         }
 
@@ -66,18 +69,18 @@ public class DatePourConfirmFormStep extends FormStep {
             if (customID.startsWith("1-")) {
                 if (customID.equals("1-1")) {
                     // Oui
-                    if (form.getDescription() == null || form.getDescription().isEmpty()) {
+                    if (devoirForm.getDescription() == null || devoirForm.getDescription().isEmpty()) {
                         // Go to next step
-                        DescriptionFormStep descriptionFormStep = new DescriptionFormStep(form);
+                        DescriptionFormStep descriptionFormStep = new DescriptionFormStep(form, devoirForm);
                         form.addStep(descriptionFormStep);
                     } else {
                         // Go to next step
-                        DevoirConfirmFormStep devoirConfirmFormStep = new DevoirConfirmFormStep(form);
+                        DevoirConfirmFormStep devoirConfirmFormStep = new DevoirConfirmFormStep(form, devoirForm);
                         form.addStep(devoirConfirmFormStep);
                     }
                 } else if (customID.equals("1-2")) {
                     // Non
-                    CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form);
+                    CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form, devoirForm);
                     form.addStep(coursPourChooserFormStep);
                 }
             } else if (customID.equals("2")) {

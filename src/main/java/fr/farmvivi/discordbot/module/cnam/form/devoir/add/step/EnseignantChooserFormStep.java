@@ -2,7 +2,8 @@ package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
-import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -20,15 +21,17 @@ import java.util.Collections;
 import java.util.List;
 
 public class EnseignantChooserFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
     private final List<Enseignant> enseignantList;
 
     private InteractionHook tempHook;
 
-    public EnseignantChooserFormStep(AddDevoirForm form, List<Enseignant> enseignantList) {
+    public EnseignantChooserFormStep(Form form, DevoirForm devoirForm, List<Enseignant> enseignantList) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
         this.enseignantList = enseignantList;
     }
 
@@ -114,9 +117,9 @@ public class EnseignantChooserFormStep extends FormStep {
     }
 
     private void nextStep(GenericInteractionCreateEvent event, Enseignant enseignant) throws SQLException {
-        form.setEnseignant(enseignant);
+        devoirForm.setEnseignant(enseignant);
 
-        List<Cours> coursList = form.getCoursDAO().selectAllByEnseignementEnseignant(form.getEnseignement().getCode(), enseignant.getId());
+        List<Cours> coursList = devoirForm.getCoursDAO().selectAllByEnseignementEnseignant(devoirForm.getEnseignement().getCode(), enseignant.getId());
         Collections.sort(coursList);
 
         // Remove all cours with date after today
@@ -132,7 +135,7 @@ public class EnseignantChooserFormStep extends FormStep {
             return;
         }
 
-        CoursDonneChooserFormStep coursDonneChooserFormStep = new CoursDonneChooserFormStep(form, coursList);
+        CoursDonneChooserFormStep coursDonneChooserFormStep = new CoursDonneChooserFormStep(form, devoirForm, coursList);
         form.addStep(coursDonneChooserFormStep);
     }
 }

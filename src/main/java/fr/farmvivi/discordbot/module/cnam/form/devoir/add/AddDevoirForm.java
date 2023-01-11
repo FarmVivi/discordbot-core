@@ -12,6 +12,7 @@ import fr.farmvivi.discordbot.module.cnam.database.enseignant.EnseignantDAO;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.EnseignementDAO;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirCreateEvent;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.step.CoursDonneCurrentCoursFormStep;
 import fr.farmvivi.discordbot.module.forms.Form;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
@@ -19,7 +20,7 @@ import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-public class AddDevoirForm extends Form {
+public class AddDevoirForm extends Form implements DevoirForm {
     private final CnamModule module;
     private final DevoirEventHandler devoirEventHandler;
 
@@ -46,7 +47,7 @@ public class AddDevoirForm extends Form {
         enseignantDAO = new EnseignantDAO(module.getDatabaseManager().getDatabaseAccess());
 
         // Steps
-        addStep(new CoursDonneCurrentCoursFormStep(this));
+        addStep(new CoursDonneCurrentCoursFormStep(this, this));
     }
 
     @Override
@@ -102,66 +103,82 @@ public class AddDevoirForm extends Form {
         }
     }
 
+    @Override
     public DevoirDAO getDevoirDAO() {
         return devoirDAO;
     }
 
+    @Override
     public CoursDAO getCoursDAO() {
         return coursDAO;
     }
 
+    @Override
     public EnseignantDAO getEnseignantDAO() {
         return enseignantDAO;
     }
 
+    @Override
     public EnseignementDAO getEnseignementDAO() {
         return enseignementDAO;
     }
 
+    @Override
     public Enseignement getEnseignement() {
         return enseignement;
     }
 
+    @Override
     public void setEnseignement(Enseignement enseignement) {
         this.enseignement = enseignement;
     }
 
+    @Override
     public Cours getCoursDonne() {
         return coursDonne;
     }
 
+    @Override
     public void setCoursDonne(Cours coursDonne) {
         this.coursDonne = coursDonne;
     }
 
+    @Override
     public Cours getCoursPour() {
         return coursPour;
     }
 
+    @Override
     public void setCoursPour(Cours coursPour) {
         this.coursPour = coursPour;
     }
 
+    @Override
     public LocalDate getDatePour() {
         return datePour;
     }
 
+    @Override
     public void setDatePour(LocalDate datePour) {
         this.datePour = datePour;
     }
 
+    @Override
     public Enseignant getEnseignant() {
         return enseignant;
     }
 
+    @Override
     public void setEnseignant(Enseignant enseignant) {
         this.enseignant = enseignant;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }

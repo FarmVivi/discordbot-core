@@ -1,6 +1,9 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.edit.EditDevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -19,14 +22,16 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 
 public class DevoirConfirmFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
 
     private InteractionHook tempHook;
 
-    public DevoirConfirmFormStep(AddDevoirForm form) {
+    public DevoirConfirmFormStep(Form form, DevoirForm devoirForm) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
     }
 
     @Override
@@ -42,27 +47,32 @@ public class DevoirConfirmFormStep extends FormStep {
             EmbedBuilder embedBuilder = new EmbedBuilder();
 
             // Embed content
-            embedBuilder.setTitle("Ajout d'un devoir");
-            embedBuilder.setColor(new Color(109, 224, 16));
+            if (form instanceof AddDevoirForm) {
+                embedBuilder.setTitle("Ajout d'un devoir");
+                embedBuilder.setColor(new Color(109, 224, 16));
+            } else if (form instanceof EditDevoirForm) {
+                embedBuilder.setTitle("Modification d'un devoir");
+                embedBuilder.setColor(new Color(234, 184, 6));
+            }
 
             // Description
-            embedBuilder.addField("Travail à faire", form.getDescription(), false);
+            embedBuilder.addField("Travail à faire", devoirForm.getDescription(), false);
 
             // Cours donné
-            String coursDonneInfos = "Date : " + dateToString(form.getCoursDonne().getDate());
-            coursDonneInfos += "\nHoraire : " + horaireToString(form.getCoursDonne().getHeureDebut(), form.getCoursDonne().getHeureFin());
-            coursDonneInfos += "\nEnseignant : " + form.getEnseignantDAO().selectById(form.getCoursDonne().getEnseignantId());
+            String coursDonneInfos = "Date : " + dateToString(devoirForm.getCoursDonne().getDate());
+            coursDonneInfos += "\nHoraire : " + horaireToString(devoirForm.getCoursDonne().getHeureDebut(), devoirForm.getCoursDonne().getHeureFin());
+            coursDonneInfos += "\nEnseignant : " + devoirForm.getEnseignantDAO().selectById(devoirForm.getCoursDonne().getEnseignantId());
             embedBuilder.addField("Cours donné", coursDonneInfos, true);
 
             // Cours pour
-            String coursPourInfos = "Date : " + dateToString(form.getCoursPour().getDate());
-            if (form.getCoursPour() != null) {
-                coursPourInfos += "\nHoraire : " + horaireToString(form.getCoursPour().getHeureDebut(), form.getCoursPour().getHeureFin());
+            String coursPourInfos = "Date : " + dateToString(devoirForm.getCoursPour().getDate());
+            if (devoirForm.getCoursPour() != null) {
+                coursPourInfos += "\nHoraire : " + horaireToString(devoirForm.getCoursPour().getHeureDebut(), devoirForm.getCoursPour().getHeureFin());
             }
-            coursPourInfos += "\nEnseignant : " + form.getEnseignant();
+            coursPourInfos += "\nEnseignant : " + devoirForm.getEnseignant();
             embedBuilder.addField("Cours pour", coursPourInfos, true);
 
-            embedBuilder.setFooter(form.getEnseignement().toString());
+            embedBuilder.setFooter(devoirForm.getEnseignement().toString());
 
             // Add embed to message
             messageBuilder.addEmbeds(embedBuilder.build());
@@ -97,15 +107,15 @@ public class DevoirConfirmFormStep extends FormStep {
                         // OK !
                         break;
                     case "1-2":
-                        CoursDonneCurrentCoursFormStep coursDonneCurrentCoursFormStep = new CoursDonneCurrentCoursFormStep(form);
+                        CoursDonneCurrentCoursFormStep coursDonneCurrentCoursFormStep = new CoursDonneCurrentCoursFormStep(form, devoirForm);
                         form.addStep(coursDonneCurrentCoursFormStep);
                         break;
                     case "1-3":
-                        CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form);
+                        CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form, devoirForm);
                         form.addStep(coursPourChooserFormStep);
                         break;
                     case "1-4":
-                        DescriptionFormStep descriptionFormStep = new DescriptionFormStep(form);
+                        DescriptionFormStep descriptionFormStep = new DescriptionFormStep(form, devoirForm);
                         form.addStep(descriptionFormStep);
                         break;
                     default:

@@ -1,7 +1,8 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
-import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -22,15 +23,17 @@ import java.util.List;
 import java.util.Locale;
 
 public class CoursDonneChooserFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
     private final List<Cours> coursList;
 
     private InteractionHook tempHook;
 
-    public CoursDonneChooserFormStep(AddDevoirForm form, List<Cours> coursList) {
+    public CoursDonneChooserFormStep(Form form, DevoirForm devoirForm, List<Cours> coursList) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
         this.coursList = coursList;
     }
 
@@ -81,10 +84,10 @@ public class CoursDonneChooserFormStep extends FormStep {
                 // Get selected cours
                 int coursIndex = Integer.parseInt(getCustomID(selectedOptions.get(0).getValue()).split("-")[1]);
                 Cours cours = coursList.get(coursIndex);
-                form.setCoursDonne(cours);
+                devoirForm.setCoursDonne(cours);
 
                 // Go to next step
-                CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form);
+                CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form, devoirForm);
                 form.addStep(coursPourChooserFormStep);
             } else {
                 // Annuler

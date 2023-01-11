@@ -2,7 +2,8 @@ package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
-import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -18,22 +19,24 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class EnseignementChooserFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
 
     private List<Enseignement> enseignementList;
     private InteractionHook tempHook;
 
-    public EnseignementChooserFormStep(AddDevoirForm form) {
+    public EnseignementChooserFormStep(Form form, DevoirForm devoirForm) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
     }
 
     @Override
     protected void handleQuestion(IReplyCallback event) {
         try {
             // Data
-            enseignementList = form.getEnseignementDAO().selectAll();
+            enseignementList = devoirForm.getEnseignementDAO().selectAll();
 
             // Message
             MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
@@ -78,16 +81,16 @@ public class EnseignementChooserFormStep extends FormStep {
                     // Get selected enseignement
                     int enseignementIndex = Integer.parseInt(getCustomID(selectedOptions.get(0).getValue()).split("-")[1]);
                     Enseignement enseignement = enseignementList.get(enseignementIndex);
-                    form.setEnseignement(enseignement);
+                    devoirForm.setEnseignement(enseignement);
 
-                    List<Enseignant> enseignantList = form.getEnseignantDAO().selectAllByEnseignement(enseignement.getCode());
+                    List<Enseignant> enseignantList = devoirForm.getEnseignantDAO().selectAllByEnseignement(enseignement.getCode());
 
                     if (enseignantList.isEmpty()) {
                         replyError(event, "Aucun enseignant n'a été trouvé pour cet enseignement");
                         return;
                     }
 
-                    EnseignantChooserFormStep enseignantChooserFormStep = new EnseignantChooserFormStep(form, enseignantList);
+                    EnseignantChooserFormStep enseignantChooserFormStep = new EnseignantChooserFormStep(form, devoirForm, enseignantList);
                     form.addStep(enseignantChooserFormStep);
                 } else {
                     // Annuler

@@ -1,7 +1,8 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
-import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -16,27 +17,29 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class CoursDonneCurrentCoursFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
 
     private List<Cours> coursList;
 
     private InteractionHook tempHook;
 
-    public CoursDonneCurrentCoursFormStep(AddDevoirForm form) {
+    public CoursDonneCurrentCoursFormStep(Form form, DevoirForm devoirForm) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
     }
 
     @Override
     protected void handleQuestion(IReplyCallback event) {
         try {
             // Data
-            coursList = form.getCoursDAO().selectAllByDateBetweenHeure(LocalDate.now(), LocalTime.now());
+            coursList = devoirForm.getCoursDAO().selectAllByDateBetweenHeure(LocalDate.now(), LocalTime.now());
             if (coursList.isEmpty()) {
-                coursList = form.getCoursDAO().selectAllByDateBetweenHeure(LocalDate.now(), LocalTime.now().minusMinutes(10));
+                coursList = devoirForm.getCoursDAO().selectAllByDateBetweenHeure(LocalDate.now(), LocalTime.now().minusMinutes(10));
                 if (coursList.isEmpty()) {
-                    EnseignementChooserFormStep enseignementChooserFormStep = new EnseignementChooserFormStep(form);
+                    EnseignementChooserFormStep enseignementChooserFormStep = new EnseignementChooserFormStep(form, devoirForm);
                     form.addStep(enseignementChooserFormStep);
                     skipStep(event);
                     return;
@@ -47,11 +50,11 @@ public class CoursDonneCurrentCoursFormStep extends FormStep {
             MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 
             // Message content
-            messageBuilder.addContent("Le devoir que vous voulez ajouter à t-il été donné pendant un cours qui vient d'avoir lieu ?");
+            messageBuilder.addContent("Le devoir a-t-il été donné pendant le cours qui vient d'avoir lieu ?");
             for (Cours cours : coursList) {
                 messageBuilder.addContent("\n" + cours.getHeureDebut() + " - " + cours.getHeureFin() + " : "
-                        + form.getEnseignementDAO().selectById(cours.getEnseignementCode()) + " par "
-                        + form.getEnseignantDAO().selectById(cours.getEnseignantId()));
+                        + devoirForm.getEnseignementDAO().selectById(cours.getEnseignementCode()) + " par "
+                        + devoirForm.getEnseignantDAO().selectById(cours.getEnseignantId()));
             }
 
             // Buttons
@@ -77,21 +80,21 @@ public class CoursDonneCurrentCoursFormStep extends FormStep {
                     case "1-1" -> {
                         // Oui
                         if (coursList.size() == 1) {
-                            form.setEnseignement(form.getEnseignementDAO().selectById(coursList.get(0).getEnseignementCode()));
-                            form.setEnseignant(form.getEnseignantDAO().selectById(coursList.get(0).getEnseignantId()));
-                            form.setCoursDonne(coursList.get(0));
+                            devoirForm.setEnseignement(devoirForm.getEnseignementDAO().selectById(coursList.get(0).getEnseignementCode()));
+                            devoirForm.setEnseignant(devoirForm.getEnseignantDAO().selectById(coursList.get(0).getEnseignantId()));
+                            devoirForm.setCoursDonne(coursList.get(0));
 
                             // Next step
-                            CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form);
+                            CoursPourChooserFormStep coursPourChooserFormStep = new CoursPourChooserFormStep(form, devoirForm);
                             form.addStep(coursPourChooserFormStep);
                         } else {
-                            CoursDonneChooserFormStep coursDonneChooserFormStep = new CoursDonneChooserFormStep(form, coursList);
+                            CoursDonneChooserFormStep coursDonneChooserFormStep = new CoursDonneChooserFormStep(form, devoirForm, coursList);
                             form.addStep(coursDonneChooserFormStep);
                         }
                     }
                     case "1-2" -> {
                         // Non
-                        EnseignementChooserFormStep enseignementChooserFormStep = new EnseignementChooserFormStep(form);
+                        EnseignementChooserFormStep enseignementChooserFormStep = new EnseignementChooserFormStep(form, devoirForm);
                         form.addStep(enseignementChooserFormStep);
                     }
                     case "2" ->

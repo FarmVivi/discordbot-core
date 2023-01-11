@@ -1,7 +1,8 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
-import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
+import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
+import fr.farmvivi.discordbot.module.forms.Form;
 import fr.farmvivi.discordbot.module.forms.FormStep;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -22,15 +23,17 @@ import java.util.List;
 import java.util.Locale;
 
 public class CoursPourChooserFormStep extends FormStep {
-    private final AddDevoirForm form;
+    private final Form form;
+    private final DevoirForm devoirForm;
 
     private List<Cours> coursList;
     private InteractionHook tempHook;
 
-    public CoursPourChooserFormStep(AddDevoirForm form) {
+    public CoursPourChooserFormStep(Form form, DevoirForm devoirForm) {
         super(form);
 
         this.form = form;
+        this.devoirForm = devoirForm;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class CoursPourChooserFormStep extends FormStep {
             messageBuilder.addActionRow(prochainCours, choisirDate);
 
             // Data
-            coursList = form.getCoursDAO().selectAllByEnseignementEnseignant(form.getEnseignement().getCode(), form.getEnseignant().getId());
+            coursList = devoirForm.getCoursDAO().selectAllByEnseignementEnseignant(devoirForm.getEnseignement().getCode(), devoirForm.getEnseignant().getId());
 
             if (!coursList.isEmpty()) {
                 Collections.sort(coursList);
@@ -107,11 +110,11 @@ public class CoursPourChooserFormStep extends FormStep {
                 // Get selected cours
                 int coursIndex = Integer.parseInt(getCustomID(selectedOptions.get(0).getValue()).split("-")[1]);
                 Cours cours = coursList.get(coursIndex);
-                form.setDatePour(cours.getDate());
-                form.setCoursPour(cours);
+                devoirForm.setDatePour(cours.getDate());
+                devoirForm.setCoursPour(cours);
 
                 // Go to next step
-                DatePourConfirmFormStep datePourConfirmFormStep = new DatePourConfirmFormStep(form);
+                DatePourConfirmFormStep datePourConfirmFormStep = new DatePourConfirmFormStep(form, devoirForm);
                 form.addStep(datePourConfirmFormStep);
             } else {
                 // Annuler
@@ -124,11 +127,11 @@ public class CoursPourChooserFormStep extends FormStep {
                 if (customID.equals("1-1")) {
                     if (!coursList.isEmpty()) {
                         Cours cours = coursList.get(0);
-                        form.setDatePour(cours.getDate());
-                        form.setCoursPour(cours);
+                        devoirForm.setDatePour(cours.getDate());
+                        devoirForm.setCoursPour(cours);
 
                         // Go to next step
-                        DatePourConfirmFormStep datePourConfirmFormStep = new DatePourConfirmFormStep(form);
+                        DatePourConfirmFormStep datePourConfirmFormStep = new DatePourConfirmFormStep(form, devoirForm);
                         form.addStep(datePourConfirmFormStep);
                     } else {
                         replyError(event, "Aucun cours n'est prévu dans les prochains jours");
