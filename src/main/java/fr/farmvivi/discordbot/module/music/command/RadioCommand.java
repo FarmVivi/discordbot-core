@@ -54,7 +54,7 @@ public class RadioCommand extends Command {
         if (args.containsKey("playlist")) {
             String playlist = args.get("playlist").getAsString();
             playRadio(guild, botConfig.radioPath + File.separator + playlist + ".m3u");
-            reply.addContent("Playlist **" + args + "** en cours de lecture.");
+            reply.addContent("Playlist **" + playlist + "** en cours de lecture.");
         } else {
             displayRadio(reply);
         }
