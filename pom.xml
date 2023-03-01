@@ -55,14 +55,14 @@
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>1.3.98.4-custom</version>
+            <version>1.3.99.2-custom</version>
         </dependency>
 
         <!-- https://nexus.farmvivi.fr -->
         <dependency>
-            <groupId>com.github</groupId>
-            <artifactId>topis-source-managers</artifactId>
-            <version>2.0.7-custom</version>
+            <groupId>com.github.TopiSenpai.LavaSrc</groupId>
+            <artifactId>lavasrc</artifactId>
+            <version>3.1.7-custom</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.sf.trove4j/trove4j -->
@@ -92,6 +92,13 @@
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
             <version>2.70.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
         </dependency>
     </dependencies>
 

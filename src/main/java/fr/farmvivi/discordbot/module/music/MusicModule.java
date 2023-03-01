@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.module.music;
 
-import com.github.topislavalinkplugins.topissourcemanagers.applemusic.AppleMusicSourceManager;
-import com.github.topislavalinkplugins.topissourcemanagers.spotify.SpotifyConfig;
-import com.github.topislavalinkplugins.topissourcemanagers.spotify.SpotifySourceManager;
+import com.github.topisenpai.lavasrc.applemusic.AppleMusicSourceManager;
+import com.github.topisenpai.lavasrc.mirror.DefaultMirroringAudioTrackResolver;
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -77,20 +77,18 @@ public class MusicModule extends Module {
         // Spotify source provider
         // create a new config
         try {
-            SpotifyConfig spotifyConfig = new SpotifyConfig();
-            spotifyConfig.setClientId(bot.getConfiguration().getValue("SPOTIFY_ID"));
-            spotifyConfig.setClientSecret(bot.getConfiguration().getValue("SPOTIFY_TOKEN"));
-            spotifyConfig.setCountryCode(bot.getConfiguration().countryCode.getAlpha2());
+            String spotifyId = bot.getConfiguration().getValue("SPOTIFY_ID");
+            String spotifyToken = bot.getConfiguration().getValue("SPOTIFY_TOKEN");
 
             // create a new SpotifySourceManager with the default providers
-            audioPlayerManager.registerSourceManager(new SpotifySourceManager(null, spotifyConfig, 1, audioPlayerManager));
+            audioPlayerManager.registerSourceManager(new SpotifySourceManager(spotifyId, spotifyToken, bot.getConfiguration().countryCode, 1, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Could not initialise spotify source provider because, " + e.getLocalizedMessage());
         }
 
         // Apple Music source provider
         // create a new AppleMusicSourceManager with the default providers
-        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, bot.getConfiguration().countryCode.getAlpha2().toLowerCase(), 1, audioPlayerManager));
+        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, bot.getConfiguration().countryCode, 1, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
 
         // SoundCloud source provider
         SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
