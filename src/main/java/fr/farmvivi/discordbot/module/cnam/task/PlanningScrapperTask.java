@@ -505,6 +505,10 @@ public class PlanningScrapperTask implements Runnable {
         listeners.add(listener);
     }
 
+    public void unregisterListener(PlanningListener listener) {
+        listeners.remove(listener);
+    }
+
     public void close() {
         webClient.close();
     }

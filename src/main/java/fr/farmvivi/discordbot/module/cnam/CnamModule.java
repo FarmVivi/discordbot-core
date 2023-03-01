@@ -6,6 +6,7 @@ import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.Module;
 import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.cnam.command.AddDevoirCommand;
+import fr.farmvivi.discordbot.module.cnam.command.EditDevoirCommand;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningDailyPrintTask;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningScrapperTask;
@@ -29,6 +30,8 @@ public class CnamModule extends Module {
     private final PlanningDailyPrintTask planningDailyPrintTask;
 
     private final DevoirEventHandler devoirEventHandler;
+    private GoulagRemoverEventHandler goulagRemoverEventHandler;
+    private PlanningEventHandler planningEventHandler;
 
     private FormsModule formsModule;
 
@@ -105,7 +108,8 @@ public class CnamModule extends Module {
         try {
             long goulagRoleId = Long.parseLong(bot.getConfiguration().getValue("GOULAG_ROLE"));
 
-            JDAManager.getJDA().addEventListener(new GoulagRemoverEventHandler(scheduler, JDAManager.getJDA().getRoleById(goulagRoleId), databaseManager.getDatabaseAccess()));
+            this.goulagRemoverEventHandler = new GoulagRemoverEventHandler(scheduler, JDAManager.getJDA().getRoleById(goulagRoleId), databaseManager.getDatabaseAccess());
+            JDAManager.getJDA().addEventListener(goulagRemoverEventHandler);
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Failed to load goulag remover because Goulag module is not loaded");
         }
@@ -113,7 +117,8 @@ public class CnamModule extends Module {
         try {
             String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_LOGS_CHANNEL_ID");
 
-            planningScrapperTask.registerListener(new PlanningEventHandler(JDAManager.getJDA().getTextChannelById(planningLogsChannelId)));
+            this.planningEventHandler = new PlanningEventHandler(JDAManager.getJDA().getTextChannelById(planningLogsChannelId));
+            planningScrapperTask.registerListener(planningEventHandler);
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -123,6 +128,7 @@ public class CnamModule extends Module {
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
 
         commandsModule.registerCommand(module, new AddDevoirCommand(this, devoirEventHandler));
+        commandsModule.registerCommand(module, new EditDevoirCommand(this, devoirEventHandler));
     }
 
     @Override
@@ -167,6 +173,14 @@ public class CnamModule extends Module {
         logger.info("Unregistering event listener...");
 
         JDAManager.getJDA().removeEventListener(devoirEventHandler);
+        if (goulagRemoverEventHandler != null) {
+            JDAManager.getJDA().removeEventListener(goulagRemoverEventHandler);
+            goulagRemoverEventHandler = null;
+        }
+        if (planningEventHandler != null) {
+            planningScrapperTask.unregisterListener(planningEventHandler);
+            planningEventHandler = null;
+        }
 
         logger.info("Stopping planning scrapper...");
 
