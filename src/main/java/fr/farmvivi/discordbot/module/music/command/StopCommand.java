@@ -5,6 +5,7 @@ import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
+import fr.farmvivi.discordbot.module.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
@@ -31,8 +32,10 @@ public class StopCommand extends Command {
             return false;
         }
 
-        musicModule.getPlayer(guild).getListener().getTracks().clear();
-        musicModule.getPlayer(guild).skipTrack();
+        MusicPlayer musicPlayer = musicModule.getPlayer(guild);
+        musicPlayer.getAudioPlayer().setPaused(false);
+        musicPlayer.getListener().getTracks().clear();
+        musicPlayer.skipTrack();
 
         reply.addContent("La musique a été stoppée.");
 

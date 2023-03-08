@@ -43,6 +43,7 @@ public class VolumeCommand extends Command {
         if (args.containsKey("volume")) {
             int volume = args.get("volume").getAsInt();
             musicModule.getPlayer(guild).getAudioPlayer().setVolume(volume);
+            musicModule.getPlayer(guild).getMusicPlayerMessage().refreshMessage();
             reply.addContent("Volume changé à **" + volume + "%**.");
         } else {
             reply.addContent("Le volume actuel est de **" + musicModule.getPlayer(guild).getAudioPlayer().getVolume() + "%**.");

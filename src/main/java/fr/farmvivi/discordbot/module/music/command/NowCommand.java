@@ -52,7 +52,7 @@ public class NowCommand extends Command {
 
         String query = args.get("requête").getAsString();
 
-        musicModule.loadTrack(guild, query, reply, true);
+        musicModule.loadTrack(guild, query, event.getChannel(), reply, true);
 
         return true;
     }

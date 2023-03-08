@@ -52,7 +52,7 @@ public class PlayCommand extends Command {
 
         String query = args.get("requête").getAsString();
 
-        musicModule.loadTrack(guild, query, reply);
+        musicModule.loadTrack(guild, query, event.getChannel(), reply);
 
         return true;
     }

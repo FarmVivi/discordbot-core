@@ -98,8 +98,21 @@ public class Bot {
         return instance;
     }
 
+    public static Activity getDefaultActivity() {
+        return Activity.playing("v" + version);
+    }
+
     public static void setDefaultActivity() {
-        JDAManager.getJDA().getPresence().setActivity(Activity.playing("v" + version));
+        JDAManager.getJDA().getPresence().setActivity(getDefaultActivity());
+    }
+
+    public static boolean isDefaultActivity() {
+        Activity currentActivity = JDAManager.getJDA().getPresence().getActivity();
+        if (currentActivity == null) {
+            return false;
+        }
+        Activity defaultActivity = getDefaultActivity();
+        return currentActivity.equals(defaultActivity);
     }
 
     public Configuration getConfiguration() {

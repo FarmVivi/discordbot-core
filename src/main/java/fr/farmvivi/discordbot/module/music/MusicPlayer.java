@@ -9,6 +9,7 @@ public class MusicPlayer {
     private final MusicModule musicModule;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
+    private final MusicPlayerMessage musicPlayerMessage;
     private final Guild guild;
     private EqualizerFactory equalizer;
 
@@ -19,9 +20,10 @@ public class MusicPlayer {
     public MusicPlayer(MusicModule musicModule, AudioPlayer audioPlayer, Guild guild) {
         this.musicModule = musicModule;
         this.audioPlayer = audioPlayer;
+        this.musicPlayerMessage = new MusicPlayerMessage(this);
         this.guild = guild;
         this.equalizer = new EqualizerFactory();
-        trackScheduler = new TrackScheduler(this);
+        this.trackScheduler = new TrackScheduler(this);
         audioPlayer.addListener(trackScheduler);
     }
 
@@ -31,6 +33,10 @@ public class MusicPlayer {
 
     public AudioPlayer getAudioPlayer() {
         return audioPlayer;
+    }
+
+    public MusicPlayerMessage getMusicPlayerMessage() {
+        return musicPlayerMessage;
     }
 
     public Guild getGuild() {
@@ -80,6 +86,7 @@ public class MusicPlayer {
         audioPlayer.setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
         audioPlayer.setFilterFactory(null);
         this.equalizer = new EqualizerFactory();
+        this.musicPlayerMessage.refreshMessage();
     }
 
     public boolean isLoopQueueMode() {
@@ -87,7 +94,10 @@ public class MusicPlayer {
     }
 
     public void setLoopQueueMode(boolean loopQueueMode) {
-        this.loopQueueMode = loopQueueMode;
+        if (this.loopQueueMode != loopQueueMode) {
+            this.musicPlayerMessage.refreshMessage();
+            this.loopQueueMode = loopQueueMode;
+        }
     }
 
     public boolean isLoopMode() {
@@ -95,7 +105,10 @@ public class MusicPlayer {
     }
 
     public void setLoopMode(boolean loopMode) {
-        this.loopMode = loopMode;
+        if (this.loopMode != loopMode) {
+            this.musicPlayerMessage.refreshMessage();
+            this.loopMode = loopMode;
+        }
     }
 
     public boolean isShuffleMode() {
@@ -103,6 +116,9 @@ public class MusicPlayer {
     }
 
     public void setShuffleMode(boolean shuffleMode) {
-        this.shuffleMode = shuffleMode;
+        if (this.shuffleMode != shuffleMode) {
+            this.musicPlayerMessage.refreshMessage();
+            this.shuffleMode = shuffleMode;
+        }
     }
 }

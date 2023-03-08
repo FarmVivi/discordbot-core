@@ -31,11 +31,14 @@ import fr.farmvivi.discordbot.module.music.command.equalizer.EqStartCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStopCommand;
 import fr.farmvivi.discordbot.module.music.sourcemanager.SearchSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MusicModule extends Module {
+    public static final String PLAYER_ID_PREFIX = "discordbot-music";
     public static final int QUIT_TIMEOUT = 900;
     public static final int DEFAULT_VOICE_VOLUME = 5;
     public static final int DEFAULT_RADIO_VOLUME = 25;
@@ -171,6 +174,14 @@ public class MusicModule extends Module {
     public void onPreDisable() {
         super.onPreDisable();
 
+        logger.info("Deleting all music players messages...");
+        for (MusicPlayer player : players.values()) {
+            Message message = player.getMusicPlayerMessage().getMessage();
+            if (message != null) {
+                message.delete().queue();
+            }
+        }
+
         logger.info("Unregistering event listener...");
 
         JDAManager.getJDA().removeEventListener(musicEventHandler);
@@ -197,20 +208,23 @@ public class MusicModule extends Module {
         return audioPlayerManager;
     }
 
-    public void loadTrack(Guild guild, String source) {
-        this.loadTrack(guild, source, null);
+    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel) {
+        this.loadTrack(guild, source, messageChannel, null);
     }
 
-    public void loadTrack(Guild guild, String source, boolean playNow) {
-        this.loadTrack(guild, source, null, playNow);
+    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel, boolean playNow) {
+        this.loadTrack(guild, source, messageChannel, null, playNow);
     }
 
-    public void loadTrack(Guild guild, String source, CommandMessageBuilder reply) {
-        this.loadTrack(guild, source, reply, false);
+    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel, CommandMessageBuilder reply) {
+        this.loadTrack(guild, source, messageChannel, reply, false);
     }
 
-    public void loadTrack(Guild guild, String source, CommandMessageBuilder reply, boolean playNow) {
+    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel, CommandMessageBuilder reply, boolean playNow) {
         MusicPlayer player = getPlayer(guild);
+
+        player.getMusicPlayerMessage().setMessageChannel(messageChannel);
+        player.getMusicPlayerMessage().refreshMessage();
 
         guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
 
@@ -295,5 +309,21 @@ public class MusicModule extends Module {
                 }
             }
         });
+    }
+
+    public static String getDiscordID(Guild guild, String action) {
+        return MusicModule.PLAYER_ID_PREFIX + "-" + guild.getId() + "-" + action;
+    }
+
+    public static String getGuildID(String discordID) {
+        // discordID = discordbot-music-<guildID>-<action>
+        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
+        return discordID.substring(index, discordID.indexOf("-", index));
+    }
+
+    public static String getAction(String discordID) {
+        // discordID = discordbot-music-<guildID>-<action>
+        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
+        return discordID.substring(discordID.indexOf("-", index) + 1);
     }
 }

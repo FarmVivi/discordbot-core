@@ -39,6 +39,7 @@ public class ClearQueueCommand extends Command {
         }
 
         musicModule.getPlayer(guild).getListener().getTracks().clear();
+        musicModule.getPlayer(guild).getMusicPlayerMessage().refreshMessage();
         reply.addContent("La liste d'attente à été vidé.");
 
         return true;

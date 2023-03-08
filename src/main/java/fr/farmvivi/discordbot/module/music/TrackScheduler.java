@@ -69,7 +69,7 @@ public class TrackScheduler extends AudioEventAdapter {
             List<AudioTrack> remainingTracks = new ArrayList<>(tracks);
             tracks.clear();
             Random random = new Random();
-            if (player.isLoopQueueMode())
+            if (player.isLoopQueueMode() && remainingTracks.size() > 1)
                 // Get random track on the 50% first part of the list
                 track = remainingTracks.get(random.nextInt(remainingTracks.size() / 2));
             else
@@ -92,18 +92,25 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onPlayerPause(AudioPlayer player) {
         // Player was paused
+        this.player.getMusicPlayerMessage().refreshMessage();
     }
 
     @Override
     public void onPlayerResume(AudioPlayer player) {
         // Player was resumed
+        this.player.getMusicPlayerMessage().refreshMessage();
     }
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         // A track started playing
-        if (!this.player.isLoopQueueMode())
+        this.player.getMusicPlayerMessage().refreshMessage();
+
+        if (!this.player.isLoopQueueMode()) {
             JDAManager.getJDA().getPresence().setActivity(Activity.streaming(track.getInfo().title, track.getInfo().uri));
+        } else if (!Bot.isDefaultActivity()) {
+            Bot.setDefaultActivity();
+        }
     }
 
     @Override
@@ -118,6 +125,9 @@ public class TrackScheduler extends AudioEventAdapter {
                 tracks.offer(track.makeClone());
             }
             nextTrack();
+        } else {
+            // End of the queue
+            this.player.getMusicPlayerMessage().refreshMessage();
         }
 
         // endReason == FINISHED: A track finished or died by an exception (mayStartNext
