@@ -60,6 +60,45 @@ public class MusicEventHandler extends ListenerAdapter {
             case "loop" -> musicPlayer.setLoopMode(!musicPlayer.isLoopMode());
             case "loopqueue" -> musicPlayer.setLoopQueueMode(!musicPlayer.isLoopQueueMode());
             case "shuffle" -> musicPlayer.setShuffleMode(!musicPlayer.isShuffleMode());
+            case "volumedown10" -> {
+                int volume = musicPlayer.getAudioPlayer().getVolume() - 10;
+                if (volume < 0) {
+                    volume = 0;
+                }
+                musicPlayer.getAudioPlayer().setVolume(volume);
+                musicPlayer.getMusicPlayerMessage().refreshMessage();
+            }
+            case "volumedown5" -> {
+                int volume = musicPlayer.getAudioPlayer().getVolume() - 5;
+                if (volume < 0) {
+                    volume = 0;
+                }
+                musicPlayer.getAudioPlayer().setVolume(volume);
+                musicPlayer.getMusicPlayerMessage().refreshMessage();
+            }
+            case "volumeup5" -> {
+                int volume = musicPlayer.getAudioPlayer().getVolume() + 5;
+                if (volume > 100) {
+                    volume = 100;
+                }
+                musicPlayer.getAudioPlayer().setVolume(volume);
+                musicPlayer.getMusicPlayerMessage().refreshMessage();
+            }
+            case "volumeup10" -> {
+                int volume = musicPlayer.getAudioPlayer().getVolume() + 10;
+                if (volume > 100) {
+                    volume = 100;
+                }
+                musicPlayer.getAudioPlayer().setVolume(volume);
+                musicPlayer.getMusicPlayerMessage().refreshMessage();
+            }
+            case "volumemute" -> {
+                if (musicPlayer.getAudioPlayer().getVolume() == 0) {
+                    musicPlayer.unmute();
+                } else {
+                    musicPlayer.mute();
+                }
+            }
             default -> event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
         }
 

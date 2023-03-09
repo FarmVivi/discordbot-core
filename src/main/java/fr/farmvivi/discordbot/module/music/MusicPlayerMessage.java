@@ -4,14 +4,14 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class MusicPlayerMessage {
@@ -45,15 +45,20 @@ public class MusicPlayerMessage {
                     e.printStackTrace();
                 }
 
-                // Delete old message
-                if (message != null) {
-                    message.delete().queue();
-                    message = null;
-                }
+                // If bot is disconnected
+                if (!musicPlayer.getGuild().getAudioManager().isConnected()) {
+                    // Delete old message
+                    if (message != null) {
+                        message.delete().queue();
+                        message = null;
+                    }
 
-                if (musicPlayer.getGuild().getAudioManager().isConnected()) {
+                    // Release semaphore
+                    semaphore.release();
+                }
+                // If bot is connected
+                else {
                     // Create embed message
-                    MessageCreateBuilder builder = new MessageCreateBuilder();
                     EmbedBuilder embedBuilder = new EmbedBuilder();
 
                     AudioTrack track = musicPlayer.getAudioPlayer().getPlayingTrack();
@@ -116,15 +121,12 @@ public class MusicPlayerMessage {
                             }
                             embedBuilder.addField("File d'attente (" + musicPlayer.getListener().getTrackSize() + ")", topQueue.toString(), false);
                         }
-                        // Add volume
-                        embedBuilder.addField("Volume", String.format("%d%%", musicPlayer.getAudioPlayer().getVolume()), false);
                     }
-
-                    builder.setEmbeds(embedBuilder.build());
 
                     // Add quick action buttons
                     List<ItemComponent> buttonsRow1 = new ArrayList<>();
                     List<ItemComponent> buttonsRow2 = new ArrayList<>();
+                    List<ItemComponent> buttonsRow3 = new ArrayList<>();
 
                     // Play / Pause
                     if (track != null) {
@@ -182,27 +184,79 @@ public class MusicPlayerMessage {
                         buttonsRow2.add(shuffleButton);
                     }
 
-                    // Add buttons to message
-                    if (!buttonsRow1.isEmpty()) {
-                        builder.addActionRow(buttonsRow1);
-                    }
-                    if (!buttonsRow2.isEmpty()) {
-                        builder.addActionRow(buttonsRow2);
-                    }
-
-                    // Send message
-                    if (messageChannel != null) {
-                        // Send message and release semaphore
-                        // TODO Edit message instead of sending new one if no new message was sent in the channel
-                        messageChannel.sendMessage(builder.build()).queue(m -> {
-                            message = m;
-                            semaphore.release();
-                        }, e -> semaphore.release());
+                    // Volume
+                    // -10%
+                    Button volumeDown10Button = Button.secondary(getButtonID("volumedown10"), "-10%");
+                    buttonsRow3.add(volumeDown10Button);
+                    // -5%
+                    Button volumeDown5Button = Button.secondary(getButtonID("volumedown5"), "-5%");
+                    buttonsRow3.add(volumeDown5Button);
+                    // Mute/Unmute (view volume)
+                    if (musicPlayer.getAudioPlayer().getVolume() == 0) {
+                        Button volumeMuteButton = Button.danger(getButtonID("volumemute"), "🔇");
+                        buttonsRow3.add(volumeMuteButton);
                     } else {
+                        Button volumeMuteButton = Button.success(getButtonID("volumemute"), "🔊 " + String.format("%d%%", musicPlayer.getAudioPlayer().getVolume()));
+                        buttonsRow3.add(volumeMuteButton);
+                    }
+                    // +5%
+                    Button volumeUp5Button = Button.secondary(getButtonID("volumeup5"), "+5%");
+                    buttonsRow3.add(volumeUp5Button);
+                    // +10%
+                    Button volumeUp10Button = Button.secondary(getButtonID("volumeup10"), "+10%");
+                    buttonsRow3.add(volumeUp10Button);
+
+                    // END, release semaphore
+                    if (messageChannel == null) {
                         semaphore.release();
                     }
-                } else {
-                    semaphore.release();
+                    // Send message and release semaphore
+                    else {
+                        /*
+                         * ALGORITHM
+                         * 1. Get the last message of the channel
+                         * 2. If the last message is the message of the player, edit it
+                         * 3. Else, delete old player message and send new one
+                         */
+                        messageChannel.getHistory().retrievePast(1).queue(messages -> {
+                            if (!messages.isEmpty()) {
+                                Message lastMessage = messages.get(0);
+                                if (message != null && lastMessage != null && lastMessage.getIdLong() == message.getIdLong()) {
+                                    // Edit message
+                                    MessageEditBuilder builder = new MessageEditBuilder();
+                                    builder.setEmbeds(embedBuilder.build());
+                                    List<LayoutComponent> components = new LinkedList<>();
+                                    if (!buttonsRow1.isEmpty()) {
+                                        components.add(ActionRow.of(buttonsRow1));
+                                    }
+                                    components.add(ActionRow.of(buttonsRow2));
+                                    components.add(ActionRow.of(buttonsRow3));
+                                    builder.setComponents(components);
+                                    lastMessage.editMessage(builder.build()).queue(m -> {
+                                        message = m;
+                                        semaphore.release();
+                                    }, e -> semaphore.release());
+                                    return;
+                                }
+                            }
+                            // Delete old message, send new message and release semaphore
+                            MessageCreateBuilder builder = new MessageCreateBuilder();
+                            builder.addEmbeds(embedBuilder.build());
+                            if (!buttonsRow1.isEmpty()) {
+                                builder.addActionRow(buttonsRow1);
+                            }
+                            builder.addActionRow(buttonsRow2);
+                            builder.addActionRow(buttonsRow3);
+                            messageChannel.sendMessage(builder.build()).queue(m -> {
+                                // Delete old message
+                                if (message != null) {
+                                    message.delete().queue();
+                                }
+                                message = m;
+                                semaphore.release();
+                            }, e -> semaphore.release());
+                        });
+                    }
                 }
             }
         };

@@ -13,6 +13,7 @@ public class MusicPlayer {
     private final Guild guild;
     private EqualizerFactory equalizer;
 
+    private int lastVolume = 0;
     private boolean loopQueueMode = false;
     private boolean loopMode = false;
     private boolean shuffleMode = false;
@@ -86,6 +87,20 @@ public class MusicPlayer {
         audioPlayer.setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
         audioPlayer.setFilterFactory(null);
         this.equalizer = new EqualizerFactory();
+        this.musicPlayerMessage.refreshMessage();
+    }
+
+    public void mute() {
+        this.lastVolume = this.audioPlayer.getVolume();
+        this.audioPlayer.setVolume(0);
+        this.musicPlayerMessage.refreshMessage();
+    }
+
+    public void unmute() {
+        if (this.lastVolume == 0) {
+            this.lastVolume = MusicModule.DEFAULT_VOICE_VOLUME;
+        }
+        this.audioPlayer.setVolume(this.lastVolume);
         this.musicPlayerMessage.refreshMessage();
     }
 
