@@ -81,7 +81,13 @@ public class MusicEventHandler extends ListenerAdapter {
                 event.replyModal(addToQueueModalBuilder.build()).queue();
             }
             case "pause" -> musicPlayer.getAudioPlayer().setPaused(!musicPlayer.getAudioPlayer().isPaused());
-            case "skip" -> musicPlayer.skipTrack();
+            case "skip" -> {
+                if (musicPlayer.isLoopQueueMode()) {
+                    musicPlayer.nextTrack();
+                } else {
+                    musicPlayer.skipTrack();
+                }
+            }
             case "stop" -> {
                 musicPlayer.getAudioPlayer().setPaused(false);
                 musicPlayer.getListener().getTracks().clear();
