@@ -76,8 +76,14 @@ public class MusicPlayerMessage {
                         embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
                         if (!musicPlayer.getAudioPlayer().isPaused() && (musicPlayer.getListener().getTrackSize() == 0 || musicPlayer.isShuffleMode())) {
                             // Add track ending time
-                            long endingTime = System.currentTimeMillis() + (track.getDuration() - track.getPosition());
-                            embedBuilder.addField("Fin", String.format("<t:%d:R>", endingTime / 1000), false);
+                            StringBuilder endingTime = new StringBuilder();
+                            if (track.getDuration() != Long.MAX_VALUE) {
+                                long endingTimeMs = System.currentTimeMillis() + (track.getDuration() - track.getPosition());
+                                endingTime.append(String.format("<t:%d:R>", endingTimeMs / 1000));
+                            } else {
+                                endingTime.append("∞");
+                            }
+                            embedBuilder.addField("Fin", endingTime.toString(), false);
                         }
                         // Add queue size
                         if (musicPlayer.getListener().getTrackSize() > 0) {
@@ -86,13 +92,20 @@ public class MusicPlayerMessage {
                                 topQueue.append("Mode aléatoire");
                             } else {
                                 int i = 0;
-                                long endingTime = System.currentTimeMillis() + (track.getDuration() - track.getPosition());
+                                long endingTimeMs = -1;
+                                if (track.getDuration() != Long.MAX_VALUE) {
+                                    endingTimeMs = System.currentTimeMillis() + (track.getDuration() - track.getPosition());
+                                }
                                 for (AudioTrack queueTrack : musicPlayer.getListener().getTracks()) {
-                                    if (musicPlayer.getAudioPlayer().isPaused()) {
+                                    if (musicPlayer.getAudioPlayer().isPaused() || endingTimeMs == -1) {
                                         topQueue.append(String.format("%s. [%s](%s)%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri));
                                     } else {
-                                        topQueue.append(String.format("%s. [%s](%s) - <t:%d:R>%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri, endingTime / 1000));
-                                        endingTime += queueTrack.getDuration();
+                                        topQueue.append(String.format("%s. [%s](%s) - <t:%d:R>%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri, endingTimeMs / 1000));
+                                        if (queueTrack.getDuration() != Long.MAX_VALUE) {
+                                            endingTimeMs += queueTrack.getDuration();
+                                        } else {
+                                            endingTimeMs = -1;
+                                        }
                                     }
                                     i++;
                                     // Limit to 5 tracks
