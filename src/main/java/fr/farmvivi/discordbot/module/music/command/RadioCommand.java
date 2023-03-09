@@ -97,11 +97,11 @@ public class RadioCommand extends Command {
                 String line;
                 while ((line = br.readLine()) != null) {
                     if (line.startsWith("http")) {
-                        musicModule.loadTrack(guild, line, null);
+                        musicModule.loadTrack(guild, line, null, null, false);
                     } else {
                         String musicFile = uri.substring(0, uri.lastIndexOf(File.separator) + 1) + line;
                         musicModule.getLogger().info("Adding radio track: " + musicFile);
-                        musicModule.loadTrack(guild, musicFile, null);
+                        musicModule.loadTrack(guild, musicFile, null, null, false);
                     }
                 }
             } catch (IOException ex) {

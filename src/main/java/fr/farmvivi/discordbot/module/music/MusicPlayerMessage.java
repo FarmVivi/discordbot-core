@@ -6,12 +6,15 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
-import java.util.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 public class MusicPlayerMessage {
@@ -66,14 +69,17 @@ public class MusicPlayerMessage {
                     // Check if track is null = no music playing
                     if (track == null) {
                         embedBuilder.setTitle("Aucune musique en cours de lecture");
+                        embedBuilder.setColor(new Color(224, 16, 16));
                     }
                     // Check if track is paused
                     else if (musicPlayer.getAudioPlayer().isPaused()) {
                         embedBuilder.setTitle("Musique en pause");
+                        embedBuilder.setColor(new Color(234, 184, 6));
                     }
                     // Track is playing
                     else {
                         embedBuilder.setTitle("Musique en cours de lecture");
+                        embedBuilder.setColor(new Color(109, 224, 16));
                     }
 
                     if (track != null) {
@@ -127,6 +133,10 @@ public class MusicPlayerMessage {
                     List<ItemComponent> buttonsRow1 = new ArrayList<>();
                     List<ItemComponent> buttonsRow2 = new ArrayList<>();
                     List<ItemComponent> buttonsRow3 = new ArrayList<>();
+
+                    // Add to queue
+                    Button addToQueueButton = Button.primary(getButtonID("add"), "🆕");
+                    buttonsRow1.add(addToQueueButton);
 
                     // Play / Pause
                     if (track != null) {
@@ -225,13 +235,7 @@ public class MusicPlayerMessage {
                                     // Edit message
                                     MessageEditBuilder builder = new MessageEditBuilder();
                                     builder.setEmbeds(embedBuilder.build());
-                                    List<LayoutComponent> components = new LinkedList<>();
-                                    if (!buttonsRow1.isEmpty()) {
-                                        components.add(ActionRow.of(buttonsRow1));
-                                    }
-                                    components.add(ActionRow.of(buttonsRow2));
-                                    components.add(ActionRow.of(buttonsRow3));
-                                    builder.setComponents(components);
+                                    builder.setComponents(ActionRow.of(buttonsRow1), ActionRow.of(buttonsRow2), ActionRow.of(buttonsRow3));
                                     lastMessage.editMessage(builder.build()).queue(m -> {
                                         message = m;
                                         semaphore.release();
@@ -241,12 +245,8 @@ public class MusicPlayerMessage {
                             }
                             // Delete old message, send new message and release semaphore
                             MessageCreateBuilder builder = new MessageCreateBuilder();
-                            builder.addEmbeds(embedBuilder.build());
-                            if (!buttonsRow1.isEmpty()) {
-                                builder.addActionRow(buttonsRow1);
-                            }
-                            builder.addActionRow(buttonsRow2);
-                            builder.addActionRow(buttonsRow3);
+                            builder.setEmbeds(embedBuilder.build());
+                            builder.setComponents(ActionRow.of(buttonsRow1), ActionRow.of(buttonsRow2), ActionRow.of(buttonsRow3));
                             messageChannel.sendMessage(builder.build()).queue(m -> {
                                 // Delete old message
                                 if (message != null) {
@@ -262,7 +262,7 @@ public class MusicPlayerMessage {
         };
 
         // Schedule timer task
-        debounceTimer.schedule(debounceTask, 1000);
+        debounceTimer.schedule(debounceTask, 500);
     }
 
     private String getButtonID(String action) {

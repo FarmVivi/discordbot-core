@@ -208,22 +208,12 @@ public class MusicModule extends Module {
         return audioPlayerManager;
     }
 
-    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel) {
-        this.loadTrack(guild, source, messageChannel, null);
-    }
-
-    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel, boolean playNow) {
-        this.loadTrack(guild, source, messageChannel, null, playNow);
-    }
-
-    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel, CommandMessageBuilder reply) {
-        this.loadTrack(guild, source, messageChannel, reply, false);
-    }
-
     public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel, CommandMessageBuilder reply, boolean playNow) {
         MusicPlayer player = getPlayer(guild);
 
-        player.getMusicPlayerMessage().setMessageChannel(messageChannel);
+        if (messageChannel != null) {
+            player.getMusicPlayerMessage().setMessageChannel(messageChannel);
+        }
         player.getMusicPlayerMessage().refreshMessage();
 
         guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());

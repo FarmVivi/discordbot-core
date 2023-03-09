@@ -2,8 +2,8 @@ package fr.farmvivi.discordbot.module.commands;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -43,11 +43,11 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     public void replyNow() {
         if (differ) {
             differ = false;
-            if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+            if (event instanceof IDeferrableCallback deferrableCallback) {
                 if (isEmpty()) {
-                    slashCommandInteractionEvent.getHook().deleteOriginal().queue();
+                    deferrableCallback.getHook().deleteOriginal().queue();
                 } else {
-                    WebhookMessageEditAction<Message> messageWebhookMessageEditAction = slashCommandInteractionEvent.getHook().editOriginal(this.getContent());
+                    WebhookMessageEditAction<Message> messageWebhookMessageEditAction = deferrableCallback.getHook().editOriginal(this.getContent());
                     if (isEphemeral()) {
                         messageWebhookMessageEditAction.delay(1, TimeUnit.MINUTES).flatMap(Predicate.not(Message::isEphemeral), Message::delete).queue();
                     } else {
