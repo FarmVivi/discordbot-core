@@ -77,7 +77,7 @@ public class MusicPlayerMessage {
                         if (!musicPlayer.getAudioPlayer().isPaused() && (musicPlayer.getListener().getTrackSize() == 0 || musicPlayer.isShuffleMode())) {
                             // Add track ending time
                             long endingTime = System.currentTimeMillis() + (track.getDuration() - track.getPosition());
-                            embedBuilder.addField("Fin du titre", String.format("<t:%d:R>", endingTime / 1000), false);
+                            embedBuilder.addField("Fin", String.format("<t:%d:R>", endingTime / 1000), false);
                         }
                         // Add queue size
                         if (musicPlayer.getListener().getTrackSize() > 0) {
@@ -195,7 +195,7 @@ public class MusicPlayerMessage {
         };
 
         // Schedule timer task
-        debounceTimer.schedule(debounceTask, 500);
+        debounceTimer.schedule(debounceTask, 1000);
     }
 
     private String getButtonID(String action) {

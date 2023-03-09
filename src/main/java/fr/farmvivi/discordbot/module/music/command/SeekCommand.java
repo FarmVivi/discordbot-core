@@ -60,6 +60,7 @@ public class SeekCommand extends Command {
         }
 
         musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().setPosition(startTime);
+        musicModule.getPlayer(guild).getMusicPlayerMessage().refreshMessage();
         reply.addContent("Seek to **" + time + "**");
 
         return true;

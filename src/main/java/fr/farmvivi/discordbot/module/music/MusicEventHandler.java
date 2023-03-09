@@ -37,6 +37,8 @@ public class MusicEventHandler extends ListenerAdapter {
 
         String guildId = MusicModule.getGuildID(id);
         if (!guildId.equals(event.getGuild().getId())) {
+            // Send error message
+            event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
             return;
         }
 
@@ -58,6 +60,12 @@ public class MusicEventHandler extends ListenerAdapter {
             case "loop" -> musicPlayer.setLoopMode(!musicPlayer.isLoopMode());
             case "loopqueue" -> musicPlayer.setLoopQueueMode(!musicPlayer.isLoopQueueMode());
             case "shuffle" -> musicPlayer.setShuffleMode(!musicPlayer.isShuffleMode());
+            default -> event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
+        }
+
+        // Delete interaction
+        if (!event.isAcknowledged()) {
+            event.deferEdit().queue();
         }
     }
 }

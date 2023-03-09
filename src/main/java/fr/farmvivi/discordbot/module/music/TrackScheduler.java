@@ -125,10 +125,10 @@ public class TrackScheduler extends AudioEventAdapter {
                 tracks.offer(track.makeClone());
             }
             nextTrack();
-        } else {
-            // End of the queue
-            this.player.getMusicPlayerMessage().refreshMessage();
         }
+
+        // End of the queue
+        this.player.getMusicPlayerMessage().refreshMessage();
 
         // endReason == FINISHED: A track finished or died by an exception (mayStartNext
         // = true).
