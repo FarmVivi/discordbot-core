@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -89,6 +90,9 @@ public class MusicPlayer {
     public void clearQueue() {
         this.trackScheduler.getTracks().clear();
         this.musicPlayerMessage.refreshMessage();
+
+        // Log : [<Guild name> (Guild id)] Queue cleared
+        this.musicModule.getLogger().info(String.format("[%s (%s)] Queue cleared", this.guild.getName(), this.guild.getId()));
     }
 
     public int getVolume() {
@@ -101,6 +105,10 @@ public class MusicPlayer {
             this.lastVolume = lastVolume;
         }
         this.audioPlayer.setVolume(volume);
+
+        // Log : [<Guild name> (Guild id)] Volume changed to <volume>
+        this.musicModule.getLogger().info(String.format("[%s (%s)] Volume changed to %d%%", this.guild.getName(), this.guild.getId(), volume));
+
         this.musicPlayerMessage.refreshMessage();
     }
 

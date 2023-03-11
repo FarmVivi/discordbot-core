@@ -36,13 +36,13 @@ public class MusicEventHandler extends ListenerAdapter {
 
             // If the bot joined a channel
             if (joinedChannel != null && leftChannel == null) {
-                // Log : [<Guild name> (Guild id)] Bot joined channel <Channel name> (Channel id)
-                logger.info(String.format("[%s (%s)] Bot joined channel %s (%s)", guild.getName(), guild.getId(), joinedChannel.getName(), joinedChannel.getId()));
+                // Log : [<Guild name> (Guild id)] Bot joined channel "Channel name" (Channel id)
+                logger.info(String.format("[%s (%s)] Bot joined channel \"%s\" (%s)", guild.getName(), guild.getId(), joinedChannel.getName(), joinedChannel.getId()));
             }
             // If the bot left a channel
             else if (leftChannel != null && joinedChannel == null) {
-                // Log : [<Guild name> (Guild id)] Bot left channel <Channel name> (Channel id)
-                logger.info(String.format("[%s (%s)] Bot left channel %s (%s)", guild.getName(), guild.getId(), leftChannel.getName(), leftChannel.getId()));
+                // Log : [<Guild name> (Guild id)] Bot left channel "Channel name" (Channel id)
+                logger.info(String.format("[%s (%s)] Bot left channel \"%s\" (%s)", guild.getName(), guild.getId(), leftChannel.getName(), leftChannel.getId()));
 
                 MusicPlayer musicPlayer = musicModule.getPlayer(event.getGuild());
                 musicPlayer.getAudioPlayer().setPaused(false);
@@ -53,8 +53,8 @@ public class MusicEventHandler extends ListenerAdapter {
             }
             // If the bot moved to another channel
             else if (leftChannel != null && joinedChannel != null) {
-                // Log : [<Guild name> (Guild id)] Bot moved from channel <Channel name> (Channel id) to channel <Channel name> (Channel id)
-                logger.info(String.format("[%s (%s)] Bot moved from channel %s (%s) to channel %s (%s)", guild.getName(), guild.getId(), leftChannel.getName(), leftChannel.getId(), joinedChannel.getName(), joinedChannel.getId()));
+                // Log : [<Guild name> (Guild id)] Bot moved from channel "Channel name" (Channel id) to channel "Channel name" (Channel id)
+                logger.info(String.format("[%s (%s)] Bot moved from channel \"%s\" (%s) to channel \"%s\" (%s)", guild.getName(), guild.getId(), leftChannel.getName(), leftChannel.getId(), joinedChannel.getName(), joinedChannel.getId()));
             }
         }
     }

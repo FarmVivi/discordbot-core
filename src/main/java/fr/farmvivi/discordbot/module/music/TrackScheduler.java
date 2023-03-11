@@ -39,21 +39,24 @@ public class TrackScheduler extends AudioEventAdapter {
         Guild guild = player.getGuild();
 
         if (quitTask != null) {
-            // Log : [<Guild name> (Guild id)] Cancel quit task
-            logger.info(String.format("[%s (%s)] Canceling quit task", guild.getName(), guild.getId()));
-
             quitTask.cancel(true);
             quitTask = null;
-        }
 
-        // Log : [<Guild name> (Guild id)] Track added to queue : <Track name> (Link) (now = <true/false>)
-        logger.info(String.format("[%s (%s)] Track added to queue : %s (%s) (first = %s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri, playNow));
+            // Log : [<Guild name> (Guild id)] Quit task canceled
+            logger.info(String.format("[%s (%s)] Quit task canceled", guild.getName(), guild.getId()));
+        }
 
         if (!player.getAudioPlayer().startTrack(track, true)) {
             if (playNow) {
                 tracks.addFirst(track);
+
+                // Log : [<Guild name> (Guild id)] Track added to queue (first) : "Track name" (Link)
+                logger.info(String.format("[%s (%s)] Track added to queue (first) : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
             } else {
                 tracks.offer(track);
+
+                // Log : [<Guild name> (Guild id)] Track added to queue : "Track name" (Link)
+                logger.info(String.format("[%s (%s)] Track added to queue : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
             }
 
             // Refresh player message
@@ -69,8 +72,13 @@ public class TrackScheduler extends AudioEventAdapter {
         Logger logger = player.getMusicModule().getLogger();
         Guild guild = player.getGuild();
 
-        // Log : [<Guild name> (Guild id)] Next track (delete = <true/false>)
-        logger.info(String.format("[%s (%s)] Next track (delete = %s)", guild.getName(), guild.getId(), delete));
+        if (delete) {
+            // Log : [<Guild name> (Guild id)] Skipping track...
+            logger.info(String.format("[%s (%s)] Skipping track...", guild.getName(), guild.getId()));
+        } else {
+            // Log : [<Guild name> (Guild id)] Playing next track...
+            logger.info(String.format("[%s (%s)] Playing next track...", guild.getName(), guild.getId()));
+        }
 
         if (!delete && player.getAudioPlayer().getPlayingTrack() != null) {
             AudioTrack currentTrack = player.getAudioPlayer().getPlayingTrack();
@@ -143,8 +151,8 @@ public class TrackScheduler extends AudioEventAdapter {
         Logger logger = this.player.getMusicModule().getLogger();
         Guild guild = this.player.getGuild();
 
-        // Log : [<Guild name> (Guild id)] Track started : <Track name> (Link)
-        logger.info(String.format("[%s (%s)] Track started : %s (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
+        // Log : [<Guild name> (Guild id)] Track started : "Track name" (Link)
+        logger.info(String.format("[%s (%s)] Track started : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
         // A track started playing
         this.player.getMusicPlayerMessage().refreshMessage();
@@ -161,8 +169,8 @@ public class TrackScheduler extends AudioEventAdapter {
         Logger logger = this.player.getMusicModule().getLogger();
         Guild guild = this.player.getGuild();
 
-        // Log : [<Guild name> (Guild id)] Track ended : <Track name> (Link) (reason = <reason>) (startNext = <true/false>)
-        logger.info(String.format("[%s (%s)] Track ended : %s (%s) (reason = %s) (startNext = %s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri, endReason.name(), endReason.mayStartNext));
+        // Log : [<Guild name> (Guild id)] Track ended : "Track name" (Link) (Reason)
+        logger.info(String.format("[%s (%s)] Track ended : \"%s\" (%s) (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri, endReason.name()));
 
         // End of the queue
         this.player.getMusicPlayerMessage().refreshMessage();

@@ -55,11 +55,11 @@ public class MusicPlayerMessage {
 
                 // If bot is disconnected
                 if (!musicPlayer.getGuild().getAudioManager().isConnected()) {
-                    // Log : [<Guild name> (Guild id)] Deleting player message...
-                    logger.info(String.format("[%s (%s)] Deleting player message...", guild.getName(), guild.getId()));
-
                     // Delete old message
                     if (message != null) {
+                        // Log : [<Guild name> (Guild id)] Deleting player message...
+                        logger.info(String.format("[%s (%s)] Deleting player message...", guild.getName(), guild.getId()));
+
                         message.delete().queue();
                         message = null;
                     }

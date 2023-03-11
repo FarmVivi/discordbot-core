@@ -225,8 +225,8 @@ public class MusicModule extends Module {
         audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                // Log : [<Guild name> (Guild id)] Track loaded: <Track name> (Link: <Track link>)
-                logger.info(String.format("[%s (%s)] Track loaded : %s (Link: %s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
+                // Log : [<Guild name> (Guild id)] Track loaded: "Track name" (Link)
+                logger.info(String.format("[%s (%s)] Track loaded : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
                 if (reply != null) {
                     reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
@@ -248,8 +248,8 @@ public class MusicModule extends Module {
                 if (playlist.isSearchResult()) {
                     AudioTrack track = playlist.getTracks().get(0);
 
-                    // Log : [<Guild name> (Guild id)] Track loaded (search): <Track name> (Link: <Track link>)
-                    logger.info(String.format("[%s (%s)] Track loaded (search): %s (Link: %s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
+                    // Log : [<Guild name> (Guild id)] Track loaded (search): "Track name" (Link)
+                    logger.info(String.format("[%s (%s)] Track loaded (search): \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
                     builder.append("**").append(track.getInfo().title).append("** ajouté à la file d'attente.");
 
@@ -263,8 +263,8 @@ public class MusicModule extends Module {
                 else {
                     List<AudioTrack> tracks = playlist.getTracks();
 
-                    // Log : [<Guild name> (Guild id)] Playlist loaded: <Playlist name> (<Playlist size> tracks)
-                    logger.info(String.format("[%s (%s)] Playlist loaded: %s (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), tracks.size()));
+                    // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (<Playlist size> tracks)
+                    logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), tracks.size()));
 
                     builder.append("Ajout de la playlist **").append(playlist.getName()).append("** à la file d'attente (").append(playlist.getTracks().size()).append(" piste(s))");
 
