@@ -215,7 +215,6 @@ public class MusicModule extends Module {
         if (messageChannel != null) {
             player.getMusicPlayerMessage().setMessageChannel(messageChannel);
         }
-        player.getMusicPlayerMessage().refreshMessage();
 
         guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
 
