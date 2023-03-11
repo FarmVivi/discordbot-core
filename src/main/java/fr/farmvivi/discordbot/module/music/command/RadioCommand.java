@@ -84,7 +84,7 @@ public class RadioCommand extends Command {
         MusicPlayer musicPlayer = musicModule.getPlayer(guild);
 
         musicPlayer.getAudioPlayer().setPaused(false);
-        musicPlayer.getListener().getTracks().clear();
+        musicPlayer.clearQueue();
         musicPlayer.skipTrack();
 
         musicPlayer.resetToDefaultSettings();

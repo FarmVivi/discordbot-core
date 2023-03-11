@@ -215,8 +215,4 @@ public class TrackScheduler extends AudioEventAdapter {
     public LinkedList<AudioTrack> getTracks() {
         return tracks;
     }
-
-    public int getTrackSize() {
-        return tracks.size();
-    }
 }

@@ -33,13 +33,12 @@ public class ClearQueueCommand extends Command {
             return false;
         }
 
-        if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
+        if (musicModule.getPlayer(guild).getQueueSize() == 0) {
             reply.addContent("Il n'y a pas de musique dans la file d'attente.");
             return false;
         }
 
-        musicModule.getPlayer(guild).getListener().getTracks().clear();
-        musicModule.getPlayer(guild).getMusicPlayerMessage().refreshMessage();
+        musicModule.getPlayer(guild).clearQueue();
         reply.addContent("La liste d'attente à été vidé.");
 
         return true;

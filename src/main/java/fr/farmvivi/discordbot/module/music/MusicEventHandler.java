@@ -46,7 +46,7 @@ public class MusicEventHandler extends ListenerAdapter {
 
                 MusicPlayer musicPlayer = musicModule.getPlayer(event.getGuild());
                 musicPlayer.getAudioPlayer().setPaused(false);
-                musicPlayer.getListener().getTracks().clear();
+                musicPlayer.clearQueue();
                 musicPlayer.skipTrack();
                 musicPlayer.resetToDefaultSettings();
                 Bot.setDefaultActivity();
@@ -115,13 +115,10 @@ public class MusicEventHandler extends ListenerAdapter {
             }
             case "stop" -> {
                 musicPlayer.getAudioPlayer().setPaused(false);
-                musicPlayer.getListener().getTracks().clear();
+                musicPlayer.clearQueue();
                 musicPlayer.skipTrack();
             }
-            case "clearqueue" -> {
-                musicPlayer.getListener().getTracks().clear();
-                musicPlayer.getMusicPlayerMessage().refreshMessage();
-            }
+            case "clearqueue" -> musicPlayer.clearQueue();
             case "loop" -> musicPlayer.setLoopMode(!musicPlayer.isLoopMode());
             case "loopqueue" -> musicPlayer.setLoopQueueMode(!musicPlayer.isLoopQueueMode());
             case "shuffle" -> musicPlayer.setShuffleMode(!musicPlayer.isShuffleMode());

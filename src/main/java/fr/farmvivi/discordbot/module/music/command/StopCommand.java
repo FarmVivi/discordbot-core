@@ -34,7 +34,7 @@ public class StopCommand extends Command {
 
         MusicPlayer musicPlayer = musicModule.getPlayer(guild);
         musicPlayer.getAudioPlayer().setPaused(false);
-        musicPlayer.getListener().getTracks().clear();
+        musicPlayer.clearQueue();
         musicPlayer.skipTrack();
 
         reply.addContent("La musique a été stoppée.");

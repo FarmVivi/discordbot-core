@@ -96,7 +96,7 @@ public class MusicPlayerMessage {
                     if (track != null) {
                         // Add track info title (with link)
                         embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
-                        if (!musicPlayer.getAudioPlayer().isPaused() && (musicPlayer.getListener().getTrackSize() == 0 || musicPlayer.isShuffleMode())) {
+                        if (!musicPlayer.getAudioPlayer().isPaused() && (musicPlayer.getQueueSize() == 0 || musicPlayer.isShuffleMode())) {
                             // Add track ending time
                             StringBuilder endingTime = new StringBuilder();
                             if (track.getDuration() != Long.MAX_VALUE) {
@@ -108,7 +108,7 @@ public class MusicPlayerMessage {
                             embedBuilder.addField("Fin", endingTime.toString(), false);
                         }
                         // Add queue size
-                        if (musicPlayer.getListener().getTrackSize() > 0) {
+                        if (musicPlayer.getQueueSize() > 0) {
                             StringBuilder topQueue = new StringBuilder();
                             if (musicPlayer.isShuffleMode()) {
                                 topQueue.append("Mode aléatoire");
@@ -118,7 +118,7 @@ public class MusicPlayerMessage {
                                 if (track.getDuration() != Long.MAX_VALUE) {
                                     endingTimeMs = System.currentTimeMillis() + (track.getDuration() - track.getPosition());
                                 }
-                                for (AudioTrack queueTrack : musicPlayer.getListener().getTracks()) {
+                                for (AudioTrack queueTrack : musicPlayer.getQueue()) {
                                     if (musicPlayer.getAudioPlayer().isPaused() || endingTimeMs == -1) {
                                         topQueue.append(String.format("%s. [%s](%s)%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri));
                                     } else {
@@ -136,7 +136,7 @@ public class MusicPlayerMessage {
                                     }
                                 }
                             }
-                            embedBuilder.addField("File d'attente (" + musicPlayer.getListener().getTrackSize() + ")", topQueue.toString(), false);
+                            embedBuilder.addField("File d'attente (" + musicPlayer.getQueueSize() + ")", topQueue.toString(), false);
                         }
                     }
 
@@ -161,7 +161,7 @@ public class MusicPlayerMessage {
                     }
 
                     // Skip track
-                    if (musicPlayer.getListener().getTrackSize() > 0) {
+                    if (musicPlayer.getQueueSize() > 0) {
                         Button nextButton = Button.primary(getButtonID("skip"), "⏭️");
                         buttonsRow1.add(nextButton);
                     }
@@ -173,7 +173,7 @@ public class MusicPlayerMessage {
                     }
 
                     // Clear queue
-                    if (musicPlayer.getListener().getTrackSize() > 0) {
+                    if (musicPlayer.getQueueSize() > 0) {
                         Button clearQueueButton = Button.secondary(getButtonID("clearqueue"), "🗑️");
                         buttonsRow1.add(clearQueueButton);
                     }

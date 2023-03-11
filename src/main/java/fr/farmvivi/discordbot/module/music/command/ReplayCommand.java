@@ -36,7 +36,7 @@ public class ReplayCommand extends Command {
         if (currentTrack == null)
             return false;
 
-        musicModule.getPlayer(guild).getListener().queue(currentTrack.makeClone(), true);
+        musicModule.getPlayer(guild).playTrackNow(currentTrack.makeClone());
         reply.addContent("La piste **" + currentTrack.getInfo().title + "** va être rejoué");
 
         return true;

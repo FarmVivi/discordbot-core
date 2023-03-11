@@ -5,6 +5,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
 
+import java.util.List;
+
 public class MusicPlayer {
     private final MusicModule musicModule;
     private final AudioPlayer audioPlayer;
@@ -48,10 +50,6 @@ public class MusicPlayer {
         return equalizer;
     }
 
-    public TrackScheduler getListener() {
-        return trackScheduler;
-    }
-
     public AudioPlayerSendHandler getAudioPlayerSendHandler() {
         return new AudioPlayerSendHandler(audioPlayer);
     }
@@ -80,13 +78,16 @@ public class MusicPlayer {
         return trackScheduler.nextTrack(delete);
     }
 
-    public void resetToDefaultSettings() {
-        this.loopQueueMode = false;
-        this.loopMode = false;
-        this.shuffleMode = false;
-        audioPlayer.setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
-        audioPlayer.setFilterFactory(null);
-        this.equalizer = new EqualizerFactory();
+    public int getQueueSize() {
+        return this.trackScheduler.getTracks().size();
+    }
+
+    public List<AudioTrack> getQueue() {
+        return this.trackScheduler.getTracks();
+    }
+
+    public void clearQueue() {
+        this.trackScheduler.getTracks().clear();
         this.musicPlayerMessage.refreshMessage();
     }
 
@@ -135,5 +136,15 @@ public class MusicPlayer {
             this.musicPlayerMessage.refreshMessage();
             this.shuffleMode = shuffleMode;
         }
+    }
+
+    public void resetToDefaultSettings() {
+        this.loopQueueMode = false;
+        this.loopMode = false;
+        this.shuffleMode = false;
+        audioPlayer.setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
+        audioPlayer.setFilterFactory(null);
+        this.equalizer = new EqualizerFactory();
+        this.musicPlayerMessage.refreshMessage();
     }
 }
