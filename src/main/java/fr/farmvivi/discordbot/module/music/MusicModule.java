@@ -162,7 +162,6 @@ public class MusicModule extends Module {
         if (!botConfig.radioPath.equalsIgnoreCase(""))
             commandsModule.registerCommand(module, new RadioCommand(this, botConfig));
 
-        commandsModule.registerCommand(module, new EffectCommand(this));
         commandsModule.registerCommand(module, new KaraokeCommand(this));
         commandsModule.registerCommand(module, new DistortionCommand(this));
         commandsModule.registerCommand(module, new LowPassCommand(this));

@@ -8,24 +8,29 @@ import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Collections;
+import java.util.Map;
 
 public class VibratoCommand extends Command {
     private final MusicModule musicModule;
 
     public VibratoCommand(MusicModule musicModule) {
-        super("vibrato", CommandCategory.MUSIC, "Active l'effet vibrato", new OptionData[]{
-                new OptionData(OptionType.NUMBER, "depth", "Profondeur de l'effet")});
+        super("vibrato", CommandCategory.MUSIC, "Active l'effet vibrato");
+
+        OptionData depthOption = new OptionData(OptionType.NUMBER, "depth", "Profondeur de l'effet", true);
+
+        this.setArgs(new OptionData[]{depthOption});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();
@@ -35,13 +40,15 @@ public class VibratoCommand extends Command {
             return false;
         }
 
+        float depth = Float.parseFloat(args.get("depth").getAsString());
+
         MusicPlayer musicPlayer = musicModule.getPlayer(guild);
         musicPlayer.getAudioPlayer().setFilterFactory((track, format, output) -> {
             VibratoPcmAudioFilter vibratoPcmAudioFilter = new VibratoPcmAudioFilter(output, format.channelCount, format.sampleRate);
-            vibratoPcmAudioFilter.setDepth(Float.parseFloat(content));
+            vibratoPcmAudioFilter.setDepth(depth);
             return Collections.singletonList(vibratoPcmAudioFilter);
         });
-        reply.addContent("**Effet vibrato** " + content + " activé.");
+        reply.addContent("**Effet vibrato** " + depth + " activé.");
 
         return true;
     }

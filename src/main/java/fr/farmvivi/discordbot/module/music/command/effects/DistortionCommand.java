@@ -8,8 +8,10 @@ import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.MusicPlayer;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Collections;
+import java.util.Map;
 
 public class DistortionCommand extends Command {
     private final MusicModule musicModule;
@@ -21,8 +23,8 @@ public class DistortionCommand extends Command {
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();
