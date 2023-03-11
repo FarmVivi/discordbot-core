@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
-import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -114,6 +113,9 @@ public class MusicPlayer {
 
     public void mute() {
         this.setVolume(0);
+
+        // Log : [<Guild name> (Guild id)] Muted
+        this.musicModule.getLogger().info(String.format("[%s (%s)] Muted", this.guild.getName(), this.guild.getId()));
     }
 
     public void unmute() {
@@ -121,6 +123,9 @@ public class MusicPlayer {
             this.lastVolume = MusicModule.DEFAULT_VOICE_VOLUME;
         }
         this.setVolume(this.lastVolume);
+
+        // Log : [<Guild name> (Guild id)] Unmuted
+        this.musicModule.getLogger().info(String.format("[%s (%s)] Unmuted", this.guild.getName(), this.guild.getId()));
     }
 
     public boolean isLoopQueueMode() {
@@ -129,8 +134,17 @@ public class MusicPlayer {
 
     public void setLoopQueueMode(boolean loopQueueMode) {
         if (this.loopQueueMode != loopQueueMode) {
-            this.musicPlayerMessage.refreshMessage();
             this.loopQueueMode = loopQueueMode;
+
+            if (loopQueueMode) {
+                // Log : [<Guild name> (Guild id)] Loop queue mode enabled
+                this.musicModule.getLogger().info(String.format("[%s (%s)] Loop queue mode enabled", this.guild.getName(), this.guild.getId()));
+            } else {
+                // Log : [<Guild name> (Guild id)] Loop queue mode disabled
+                this.musicModule.getLogger().info(String.format("[%s (%s)] Loop queue mode disabled", this.guild.getName(), this.guild.getId()));
+            }
+
+            this.musicPlayerMessage.refreshMessage();
         }
     }
 
@@ -140,8 +154,17 @@ public class MusicPlayer {
 
     public void setLoopMode(boolean loopMode) {
         if (this.loopMode != loopMode) {
-            this.musicPlayerMessage.refreshMessage();
             this.loopMode = loopMode;
+
+            if (loopMode) {
+                // Log : [<Guild name> (Guild id)] Loop mode enabled
+                this.musicModule.getLogger().info(String.format("[%s (%s)] Loop mode enabled", this.guild.getName(), this.guild.getId()));
+            } else {
+                // Log : [<Guild name> (Guild id)] Loop mode disabled
+                this.musicModule.getLogger().info(String.format("[%s (%s)] Loop mode disabled", this.guild.getName(), this.guild.getId()));
+            }
+
+            this.musicPlayerMessage.refreshMessage();
         }
     }
 
@@ -151,12 +174,24 @@ public class MusicPlayer {
 
     public void setShuffleMode(boolean shuffleMode) {
         if (this.shuffleMode != shuffleMode) {
-            this.musicPlayerMessage.refreshMessage();
             this.shuffleMode = shuffleMode;
+
+            if (shuffleMode) {
+                // Log : [<Guild name> (Guild id)] Shuffle mode enabled
+                this.musicModule.getLogger().info(String.format("[%s (%s)] Shuffle mode enabled", this.guild.getName(), this.guild.getId()));
+            } else {
+                // Log : [<Guild name> (Guild id)] Shuffle mode disabled
+                this.musicModule.getLogger().info(String.format("[%s (%s)] Shuffle mode disabled", this.guild.getName(), this.guild.getId()));
+            }
+
+            this.musicPlayerMessage.refreshMessage();
         }
     }
 
     public void resetToDefaultSettings() {
+        // Log : [<Guild name> (Guild id)] Resetting to default settings...
+        this.musicModule.getLogger().info(String.format("[%s (%s)] Resetting to default settings...", this.guild.getName(), this.guild.getId()));
+
         this.setLoopQueueMode(false);
         this.setLoopMode(false);
         this.setShuffleMode(false);
