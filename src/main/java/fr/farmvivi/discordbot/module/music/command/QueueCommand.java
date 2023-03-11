@@ -7,31 +7,36 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import java.util.Map;
 
 public class QueueCommand extends Command {
     private final MusicModule musicModule;
 
     public QueueCommand(MusicModule musicModule) {
-        super("queue", CommandCategory.MUSIC, "Affiche la file d'attente", new String[]{"viewqueue", "view-queue"});
+        super("queue", CommandCategory.MUSIC, "Affiche la file d'attente");
+
+        this.setAliases(new String[]{"viewqueue", "view-queue"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();
 
-        if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
+        if (musicModule.getPlayer(guild).getQueueSize() == 0) {
             reply.addContent("Il n'y a pas de musique dans la file d'attente.");
             return true;
         }
 
         StringBuilder builder = new StringBuilder();
         builder.append("**Queue** :");
-        for (AudioTrack track : musicModule.getPlayer(guild).getListener().getTracks())
+        for (AudioTrack track : musicModule.getPlayer(guild).getQueue())
             builder.append("\n-> **").append(track.getInfo().title).append("**");
         reply.addContent(builder.toString());
 

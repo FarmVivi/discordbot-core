@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.module.music;
 
-import com.github.topislavalinkplugins.topissourcemanagers.applemusic.AppleMusicSourceManager;
-import com.github.topislavalinkplugins.topissourcemanagers.spotify.SpotifyConfig;
-import com.github.topislavalinkplugins.topissourcemanagers.spotify.SpotifySourceManager;
+import com.github.topisenpai.lavasrc.applemusic.AppleMusicSourceManager;
+import com.github.topisenpai.lavasrc.mirror.DefaultMirroringAudioTrackResolver;
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -32,27 +32,29 @@ import fr.farmvivi.discordbot.module.music.command.equalizer.EqStartCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStopCommand;
 import fr.farmvivi.discordbot.module.music.sourcemanager.SearchSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MusicModule extends Module {
+    public static final String PLAYER_ID_PREFIX = "discordbot-music";
     public static final int QUIT_TIMEOUT = 900;
     public static final int DEFAULT_VOICE_VOLUME = 5;
     public static final int DEFAULT_RADIO_VOLUME = 25;
 
-    private final Modules module;
     private final Bot bot;
-    private final MusicListener musicListener;
+    private final MusicEventHandler musicEventHandler;
     private final AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
     private final Map<String, MusicPlayer> players = new HashMap<>();
 
-    public MusicModule(Modules module, Bot bot) {
-        super(module);
+    public MusicModule(Bot bot) {
+        super(Modules.MUSIC);
 
-        this.module = module;
         this.bot = bot;
-        this.musicListener = new MusicListener(this);
+        this.musicEventHandler = new MusicEventHandler(this);
     }
 
     @Override
@@ -70,30 +72,28 @@ public class MusicModule extends Module {
         try {
             String ytEmail = bot.getConfiguration().getValue("YOUTUBE_EMAIL");
             String ytPassword = bot.getConfiguration().getValue("YOUTUBE_PASSWORD");
-            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, 1, ytEmail, ytPassword);
+            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, ytEmail, ytPassword);
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Playing restricted youtube videos will throws exceptions because no credentials provided : " + e.getLocalizedMessage());
-            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, 1, null, null);
+            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, null, null);
         }
         audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
 
         // Spotify source provider
         // create a new config
         try {
-            SpotifyConfig spotifyConfig = new SpotifyConfig();
-            spotifyConfig.setClientId(bot.getConfiguration().getValue("SPOTIFY_ID"));
-            spotifyConfig.setClientSecret(bot.getConfiguration().getValue("SPOTIFY_TOKEN"));
-            spotifyConfig.setCountryCode(bot.getConfiguration().countryCode.getAlpha2());
+            String spotifyId = bot.getConfiguration().getValue("SPOTIFY_ID");
+            String spotifyToken = bot.getConfiguration().getValue("SPOTIFY_TOKEN");
 
             // create a new SpotifySourceManager with the default providers
-            audioPlayerManager.registerSourceManager(new SpotifySourceManager(null, spotifyConfig, 1, audioPlayerManager));
+            audioPlayerManager.registerSourceManager(new SpotifySourceManager(spotifyId, spotifyToken, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Could not initialise spotify source provider because, " + e.getLocalizedMessage());
         }
 
         // Apple Music source provider
         // create a new AppleMusicSourceManager with the default providers
-        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, bot.getConfiguration().countryCode.getAlpha2().toLowerCase(), 1, audioPlayerManager));
+        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
 
         // SoundCloud source provider
         SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
@@ -101,7 +101,7 @@ public class MusicModule extends Module {
         SoundCloudFormatHandler formatHandler = new DefaultSoundCloudFormatHandler();
         SoundCloudPlaylistLoader playlistLoader = new DefaultSoundCloudPlaylistLoader(dataLoader, dataReader, formatHandler);
 
-        audioPlayerManager.registerSourceManager(new SoundCloudAudioSourceManager(true, 1, dataReader, dataLoader, formatHandler, playlistLoader));
+        audioPlayerManager.registerSourceManager(new SoundCloudAudioSourceManager(true, dataReader, dataLoader, formatHandler, playlistLoader));
 
         // Bandcamp source provider
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
@@ -124,7 +124,7 @@ public class MusicModule extends Module {
         audioPlayerManager.registerSourceManager(new LocalAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
 
         // Search source provider
-        audioPlayerManager.registerSourceManager(new SearchSourceManager(youtubeAudioSourceManager, "ytmsearch:"));
+        audioPlayerManager.registerSourceManager(new SearchSourceManager(youtubeAudioSourceManager, "ytsearch:"));
 
         audioPlayerManager.getConfiguration().setFilterHotSwapEnabled(true);
     }
@@ -179,16 +179,24 @@ public class MusicModule extends Module {
 
         logger.info("Registering event listener...");
 
-        JDAManager.getJDA().addEventListener(musicListener);
+        JDAManager.getJDA().addEventListener(musicEventHandler);
     }
 
     @Override
     public void onPreDisable() {
         super.onPreDisable();
 
+        logger.info("Deleting all music players messages...");
+        for (MusicPlayer player : players.values()) {
+            Message message = player.getMusicPlayerMessage().getMessage();
+            if (message != null) {
+                message.delete().queue();
+            }
+        }
+
         logger.info("Unregistering event listener...");
 
-        JDAManager.getJDA().removeEventListener(musicListener);
+        JDAManager.getJDA().removeEventListener(musicEventHandler);
     }
 
     @Override
@@ -212,20 +220,12 @@ public class MusicModule extends Module {
         return audioPlayerManager;
     }
 
-    public void loadTrack(Guild guild, String source) {
-        this.loadTrack(guild, source, null);
-    }
-
-    public void loadTrack(Guild guild, String source, boolean playNow) {
-        this.loadTrack(guild, source, null, playNow);
-    }
-
-    public void loadTrack(Guild guild, String source, CommandMessageBuilder reply) {
-        this.loadTrack(guild, source, reply, false);
-    }
-
-    public void loadTrack(Guild guild, String source, CommandMessageBuilder reply, boolean playNow) {
+    public void loadTrack(Guild guild, String source, MessageChannelUnion messageChannel, CommandMessageBuilder reply, boolean playNow) {
         MusicPlayer player = getPlayer(guild);
+
+        if (messageChannel != null) {
+            player.getMusicPlayerMessage().setMessageChannel(messageChannel);
+        }
 
         guild.getAudioManager().setSendingHandler(player.getAudioPlayerSendHandler());
 
@@ -236,6 +236,9 @@ public class MusicModule extends Module {
         audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
+                // Log : [<Guild name> (Guild id)] Track loaded: "Track name" (Link)
+                logger.info(String.format("[%s (%s)] Track loaded : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
+
                 if (reply != null) {
                     reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
                     reply.replyNow();
@@ -252,11 +255,13 @@ public class MusicModule extends Module {
             public void playlistLoaded(AudioPlaylist playlist) {
                 StringBuilder builder = new StringBuilder();
 
-                String playlistName = playlist.getName();
-
-                // Si c'est le résultat d'une recherche
-                if (playlistName.matches(".* search \".*\"") && playlist.getTracks().size() == 1) {
+                // If the playlist is a search result, we only want to queue the first track
+                if (playlist.isSearchResult()) {
                     AudioTrack track = playlist.getTracks().get(0);
+
+                    // Log : [<Guild name> (Guild id)] Track loaded (search): "Track name" (Link)
+                    logger.info(String.format("[%s (%s)] Track loaded (search): \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
+
                     builder.append("**").append(track.getInfo().title).append("** ajouté à la file d'attente.");
 
                     if (playNow) {
@@ -264,14 +269,17 @@ public class MusicModule extends Module {
                     } else {
                         player.playTrack(track);
                     }
+                }
+                // Else we queue the whole playlist
+                else {
+                    List<AudioTrack> tracks = playlist.getTracks();
 
-                    // Sinon c'est que c'est une playlist normal
-                } else {
-                    builder.append("Ajout de la playlist **").append(playlistName).append("** :");
+                    // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (<Playlist size> tracks)
+                    logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), tracks.size()));
+
+                    builder.append("Ajout de la playlist **").append(playlist.getName()).append("** à la file d'attente (").append(playlist.getTracks().size()).append(" piste(s))");
 
                     for (AudioTrack track : playlist.getTracks()) {
-                        builder.append("\n-> **").append(track.getInfo().title).append("**");
-
                         if (playNow) {
                             player.playTrackNow(track);
                         } else {
@@ -288,27 +296,45 @@ public class MusicModule extends Module {
 
             @Override
             public void noMatches() {
+                // Log : [<Guild name> (Guild id)] Track not found: <Track name>
+                logger.warn(String.format("[%s (%s)] Track not found: %s", guild.getName(), guild.getId(), source));
+
                 // Notify the user that we've got nothing
                 if (reply != null) {
-                    reply.addContent("La piste " + source + " n'a pas été trouvé.");
+                    reply.addContent("Impossible de trouver la piste demandée.");
                     reply.setEphemeral(true);
                     reply.replyNow();
-                } else {
-                    logger.warn("La piste " + source + " n'a pas été trouvé.");
                 }
             }
 
             @Override
             public void loadFailed(FriendlyException throwable) {
+                // Log : [<Guild name> (Guild id)] Track load failed: <Track name> (Reason: <Reason>)
+                logger.error(String.format("[%s (%s)] Track load failed: %s (Reason: %s)", guild.getName(), guild.getId(), source, throwable.getMessage()));
+
                 // Notify the user that everything exploded
                 if (reply != null) {
-                    reply.addContent("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").");
+                    reply.addContent("Impossible de charger la piste demandée.");
                     reply.setEphemeral(true);
                     reply.replyNow();
-                } else {
-                    logger.warn("Impossible de jouer la piste.", throwable);
                 }
             }
         });
+    }
+
+    public static String getDiscordID(Guild guild, String action) {
+        return MusicModule.PLAYER_ID_PREFIX + "-" + guild.getId() + "-" + action;
+    }
+
+    public static String getGuildID(String discordID) {
+        // discordID = discordbot-music-<guildID>-<action>
+        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
+        return discordID.substring(index, discordID.indexOf("-", index));
+    }
+
+    public static String getAction(String discordID) {
+        // discordID = discordbot-music-<guildID>-<action>
+        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
+        return discordID.substring(discordID.indexOf("-", index) + 1);
     }
 }

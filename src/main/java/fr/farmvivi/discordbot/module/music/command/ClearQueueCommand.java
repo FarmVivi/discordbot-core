@@ -6,19 +6,24 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import java.util.Map;
 
 public class ClearQueueCommand extends Command {
     private final MusicModule musicModule;
 
     public ClearQueueCommand(MusicModule musicModule) {
-        super("clear-queue", CommandCategory.MUSIC, "Vide la file d'attente", new String[]{"clear", "clearqueue"});
+        super("clear-queue", CommandCategory.MUSIC, "Vide la file d'attente");
+
+        this.setAliases(new String[]{"clear", "clearqueue"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();
@@ -28,12 +33,12 @@ public class ClearQueueCommand extends Command {
             return false;
         }
 
-        if (musicModule.getPlayer(guild).getListener().getTracks().isEmpty()) {
+        if (musicModule.getPlayer(guild).getQueueSize() == 0) {
             reply.addContent("Il n'y a pas de musique dans la file d'attente.");
             return false;
         }
 
-        musicModule.getPlayer(guild).getListener().getTracks().clear();
+        musicModule.getPlayer(guild).clearQueue();
         reply.addContent("La liste d'attente à été vidé.");
 
         return true;

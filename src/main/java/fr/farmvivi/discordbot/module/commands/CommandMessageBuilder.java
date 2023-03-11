@@ -2,11 +2,12 @@ package fr.farmvivi.discordbot.module.commands;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -42,23 +43,43 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     public void replyNow() {
         if (differ) {
             differ = false;
-            if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
-                WebhookMessageEditAction<Message> messageWebhookMessageEditAction = slashCommandInteractionEvent.getHook().editOriginal(this.getContent());
-                if (isEphemeral()) {
-                    messageWebhookMessageEditAction.delay(1, TimeUnit.MINUTES).flatMap(Predicate.not(Message::isEphemeral), Message::delete).queue();
+            if (event instanceof IDeferrableCallback deferrableCallback) {
+                if (isEmpty()) {
+                    deferrableCallback.getHook().deleteOriginal().queue();
                 } else {
-                    messageWebhookMessageEditAction.queue();
+                    WebhookMessageEditAction<Message> messageWebhookMessageEditAction = deferrableCallback.getHook().editOriginal(this.getContent());
+                    if (isEphemeral()) {
+                        messageWebhookMessageEditAction.delay(1, TimeUnit.MINUTES).flatMap(Predicate.not(Message::isEphemeral), Message::delete).queue();
+                    } else {
+                        messageWebhookMessageEditAction.queue();
+                    }
                 }
             } else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
-                Message originalMessage = messageReceivedEvent.getMessage();
-                MessageCreateAction messageCreateAction = originalMessage.reply(this.build());
-                if (isEphemeral()) {
-                    messageCreateAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
+                if (!isEmpty()) {
+                    Message originalMessage = messageReceivedEvent.getMessage();
+                    MessageCreateAction messageCreateAction = originalMessage.reply(this.build());
+                    if (isEphemeral()) {
+                        messageCreateAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
+                        originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
+                    } else {
+                        messageCreateAction.queue();
+                    }
+                } else if (isEphemeral()) {
+                    Message originalMessage = messageReceivedEvent.getMessage();
                     originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
-                } else {
-                    messageCreateAction.queue();
                 }
             }
         }
+    }
+
+    @NotNull
+    @Override
+    public MessageCreateBuilder addContent(String content) {
+        // Limit message length
+        if (content.length() > Message.MAX_CONTENT_LENGTH) {
+            content = content.substring(0, Message.MAX_CONTENT_LENGTH - 3) + "...";
+        }
+
+        return super.addContent(content);
     }
 }

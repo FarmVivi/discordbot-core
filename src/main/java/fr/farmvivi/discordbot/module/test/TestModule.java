@@ -7,13 +7,11 @@ import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.test.command.TestCommand;
 
 public class TestModule extends Module {
-    private final Modules module;
     private final Bot bot;
 
-    public TestModule(Modules module, Bot bot) {
-        super(module);
+    public TestModule(Bot bot) {
+        super(Modules.TEST);
 
-        this.module = module;
         this.bot = bot;
     }
 

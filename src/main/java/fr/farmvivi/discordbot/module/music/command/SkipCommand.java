@@ -7,19 +7,24 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import java.util.Map;
 
 public class SkipCommand extends Command {
     private final MusicModule musicModule;
 
     public SkipCommand(MusicModule musicModule) {
-        super("skip", CommandCategory.MUSIC, "Passe à la musique suivante", new String[]{"fs"});
+        super("skip", CommandCategory.MUSIC, "Passe à la musique suivante");
+
+        this.setAliases(new String[]{"fs"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();

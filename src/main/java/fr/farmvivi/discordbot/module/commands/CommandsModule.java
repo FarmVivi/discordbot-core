@@ -8,6 +8,7 @@ import fr.farmvivi.discordbot.module.commands.command.HelpCommand;
 import fr.farmvivi.discordbot.module.commands.command.ShutdownCommand;
 import fr.farmvivi.discordbot.module.commands.command.VersionCommand;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
@@ -17,18 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandsModule extends Module {
-    private final Modules module;
     private final Bot bot;
-    private final CommandsListener commandsListener;
+    private final CommandsEventHandler commandsEventHandler;
 
     private final Map<Modules, List<Command>> commands = new HashMap<>();
 
-    public CommandsModule(Modules module, Bot bot) {
-        super(module);
+    public CommandsModule(Bot bot) {
+        super(Modules.COMMANDS);
 
-        this.module = module;
         this.bot = bot;
-        this.commandsListener = new CommandsListener(this, bot.getConfiguration());
+        this.commandsEventHandler = new CommandsEventHandler(this, bot.getConfiguration());
     }
 
     @Override
@@ -51,19 +50,35 @@ public class CommandsModule extends Module {
         for (Command command : getCommands()) {
             // Registering command to Discord API
             SlashCommandData commandData = Commands.slash(command.getName(), command.getDescription());
+
+            // Adding options
             if (command.getArgs().length > 0) {
-                commandData.addOptions(command.getArgs());
+                int requiredIndex = 0;
+                List<OptionData> options = new ArrayList<>();
+                for (OptionData option : command.getArgs()) {
+                    if (option.isRequired()) {
+                        options.add(requiredIndex, option);
+                        requiredIndex++;
+                    } else {
+                        options.add(option);
+                    }
+                }
+                commandData.addOptions(options);
             }
+
+            // Attributes
             commandData.setGuildOnly(command.isGuildOnly());
+
+            // Adding command to Discord API
             logger.info("Registering " + command.getName() + " commands to Discord API...");
-            commandListUpdateAction.addCommands(commandData);
+            commandListUpdateAction = commandListUpdateAction.addCommands(commandData);
         }
 
         commandListUpdateAction.queue();
 
         logger.info("Registering event listener...");
 
-        JDAManager.getJDA().addEventListener(commandsListener);
+        JDAManager.getJDA().addEventListener(commandsEventHandler);
     }
 
     @Override
@@ -72,7 +87,7 @@ public class CommandsModule extends Module {
 
         logger.info("Unregistering event listener...");
 
-        JDAManager.getJDA().removeEventListener(commandsListener);
+        JDAManager.getJDA().removeEventListener(commandsEventHandler);
     }
 
     @Override

@@ -6,19 +6,24 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import java.util.Map;
 
 public class PauseCommand extends Command {
     private final MusicModule musicModule;
 
     public PauseCommand(MusicModule musicModule) {
-        super("pause", CommandCategory.MUSIC, "Met en pause la musique", new String[]{"resume"});
+        super("pause", CommandCategory.MUSIC, "Met en pause la musique");
+
+        this.setAliases(new String[]{"resume"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
 
         Guild guild = event.getGuild();

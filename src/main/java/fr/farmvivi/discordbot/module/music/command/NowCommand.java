@@ -5,29 +5,32 @@ import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
+import java.util.Map;
 
 public class NowCommand extends Command {
     private final MusicModule musicModule;
 
     public NowCommand(MusicModule musicModule) {
-        super("now", CommandCategory.MUSIC, "Ajoute une musique en haut de la file d'attente", new OptionData[]{
-                new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente")}, new String[]{"n"});
+        super("now", CommandCategory.MUSIC, "Ajoute une musique en haut de la file d'attente");
+
+        OptionData requestOption = new OptionData(OptionType.STRING, "requête", "Musique à ajouter à la file d'attente", true);
+
+        this.setArgs(new OptionData[]{requestOption});
+        this.setAliases(new String[]{"n"});
 
         this.musicModule = musicModule;
     }
 
     @Override
-    public boolean execute(CommandReceivedEvent event, String content, CommandMessageBuilder reply) {
-        if (!super.execute(event, content, reply))
+    public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        if (!super.execute(event, args, reply))
             return false;
-        if (this.getArgs().length > 0 && content.length() == 0) {
-            reply.addContent("Utilisation de la commande: **/" + this.getName() + " " + this.getArgsAsString() + "**");
-            return false;
-        }
 
         Guild guild = event.getGuild();
 
@@ -39,7 +42,7 @@ public class NowCommand extends Command {
             }
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
-            musicModule.getPlayer(guild).getAudioPlayer().setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
+            musicModule.getPlayer(guild).setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
         }
 
         if (musicModule.getPlayer(guild).getAudioPlayer().isPaused()) {
@@ -47,7 +50,9 @@ public class NowCommand extends Command {
             reply.addContent("Lecture !");
         }
 
-        musicModule.loadTrack(guild, content, reply, true);
+        String query = args.get("requête").getAsString();
+
+        musicModule.loadTrack(guild, query, event.getChannel(), reply, true);
 
         return true;
     }

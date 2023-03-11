@@ -2,11 +2,13 @@ package fr.farmvivi.discordbot;
 
 import fr.farmvivi.discordbot.jda.JDAManager;
 import fr.farmvivi.discordbot.module.ModulesManager;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Properties;
 
 public class Bot {
@@ -59,7 +61,13 @@ public class Bot {
 
         modulesManager = new ModulesManager(this);
 
-        modulesManager.loadModules();
+        try {
+            logger.info("Loading modules...");
+            modulesManager.loadModules();
+        } catch (Exception e) {
+            logger.error("Cannot load modules", e);
+            System.exit(1);
+        }
 
         setDefaultActivity();
 
@@ -68,7 +76,19 @@ public class Bot {
 
             modulesManager.unloadModules();
 
-            JDAManager.getJDA().shutdown();
+            JDA jda = JDAManager.getJDA();
+
+            // Initiating the shutdown, this closes the gateway connection and subsequently closes the requester queue
+            jda.shutdown();
+            // Allow at most 30 seconds for remaining requests to finish
+            try {
+                if (!jda.awaitShutdown(Duration.ofSeconds(30))) { // returns true if shutdown is graceful, false if timeout exceeded
+                    jda.shutdownNow(); // Cancel all remaining requests, and stop thread-pools
+                    jda.awaitShutdown(); // Wait until shutdown is complete (indefinitely)
+                }
+            } catch (InterruptedException e) {
+                logger.error("Cannot shutdown JDA", e);
+            }
 
             logger.info("Bye!");
         }));
@@ -78,8 +98,21 @@ public class Bot {
         return instance;
     }
 
+    public static Activity getDefaultActivity() {
+        return Activity.playing("v" + version);
+    }
+
     public static void setDefaultActivity() {
-        JDAManager.getJDA().getPresence().setActivity(Activity.playing("v" + version));
+        JDAManager.getJDA().getPresence().setActivity(getDefaultActivity());
+    }
+
+    public static boolean isDefaultActivity() {
+        Activity currentActivity = JDAManager.getJDA().getPresence().getActivity();
+        if (currentActivity == null) {
+            return false;
+        }
+        Activity defaultActivity = getDefaultActivity();
+        return currentActivity.equals(defaultActivity);
     }
 
     public Configuration getConfiguration() {
