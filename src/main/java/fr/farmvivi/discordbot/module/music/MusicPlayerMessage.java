@@ -70,7 +70,7 @@ public class MusicPlayerMessage {
                 // If bot is connected
                 else {
                     // Log : [<Guild name> (Guild id)] Refreshing player message...
-                    logger.info(String.format("[%s (%s)] Refreshing player message...", guild.getName(), guild.getId()));
+                    logger.debug(String.format("[%s (%s)] Refreshing player message...", guild.getName(), guild.getId()));
 
                     // Create embed message
                     EmbedBuilder embedBuilder = new EmbedBuilder();
