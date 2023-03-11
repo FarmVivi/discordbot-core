@@ -123,39 +123,35 @@ public class MusicEventHandler extends ListenerAdapter {
             case "loopqueue" -> musicPlayer.setLoopQueueMode(!musicPlayer.isLoopQueueMode());
             case "shuffle" -> musicPlayer.setShuffleMode(!musicPlayer.isShuffleMode());
             case "volumedown10" -> {
-                int volume = musicPlayer.getAudioPlayer().getVolume() - 10;
+                int volume = musicPlayer.getVolume() - 10;
                 if (volume < 0) {
                     volume = 0;
                 }
-                musicPlayer.getAudioPlayer().setVolume(volume);
-                musicPlayer.getMusicPlayerMessage().refreshMessage();
+                musicPlayer.setVolume(volume);
             }
             case "volumedown5" -> {
-                int volume = musicPlayer.getAudioPlayer().getVolume() - 5;
+                int volume = musicPlayer.getVolume() - 5;
                 if (volume < 0) {
                     volume = 0;
                 }
-                musicPlayer.getAudioPlayer().setVolume(volume);
-                musicPlayer.getMusicPlayerMessage().refreshMessage();
+                musicPlayer.setVolume(volume);
             }
             case "volumeup5" -> {
-                int volume = musicPlayer.getAudioPlayer().getVolume() + 5;
+                int volume = musicPlayer.getVolume() + 5;
                 if (volume > 100) {
                     volume = 100;
                 }
-                musicPlayer.getAudioPlayer().setVolume(volume);
-                musicPlayer.getMusicPlayerMessage().refreshMessage();
+                musicPlayer.setVolume(volume);
             }
             case "volumeup10" -> {
-                int volume = musicPlayer.getAudioPlayer().getVolume() + 10;
+                int volume = musicPlayer.getVolume() + 10;
                 if (volume > 100) {
                     volume = 100;
                 }
-                musicPlayer.getAudioPlayer().setVolume(volume);
-                musicPlayer.getMusicPlayerMessage().refreshMessage();
+                musicPlayer.setVolume(volume);
             }
             case "volumemute" -> {
-                if (musicPlayer.getAudioPlayer().getVolume() == 0) {
+                if (musicPlayer.getVolume() == 0) {
                     musicPlayer.unmute();
                 } else {
                     musicPlayer.mute();

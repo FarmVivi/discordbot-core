@@ -88,7 +88,7 @@ public class RadioCommand extends Command {
         musicPlayer.skipTrack();
 
         musicPlayer.resetToDefaultSettings();
-        musicPlayer.getAudioPlayer().setVolume(MusicModule.DEFAULT_RADIO_VOLUME);
+        musicPlayer.setVolume(MusicModule.DEFAULT_RADIO_VOLUME);
         musicPlayer.setLoopQueueMode(true);
         musicPlayer.setShuffleMode(true);
 

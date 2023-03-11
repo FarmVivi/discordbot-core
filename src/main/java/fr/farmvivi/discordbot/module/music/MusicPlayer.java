@@ -91,18 +91,28 @@ public class MusicPlayer {
         this.musicPlayerMessage.refreshMessage();
     }
 
-    public void mute() {
-        this.lastVolume = this.audioPlayer.getVolume();
-        this.audioPlayer.setVolume(0);
+    public int getVolume() {
+        return this.audioPlayer.getVolume();
+    }
+
+    public void setVolume(int volume) {
+        int lastVolume = this.audioPlayer.getVolume();
+        if (lastVolume > 0) {
+            this.lastVolume = lastVolume;
+        }
+        this.audioPlayer.setVolume(volume);
         this.musicPlayerMessage.refreshMessage();
+    }
+
+    public void mute() {
+        this.setVolume(0);
     }
 
     public void unmute() {
         if (this.lastVolume == 0) {
             this.lastVolume = MusicModule.DEFAULT_VOICE_VOLUME;
         }
-        this.audioPlayer.setVolume(this.lastVolume);
-        this.musicPlayerMessage.refreshMessage();
+        this.setVolume(this.lastVolume);
     }
 
     public boolean isLoopQueueMode() {
@@ -139,12 +149,11 @@ public class MusicPlayer {
     }
 
     public void resetToDefaultSettings() {
-        this.loopQueueMode = false;
-        this.loopMode = false;
-        this.shuffleMode = false;
-        audioPlayer.setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
+        this.setLoopQueueMode(false);
+        this.setLoopMode(false);
+        this.setShuffleMode(false);
+        this.setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
         audioPlayer.setFilterFactory(null);
         this.equalizer = new EqualizerFactory();
-        this.musicPlayerMessage.refreshMessage();
     }
 }

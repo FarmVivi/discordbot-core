@@ -42,7 +42,7 @@ public class PlayCommand extends Command {
             }
             guild.getAudioManager().openAudioConnection(voiceChannel);
             guild.getAudioManager().setAutoReconnect(true);
-            musicModule.getPlayer(guild).getAudioPlayer().setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
+            musicModule.getPlayer(guild).setVolume(MusicModule.DEFAULT_VOICE_VOLUME);
         }
 
         if (musicModule.getPlayer(guild).getAudioPlayer().isPaused()) {

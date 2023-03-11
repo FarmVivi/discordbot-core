@@ -213,7 +213,7 @@ public class MusicPlayerMessage {
                     Button volumeDown5Button = Button.secondary(getButtonID("volumedown5"), "-5%");
                     buttonsRow3.add(volumeDown5Button);
                     // Mute/Unmute (view volume)
-                    if (musicPlayer.getAudioPlayer().getVolume() == 0) {
+                    if (musicPlayer.getVolume() == 0) {
                         Button volumeMuteButton = Button.danger(getButtonID("volumemute"), "🔇");
                         buttonsRow3.add(volumeMuteButton);
                     } else {
