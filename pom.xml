@@ -31,8 +31,8 @@
         </repository>
 
         <repository>
-            <id>jitpack.io-farmvivi</id>
-            <url>https://nexus.farmvivi.fr/repository/jitpack/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -51,18 +51,18 @@
             <version>5.0.0-beta.5</version>
         </dependency>
 
-        <!-- https://nexus.farmvivi.fr -->
+        <!-- https://jitpack.io/#walkyst/lavaplayer-fork -->
         <dependency>
-            <groupId>com.sedmelluq</groupId>
+            <groupId>com.github.walkyst.lavaplayer-fork</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>1.3.99.2-custom</version>
+            <version>1.4.0</version>
         </dependency>
 
-        <!-- https://nexus.farmvivi.fr -->
+        <!-- https://jitpack.io/#TopiSenpai/LavaSrc -->
         <dependency>
             <groupId>com.github.TopiSenpai.LavaSrc</groupId>
             <artifactId>lavasrc</artifactId>
-            <version>3.1.7-custom</version>
+            <version>3.2.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.sf.trove4j/trove4j -->

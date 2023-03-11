@@ -71,10 +71,10 @@ public class MusicModule extends Module {
         try {
             String ytEmail = bot.getConfiguration().getValue("YOUTUBE_EMAIL");
             String ytPassword = bot.getConfiguration().getValue("YOUTUBE_PASSWORD");
-            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, 1, ytEmail, ytPassword);
+            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, ytEmail, ytPassword);
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Playing restricted youtube videos will throws exceptions because no credentials provided : " + e.getLocalizedMessage());
-            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, 1, null, null);
+            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, null, null);
         }
         audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
 
@@ -85,14 +85,14 @@ public class MusicModule extends Module {
             String spotifyToken = bot.getConfiguration().getValue("SPOTIFY_TOKEN");
 
             // create a new SpotifySourceManager with the default providers
-            audioPlayerManager.registerSourceManager(new SpotifySourceManager(spotifyId, spotifyToken, bot.getConfiguration().countryCode, 1, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
+            audioPlayerManager.registerSourceManager(new SpotifySourceManager(spotifyId, spotifyToken, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Could not initialise spotify source provider because, " + e.getLocalizedMessage());
         }
 
         // Apple Music source provider
         // create a new AppleMusicSourceManager with the default providers
-        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, bot.getConfiguration().countryCode, 1, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
+        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
 
         // SoundCloud source provider
         SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
@@ -100,7 +100,7 @@ public class MusicModule extends Module {
         SoundCloudFormatHandler formatHandler = new DefaultSoundCloudFormatHandler();
         SoundCloudPlaylistLoader playlistLoader = new DefaultSoundCloudPlaylistLoader(dataLoader, dataReader, formatHandler);
 
-        audioPlayerManager.registerSourceManager(new SoundCloudAudioSourceManager(true, 1, dataReader, dataLoader, formatHandler, playlistLoader));
+        audioPlayerManager.registerSourceManager(new SoundCloudAudioSourceManager(true, dataReader, dataLoader, formatHandler, playlistLoader));
 
         // Bandcamp source provider
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
