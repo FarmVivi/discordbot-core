@@ -2,6 +2,8 @@ package fr.farmvivi.discordbot.module.music;
 
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -11,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 public class MusicEventHandler extends ListenerAdapter {
     private final MusicModule musicModule;
@@ -23,14 +26,36 @@ public class MusicEventHandler extends ListenerAdapter {
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
         super.onGuildVoiceUpdate(event);
 
-        if (event.getChannelLeft() != null && event.getChannelJoined() == null &&
-                event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
-            MusicPlayer musicPlayer = musicModule.getPlayer(event.getGuild());
-            musicPlayer.getAudioPlayer().setPaused(false);
-            musicPlayer.getListener().getTracks().clear();
-            musicPlayer.skipTrack();
-            musicPlayer.resetToDefaultSettings();
-            Bot.setDefaultActivity();
+        // If the bot
+        if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
+            Logger logger = musicModule.getLogger();
+            Guild guild = event.getGuild();
+
+            AudioChannelUnion joinedChannel = event.getChannelJoined();
+            AudioChannelUnion leftChannel = event.getChannelLeft();
+
+            // If the bot joined a channel
+            if (joinedChannel != null && leftChannel == null) {
+                // Log : [<Guild name> (Guild id)] Bot joined channel <Channel name> (Channel id)
+                logger.info(String.format("[%s (%s)] Bot joined channel %s (%s)", guild.getName(), guild.getId(), joinedChannel.getName(), joinedChannel.getId()));
+            }
+            // If the bot left a channel
+            else if (leftChannel != null && joinedChannel == null) {
+                // Log : [<Guild name> (Guild id)] Bot left channel <Channel name> (Channel id)
+                logger.info(String.format("[%s (%s)] Bot left channel %s (%s)", guild.getName(), guild.getId(), leftChannel.getName(), leftChannel.getId()));
+
+                MusicPlayer musicPlayer = musicModule.getPlayer(event.getGuild());
+                musicPlayer.getAudioPlayer().setPaused(false);
+                musicPlayer.getListener().getTracks().clear();
+                musicPlayer.skipTrack();
+                musicPlayer.resetToDefaultSettings();
+                Bot.setDefaultActivity();
+            }
+            // If the bot moved to another channel
+            else if (leftChannel != null && joinedChannel != null) {
+                // Log : [<Guild name> (Guild id)] Bot moved from channel <Channel name> (Channel id) to channel <Channel name> (Channel id)
+                logger.info(String.format("[%s (%s)] Bot moved from channel %s (%s) to channel %s (%s)", guild.getName(), guild.getId(), leftChannel.getName(), leftChannel.getId(), joinedChannel.getName(), joinedChannel.getId()));
+            }
         }
     }
 

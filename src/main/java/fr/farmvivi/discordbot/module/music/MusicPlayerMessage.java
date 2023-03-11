@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.module.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import org.slf4j.Logger;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -48,8 +50,14 @@ public class MusicPlayerMessage {
                     e.printStackTrace();
                 }
 
+                Logger logger = musicPlayer.getMusicModule().getLogger();
+                Guild guild = musicPlayer.getGuild();
+
                 // If bot is disconnected
                 if (!musicPlayer.getGuild().getAudioManager().isConnected()) {
+                    // Log : [<Guild name> (Guild id)] Deleting player message...
+                    logger.info(String.format("[%s (%s)] Deleting player message...", guild.getName(), guild.getId()));
+
                     // Delete old message
                     if (message != null) {
                         message.delete().queue();
@@ -61,6 +69,9 @@ public class MusicPlayerMessage {
                 }
                 // If bot is connected
                 else {
+                    // Log : [<Guild name> (Guild id)] Refreshing player message...
+                    logger.info(String.format("[%s (%s)] Refreshing player message...", guild.getName(), guild.getId()));
+
                     // Create embed message
                     EmbedBuilder embedBuilder = new EmbedBuilder();
 

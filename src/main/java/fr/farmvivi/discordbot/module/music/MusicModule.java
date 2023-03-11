@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MusicModule extends Module {
@@ -225,6 +226,9 @@ public class MusicModule extends Module {
         audioPlayerManager.loadItemOrdered(player, source, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
+                // Log : [<Guild name> (Guild id)] Track loaded: <Track name> (Link: <Track link>)
+                logger.info(String.format("[%s (%s)] Track loaded : %s (Link: %s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
+
                 if (reply != null) {
                     reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
                     reply.replyNow();
@@ -241,11 +245,13 @@ public class MusicModule extends Module {
             public void playlistLoaded(AudioPlaylist playlist) {
                 StringBuilder builder = new StringBuilder();
 
-                String playlistName = playlist.getName();
-
-                // Si c'est le résultat d'une recherche
-                if (playlistName.matches(".* search \".*\"") && playlist.getTracks().size() == 1) {
+                // If the playlist is a search result, we only want to queue the first track
+                if (playlist.isSearchResult()) {
                     AudioTrack track = playlist.getTracks().get(0);
+
+                    // Log : [<Guild name> (Guild id)] Track loaded (search): <Track name> (Link: <Track link>)
+                    logger.info(String.format("[%s (%s)] Track loaded (search): %s (Link: %s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
+
                     builder.append("**").append(track.getInfo().title).append("** ajouté à la file d'attente.");
 
                     if (playNow) {
@@ -253,14 +259,17 @@ public class MusicModule extends Module {
                     } else {
                         player.playTrack(track);
                     }
+                }
+                // Else we queue the whole playlist
+                else {
+                    List<AudioTrack> tracks = playlist.getTracks();
 
-                    // Sinon c'est que c'est une playlist normale
-                } else {
-                    builder.append("Ajout de la playlist **").append(playlistName).append("** :");
+                    // Log : [<Guild name> (Guild id)] Playlist loaded: <Playlist name> (<Playlist size> tracks)
+                    logger.info(String.format("[%s (%s)] Playlist loaded: %s (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), tracks.size()));
+
+                    builder.append("Ajout de la playlist **").append(playlist.getName()).append("** à la file d'attente (").append(playlist.getTracks().size()).append(" piste(s))");
 
                     for (AudioTrack track : playlist.getTracks()) {
-                        builder.append("\n-> **").append(track.getInfo().title).append("**");
-
                         if (playNow) {
                             player.playTrackNow(track);
                         } else {
@@ -277,25 +286,27 @@ public class MusicModule extends Module {
 
             @Override
             public void noMatches() {
+                // Log : [<Guild name> (Guild id)] Track not found: <Track name>
+                logger.warn(String.format("[%s (%s)] Track not found: %s", guild.getName(), guild.getId(), source));
+
                 // Notify the user that we've got nothing
                 if (reply != null) {
-                    reply.addContent("La piste " + source + " n'a pas été trouvé.");
+                    reply.addContent("Impossible de trouver la piste demandée.");
                     reply.setEphemeral(true);
                     reply.replyNow();
-                } else {
-                    logger.warn("La piste " + source + " n'a pas été trouvé.");
                 }
             }
 
             @Override
             public void loadFailed(FriendlyException throwable) {
+                // Log : [<Guild name> (Guild id)] Track load failed: <Track name> (Reason: <Reason>)
+                logger.error(String.format("[%s (%s)] Track load failed: %s (Reason: %s)", guild.getName(), guild.getId(), source, throwable.getMessage()));
+
                 // Notify the user that everything exploded
                 if (reply != null) {
-                    reply.addContent("Impossible de jouer la piste (raison: " + throwable.getMessage() + ").");
+                    reply.addContent("Impossible de charger la piste demandée.");
                     reply.setEphemeral(true);
                     reply.replyNow();
-                } else {
-                    logger.warn("Impossible de jouer la piste.", throwable);
                 }
             }
         });
