@@ -36,7 +36,7 @@ public abstract class MusicCommand extends Command {
         // Check if member is connected to a voice channel
         GuildVoiceState memberVoiceState = member.getVoiceState();
         if (memberVoiceState == null || !memberVoiceState.inAudioChannel()) {
-            reply.addContent("Veuillez rejoindre un salon vocal pour exécuter cette commande.");
+            reply.addContent("Connectez-vous à un salon vocal pour exécuter cette commande.");
             return false;
         }
 
@@ -52,7 +52,7 @@ public abstract class MusicCommand extends Command {
 
         // Check if member and bot are in the same voice channel
         if (!memberVoiceState.getChannel().equals(botVoiceState.getChannel())) {
-            reply.addContent("Veuillez rejoindre le salon vocal du bot pour effectuer cette action.");
+            reply.addContent("Connectez-vous au même salon vocal que le bot pour exécuter cette commande.");
             return false;
         }
 

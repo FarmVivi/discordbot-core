@@ -28,7 +28,7 @@ public class MusicEventHandler extends ListenerAdapter {
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
         super.onGuildVoiceUpdate(event);
 
-        // If the bot
+        // If it's the bot
         if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
             Logger logger = musicModule.getLogger();
             Guild guild = event.getGuild();
@@ -94,13 +94,13 @@ public class MusicEventHandler extends ListenerAdapter {
         // Check if member is connected to a voice channel
         GuildVoiceState memberVoiceState = member.getVoiceState();
         if (memberVoiceState == null || memberVoiceState.getChannel() == null) {
-            event.reply("Veuillez rejoindre le salon vocal du bot pour effectuer cette action.").setEphemeral(true).queue();
+            event.reply("Connectez-vous à un salon vocal pour effectuer cette action.").setEphemeral(true).queue();
             return;
         }
 
         // Check if member and bot are in the same voice channel
         if (!memberVoiceState.getChannel().equals(botVoiceState.getChannel())) {
-            event.reply("Veuillez rejoindre le salon vocal du bot pour effectuer cette action.").setEphemeral(true).queue();
+            event.reply("Connectez-vous au même salon vocal que le bot pour effectuer cette action.").setEphemeral(true).queue();
             return;
         }
 
@@ -224,20 +224,20 @@ public class MusicEventHandler extends ListenerAdapter {
         // Check if bot is connected to a voice channel
         GuildVoiceState botVoiceState = event.getGuild().getSelfMember().getVoiceState();
         if (botVoiceState == null || botVoiceState.getChannel() == null) {
-            event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
+            event.reply("Erreur : le bot n'est pas connecté à un salon vocal.").setEphemeral(true).queue();
             return;
         }
 
         // Check if member is connected to a voice channel
         GuildVoiceState memberVoiceState = member.getVoiceState();
         if (memberVoiceState == null || memberVoiceState.getChannel() == null) {
-            event.reply("Veuillez rejoindre le salon vocal du bot pour effectuer cette action.").setEphemeral(true).queue();
+            event.reply("Connectez-vous à un salon vocal pour effectuer cette action.").setEphemeral(true).queue();
             return;
         }
 
         // Check if member and bot are in the same voice channel
         if (!memberVoiceState.getChannel().equals(botVoiceState.getChannel())) {
-            event.reply("Veuillez rejoindre le salon vocal du bot pour effectuer cette action.").setEphemeral(true).queue();
+            event.reply("Connectez-vous au même salon vocal que le bot pour effectuer cette action.").setEphemeral(true).queue();
             return;
         }
 
