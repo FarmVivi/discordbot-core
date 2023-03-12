@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -10,13 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class LoopCommand extends Command {
-    private final MusicModule musicModule;
-
+public class LoopCommand extends MusicCommand {
     public LoopCommand(MusicModule musicModule) {
-        super("loop", CommandCategory.MUSIC, "Répète en boucle la musique en cours de lecture");
-
-        this.musicModule = musicModule;
+        super(musicModule, "loop", CommandCategory.MUSIC, "Répète en boucle la musique en cours de lecture");
     }
 
     @Override

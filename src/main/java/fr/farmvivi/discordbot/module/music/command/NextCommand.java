@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -11,13 +10,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class NextCommand extends Command {
-    private final MusicModule musicModule;
-
+public class NextCommand extends MusicCommand {
     public NextCommand(MusicModule musicModule) {
-        super("next", CommandCategory.MUSIC, "Passe à la musique suivante (reste dans la file d'attente si loopqueue est activé)");
-
-        this.musicModule = musicModule;
+        super(musicModule, "next", CommandCategory.MUSIC, "Passe à la musique suivante (reste dans la file d'attente si loopqueue est activé)");
     }
 
     @Override
@@ -36,7 +31,7 @@ public class NextCommand extends Command {
         if (track == null) {
             reply.addContent("Plus aucune musique à jouer.");
         } else {
-            reply.addContent("Musique suivante: **" + track.getInfo().title + "**");
+            reply.addContent(String.format("Musique suivante: [%s](%s).", track.getInfo().title, track.getInfo().uri));
         }
 
         return true;

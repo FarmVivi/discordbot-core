@@ -24,10 +24,13 @@ public abstract class Command {
     }
 
     public boolean execute(CommandReceivedEvent event, Map<String, OptionMapping> args, CommandMessageBuilder reply) {
+        // Check guildOnly permission
         if (guildOnly && !event.isFromGuild()) {
             reply.addContent("Cette commande peut seulement être exécuté sur un serveur discord.");
             return false;
-        } else if (adminOnly && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
+        }
+        // Check adminOnly permission
+        else if (adminOnly && !Bot.getInstance().getConfiguration().cmdAdmins.contains(event.getAuthor().getIdLong())) {
             reply.addContent("Vous n'avez pas la permission d'exécuter cette commande.");
             return false;
         }

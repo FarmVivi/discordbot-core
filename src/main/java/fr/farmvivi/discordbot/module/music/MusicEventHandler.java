@@ -3,6 +3,8 @@ package fr.farmvivi.discordbot.module.music;
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -26,7 +28,7 @@ public class MusicEventHandler extends ListenerAdapter {
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
         super.onGuildVoiceUpdate(event);
 
-        // If the bot
+        // If it's the bot
         if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
             Logger logger = musicModule.getLogger();
             Guild guild = event.getGuild();
@@ -61,6 +63,7 @@ public class MusicEventHandler extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        // Check if button is part of the music module
         String id = event.getComponentId();
         if (!id.startsWith(MusicModule.PLAYER_ID_PREFIX)) {
             return;
@@ -70,6 +73,34 @@ public class MusicEventHandler extends ListenerAdapter {
         if (!guildId.equals(event.getGuild().getId())) {
             // Send error message
             event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check permission (if user is in the same voice channel as the bot)
+        // Check if member exists
+        Member member = event.getMember();
+        if (member == null) {
+            event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check if bot is connected to a voice channel
+        GuildVoiceState botVoiceState = event.getGuild().getSelfMember().getVoiceState();
+        if (botVoiceState == null || botVoiceState.getChannel() == null) {
+            event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check if member is connected to a voice channel
+        GuildVoiceState memberVoiceState = member.getVoiceState();
+        if (memberVoiceState == null || memberVoiceState.getChannel() == null) {
+            event.reply("Connectez-vous à un salon vocal pour effectuer cette action.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check if member and bot are in the same voice channel
+        if (!memberVoiceState.getChannel().equals(botVoiceState.getChannel())) {
+            event.reply("Connectez-vous au même salon vocal que le bot pour effectuer cette action.").setEphemeral(true).queue();
             return;
         }
 
@@ -89,6 +120,7 @@ public class MusicEventHandler extends ListenerAdapter {
                         .addOption("Recherche YouTube", "youtube")
                         .addOption("Recherche YouTube Music", "youtubemusic")
                         .addOption("Recherche Spotify", "spotify")
+                        .addOption("Recherche Deezer", "deezer")
                         .addOption("Recherche SoundCloud", "soundcloud")
                         .addOption("Recherche Apple Music", "applemusic")
                         .setRequiredRange(1, 1)
@@ -168,6 +200,7 @@ public class MusicEventHandler extends ListenerAdapter {
 
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
+        // Check if modal is from music module
         String id = event.getModalId();
         if (!id.startsWith(MusicModule.PLAYER_ID_PREFIX)) {
             return;
@@ -177,6 +210,34 @@ public class MusicEventHandler extends ListenerAdapter {
         if (!guildId.equals(event.getGuild().getId())) {
             // Send error message
             event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check permission (if user is in the same voice channel as the bot)
+        // Check if member exists
+        Member member = event.getMember();
+        if (member == null) {
+            event.reply("Une erreur est survenue, veuillez réessayer.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check if bot is connected to a voice channel
+        GuildVoiceState botVoiceState = event.getGuild().getSelfMember().getVoiceState();
+        if (botVoiceState == null || botVoiceState.getChannel() == null) {
+            event.reply("Erreur : le bot n'est pas connecté à un salon vocal.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check if member is connected to a voice channel
+        GuildVoiceState memberVoiceState = member.getVoiceState();
+        if (memberVoiceState == null || memberVoiceState.getChannel() == null) {
+            event.reply("Connectez-vous à un salon vocal pour effectuer cette action.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Check if member and bot are in the same voice channel
+        if (!memberVoiceState.getChannel().equals(botVoiceState.getChannel())) {
+            event.reply("Connectez-vous au même salon vocal que le bot pour effectuer cette action.").setEphemeral(true).queue();
             return;
         }
 

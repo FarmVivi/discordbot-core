@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -11,13 +10,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class ReplayCommand extends Command {
-    private final MusicModule musicModule;
-
+public class ReplayCommand extends MusicCommand {
     public ReplayCommand(MusicModule musicModule) {
-        super("replay", CommandCategory.MUSIC, "Ajoute la musique en cours de lecture en haut de la file d'attente");
-
-        this.musicModule = musicModule;
+        super(musicModule, "replay", CommandCategory.MUSIC, "Ajoute la musique en cours de lecture en haut de la file d'attente");
     }
 
     @Override
@@ -26,18 +21,15 @@ public class ReplayCommand extends Command {
             return false;
 
         Guild guild = event.getGuild();
+        AudioTrack currentTrack = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
 
-        if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
+        if (currentTrack == null) {
             reply.addContent("Aucune musique en cours de lecture.");
             return false;
         }
 
-        AudioTrack currentTrack = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
-        if (currentTrack == null)
-            return false;
-
         musicModule.getPlayer(guild).playTrackNow(currentTrack.makeClone());
-        reply.addContent("La piste **" + currentTrack.getInfo().title + "** va être rejoué");
+        reply.addContent(String.format("La piste [%s](%s) va être rejoué.", currentTrack.getInfo().title, currentTrack.getInfo().uri));
 
         return true;
     }

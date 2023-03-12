@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -10,15 +9,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class PauseCommand extends Command {
-    private final MusicModule musicModule;
-
+public class PauseCommand extends MusicCommand {
     public PauseCommand(MusicModule musicModule) {
-        super("pause", CommandCategory.MUSIC, "Met en pause la musique");
+        super(musicModule, "pause", CommandCategory.MUSIC, "Met en pause la musique");
 
         this.setAliases(new String[]{"resume"});
-
-        this.musicModule = musicModule;
     }
 
     @Override

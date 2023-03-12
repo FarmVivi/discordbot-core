@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.music;
 
 import com.github.topisenpai.lavasrc.applemusic.AppleMusicSourceManager;
+import com.github.topisenpai.lavasrc.deezer.DeezerAudioSourceManager;
 import com.github.topisenpai.lavasrc.mirror.DefaultMirroringAudioTrackResolver;
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
@@ -80,7 +81,6 @@ public class MusicModule extends Module {
         audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
 
         // Spotify source provider
-        // create a new config
         try {
             String spotifyId = bot.getConfiguration().getValue("SPOTIFY_ID");
             String spotifyToken = bot.getConfiguration().getValue("SPOTIFY_TOKEN");
@@ -89,6 +89,16 @@ public class MusicModule extends Module {
             audioPlayerManager.registerSourceManager(new SpotifySourceManager(spotifyId, spotifyToken, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Could not initialise spotify source provider because, " + e.getLocalizedMessage());
+        }
+
+        // Deezer source provider
+        try {
+            String deezerMasterDecryptionKey = bot.getConfiguration().getValue("DEEZER_MASTER_DECRYPTION_KEY");
+
+            // create a new DeezerAudioSourceManager with the default providers
+            audioPlayerManager.registerSourceManager(new DeezerAudioSourceManager(deezerMasterDecryptionKey));
+        } catch (Configuration.ValueNotFoundException e) {
+            logger.warn("Could not initialise deezer source provider because, " + e.getLocalizedMessage());
         }
 
         // Apple Music source provider
@@ -146,7 +156,7 @@ public class MusicModule extends Module {
         commandsModule.registerCommand(module, new ClearQueueCommand(this));
         commandsModule.registerCommand(module, new CurrentCommand(this));
         commandsModule.registerCommand(module, new StopCommand(this));
-        commandsModule.registerCommand(module, new LeaveCommand());
+        commandsModule.registerCommand(module, new LeaveCommand(this));
         commandsModule.registerCommand(module, new PauseCommand(this));
         commandsModule.registerCommand(module, new LoopQueueCommand(this));
         commandsModule.registerCommand(module, new LoopCommand(this));
@@ -239,7 +249,7 @@ public class MusicModule extends Module {
                 logger.info(String.format("[%s (%s)] Track loaded : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
                 if (reply != null) {
-                    reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
+                    reply.addContent(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
                     reply.replyNow();
                 }
 
@@ -261,7 +271,7 @@ public class MusicModule extends Module {
                     // Log : [<Guild name> (Guild id)] Track loaded (search): "Track name" (Link)
                     logger.info(String.format("[%s (%s)] Track loaded (search): \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
-                    builder.append("**").append(track.getInfo().title).append("** ajouté à la file d'attente.");
+                    builder.append(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
 
                     if (playNow) {
                         player.playTrackNow(track);
@@ -273,10 +283,10 @@ public class MusicModule extends Module {
                 else {
                     List<AudioTrack> tracks = playlist.getTracks();
 
-                    // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (<Playlist size> tracks)
-                    logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), tracks.size()));
+                    // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (Link) (<Playlist size> tracks)
+                    logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%s) (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), source, tracks.size()));
 
-                    builder.append("Ajout de la playlist **").append(playlist.getName()).append("** à la file d'attente (").append(playlist.getTracks().size()).append(" piste(s))");
+                    builder.append(String.format("Ajout de la playlist [%s](%s) à la file d'attente (%d piste(s))", playlist.getName(), source, playlist.getTracks().size()));
 
                     for (AudioTrack track : playlist.getTracks()) {
                         if (playNow) {
