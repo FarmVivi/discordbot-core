@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.commands;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -62,6 +63,15 @@ public class CommandReceivedEvent {
             return slashCommandInteractionEvent.getUser();
         else if (event instanceof MessageReceivedEvent messageReceivedEvent)
             return messageReceivedEvent.getAuthor();
+        else
+            return null;
+    }
+
+    public Member getMember() {
+        if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent)
+            return slashCommandInteractionEvent.getMember();
+        else if (event instanceof MessageReceivedEvent messageReceivedEvent)
+            return messageReceivedEvent.getMember();
         else
             return null;
     }
