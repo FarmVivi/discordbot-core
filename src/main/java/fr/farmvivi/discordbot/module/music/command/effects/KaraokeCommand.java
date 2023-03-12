@@ -1,25 +1,21 @@
 package fr.farmvivi.discordbot.module.music.command.effects;
 
 import com.github.natanbc.lavadsp.karaoke.KaraokePcmAudioFilter;
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.MusicPlayer;
+import fr.farmvivi.discordbot.module.music.command.MusicCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Collections;
 import java.util.Map;
 
-public class KaraokeCommand extends Command {
-    private final MusicModule musicModule;
-
+public class KaraokeCommand extends MusicCommand {
     public KaraokeCommand(MusicModule musicModule) {
-        super("karaoke", CommandCategory.MUSIC, "Active l'effet karaoke");
-
-        this.musicModule = musicModule;
+        super(musicModule, "karaoke", CommandCategory.MUSIC, "Active l'effet karaoke");
     }
 
     @Override
