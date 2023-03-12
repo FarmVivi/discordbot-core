@@ -273,10 +273,10 @@ public class MusicModule extends Module {
                 else {
                     List<AudioTrack> tracks = playlist.getTracks();
 
-                    // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (<Playlist size> tracks)
-                    logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), tracks.size()));
+                    // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (Link) (<Playlist size> tracks)
+                    logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%s) (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), source, tracks.size()));
 
-                    builder.append("Ajout de la playlist **").append(playlist.getName()).append("** à la file d'attente (").append(playlist.getTracks().size()).append(" piste(s))");
+                    builder.append(String.format("Ajout de la playlist [%s](%s) à la file d'attente (%d piste(s))", playlist.getName(), source, playlist.getTracks().size()));
 
                     for (AudioTrack track : playlist.getTracks()) {
                         if (playNow) {
