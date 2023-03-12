@@ -89,6 +89,7 @@ public class MusicEventHandler extends ListenerAdapter {
                         .addOption("Recherche YouTube", "youtube")
                         .addOption("Recherche YouTube Music", "youtubemusic")
                         .addOption("Recherche Spotify", "spotify")
+                        .addOption("Recherche Deezer", "deezer")
                         .addOption("Recherche SoundCloud", "soundcloud")
                         .addOption("Recherche Apple Music", "applemusic")
                         .setRequiredRange(1, 1)

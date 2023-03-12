@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.music;
 
 import com.github.topisenpai.lavasrc.applemusic.AppleMusicSourceManager;
+import com.github.topisenpai.lavasrc.deezer.DeezerAudioSourceManager;
 import com.github.topisenpai.lavasrc.mirror.DefaultMirroringAudioTrackResolver;
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
@@ -79,7 +80,6 @@ public class MusicModule extends Module {
         audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
 
         // Spotify source provider
-        // create a new config
         try {
             String spotifyId = bot.getConfiguration().getValue("SPOTIFY_ID");
             String spotifyToken = bot.getConfiguration().getValue("SPOTIFY_TOKEN");
@@ -88,6 +88,16 @@ public class MusicModule extends Module {
             audioPlayerManager.registerSourceManager(new SpotifySourceManager(spotifyId, spotifyToken, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Could not initialise spotify source provider because, " + e.getLocalizedMessage());
+        }
+
+        // Deezer source provider
+        try {
+            String deezerMasterDecryptionKey = bot.getConfiguration().getValue("DEEZER_MASTER_DECRYPTION_KEY");
+
+            // create a new DeezerAudioSourceManager with the default providers
+            audioPlayerManager.registerSourceManager(new DeezerAudioSourceManager(deezerMasterDecryptionKey));
+        } catch (Configuration.ValueNotFoundException e) {
+            logger.warn("Could not initialise deezer source provider because, " + e.getLocalizedMessage());
         }
 
         // Apple Music source provider
