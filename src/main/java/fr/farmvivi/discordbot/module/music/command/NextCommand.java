@@ -31,7 +31,7 @@ public class NextCommand extends MusicCommand {
         if (track == null) {
             reply.addContent("Plus aucune musique à jouer.");
         } else {
-            reply.addContent("Musique suivante: **" + track.getInfo().title + "**");
+            reply.addContent(String.format("Musique suivante: [%s](%s).", track.getInfo().title, track.getInfo().uri));
         }
 
         return true;

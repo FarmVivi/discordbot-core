@@ -29,7 +29,7 @@ public class ReplayCommand extends MusicCommand {
         }
 
         musicModule.getPlayer(guild).playTrackNow(currentTrack.makeClone());
-        reply.addContent("La piste **" + currentTrack.getInfo().title + "** va être rejoué");
+        reply.addContent(String.format("La piste [%s](%s) va être rejoué.", currentTrack.getInfo().title, currentTrack.getInfo().uri));
 
         return true;
     }

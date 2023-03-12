@@ -239,7 +239,7 @@ public class MusicModule extends Module {
                 logger.info(String.format("[%s (%s)] Track loaded : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
                 if (reply != null) {
-                    reply.addContent("**" + track.getInfo().title + "** ajouté à la file d'attente.");
+                    reply.addContent(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
                     reply.replyNow();
                 }
 
@@ -261,7 +261,7 @@ public class MusicModule extends Module {
                     // Log : [<Guild name> (Guild id)] Track loaded (search): "Track name" (Link)
                     logger.info(String.format("[%s (%s)] Track loaded (search): \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
-                    builder.append("**").append(track.getInfo().title).append("** ajouté à la file d'attente.");
+                    builder.append(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
 
                     if (playNow) {
                         player.playTrackNow(track);
