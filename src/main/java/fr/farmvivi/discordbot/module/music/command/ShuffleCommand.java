@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -10,13 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class ShuffleCommand extends Command {
-    private final MusicModule musicModule;
-
+public class ShuffleCommand extends MusicCommand {
     public ShuffleCommand(MusicModule musicModule) {
-        super("shuffle", CommandCategory.MUSIC, "Joue une musique aléatoire de la file d'attente");
-
-        this.musicModule = musicModule;
+        super(musicModule, "shuffle", CommandCategory.MUSIC, "Joue une musique aléatoire de la file d'attente");
     }
 
     @Override

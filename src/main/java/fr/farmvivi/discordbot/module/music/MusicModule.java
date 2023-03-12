@@ -155,7 +155,7 @@ public class MusicModule extends Module {
         commandsModule.registerCommand(module, new ClearQueueCommand(this));
         commandsModule.registerCommand(module, new CurrentCommand(this));
         commandsModule.registerCommand(module, new StopCommand(this));
-        commandsModule.registerCommand(module, new LeaveCommand());
+        commandsModule.registerCommand(module, new LeaveCommand(this));
         commandsModule.registerCommand(module, new PauseCommand(this));
         commandsModule.registerCommand(module, new LoopQueueCommand(this));
         commandsModule.registerCommand(module, new LoopCommand(this));

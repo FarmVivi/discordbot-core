@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -11,15 +10,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class QueueCommand extends Command {
-    private final MusicModule musicModule;
-
+public class QueueCommand extends MusicCommand {
     public QueueCommand(MusicModule musicModule) {
-        super("queue", CommandCategory.MUSIC, "Affiche la file d'attente");
+        super(musicModule, "queue", CommandCategory.MUSIC, "Affiche la file d'attente");
 
         this.setAliases(new String[]{"viewqueue", "view-queue"});
-
-        this.musicModule = musicModule;
     }
 
     @Override

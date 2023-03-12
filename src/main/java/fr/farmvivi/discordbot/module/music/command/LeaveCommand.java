@@ -1,17 +1,17 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
+import fr.farmvivi.discordbot.module.music.MusicModule;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class LeaveCommand extends Command {
-    public LeaveCommand() {
-        super("leave", CommandCategory.MUSIC, "Déconnecte le bot du salon audio");
+public class LeaveCommand extends MusicCommand {
+    public LeaveCommand(MusicModule musicModule) {
+        super(musicModule, "leave", CommandCategory.MUSIC, "Déconnecte le bot du salon audio");
 
         this.setAliases(new String[]{"disconnect", "quit"});
     }

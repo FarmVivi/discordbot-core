@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -12,11 +11,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Map;
 
-public class VolumeCommand extends Command {
-    private final MusicModule musicModule;
-
+public class VolumeCommand extends MusicCommand {
     public VolumeCommand(MusicModule musicModule) {
-        super("volume", CommandCategory.MUSIC, "Voir/Changer le volume de la musique");
+        super(musicModule, "volume", CommandCategory.MUSIC, "Voir/Changer le volume de la musique");
 
         OptionData volumeOption = new OptionData(OptionType.INTEGER, "volume", "Nouveau volume", false);
         volumeOption.setMinValue(0);
@@ -24,8 +21,6 @@ public class VolumeCommand extends Command {
 
         this.setArgs(new OptionData[]{volumeOption});
         this.setAliases(new String[]{"v"});
-
-        this.musicModule = musicModule;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.module.music.command;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -14,17 +13,13 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Map;
 
-public class SeekCommand extends Command {
-    private final MusicModule musicModule;
-
+public class SeekCommand extends MusicCommand {
     public SeekCommand(MusicModule musicModule) {
-        super("seek", CommandCategory.MUSIC, "Joue la musique a partir du temps donné");
+        super(musicModule, "seek", CommandCategory.MUSIC, "Joue la musique a partir du temps donné");
 
         OptionData timeOption = new OptionData(OptionType.STRING, "temps", "Temps à partir duquel lire la musique", true);
 
         this.setArgs(new OptionData[]{timeOption});
-
-        this.musicModule = musicModule;
     }
 
     @Override

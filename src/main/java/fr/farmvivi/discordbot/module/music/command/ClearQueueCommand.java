@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.module.music.command;
 
-import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
@@ -10,15 +9,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
-public class ClearQueueCommand extends Command {
-    private final MusicModule musicModule;
-
+public class ClearQueueCommand extends MusicCommand {
     public ClearQueueCommand(MusicModule musicModule) {
-        super("clear-queue", CommandCategory.MUSIC, "Vide la file d'attente");
+        super(musicModule, "clear-queue", CommandCategory.MUSIC, "Vide la file d'attente");
 
         this.setAliases(new String[]{"clear", "clearqueue"});
-
-        this.musicModule = musicModule;
     }
 
     @Override
