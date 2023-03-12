@@ -31,6 +31,8 @@ public class QueueCommand extends MusicCommand {
             return true;
         }
 
+        reply.addContent("File d'attente (" + musicPlayer.getQueueSize() + ") :\n");
+
         AudioTrack track = musicPlayer.getAudioPlayer().getPlayingTrack();
 
         StringBuilder topQueue = new StringBuilder();
