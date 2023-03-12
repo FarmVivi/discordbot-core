@@ -28,11 +28,6 @@ public class PlayCommand extends MusicCommand {
 
         Guild guild = event.getGuild();
 
-        if (musicModule.getPlayer(guild).getAudioPlayer().isPaused()) {
-            musicModule.getPlayer(guild).getAudioPlayer().setPaused(false);
-            reply.addContent("Lecture !");
-        }
-
         String query = args.get("requête").getAsString();
 
         musicModule.loadTrack(guild, query, event.getChannel(), reply, false);
