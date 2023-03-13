@@ -239,7 +239,7 @@ public class MusicModule extends Module {
                 logger.info(String.format("[%s (%s)] Track loaded : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
                 if (reply != null) {
-                    reply.addContent(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title.trim(), track.getInfo().uri));
+                    reply.addContent(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
                     reply.replyNow();
                 }
 
@@ -261,7 +261,7 @@ public class MusicModule extends Module {
                     // Log : [<Guild name> (Guild id)] Track loaded (search): "Track name" (Link)
                     logger.info(String.format("[%s (%s)] Track loaded (search): \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
-                    builder.append(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title.trim(), track.getInfo().uri));
+                    builder.append(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
 
                     if (playNow) {
                         player.playTrackNow(track);
@@ -276,7 +276,7 @@ public class MusicModule extends Module {
                     // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (Link) (<Playlist size> tracks)
                     logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%s) (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), source, tracks.size()));
 
-                    builder.append(String.format("Ajout de la playlist [%s](%s) à la file d'attente (%d piste(s))", playlist.getName().trim(), source.trim(), playlist.getTracks().size()));
+                    builder.append(String.format("Ajout de la playlist [%s](%s) à la file d'attente (%d piste(s))", playlist.getName(), source, playlist.getTracks().size()));
 
                     for (AudioTrack track : playlist.getTracks()) {
                         if (playNow) {

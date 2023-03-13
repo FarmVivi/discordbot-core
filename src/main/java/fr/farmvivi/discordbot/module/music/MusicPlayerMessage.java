@@ -95,7 +95,7 @@ public class MusicPlayerMessage {
 
                     if (track != null) {
                         // Add track info title (with link)
-                        embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title.trim(), track.getInfo().uri), false);
+                        embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
                         if (!musicPlayer.getAudioPlayer().isPaused() && (musicPlayer.getQueueSize() == 0 || musicPlayer.isShuffleMode())) {
                             // Add track ending time
                             StringBuilder endingTime = new StringBuilder();
@@ -120,9 +120,9 @@ public class MusicPlayerMessage {
                                 }
                                 for (AudioTrack queueTrack : musicPlayer.getQueue()) {
                                     if (musicPlayer.getAudioPlayer().isPaused() || endingTimeMs == -1) {
-                                        topQueue.append(String.format("%s. [%s](%s)%n", i + 1, queueTrack.getInfo().title.trim(), queueTrack.getInfo().uri));
+                                        topQueue.append(String.format("%s. [%s](%s)%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri));
                                     } else {
-                                        topQueue.append(String.format("%s. [%s](%s) - <t:%d:R>%n", i + 1, queueTrack.getInfo().title.trim(), queueTrack.getInfo().uri, endingTimeMs / 1000));
+                                        topQueue.append(String.format("%s. [%s](%s) - <t:%d:R>%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri, endingTimeMs / 1000));
                                         if (queueTrack.getDuration() != Long.MAX_VALUE) {
                                             endingTimeMs += queueTrack.getDuration();
                                         } else {
