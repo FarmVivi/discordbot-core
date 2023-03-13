@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.commands.command;
 
 import fr.farmvivi.discordbot.module.commands.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.HashMap;
@@ -22,6 +23,10 @@ public class HelpCommand extends Command {
         if (!super.execute(event, args, reply))
             return false;
 
+        EmbedBuilder embed = reply.createInfoEmbed();
+
+        embed.setTitle("Aide");
+
         Map<CommandCategory, StringBuilder> strBuilders = new HashMap<>();
         for (Command cmd : commandsModule.getCommands()) {
             if (!strBuilders.containsKey(cmd.getCategory()))
@@ -34,8 +39,10 @@ public class HelpCommand extends Command {
         for (StringBuilder strBuilder : strBuilders.values())
             finalBuilder.append(strBuilder.toString()).append("\n\n");
         String message = finalBuilder.toString();
-        reply.addContent(message.substring(0, message.length() - 2));
 
+        embed.setDescription(message.substring(0, message.length() - 2));
+
+        reply.addEmbeds(embed.build());
         reply.setEphemeral(true);
 
         return true;

@@ -24,17 +24,18 @@ public class ClearQueueCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.error("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).getQueueSize() == 0) {
-            reply.addContent("Il n'y a pas de musique dans la file d'attente.");
+            reply.error("Il n'y a pas de musique dans la file d'attente.");
             return false;
         }
 
         musicModule.getPlayer(guild).clearQueue();
-        reply.addContent("La liste d'attente à été vidé.");
+        reply.success("La liste d'attente à été vidé.");
+        reply.setEphemeral(true);
 
         return true;
     }

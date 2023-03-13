@@ -6,6 +6,7 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.MusicPlayer;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -37,12 +38,13 @@ public class RadioCommand extends MusicCommand {
 
         Guild guild = event.getGuild();
 
-        if (args.containsKey("playlist")) {
+        if (!args.containsKey("playlist")) {
+            displayRadio(reply);
+            return false;
+        } else {
             String playlist = args.get("playlist").getAsString();
             playRadio(guild, botConfig.radioPath + File.separator + playlist + ".m3u");
-            reply.addContent("Playlist **" + playlist + "** en cours de lecture.");
-        } else {
-            displayRadio(reply);
+            reply.success("Playlist **" + playlist + "** en cours de lecture.");
         }
 
         return true;
@@ -53,17 +55,23 @@ public class RadioCommand extends MusicCommand {
 
         File directory = new File(botConfig.radioPath);
         if (!directory.exists()) {
-            reply.addContent("Une erreur est survenue");
+            reply.error("Le dossier de radio n'existe pas.");
             return;
         }
 
-        StringBuilder builder = new StringBuilder("Playlists :");
+        EmbedBuilder embedBuilder = reply.createInfoEmbed();
 
-        for (File file : directory.listFiles())
-            if (file.getName().endsWith(".m3u"))
+        embedBuilder.setTitle("Playlists");
+
+        StringBuilder builder = new StringBuilder();
+        for (File file : directory.listFiles()) {
+            if (file.getName().endsWith(".m3u")) {
                 builder.append("\n- **").append(file.getName().replace(".m3u", "")).append("**");
+            }
+        }
+        embedBuilder.setDescription(builder.toString());
 
-        reply.addContent(builder.toString());
+        reply.addEmbeds(embedBuilder.build());
     }
 
     private void playRadio(Guild guild, String uri) {

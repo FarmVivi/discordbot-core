@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam;
 
+import fr.farmvivi.discordbot.DiscordColor;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.devoir.Devoir;
@@ -207,7 +208,7 @@ public class DevoirEventHandler extends ListenerAdapter implements DevoirListene
 
             // Embed content
             embedBuilder.setTitle(dateToShortString(datePour) + " - " + enseignement.getCode() + (devoir.isOptionnel() ? " (facultatif)" : ""));
-            embedBuilder.setColor(new Color(109, 224, 16));
+            embedBuilder.setColor(DiscordColor.GREEN.getColor());
 
             // UE
             embedBuilder.addField("UE", enseignement.toString(), false);

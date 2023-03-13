@@ -42,29 +42,34 @@ public class GoulagCommand extends Command {
 
         Member malfaisant = args.get("malfaisant").getAsMember();
         if (malfaisant == null) {
-            reply.addContent("> Une erreur est survenue lors de la récupération du malfaisant");
+            //reply.addContent("> Une erreur est survenue lors de la récupération du malfaisant");
+            reply.error("Impossible de récupérer le malfaisant");
             return false;
         }
 
         Role respondentRole = event.getGuild().getRoleById(this.respondentRoleId);
         Role goulagRole = event.getGuild().getRoleById(this.goulagRoleId);
         if (goulagRole == null) {
-            reply.addContent("> Une erreur est survenue, le rôle du goulag n'existe pas");
+            //reply.addContent("> Une erreur est survenue, le rôle du goulag n'existe pas");
+            reply.error("Impossible de récupérer le rôle du goulag");
             return false;
         }
 
         if (malfaisant.getUser().isBot()) {
-            reply.addContent("Tu ne peux pas mettre un bot au " + goulagRole.getAsMention() + " !");
+            //reply.addContent("Tu ne peux pas mettre un bot au " + goulagRole.getAsMention() + " !");
+            reply.error("Tu ne peux pas mettre un bot au " + goulagRole.getAsMention() + " !");
             return false;
         }
 
         if (malfaisant.getRoles().contains(goulagRole)) {
-            reply.addContent(malfaisant.getAsMention() + " est déjà au " + goulagRole.getAsMention() + " !");
+            //reply.addContent(malfaisant.getAsMention() + " est déjà au " + goulagRole.getAsMention() + " !");
+            reply.error(malfaisant.getAsMention() + " est déjà au " + goulagRole.getAsMention() + " !");
             return false;
         }
 
         if (currentPoll != null) {
-            reply.addContent("Un sondage est déjà en cours pour envoyer " + currentPoll.getEvil().getAsMention() + " au " + goulagRole.getAsMention() + " !");
+            //reply.addContent("Un sondage est déjà en cours pour envoyer " + currentPoll.getEvil().getAsMention() + " au " + goulagRole.getAsMention() + " !");
+            reply.error("Un sondage est déjà en cours pour envoyer " + currentPoll.getEvil().getAsMention() + " au " + goulagRole.getAsMention() + " !");
             return false;
         }
 
@@ -74,7 +79,8 @@ public class GoulagCommand extends Command {
         currentPoll = poll;
 
         reply.setEphemeral(true);
-        reply.addContent("Sondage envoyé pour mettre " + malfaisant.getAsMention() + " au " + goulagRole.getAsMention() + " !");
+        //reply.addContent("Sondage envoyé pour mettre " + malfaisant.getAsMention() + " au " + goulagRole.getAsMention() + " !");
+        reply.success("Sondage envoyé pour mettre " + malfaisant.getAsMention() + " au " + goulagRole.getAsMention() + " !");
 
         return true;
     }

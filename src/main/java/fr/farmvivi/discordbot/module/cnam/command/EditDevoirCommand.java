@@ -31,12 +31,12 @@ public class EditDevoirCommand extends Command {
 
         if (event.getOriginalEvent() instanceof IReplyCallback replyCallback) {
             // EN COURS DE DEVELOPPEMENT
-            reply.addContent("Cette commande est en cours de développement.");
+            reply.info("Cette commande est en cours de développement.");
             return false;
             /*Form form = new EditDevoirForm(module, devoirEventHandler);
             form.start(replyCallback);*/
         } else {
-            reply.addContent("Une erreur est survenue lors de l'exécution de la commande.");
+            reply.error("Une erreur est survenue lors de l'exécution de la commande.");
             return false;
         }
 

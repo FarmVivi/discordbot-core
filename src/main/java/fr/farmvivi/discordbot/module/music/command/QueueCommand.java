@@ -6,6 +6,7 @@ import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
 import fr.farmvivi.discordbot.module.music.MusicPlayer;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
@@ -27,11 +28,13 @@ public class QueueCommand extends MusicCommand {
         MusicPlayer musicPlayer = musicModule.getPlayer(guild);
 
         if (musicPlayer.getQueueSize() == 0) {
-            reply.addContent("Il n'y a pas de musique dans la file d'attente.");
-            return true;
+            reply.warning("Il n'y a pas de musique dans la file d'attente.");
+            return false;
         }
 
-        reply.addContent("File d'attente (" + musicPlayer.getQueueSize() + ") :\n");
+        EmbedBuilder embed = reply.createInfoEmbed();
+
+        embed.setTitle("File d'attente (" + musicPlayer.getQueueSize() + ")");
 
         AudioTrack track = musicPlayer.getAudioPlayer().getPlayingTrack();
 
@@ -58,7 +61,9 @@ public class QueueCommand extends MusicCommand {
                 break;
             }
         }
-        reply.addContent(topQueue.toString());
+        embed.setDescription(topQueue.toString());
+
+        reply.addEmbeds(embed.build());
 
         return true;
     }

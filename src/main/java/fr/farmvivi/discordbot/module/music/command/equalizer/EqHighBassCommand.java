@@ -31,7 +31,7 @@ public class EqHighBassCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.error("Aucune musique en cours de lecture.");
             return false;
         }
 
@@ -40,7 +40,8 @@ public class EqHighBassCommand extends MusicCommand {
         for (int i = 0; i < BASS_BOOST.length; i++)
             musicModule.getPlayer(guild).getEqualizer().setGain(i, BASS_BOOST[i] + level);
 
-        reply.addContent("**Equalizer - High Bass** de " + level + " activé.");
+        reply.success("**Equalizer - High Bass** de " + level + " activé.");
+        reply.setEphemeral(true);
 
         return true;
     }

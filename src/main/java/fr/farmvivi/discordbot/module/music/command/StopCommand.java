@@ -23,7 +23,7 @@ public class StopCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.error("Aucune musique en cours de lecture.");
             return false;
         }
 
@@ -32,7 +32,9 @@ public class StopCommand extends MusicCommand {
         musicPlayer.clearQueue();
         musicPlayer.skipTrack();
 
-        reply.addContent("La musique a été stoppée.");
+        reply.success("La musique a été stoppée.");
+
+        reply.setEphemeral(true);
 
         return true;
     }

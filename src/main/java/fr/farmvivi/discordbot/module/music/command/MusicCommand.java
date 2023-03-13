@@ -29,14 +29,14 @@ public abstract class MusicCommand extends Command {
         // Check if member exists
         Member member = event.getMember();
         if (member == null) {
-            reply.addContent("Une erreur est survenue, veuillez réessayer.");
+            reply.error("Impossible de récupérer les informations de l'utilisateur.");
             return false;
         }
 
         // Check if member is connected to a voice channel
         GuildVoiceState memberVoiceState = member.getVoiceState();
         if (memberVoiceState == null || !memberVoiceState.inAudioChannel()) {
-            reply.addContent("Connectez-vous à un salon vocal pour exécuter cette commande.");
+            reply.error("Connectez-vous à un salon vocal pour exécuter cette commande.");
             return false;
         }
 
@@ -52,7 +52,7 @@ public abstract class MusicCommand extends Command {
 
         // Check if member and bot are in the same voice channel
         if (!memberVoiceState.getChannel().equals(botVoiceState.getChannel())) {
-            reply.addContent("Connectez-vous au même salon vocal que le bot pour exécuter cette commande.");
+            reply.error("Connectez-vous au même salon vocal que le bot pour exécuter cette commande.");
             return false;
         }
 

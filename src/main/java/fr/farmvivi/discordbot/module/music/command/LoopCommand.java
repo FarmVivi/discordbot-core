@@ -22,17 +22,19 @@ public class LoopCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.error("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (musicModule.getPlayer(guild).isLoopMode()) {
             musicModule.getPlayer(guild).setLoopMode(false);
-            reply.addContent("**Loop** désactivé.");
+            reply.success("**Loop** désactivé.");
         } else {
             musicModule.getPlayer(guild).setLoopMode(true);
-            reply.addContent("**Loop** activé.");
+            reply.success("**Loop** activé.");
         }
+
+        reply.setEphemeral(true);
 
         return true;
     }

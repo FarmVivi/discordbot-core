@@ -48,7 +48,7 @@ public class PollCommand extends Command {
         try {
             channel = event.getChannel().asGuildMessageChannel();
         } catch (IllegalStateException e) {
-            reply.addContent("Vous devez être dans un salon d'une guilde !");
+            reply.error("Vous devez être dans un salon d'une guilde !");
             return false;
         }
 
@@ -97,7 +97,8 @@ public class PollCommand extends Command {
         pool.sendPoll(channel);
 
         reply.setEphemeral(true);
-        reply.addContent("Sondage lancé !");
+        //reply.addContent("Sondage lancé !");
+        reply.success("Sondage lancé !");
 
         return true;
     }

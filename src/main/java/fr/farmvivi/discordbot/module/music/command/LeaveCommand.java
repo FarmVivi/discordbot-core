@@ -23,13 +23,15 @@ public class LeaveCommand extends MusicCommand {
 
         Guild guild = event.getGuild();
 
-        if (guild.getAudioManager().isConnected()) {
-            guild.getAudioManager().closeAudioConnection();
-            reply.addContent("Déconnecté.");
-            return true;
-        } else {
-            reply.addContent("Le bot n'est pas connecté à un salon vocal.");
+        if (!guild.getAudioManager().isConnected()) {
+            reply.error("Le bot n'est pas connecté à un salon vocal.");
             return false;
         }
+
+        guild.getAudioManager().closeAudioConnection();
+        reply.success("Déconnecté.");
+        reply.setEphemeral(true);
+
+        return true;
     }
 }

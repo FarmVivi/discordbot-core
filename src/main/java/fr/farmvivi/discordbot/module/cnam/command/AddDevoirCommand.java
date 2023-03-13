@@ -35,7 +35,7 @@ public class AddDevoirCommand extends Command {
             Form form = new AddDevoirForm(module, devoirEventHandler);
             form.start(replyCallback);
         } else {
-            reply.addContent("Une erreur est survenue lors de l'exécution de la commande.");
+            reply.error("Une erreur est survenue lors de l'exécution de la commande.");
             return false;
         }
 

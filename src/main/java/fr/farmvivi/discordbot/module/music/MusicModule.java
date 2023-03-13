@@ -31,6 +31,7 @@ import fr.farmvivi.discordbot.module.music.command.equalizer.EqHighBassCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStartCommand;
 import fr.farmvivi.discordbot.module.music.command.equalizer.EqStopCommand;
 import fr.farmvivi.discordbot.module.music.sourcemanager.SearchSourceManager;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -239,7 +240,11 @@ public class MusicModule extends Module {
                 logger.info(String.format("[%s (%s)] Track loaded : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
                 if (reply != null) {
-                    reply.addContent(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
+                    //reply.addContent(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
+                    EmbedBuilder embedBuilder = reply.createSuccessEmbed();
+                    embedBuilder.setTitle("Musique ajoutée à la file d'attente");
+                    embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
+                    reply.addEmbeds(embedBuilder.build());
                     reply.replyNow();
                 }
 
@@ -252,8 +257,6 @@ public class MusicModule extends Module {
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
-                StringBuilder builder = new StringBuilder();
-
                 // If the playlist is a search result, we only want to queue the first track
                 if (playlist.isSearchResult()) {
                     AudioTrack track = playlist.getTracks().get(0);
@@ -261,7 +264,14 @@ public class MusicModule extends Module {
                     // Log : [<Guild name> (Guild id)] Track loaded (search): "Track name" (Link)
                     logger.info(String.format("[%s (%s)] Track loaded (search): \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
-                    builder.append(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
+                    //builder.append(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
+                    if (reply != null) {
+                        EmbedBuilder embedBuilder = reply.createSuccessEmbed();
+                        embedBuilder.setTitle("Musique ajoutée à la file d'attente");
+                        embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
+                        reply.addEmbeds(embedBuilder.build());
+                        reply.replyNow();
+                    }
 
                     if (playNow) {
                         player.playTrackNow(track);
@@ -276,7 +286,15 @@ public class MusicModule extends Module {
                     // Log : [<Guild name> (Guild id)] Playlist loaded: "Playlist name" (Link) (<Playlist size> tracks)
                     logger.info(String.format("[%s (%s)] Playlist loaded: \"%s\" (%s) (%d tracks)", guild.getName(), guild.getId(), playlist.getName(), source, tracks.size()));
 
-                    builder.append(String.format("Ajout de la playlist [%s](%s) à la file d'attente (%d piste(s))", playlist.getName(), source, playlist.getTracks().size()));
+                    //builder.append(String.format("Ajout de la playlist [%s](%s) à la file d'attente (%d piste(s))", playlist.getName(), source, playlist.getTracks().size()));
+                    if (reply != null) {
+                        EmbedBuilder embedBuilder = reply.createSuccessEmbed();
+                        embedBuilder.setTitle("Playlist ajoutée à la file d'attente");
+                        embedBuilder.addField("Titre", String.format("[%s](%s)", playlist.getName(), source), false);
+                        embedBuilder.addField("Nombre de pistes", String.valueOf(playlist.getTracks().size()), false);
+                        reply.addEmbeds(embedBuilder.build());
+                        reply.replyNow();
+                    }
 
                     for (AudioTrack track : playlist.getTracks()) {
                         if (playNow) {
@@ -285,11 +303,6 @@ public class MusicModule extends Module {
                             player.playTrack(track);
                         }
                     }
-                }
-
-                if (reply != null) {
-                    reply.addContent(builder.toString());
-                    reply.replyNow();
                 }
             }
 
@@ -300,7 +313,7 @@ public class MusicModule extends Module {
 
                 // Notify the user that we've got nothing
                 if (reply != null) {
-                    reply.addContent("Impossible de trouver la piste demandée.");
+                    reply.error("Impossible de trouver la piste demandée.");
                     reply.setEphemeral(true);
                     reply.replyNow();
                 }
@@ -313,7 +326,7 @@ public class MusicModule extends Module {
 
                 // Notify the user that everything exploded
                 if (reply != null) {
-                    reply.addContent("Impossible de charger la piste demandée.");
+                    reply.error("Impossible de charger la piste demandée.");
                     reply.setEphemeral(true);
                     reply.replyNow();
                 }

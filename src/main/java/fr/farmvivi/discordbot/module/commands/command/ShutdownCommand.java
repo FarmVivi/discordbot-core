@@ -21,7 +21,16 @@ public class ShutdownCommand extends Command {
         if (!super.execute(event, args, reply))
             return false;
 
-        System.exit(0);
+        reply.success("Arrêt du bot en cours...");
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.exit(0);
+        }).start();
 
         return true;
     }

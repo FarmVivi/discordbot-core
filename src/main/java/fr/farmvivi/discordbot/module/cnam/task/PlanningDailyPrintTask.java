@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam.task;
 
+import fr.farmvivi.discordbot.DiscordColor;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseAccess;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
@@ -49,7 +50,7 @@ public class PlanningDailyPrintTask implements Runnable {
             }
             Collections.sort(cours);
             EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setColor(new Color(88, 101, 242));
+            embedBuilder.setColor(DiscordColor.BLURPLE.getColor());
             embedBuilder.setTitle("Planning du " + date.getDayOfWeek().getDisplayName(TextStyle.FULL, FRANCE) + " " + date.getDayOfMonth() + " " + date.getMonth().getDisplayName(TextStyle.FULL, FRANCE) + " " + date.getYear());
             Cours previousCours = null;
             for (Cours cours1 : cours) {

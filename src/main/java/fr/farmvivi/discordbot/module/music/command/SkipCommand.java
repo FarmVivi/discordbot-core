@@ -5,6 +5,7 @@ import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
@@ -25,16 +26,24 @@ public class SkipCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.error("Aucune musique en cours de lecture.");
             return false;
         }
 
         AudioTrack track = musicModule.getPlayer(guild).skipTrack();
         if (track == null) {
-            reply.addContent("Plus aucune musique à jouer.");
+            reply.warning("Plus aucune musique à jouer.");
         } else {
-            reply.addContent(String.format("Musique suivante: [%s](%s)", track.getInfo().title, track.getInfo().uri));
+            EmbedBuilder embed = reply.createSuccessEmbed();
+
+            embed.setTitle("Musique suivante");
+
+            embed.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
+
+            reply.addEmbeds(embed.build());
         }
+
+        reply.setEphemeral(true);
 
         return true;
     }

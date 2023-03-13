@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import fr.farmvivi.discordbot.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -12,7 +13,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -80,17 +80,17 @@ public class MusicPlayerMessage {
                     // Check if track is null = no music playing
                     if (track == null) {
                         embedBuilder.setTitle("Aucune musique en cours de lecture");
-                        embedBuilder.setColor(new Color(224, 16, 16));
+                        embedBuilder.setColor(DiscordColor.RED.getColor());
                     }
                     // Check if track is paused
                     else if (musicPlayer.getAudioPlayer().isPaused()) {
                         embedBuilder.setTitle("Musique en pause");
-                        embedBuilder.setColor(new Color(234, 184, 6));
+                        embedBuilder.setColor(DiscordColor.ORANGE.getColor());
                     }
                     // Track is playing
                     else {
                         embedBuilder.setTitle("Musique en cours de lecture");
-                        embedBuilder.setColor(new Color(109, 224, 16));
+                        embedBuilder.setColor(DiscordColor.GREEN.getColor());
                     }
 
                     if (track != null) {

@@ -25,7 +25,7 @@ public class TestCommand extends Command {
         if (!super.execute(event, args, reply))
             return false;
 
-        reply.addContent("Test");
+        reply.info("Test");
 
         return true;
     }

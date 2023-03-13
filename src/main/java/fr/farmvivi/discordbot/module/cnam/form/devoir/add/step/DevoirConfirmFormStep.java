@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
+import fr.farmvivi.discordbot.DiscordColor;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.edit.EditDevoirForm;
@@ -49,10 +50,10 @@ public class DevoirConfirmFormStep extends FormStep {
             // Embed content
             if (form instanceof AddDevoirForm) {
                 embedBuilder.setTitle("Ajout d'un devoir");
-                embedBuilder.setColor(new Color(109, 224, 16));
+                embedBuilder.setColor(DiscordColor.GREEN.getColor());
             } else if (form instanceof EditDevoirForm) {
                 embedBuilder.setTitle("Modification d'un devoir");
-                embedBuilder.setColor(new Color(234, 184, 6));
+                embedBuilder.setColor(DiscordColor.ORANGE.getColor());
             }
 
             // Description

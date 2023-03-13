@@ -30,19 +30,19 @@ public class SeekCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.error("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (!musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().isSeekable()) {
-            reply.addContent("Cette piste n'est pas seekable.");
+            reply.error("Cette piste n'est pas seekable.");
             return false;
         }
 
         String time = args.get("temps").getAsString();
 
         if (!TimeParser.isFormatted(time)) {
-            reply.addContent("Format de temps à utiliser: **jours:heures:minutes:secondes**");
+            reply.error("Format de temps à utiliser: **jours:heures:minutes:secondes**");
             return false;
         }
 
@@ -50,13 +50,15 @@ public class SeekCommand extends MusicCommand {
         time = TimeParser.convertIntToString(startTime / 1000);
         AudioTrack currentTrack = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
         if ((long) startTime > currentTrack.getDuration()) {
-            reply.addContent("**" + time + "** > durée de la piste (**" + TimeParser.convertIntToString((int) currentTrack.getDuration() / 1000) + "**)");
+            reply.error("**" + time + "** > durée de la piste (**" + TimeParser.convertIntToString((int) currentTrack.getDuration() / 1000) + "**)");
             return false;
         }
 
         musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().setPosition(startTime);
         musicModule.getPlayer(guild).getMusicPlayerMessage().refreshMessage();
-        reply.addContent("Seek to **" + time + "**");
+        reply.success("Seek to **" + time + "**");
+
+        reply.setEphemeral(true);
 
         return true;
     }

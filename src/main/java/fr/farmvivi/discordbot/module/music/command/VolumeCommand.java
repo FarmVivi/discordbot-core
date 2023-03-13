@@ -31,17 +31,19 @@ public class VolumeCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.error("Aucune musique en cours de lecture.");
             return false;
         }
 
         if (args.containsKey("volume")) {
             int volume = args.get("volume").getAsInt();
             musicModule.getPlayer(guild).setVolume(volume);
-            reply.addContent("Volume changé à **" + volume + "%**.");
+            reply.success("Volume changé à **" + volume + "%**.");
         } else {
-            reply.addContent("Le volume actuel est de **" + musicModule.getPlayer(guild).getVolume() + "%**.");
+            reply.info("Le volume actuel est de **" + musicModule.getPlayer(guild).getVolume() + "%**.");
         }
+
+        reply.setEphemeral(true);
 
         return true;
     }

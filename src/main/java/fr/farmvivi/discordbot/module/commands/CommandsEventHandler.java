@@ -62,7 +62,9 @@ public class CommandsEventHandler extends ListenerAdapter {
             }
         }
 
-        event.reply("> Une erreur est survenue, la commande est inconnue :confused:").setEphemeral(true).queue();
+        // If the command is not found, send an error message
+        reply.error("Cette commande est inconnue :confused:");
+        event.reply(reply.build()).setEphemeral(true).queue();
     }
 
     @Override
@@ -104,8 +106,10 @@ public class CommandsEventHandler extends ListenerAdapter {
                         int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
 
                         if (message.length() <= commandLength && requiredArgs > 0) {
-                            reply.addContent("> **Erreur :** Vous devez spécifier des arguments !\n"
-                                    + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
+                            /*reply.addContent("> **Erreur :** Vous devez spécifier des arguments !\n"
+                                    + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");*/
+                            reply.error("Vous devez spécifier des arguments !\n"
+                                    + "Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
                             sendErrorMessage(event, reply);
                             return;
                         } else if (message.length() > commandLength) {
@@ -114,8 +118,10 @@ public class CommandsEventHandler extends ListenerAdapter {
 
                             // Si le nombre d'arguments est inférieur au nombre d'arguments requis
                             if (splitContent.length < requiredArgs) {
-                                reply.addContent("> **Erreur :** Vous n'avez pas fourni assez d'arguments !\n"
-                                        + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
+                                /*reply.addContent("> **Erreur :** Vous n'avez pas fourni assez d'arguments !\n"
+                                        + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");*/
+                                reply.error("Vous n'avez pas fourni assez d'arguments !\n"
+                                        + "Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
                                 sendErrorMessage(event, reply);
                                 return;
                             }
@@ -133,8 +139,10 @@ public class CommandsEventHandler extends ListenerAdapter {
                             } else
                                 // Si le nombre d'arguments est supérieur au nombre d'arguments possibles
                                 if (optionalArgs + requiredArgs > command.getArgs().length) {
-                                    reply.addContent("> **Erreur :** Vous avez fourni trop d'arguments !\n"
-                                            + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
+                                    /*reply.addContent("> **Erreur :** Vous avez fourni trop d'arguments !\n"
+                                            + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");*/
+                                    reply.error("Vous avez fourni trop d'arguments !\n"
+                                            + "Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
                                     sendErrorMessage(event, reply);
                                     return;
                                 }
@@ -172,24 +180,28 @@ public class CommandsEventHandler extends ListenerAdapter {
                                                 parseMentionable(option, dataObject, argValue, resolved, event.getJDA(), event.getGuild());
                                         case NUMBER -> parseNumber(option, dataObject, argValue);
                                         default -> {
-                                            reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** est seulement compatible avec les commandes slash !");
+                                            //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** est seulement compatible avec les commandes slash !");
+                                            reply.error("L'argument **" + option.getName() + "** est seulement compatible avec les commandes slash !");
                                             sendErrorMessage(event, reply);
                                             return;
                                         }
                                     }
                                 } catch (CommandOptionParseErrorException e) {
-                                    reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                    //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                    reply.error("L'argument **" + option.getName() + "** " + e.getMessage());
                                     sendErrorMessage(event, reply);
                                     return;
                                 } catch (CommandOptionParseTypeException e) {
                                     if (option.isRequired()) {
-                                        reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                        //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                        reply.error("L'argument **" + option.getName() + "** " + e.getMessage());
                                         sendErrorMessage(event, reply);
                                         return;
                                     } else {
                                         optionalArgs++;
                                         if (optionalArgs >= command.getArgs().length - i) {
-                                            reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                            //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                            reply.error("L'argument **" + option.getName() + "** " + e.getMessage());
                                             sendErrorMessage(event, reply);
                                             return;
                                         }

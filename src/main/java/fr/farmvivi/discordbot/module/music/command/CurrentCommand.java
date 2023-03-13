@@ -5,6 +5,8 @@ import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.music.MusicModule;
+import fr.farmvivi.discordbot.module.music.utils.TimeParser;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
@@ -25,12 +27,29 @@ public class CurrentCommand extends MusicCommand {
         Guild guild = event.getGuild();
 
         if (musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack() == null) {
-            reply.addContent("Aucune musique en cours de lecture.");
+            reply.warning("Aucune musique en cours de lecture.");
             return false;
         }
 
         AudioTrack track = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
-        reply.addContent(String.format("Musique en cours de lecture: [%s](%s).", track.getInfo().title, track.getInfo().uri));
+        EmbedBuilder embed = reply.createInfoEmbed();
+
+        embed.setTitle("Musique en cours de lecture");
+
+        embed.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
+
+        if (track.getInfo().author != null) {
+            embed.addField("Auteur", track.getInfo().author, false);
+        }
+
+        if (track.getInfo().isStream) {
+            embed.addField("Durée", "En direct", false);
+        } else {
+            embed.addField("Durée", TimeParser.convertIntToString((int) track.getDuration() / 1000), false);
+        }
+
+        reply.addEmbeds(embed.build());
+        reply.setEphemeral(true);
 
         return true;
     }

@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam;
 
+import fr.farmvivi.discordbot.DiscordColor;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
@@ -98,15 +99,15 @@ public class PlanningEventHandler implements PlanningListener {
     }
 
     private EmbedBuilder buildBaseCreateEmbed(String title) {
-        return buildBaseEmbed().setColor(new Color(109, 224, 16)).setTitle(title);
+        return buildBaseEmbed().setColor(DiscordColor.GREEN.getColor()).setTitle(title);
     }
 
     private EmbedBuilder buildBaseRemoveEmbed(String title) {
-        return buildBaseEmbed().setColor(new Color(224, 16, 16)).setTitle(title);
+        return buildBaseEmbed().setColor(DiscordColor.RED.getColor()).setTitle(title);
     }
 
     private EmbedBuilder buildBaseUpdateEmbed(String title) {
-        return buildBaseEmbed().setColor(new Color(234, 184, 6)).setTitle(title);
+        return buildBaseEmbed().setColor(DiscordColor.ORANGE.getColor()).setTitle(title);
     }
 
     private EmbedBuilder buildSalleEmbed(EmbedBuilder baseEmbed, Salle salle) {
