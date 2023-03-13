@@ -43,9 +43,9 @@ public class QueueCommand extends MusicCommand {
         }
         for (AudioTrack queueTrack : musicPlayer.getQueue()) {
             if (musicPlayer.getAudioPlayer().isPaused() || endingTimeMs == -1) {
-                topQueue.append(String.format("%s. [%s](%s)%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri));
+                topQueue.append(String.format("%s. [%s](%s)%n", i + 1, queueTrack.getInfo().title.trim(), queueTrack.getInfo().uri));
             } else {
-                topQueue.append(String.format("%s. [%s](%s) - <t:%d:R>%n", i + 1, queueTrack.getInfo().title, queueTrack.getInfo().uri, endingTimeMs / 1000));
+                topQueue.append(String.format("%s. [%s](%s) - <t:%d:R>%n", i + 1, queueTrack.getInfo().title.trim(), queueTrack.getInfo().uri, endingTimeMs / 1000));
                 if (queueTrack.getDuration() != Long.MAX_VALUE) {
                     endingTimeMs += queueTrack.getDuration();
                 } else {

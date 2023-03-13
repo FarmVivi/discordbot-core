@@ -30,7 +30,7 @@ public class CurrentCommand extends MusicCommand {
         }
 
         AudioTrack track = musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack();
-        reply.addContent(String.format("Musique en cours de lecture: [%s](%s).", track.getInfo().title, track.getInfo().uri));
+        reply.addContent(String.format("Musique en cours de lecture: [%s](%s).", track.getInfo().title.trim(), track.getInfo().uri));
 
         return true;
     }
