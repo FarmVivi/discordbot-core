@@ -6,3 +6,7 @@ target/
 
 # Ignore dev file cotaining sensible data
 dev.txt
+
+# Ignore scipts
+gource-nvenc.bat
+gource-nvenc.sh
