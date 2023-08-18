@@ -1,9 +1,5 @@
 package fr.farmvivi.discordbot.module.cnam.task;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseAccess;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
@@ -26,6 +22,10 @@ import fr.farmvivi.discordbot.module.cnam.events.enseignement.EnseignementUpdate
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
+import org.htmlunit.WebClient;
+import org.htmlunit.WebRequest;
+import org.htmlunit.html.HtmlElement;
+import org.htmlunit.html.HtmlPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
