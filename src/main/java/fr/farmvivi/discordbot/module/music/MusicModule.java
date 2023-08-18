@@ -102,8 +102,14 @@ public class MusicModule extends Module {
         }
 
         // Apple Music source provider
-        // create a new AppleMusicSourceManager with the default providers
-        audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(null, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
+        try {
+            String appleMusicToken = bot.getConfiguration().getValue("APPLE_MUSIC_TOKEN");
+
+            // create a new AppleMusicSourceManager with the default providers
+            audioPlayerManager.registerSourceManager(new AppleMusicSourceManager(appleMusicToken, bot.getConfiguration().countryCode, audioPlayerManager, new DefaultMirroringAudioTrackResolver(null)));
+        } catch (Configuration.ValueNotFoundException e) {
+            logger.warn("Could not initialise apple music source provider because, " + e.getLocalizedMessage());
+        }
 
         // SoundCloud source provider
         SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
