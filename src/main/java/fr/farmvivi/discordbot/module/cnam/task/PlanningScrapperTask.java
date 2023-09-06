@@ -69,7 +69,7 @@ public class PlanningScrapperTask implements Runnable {
     @Override
     public void run() {
         // Set up the URL with the search term and send the request
-        String searchUrl = "https://iscople.gescicca.net/Planning.aspx?code_scolarite=" + URLEncoder.encode(codeScolarite, StandardCharsets.UTF_8) + "&uid=" + URLEncoder.encode(uid, StandardCharsets.UTF_8);
+        String searchUrl = "https://senesi.gescicca.net/Planning.aspx?code_scolarite=" + URLEncoder.encode(codeScolarite, StandardCharsets.UTF_8) + "&uid=" + URLEncoder.encode(uid, StandardCharsets.UTF_8);
         HtmlPage page;
         try {
             WebRequest webRequest = new WebRequest(new URL(searchUrl));
