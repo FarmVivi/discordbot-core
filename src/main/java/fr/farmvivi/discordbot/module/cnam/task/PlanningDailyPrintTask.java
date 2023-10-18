@@ -12,8 +12,9 @@ import fr.farmvivi.discordbot.module.cnam.database.salle.Salle;
 import fr.farmvivi.discordbot.module.cnam.database.salle.SalleDAO;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -31,6 +32,8 @@ public class PlanningDailyPrintTask implements Runnable {
     private final EnseignantDAO enseignantDAO;
     private final SalleDAO salleDAO;
 
+    private final Logger logger = LoggerFactory.getLogger(PlanningDailyPrintTask.class);
+
     public PlanningDailyPrintTask(TextChannel channel, DatabaseAccess databaseAccess) {
         this.channel = channel;
         this.coursDAO = new CoursDAO(databaseAccess);
@@ -41,6 +44,9 @@ public class PlanningDailyPrintTask implements Runnable {
 
     @Override
     public void run() {
+        // Starting this task... (show planning)
+        logger.info("Showing planning...");
+
         // Affichage du planning
         try {
             LocalDate date = LocalDate.now().plusDays(1);
@@ -70,8 +76,11 @@ public class PlanningDailyPrintTask implements Runnable {
                 previousCours = cours1;
             }
             channel.sendMessageEmbeds(embedBuilder.build()).queue();
+
+            // Ending this task... (show planning)
+            logger.info("Planning showed");
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error while showing planning", e);
         }
     }
 
