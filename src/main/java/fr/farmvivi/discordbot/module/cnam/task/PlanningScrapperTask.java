@@ -68,6 +68,9 @@ public class PlanningScrapperTask implements Runnable {
 
     @Override
     public void run() {
+        // Starting this task... (scrapping planning)
+        logger.info("Scrapping planning...");
+
         // Set up the URL with the search term and send the request
         String searchUrl = "https://senesi.gescicca.net/Planning.aspx?code_scolarite=" + URLEncoder.encode(codeScolarite, StandardCharsets.UTF_8) + "&uid=" + URLEncoder.encode(uid, StandardCharsets.UTF_8);
         HtmlPage page;
@@ -76,17 +79,22 @@ public class PlanningScrapperTask implements Runnable {
             webRequest.setCharset(StandardCharsets.UTF_8);
             page = webClient.getPage(webRequest);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error("Error while getting page", e);
+            return;
         }
 
         HtmlElement htmlElement = page.getFirstByXPath("//*[@id=\"m_c_planning_lbChangerModeAffichage\"]");
         try {
             htmlElement.click();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error("Error while clicking on element", e);
+            return;
         }
 
         webClient.waitForBackgroundJavaScript(10000);
+
+        // Retrieve planning from database
+        logger.info("Retrieving planning from database...");
 
         List<Salle> bddSalles;
         List<Enseignant> bddEnseignants;
@@ -103,6 +111,9 @@ public class PlanningScrapperTask implements Runnable {
             return;
         }
 
+        // Parsing planning from HTML
+        logger.info("Parsing planning from HTML...");
+
         List<Salle> salles = new ArrayList<>();
         List<Enseignant> enseignants = new ArrayList<>();
         List<Enseignement> enseignements = new ArrayList<>();
@@ -111,6 +122,9 @@ public class PlanningScrapperTask implements Runnable {
         // Retrieve all <li> elements
         List<HtmlElement> items = page.getByXPath("//*[@class=\"cgvRow\"] | //*[@class=\"cgvRowAlt\"]");
         if (!items.isEmpty()) {
+            // Reading cours
+            logger.info("Reading cours from HTML...");
+
             // Iterate over all elements
             int rowId = 0;
             rowsLoop:
@@ -235,18 +249,28 @@ public class PlanningScrapperTask implements Runnable {
 
                                 // Si une salle similaire est trouvée, on la met à jour
                                 if (searchSalle != null) {
+                                    logger.info("Updating salle " + searchSalle.getId() + " \"" + searchSalle + "\" to " + salle.getId() + " \"" + salle + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onSalleUpdate(new SalleUpdateEvent(searchSalle, salle));
                                     }
+
+                                    // Mise à jour en base de données
                                     salle = new Salle(searchSalle.getId(), salle.getNom(), salle.getAdresse());
                                     salleDAO.update(salle);
                                     bddSalles.remove(searchSalle);
 
                                     // Sinon si aucune salle similaire n'est trouvée, on en créée une nouvelle
                                 } else {
+                                    logger.info("Creating salle \"" + salle + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onSalleCreate(new SalleCreateEvent(salle));
                                     }
+
+                                    // Création en base de données
                                     salle = salleDAO.create(salle);
                                 }
 
@@ -275,18 +299,28 @@ public class PlanningScrapperTask implements Runnable {
 
                                 // Si un enseignant similaire est trouvé, on le met à jour
                                 if (searchEnseignant != null) {
+                                    logger.info("Updating enseignant " + searchEnseignant.getId() + " \"" + searchEnseignant + "\" to " + enseignant.getId() + " \"" + enseignant + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onEnseignantUpdate(new EnseignantUpdateEvent(searchEnseignant, enseignant));
                                     }
+
+                                    // Mise à jour en base de données
                                     enseignant = new Enseignant(searchEnseignant.getId(), enseignant.getNom(), enseignant.getPrenom());
                                     enseignantDAO.update(enseignant);
                                     bddEnseignants.remove(searchEnseignant);
 
                                     // Sinon si aucun enseignant similaire n'est trouvé, on en crée un nouveau
                                 } else {
+                                    logger.info("Creating enseignant \"" + enseignant + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onEnseignantCreate(new EnseignantCreateEvent(enseignant));
                                     }
+
+                                    // Création en base de données
                                     enseignant = enseignantDAO.create(enseignant);
                                 }
 
@@ -315,18 +349,28 @@ public class PlanningScrapperTask implements Runnable {
 
                                 // Si un enseignement similaire est trouvé, on le met à jour
                                 if (searchEnseignement != null) {
+                                    logger.info("Updating enseignement " + searchEnseignement.getCode() + " \"" + searchEnseignement + "\" to " + enseignement.getCode() + " \"" + enseignement + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onEnseignementUpdate(new EnseignementUpdateEvent(searchEnseignement, enseignement));
                                     }
+
+                                    // Mise à jour en base de données
                                     enseignement = new Enseignement(searchEnseignement.getCode(), enseignement.getNom());
                                     enseignementDAO.update(enseignement);
                                     bddEnseignements.remove(searchEnseignement);
 
                                     // Sinon si aucun enseignement similaire n'est trouvé, on en crée un nouveau
                                 } else {
+                                    logger.info("Creating enseignement \"" + enseignement + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onEnseignementCreate(new EnseignementCreateEvent(enseignement));
                                     }
+
+                                    // Création en base de données
                                     enseignement = enseignementDAO.create(enseignement);
                                 }
 
@@ -364,18 +408,28 @@ public class PlanningScrapperTask implements Runnable {
 
                                 // Si un cours similaire est trouvé, on le met à jour
                                 if (searchCours != null) {
+                                    logger.info("Updating cours " + searchCours.getId() + " \"" + searchCours + "\" to " + cours.getId() + " \"" + cours + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onCoursUpdate(new CoursUpdateEvent(searchCours, cours, salle, enseignant, enseignement));
                                     }
+
+                                    // Mise à jour en base de données
                                     cours = new Cours(searchCours.getId(), cours.getDate(), cours.getHeureDebut(), cours.getHeureFin(), cours.isPresentiel(), cours.getEnseignantId(), cours.getSalleId(), cours.getEnseignementCode());
                                     coursDAO.update(cours);
                                     bddCourss.remove(searchCours);
 
                                     // Sinon si aucun cours similaire n'est trouvé, on en crée un nouveau
                                 } else {
+                                    logger.info("Creating cours \"" + cours + "\"");
+
+                                    // Envoi de l'événement
                                     for (PlanningListener listener : listeners) {
                                         listener.onCoursCreate(new CoursCreateEvent(cours, salle, enseignant, enseignement));
                                     }
+
+                                    // Création en base de données
                                     cours = coursDAO.create(cours);
                                 }
 
@@ -418,38 +472,51 @@ public class PlanningScrapperTask implements Runnable {
                      *** Fin création des objets et appel des événements ***
                      *******************************************************/
                 } else {
-                    System.out.println("No column found for row " + rowId + " !");
+                    logger.warn("No column found for row " + rowId + " !");
                 }
                 rowId++;
             }
+
+            // Delete all elements that are not in the HTML anymore
+            logger.info("Deleting elements that are not in the HTML anymore...");
 
             // Suppression des éléments non utilisés
             // Cours
             bddCourss.removeAll(courss);
             for (Cours cours : bddCourss) {
+                logger.info("Deleting cours " + cours.getId() + " \"" + cours + "\"");
+
+                // Récupération des informations du cours
+                Salle salleCours;
+                Enseignant enseignantCours;
+                Enseignement enseignementCours;
+                try {
+                    salleCours = salleDAO.selectById(cours.getSalleId());
+                    enseignantCours = enseignantDAO.selectById(cours.getEnseignantId());
+                    enseignementCours = enseignementDAO.selectById(cours.getEnseignementCode());
+                } catch (SQLException e) {
+                    logger.error("Error while deleting a cours, impossible to retrieve cours informations " + cours.getId() + " \"" + cours + "\" to trigger the event", e);
+                    continue;
+                }
+
+                // Envoi de l'événement
                 for (PlanningListener listener : listeners) {
-                    // Envoi de l'événement
-                    try {
-                        Salle salleCours = salleDAO.selectById(cours.getSalleId());
-                        Enseignant enseignantCours = enseignantDAO.selectById(cours.getEnseignantId());
-                        Enseignement enseignementCours = enseignementDAO.selectById(cours.getEnseignementCode());
-                        listener.onCoursRemove(new CoursRemoveEvent(cours, salleCours, enseignantCours, enseignementCours));
-                    } catch (SQLException e) {
-                        logger.error("Erreur lors de la suppression d'un cours, impossible de récupérer les informations du cours \" " + cours + "\" pour déclencher l'événement", e);
-                    }
+                    listener.onCoursRemove(new CoursRemoveEvent(cours, salleCours, enseignantCours, enseignementCours));
                 }
 
                 // Suppression en base de données
                 try {
                     coursDAO.delete(cours);
                 } catch (SQLException e) {
-                    logger.error("Erreur lors de la suppression du cours " + cours.getId() + " \"" + cours + "\"", e);
+                    logger.error("Error while deleting a cours " + cours.getId() + " \"" + cours + "\"", e);
                 }
             }
 
             // Salles
             bddSalles.removeAll(salles);
             for (Salle salle : bddSalles) {
+                logger.info("Deleting salle " + salle.getId() + " \"" + salle + "\"");
+
                 // Envoi de l'événement
                 for (PlanningListener listener : listeners) {
                     listener.onSalleRemove(new SalleRemoveEvent(salle));
@@ -459,13 +526,15 @@ public class PlanningScrapperTask implements Runnable {
                 try {
                     salleDAO.delete(salle);
                 } catch (SQLException e) {
-                    logger.error("Erreur lors de la suppression de la salle " + salle.getId() + " \"" + salle + "\"", e);
+                    logger.error("Error while deleting a salle " + salle.getId() + " \"" + salle + "\"", e);
                 }
             }
 
             // Enseignants
             bddEnseignants.removeAll(enseignants);
             for (Enseignant enseignant : bddEnseignants) {
+                logger.info("Deleting enseignant " + enseignant.getId() + " \"" + enseignant + "\"");
+
                 // Envoi de l'événement
                 for (PlanningListener listener : listeners) {
                     listener.onEnseignantRemove(new EnseignantRemoveEvent(enseignant));
@@ -475,13 +544,15 @@ public class PlanningScrapperTask implements Runnable {
                 try {
                     enseignantDAO.delete(enseignant);
                 } catch (SQLException e) {
-                    logger.error("Erreur lors de la suppression de l'enseignant " + enseignant.getId() + " \"" + enseignant + "\"", e);
+                    logger.error("Error while deleting a enseignant " + enseignant.getId() + " \"" + enseignant + "\"", e);
                 }
             }
 
             // Enseignements
             bddEnseignements.removeAll(enseignements);
             for (Enseignement enseignement : bddEnseignements) {
+                logger.info("Deleting enseignement " + enseignement.getCode() + " \"" + enseignement + "\"");
+
                 // Envoi de l'événement
                 for (PlanningListener listener : listeners) {
                     listener.onEnseignementRemove(new EnseignementRemoveEvent(enseignement));
@@ -491,14 +562,17 @@ public class PlanningScrapperTask implements Runnable {
                 try {
                     enseignementDAO.delete(enseignement);
                 } catch (SQLException e) {
-                    logger.error("Erreur lors de la suppression de l'enseignement " + enseignement.getCode() + " \"" + enseignement + "\"", e);
+                    logger.error("Error while deleting a enseignement " + enseignement.getCode() + " \"" + enseignement + "\"", e);
                 }
             }
         } else {
-            logger.warn("Aucune donnée trouvée !");
+            logger.warn("No row found in the HTML !");
         }
 
         page.cleanUp();
+
+        // End of this task
+        logger.info("Scrapping planning finished");
     }
 
     public void registerListener(PlanningListener listener) {
