@@ -66,27 +66,30 @@ public class CoursPourChooserFormStep extends FormStep {
                     coursList = coursList.subList(0, 25);
                 }
 
-                StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(getDiscordID("2"));
+                // Check if there is at least one cours
+                if (!coursList.isEmpty()) {
+                    StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(getDiscordID("2"));
 
-                // Placeholder
-                menuBuilder.setPlaceholder("Choisissez le cours pour lequel le devoir doit être rendu");
+                    // Placeholder
+                    menuBuilder.setPlaceholder("Choisissez le cours pour lequel le devoir doit être rendu");
 
-                // Options
-                menuBuilder.setRequiredRange(0, 1);
-                for (int i = 0; i < coursList.size(); i++) {
-                    Cours cours = coursList.get(i);
-                    // Label = Lundi 27/09/2021 - 10:00 à 11:00 - dans 2 jours
-                    String label = cours.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE);
-                    label = label.substring(0, 1).toUpperCase() + label.substring(1);
-                    label += " " + new DateTimeFormatterBuilder().appendPattern("dd/MM/yyyy").toFormatter().format(cours.getDate());
-                    label += " - " + cours.getHeureDebut().toString() + " à " + cours.getHeureFin().toString();
-                    long days = cours.getDate().toEpochDay() - LocalDate.now().toEpochDay();
-                    label += " - dans " + days + " jour" + (days > 1 ? "s" : "");
-                    menuBuilder.addOption(label, getDiscordID("2-" + i));
+                    // Options
+                    menuBuilder.setRequiredRange(0, 1);
+                    for (int i = 0; i < coursList.size(); i++) {
+                        Cours cours = coursList.get(i);
+                        // Label = Lundi 27/09/2021 - 10:00 à 11:00 - dans 2 jours
+                        String label = cours.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE);
+                        label = label.substring(0, 1).toUpperCase() + label.substring(1);
+                        label += " " + new DateTimeFormatterBuilder().appendPattern("dd/MM/yyyy").toFormatter().format(cours.getDate());
+                        label += " - " + cours.getHeureDebut().toString() + " à " + cours.getHeureFin().toString();
+                        long days = cours.getDate().toEpochDay() - LocalDate.now().toEpochDay();
+                        label += " - dans " + days + " jour" + (days > 1 ? "s" : "");
+                        menuBuilder.addOption(label, getDiscordID("2-" + i));
+                    }
+
+                    // Add menu to message
+                    messageBuilder.addActionRow(menuBuilder.build());
                 }
-
-                // Add menu to message
-                messageBuilder.addActionRow(menuBuilder.build());
             }
 
             // Cancel
