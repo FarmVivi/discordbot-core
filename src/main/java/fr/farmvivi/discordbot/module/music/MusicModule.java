@@ -1,9 +1,9 @@
 package fr.farmvivi.discordbot.module.music;
 
-import com.github.topisenpai.lavasrc.applemusic.AppleMusicSourceManager;
-import com.github.topisenpai.lavasrc.deezer.DeezerAudioSourceManager;
-import com.github.topisenpai.lavasrc.mirror.DefaultMirroringAudioTrackResolver;
-import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
+import com.github.topi314.lavasrc.applemusic.AppleMusicSourceManager;
+import com.github.topi314.lavasrc.deezer.DeezerAudioSourceManager;
+import com.github.topi314.lavasrc.mirror.DefaultMirroringAudioTrackResolver;
+import com.github.topi314.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
