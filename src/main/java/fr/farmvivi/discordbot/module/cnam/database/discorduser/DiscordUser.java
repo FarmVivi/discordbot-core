@@ -23,8 +23,7 @@ public class DiscordUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DiscordUser discordUser = (DiscordUser) o;
-        if (id != -1 && id == discordUser.id) return true;
-        return false;
+        return id != -1 && id == discordUser.id;
     }
 
     @Override

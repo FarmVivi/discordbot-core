@@ -12,6 +12,12 @@ import java.time.Duration;
 import java.util.Properties;
 
 public class Bot {
+    public static final String name;
+    public static final String version;
+    public static final boolean production;
+    public static final Logger logger;
+    private static Bot instance;
+
     static {
         Properties properties = new Properties();
         try {
@@ -28,13 +34,6 @@ public class Bot {
         logger = LoggerFactory.getLogger(Bot.name);
     }
 
-    public static final String name;
-    public static final String version;
-    public static final boolean production;
-
-    public static final Logger logger;
-
-    private static Bot instance;
     private final Configuration configuration;
     private final ModulesManager modulesManager;
 

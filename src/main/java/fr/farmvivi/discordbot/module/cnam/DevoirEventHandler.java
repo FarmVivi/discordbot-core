@@ -30,7 +30,6 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
-import java.awt.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

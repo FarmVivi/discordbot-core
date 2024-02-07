@@ -58,6 +58,22 @@ public class MusicModule extends Module {
         this.musicEventHandler = new MusicEventHandler(this);
     }
 
+    public static String getDiscordID(Guild guild, String action) {
+        return MusicModule.PLAYER_ID_PREFIX + "-" + guild.getId() + "-" + action;
+    }
+
+    public static String getGuildID(String discordID) {
+        // discordID = discordbot-music-<guildID>-<action>
+        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
+        return discordID.substring(index, discordID.indexOf("-", index));
+    }
+
+    public static String getAction(String discordID) {
+        // discordID = discordbot-music-<guildID>-<action>
+        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
+        return discordID.substring(discordID.indexOf("-", index) + 1);
+    }
+
     @Override
     public void onPreEnable() {
         super.onPreEnable();
@@ -338,21 +354,5 @@ public class MusicModule extends Module {
                 }
             }
         });
-    }
-
-    public static String getDiscordID(Guild guild, String action) {
-        return MusicModule.PLAYER_ID_PREFIX + "-" + guild.getId() + "-" + action;
-    }
-
-    public static String getGuildID(String discordID) {
-        // discordID = discordbot-music-<guildID>-<action>
-        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
-        return discordID.substring(index, discordID.indexOf("-", index));
-    }
-
-    public static String getAction(String discordID) {
-        // discordID = discordbot-music-<guildID>-<action>
-        int index = MusicModule.PLAYER_ID_PREFIX.length() + 1;
-        return discordID.substring(discordID.indexOf("-", index) + 1);
     }
 }

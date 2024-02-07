@@ -21,7 +21,6 @@ import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-import java.awt.*;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;

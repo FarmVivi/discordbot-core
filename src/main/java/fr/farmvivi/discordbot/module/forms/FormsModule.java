@@ -22,6 +22,40 @@ public class FormsModule extends Module {
         this.formsEventHandler = new FormsEventHandler(this);
     }
 
+    public static String getDiscordID(UUID uuid, int step) {
+        return FormsModule.FORMS_ID_PREFIX + "-" + uuid + "-" + step;
+    }
+
+    public static String getDiscordID(UUID uuid, int step, String other) {
+        return FormsModule.FORMS_ID_PREFIX + "-" + uuid + "-" + step + "-" + other;
+    }
+
+    public static UUID getFormUUID(String discordID) {
+        // discordID = discordbot-form-<UUID>-<step>-<customID>
+        int index = FormsModule.FORMS_ID_PREFIX.length() + 1;
+        return UUID.fromString(discordID.substring(index, index + 36));
+    }
+
+    public static int getFormStep(String discordID) {
+        // discordID = discordbot-form-<UUID>-<step>-<customID>
+        int startIndex = FormsModule.FORMS_ID_PREFIX.length() + 1 + 36 + 1;
+        int endIndex = discordID.indexOf('-', startIndex);
+        if (endIndex == -1) {
+            endIndex = discordID.length();
+        }
+        return Integer.parseInt(discordID.substring(startIndex, endIndex));
+    }
+
+    public static String getFormCustomID(String discordID) {
+        // discordID = discordbot-form-<UUID>-<step>-<customID>
+        int startIndex = FormsModule.FORMS_ID_PREFIX.length() + 1 + 36 + 1;
+        int endIndex = discordID.indexOf('-', startIndex);
+        if (endIndex == -1) {
+            return null;
+        }
+        return discordID.substring(endIndex + 1);
+    }
+
     @Override
     public void onPostEnable() {
         super.onPostEnable();
@@ -75,39 +109,5 @@ public class FormsModule extends Module {
         }
 
         return forms;
-    }
-
-    public static String getDiscordID(UUID uuid, int step) {
-        return FormsModule.FORMS_ID_PREFIX + "-" + uuid + "-" + step;
-    }
-
-    public static String getDiscordID(UUID uuid, int step, String other) {
-        return FormsModule.FORMS_ID_PREFIX + "-" + uuid + "-" + step + "-" + other;
-    }
-
-    public static UUID getFormUUID(String discordID) {
-        // discordID = discordbot-form-<UUID>-<step>-<customID>
-        int index = FormsModule.FORMS_ID_PREFIX.length() + 1;
-        return UUID.fromString(discordID.substring(index, index + 36));
-    }
-
-    public static int getFormStep(String discordID) {
-        // discordID = discordbot-form-<UUID>-<step>-<customID>
-        int startIndex = FormsModule.FORMS_ID_PREFIX.length() + 1 + 36 + 1;
-        int endIndex = discordID.indexOf('-', startIndex);
-        if (endIndex == -1) {
-            endIndex = discordID.length();
-        }
-        return Integer.parseInt(discordID.substring(startIndex, endIndex));
-    }
-
-    public static String getFormCustomID(String discordID) {
-        // discordID = discordbot-form-<UUID>-<step>-<customID>
-        int startIndex = FormsModule.FORMS_ID_PREFIX.length() + 1 + 36 + 1;
-        int endIndex = discordID.indexOf('-', startIndex);
-        if (endIndex == -1) {
-            return null;
-        }
-        return discordID.substring(endIndex + 1);
     }
 }

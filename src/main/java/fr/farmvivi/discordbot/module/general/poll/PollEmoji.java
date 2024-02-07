@@ -23,14 +23,6 @@ public enum PollEmoji {
         this.emoji = emoji;
     }
 
-    public int getNumber() {
-        return number;
-    }
-
-    public Emoji getEmoji() {
-        return emoji;
-    }
-
     public static PollEmoji getEmoji(int number) {
         for (PollEmoji pollEmoji : values()) {
             if (pollEmoji.getNumber() == number) {
@@ -47,5 +39,13 @@ public enum PollEmoji {
             }
         }
         return UNKNOWN;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public Emoji getEmoji() {
+        return emoji;
     }
 }

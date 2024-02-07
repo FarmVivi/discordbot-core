@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
-import java.awt.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
