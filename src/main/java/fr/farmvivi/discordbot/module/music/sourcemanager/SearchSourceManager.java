@@ -16,7 +16,7 @@ public class SearchSourceManager implements AudioSourceManager {
     private final AudioSourceManager otherAudioSourceManager;
     private final String search;
 
-    public SearchSourceManager(YoutubeAudioSourceManager otherAudioSourceManager, String search) {
+    public SearchSourceManager(AudioSourceManager otherAudioSourceManager, String search) {
         this.otherAudioSourceManager = otherAudioSourceManager;
         this.search = search;
     }
