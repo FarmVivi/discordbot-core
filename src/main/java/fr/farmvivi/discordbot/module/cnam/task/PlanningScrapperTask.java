@@ -48,7 +48,6 @@ public class PlanningScrapperTask implements Runnable {
     private final EnseignantDAO enseignantDAO;
     private final EnseignementDAO enseignementDAO;
     private final CoursDAO coursDAO;
-    private final WebClient webClient;
 
     private final Logger logger = LoggerFactory.getLogger(PlanningScrapperTask.class);
     private final List<PlanningListener> listeners = new LinkedList<>();
@@ -60,16 +59,16 @@ public class PlanningScrapperTask implements Runnable {
         this.enseignantDAO = new EnseignantDAO(databaseAccess);
         this.enseignementDAO = new EnseignementDAO(databaseAccess);
         this.coursDAO = new CoursDAO(databaseAccess);
-
-        this.webClient = new WebClient();
-        webClient.getOptions().setCssEnabled(false);
-        webClient.getOptions().setJavaScriptEnabled(true);
     }
 
     @Override
     public void run() {
         // Starting this task... (scrapping planning)
         logger.info("Scrapping planning...");
+
+        WebClient webClient = new WebClient();
+        webClient.getOptions().setCssEnabled(false);
+        webClient.getOptions().setJavaScriptEnabled(true);
 
         // Set up the URL with the search term and send the request
         String searchUrl = "https://senesi.gescicca.net/Planning.aspx?code_scolarite=" + URLEncoder.encode(codeScolarite, StandardCharsets.UTF_8) + "&uid=" + URLEncoder.encode(uid, StandardCharsets.UTF_8);
@@ -80,6 +79,7 @@ public class PlanningScrapperTask implements Runnable {
             page = webClient.getPage(webRequest);
         } catch (IOException e) {
             logger.error("Error while getting page", e);
+            webClient.close();
             return;
         }
 
@@ -88,6 +88,8 @@ public class PlanningScrapperTask implements Runnable {
             htmlElement.click();
         } catch (IOException e) {
             logger.error("Error while clicking on element", e);
+            page.cleanUp();
+            webClient.close();
             return;
         }
 
@@ -108,6 +110,8 @@ public class PlanningScrapperTask implements Runnable {
             bddCourss = coursDAO.selectAll();
         } catch (SQLException e) {
             logger.error("Error while getting data from database", e);
+            page.cleanUp();
+            webClient.close();
             return;
         }
 
@@ -566,13 +570,11 @@ public class PlanningScrapperTask implements Runnable {
                 }
             }
         } else {
-            logger.warn("No row found in the HTML !");
+            logger.warn("No cours found in the HTML !");
         }
 
         page.cleanUp();
-
-        // End of this task
-        logger.info("Scrapping planning finished");
+        webClient.close();
     }
 
     public void registerListener(PlanningListener listener) {
@@ -581,9 +583,5 @@ public class PlanningScrapperTask implements Runnable {
 
     public void unregisterListener(PlanningListener listener) {
         listeners.remove(listener);
-    }
-
-    public void close() {
-        webClient.close();
     }
 }

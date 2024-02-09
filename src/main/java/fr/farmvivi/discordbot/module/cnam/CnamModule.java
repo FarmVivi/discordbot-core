@@ -194,10 +194,6 @@ public class CnamModule extends Module {
             logger.warn("Planning scrapper didn't stop in time, forcing shutdown");
             scheduler.shutdownNow();
         }
-
-        logger.info("Closing planning scrapper...");
-
-        planningScrapperTask.close();
     }
 
     @Override
