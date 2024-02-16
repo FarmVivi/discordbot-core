@@ -59,7 +59,7 @@ public class CoursPourChooserFormStep extends FormStep {
                 Collections.sort(coursList);
 
                 // Remove all cours with date before today
-                coursList.removeIf(cours -> cours.getDate().isBefore(LocalDate.now()) || cours.getDate().isEqual(LocalDate.now()));
+                coursList.removeIf(cours -> cours.getDebutCours().toLocalDate().isBefore(LocalDate.now()) || cours.getDebutCours().toLocalDate().isEqual(LocalDate.now()));
 
                 // Limit cours list to 25
                 if (coursList.size() > 25) {
@@ -78,11 +78,11 @@ public class CoursPourChooserFormStep extends FormStep {
                     for (int i = 0; i < coursList.size(); i++) {
                         Cours cours = coursList.get(i);
                         // Label = Lundi 27/09/2021 - 10:00 à 11:00 - dans 2 jours
-                        String label = cours.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE);
+                        String label = cours.getDebutCours().toLocalDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE);
                         label = label.substring(0, 1).toUpperCase() + label.substring(1);
-                        label += " " + new DateTimeFormatterBuilder().appendPattern("dd/MM/yyyy").toFormatter().format(cours.getDate());
-                        label += " - " + cours.getHeureDebut().toString() + " à " + cours.getHeureFin().toString();
-                        long days = cours.getDate().toEpochDay() - LocalDate.now().toEpochDay();
+                        label += " " + new DateTimeFormatterBuilder().appendPattern("dd/MM/yyyy").toFormatter().format(cours.getDebutCours().toLocalDate());
+                        label += " - " + cours.getDebutCours().toLocalTime().toString() + " à " + cours.getFinCours().toLocalTime().toString();
+                        long days = cours.getDebutCours().toLocalDate().toEpochDay() - LocalDate.now().toEpochDay();
                         label += " - dans " + days + " jour" + (days > 1 ? "s" : "");
                         menuBuilder.addOption(label, getDiscordID("2-" + i));
                     }
@@ -113,7 +113,7 @@ public class CoursPourChooserFormStep extends FormStep {
                 // Get selected cours
                 int coursIndex = Integer.parseInt(getCustomID(selectedOptions.get(0).getValue()).split("-")[1]);
                 Cours cours = coursList.get(coursIndex);
-                devoirForm.setDatePour(cours.getDate());
+                devoirForm.setDatePour(cours.getDebutCours().toLocalDate());
                 devoirForm.setCoursPour(cours);
 
                 // Go to next step
@@ -130,7 +130,7 @@ public class CoursPourChooserFormStep extends FormStep {
                 if (customID.equals("1-1")) {
                     if (!coursList.isEmpty()) {
                         Cours cours = coursList.get(0);
-                        devoirForm.setDatePour(cours.getDate());
+                        devoirForm.setDatePour(cours.getDebutCours().toLocalDate());
                         devoirForm.setCoursPour(cours);
 
                         // Go to next step

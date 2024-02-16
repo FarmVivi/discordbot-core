@@ -59,15 +59,15 @@ public class DevoirConfirmFormStep extends FormStep {
             embedBuilder.addField("Travail à faire", devoirForm.getDescription(), false);
 
             // Cours donné
-            String coursDonneInfos = "Date : " + dateToString(devoirForm.getCoursDonne().getDate());
-            coursDonneInfos += "\nHoraire : " + horaireToString(devoirForm.getCoursDonne().getHeureDebut(), devoirForm.getCoursDonne().getHeureFin());
+            String coursDonneInfos = "Date : " + dateToString(devoirForm.getCoursDonne().getDebutCours().toLocalDate());
+            coursDonneInfos += "\nHoraire : " + horaireToString(devoirForm.getCoursDonne().getDebutCours().toLocalTime(), devoirForm.getCoursDonne().getFinCours().toLocalTime());
             coursDonneInfos += "\nEnseignant : " + devoirForm.getEnseignantDAO().selectById(devoirForm.getCoursDonne().getEnseignantId());
             embedBuilder.addField("Cours donné", coursDonneInfos, true);
 
             // Cours pour
-            String coursPourInfos = "Date : " + dateToString(devoirForm.getCoursPour().getDate());
+            String coursPourInfos = "Date : " + dateToString(devoirForm.getCoursPour().getDebutCours().toLocalDate());
             if (devoirForm.getCoursPour() != null) {
-                coursPourInfos += "\nHoraire : " + horaireToString(devoirForm.getCoursPour().getHeureDebut(), devoirForm.getCoursPour().getHeureFin());
+                coursPourInfos += "\nHoraire : " + horaireToString(devoirForm.getCoursPour().getDebutCours().toLocalTime(), devoirForm.getCoursPour().getFinCours().toLocalTime());
             }
             coursPourInfos += "\nEnseignant : " + devoirForm.getEnseignant();
             embedBuilder.addField("Cours pour", coursPourInfos, true);

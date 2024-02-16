@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -35,9 +36,9 @@ public class CoursDonneCurrentCoursFormStep extends FormStep {
     protected void handleQuestion(IReplyCallback event) {
         try {
             // Data
-            coursList = devoirForm.getCoursDAO().selectAllByDateBetweenHeure(LocalDate.now(), LocalTime.now());
+            coursList = devoirForm.getCoursDAO().selectAllByDateTime(LocalDateTime.now());
             if (coursList.isEmpty()) {
-                coursList = devoirForm.getCoursDAO().selectAllByDateBetweenHeure(LocalDate.now(), LocalTime.now().minusMinutes(10));
+                coursList = devoirForm.getCoursDAO().selectAllByDateTime(LocalDateTime.now().minusMinutes(10));
                 if (coursList.isEmpty()) {
                     EnseignementChooserFormStep enseignementChooserFormStep = new EnseignementChooserFormStep(form, devoirForm);
                     form.addStep(enseignementChooserFormStep);
@@ -52,7 +53,7 @@ public class CoursDonneCurrentCoursFormStep extends FormStep {
             // Message content
             messageBuilder.addContent("Le devoir a-t-il été donné pendant le cours qui vient d'avoir lieu ?");
             for (Cours cours : coursList) {
-                messageBuilder.addContent("\n" + cours.getHeureDebut() + " - " + cours.getHeureFin() + " : "
+                messageBuilder.addContent("\n" + cours.getDebutCours().toLocalTime() + " - " + cours.getFinCours().toLocalTime() + " : "
                         + devoirForm.getEnseignementDAO().selectById(cours.getEnseignementCode()) + " par "
                         + devoirForm.getEnseignantDAO().selectById(cours.getEnseignantId()));
             }

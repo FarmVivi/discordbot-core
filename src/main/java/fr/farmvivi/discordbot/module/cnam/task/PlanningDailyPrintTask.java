@@ -65,10 +65,10 @@ public class PlanningDailyPrintTask implements Runnable {
 
                 Enseignant enseignant = enseignantDAO.selectById(cours1.getEnseignantId());
                 Salle salle = salleDAO.selectById(cours1.getSalleId());
-                String description = "De **" + cours1.getHeureDebut() + "** à **" + cours1.getHeureFin() + "** (" + calculDuree(cours1.getHeureDebut(), cours1.getHeureFin()) + ") avec " + enseignant.getPrenom() + " " + enseignant.getNom() + " en " + salle.getNom();
+                String description = "De **" + cours1.getDebutCours().toLocalTime() + "** à **" + cours1.getFinCours().toLocalTime() + "** (" + calculDuree(cours1.getDebutCours().toLocalTime(), cours1.getFinCours().toLocalTime()) + ") avec " + enseignant.getPrenom() + " " + enseignant.getNom() + " en " + salle.getNom();
 
-                if (previousCours != null && !previousCours.getHeureFin().equals(cours1.getHeureDebut())) {
-                    embedBuilder.addField("Pause", "De **" + previousCours.getHeureFin() + "** à **" + cours1.getHeureDebut() + "** (" + calculDuree(previousCours.getHeureFin(), cours1.getHeureDebut()) + ")", false);
+                if (previousCours != null && !previousCours.getFinCours().toLocalTime().equals(cours1.getDebutCours().toLocalTime())) {
+                    embedBuilder.addField("Pause", "De **" + previousCours.getFinCours().toLocalTime() + "** à **" + cours1.getDebutCours().toLocalTime() + "** (" + calculDuree(previousCours.getFinCours().toLocalTime(), cours1.getDebutCours().toLocalTime()) + ")", false);
                 }
 
                 embedBuilder.addField(title, description, false);

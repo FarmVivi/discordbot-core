@@ -38,8 +38,8 @@ public class DatePourConfirmFormStep extends FormStep {
         messageBuilder.addContent("Le devoir devra être rendu pour le " + date);
 
         if (devoirForm.getCoursPour() != null) {
-            String horaires = "de " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(devoirForm.getCoursPour().getHeureDebut());
-            horaires += " à " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(devoirForm.getCoursPour().getHeureFin());
+            String horaires = "de " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(devoirForm.getCoursPour().getDebutCours().toLocalTime());
+            horaires += " à " + new DateTimeFormatterBuilder().appendPattern("HH'h'mm").toFormatter().format(devoirForm.getCoursPour().getFinCours().toLocalTime());
             messageBuilder.addContent(" " + horaires);
         }
 

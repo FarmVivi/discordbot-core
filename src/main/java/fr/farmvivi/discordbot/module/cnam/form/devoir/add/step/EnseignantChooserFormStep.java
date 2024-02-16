@@ -123,7 +123,7 @@ public class EnseignantChooserFormStep extends FormStep {
         Collections.sort(coursList);
 
         // Remove all cours with date after today
-        coursList.removeIf(cours -> cours.getDate().isAfter(LocalDate.now()));
+        coursList.removeIf(cours -> cours.getDebutCours().toLocalDate().isAfter(LocalDate.now()));
 
         // Limit cours list to 25 last cours
         if (coursList.size() > 25) {

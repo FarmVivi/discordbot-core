@@ -10,8 +10,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,11 +31,10 @@ public class GoulagRemoverEventHandler extends ListenerAdapter {
         Member member = event.getMember();
         if (event.getRoles().contains(role)) {
             // Now
-            LocalDate date = LocalDate.now();
-            LocalTime time = LocalTime.now();
+            LocalDateTime now = LocalDateTime.now();
 
             try {
-                List<Cours> courss = coursDAO.selectAllByDateBetweenHeure(date, time);
+                List<Cours> courss = coursDAO.selectAllByDateTime(now);
                 if (courss.isEmpty()) {
                     event.getGuild().removeRoleFromMember(member, role).queue();
                 } else {
@@ -44,7 +42,7 @@ public class GoulagRemoverEventHandler extends ListenerAdapter {
 
                     // Schedule task to remove role from member after the end of the cours
                     GoulagRemoverTask task = new GoulagRemoverTask(role, member);
-                    scheduler.schedule(task, cours.getHeureFin().toSecondOfDay() - time.toSecondOfDay(), TimeUnit.SECONDS);
+                    scheduler.schedule(task, cours.getFinCours().toLocalTime().toSecondOfDay() - now.toLocalTime().toSecondOfDay(), TimeUnit.SECONDS);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);

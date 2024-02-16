@@ -58,8 +58,8 @@ public class CoursDonneChooserFormStep extends FormStep {
         for (int i = 0; i < coursList.size(); i++) {
             Cours cours = coursList.get(i);
             // Label = Lundi 27/09/2021 de 10:00 à 11:00
-            String label = dateToString(cours.getDate());
-            label += " de " + horaireToString(cours.getHeureDebut(), cours.getHeureFin());
+            String label = dateToString(cours.getDebutCours().toLocalDate());
+            label += " de " + horaireToString(cours.getDebutCours().toLocalTime(), cours.getFinCours().toLocalTime());
             menuBuilder.addOption(label, getDiscordID("1-" + i));
         }
 

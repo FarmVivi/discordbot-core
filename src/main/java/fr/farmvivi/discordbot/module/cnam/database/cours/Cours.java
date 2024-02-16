@@ -2,30 +2,27 @@ package fr.farmvivi.discordbot.module.cnam.database.cours;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Objects;
 
 public class Cours implements Comparable<Cours> {
     private final int id;
-    private LocalDate date;
-    private LocalTime heureDebut;
-    private LocalTime heureFin;
+    private LocalDateTime debutCours;
+    private LocalDateTime finCours;
     private boolean presentiel;
     private int enseignantId;
     private int salleId;
     private String enseignementCode;
 
-    public Cours(LocalDate date, LocalTime heureDebut, LocalTime heureFin, boolean presentiel, int enseignantId, int salleId, String enseignementCode) {
-        this(-1, date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode);
+    public Cours(LocalDateTime debutCours, LocalDateTime finCours, boolean presentiel, int enseignantId, int salleId, String enseignementCode) {
+        this(-1, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode);
     }
 
-    public Cours(int id, LocalDate date, LocalTime heureDebut, LocalTime heureFin, boolean presentiel, int enseignantId, int salleId, String enseignementCode) {
+    public Cours(int id, LocalDateTime debutCours, LocalDateTime finCours, boolean presentiel, int enseignantId, int salleId, String enseignementCode) {
         this.id = id;
-        this.date = date;
-        this.heureDebut = heureDebut;
-        this.heureFin = heureFin;
+        this.debutCours = debutCours;
+        this.finCours = finCours;
         this.presentiel = presentiel;
         this.enseignantId = enseignantId;
         this.salleId = salleId;
@@ -36,28 +33,20 @@ public class Cours implements Comparable<Cours> {
         return id;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getDebutCours() {
+        return debutCours;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDebutCours(LocalDateTime debutCours) {
+        this.debutCours = debutCours;
     }
 
-    public LocalTime getHeureDebut() {
-        return heureDebut;
+    public LocalDateTime getFinCours() {
+        return finCours;
     }
 
-    public void setHeureDebut(LocalTime heureDebut) {
-        this.heureDebut = heureDebut;
-    }
-
-    public LocalTime getHeureFin() {
-        return heureFin;
-    }
-
-    public void setHeureFin(LocalTime heureFin) {
-        this.heureFin = heureFin;
+    public void setFinCours(LocalDateTime finCours) {
+        this.finCours = finCours;
     }
 
     public boolean isPresentiel() {
@@ -94,17 +83,13 @@ public class Cours implements Comparable<Cours> {
 
     @Override
     public int compareTo(@NotNull Cours o) {
-        // Comparaison par date puis par heure de début
-        int dateCompare = date.compareTo(o.date);
-        if (dateCompare == 0) {
-            return heureDebut.compareTo(o.heureDebut);
-        }
-        return dateCompare;
+        // Comparaison par début de cours
+        return debutCours.compareTo(o.debutCours);
     }
 
     @Override
     public String toString() {
-        return date.format(new DateTimeFormatterBuilder().appendPattern("dd/MM/yyyy").toFormatter()) + " de " + heureDebut.format(new DateTimeFormatterBuilder().appendPattern("HH:mm").toFormatter()) + " à " + heureFin.format(new DateTimeFormatterBuilder().appendPattern("HH:mm").toFormatter());
+        return debutCours.format(new DateTimeFormatterBuilder().appendPattern("dd/MM/yyyy").toFormatter()) + " de " + debutCours.format(new DateTimeFormatterBuilder().appendPattern("HH:mm").toFormatter()) + " à " + finCours.format(new DateTimeFormatterBuilder().appendPattern("HH:mm").toFormatter());
     }
 
     @Override
@@ -113,11 +98,11 @@ public class Cours implements Comparable<Cours> {
         if (o == null || getClass() != o.getClass()) return false;
         Cours cours = (Cours) o;
         if (id != -1 && id == cours.id) return true;
-        return presentiel == cours.presentiel && enseignantId == cours.enseignantId && salleId == cours.salleId && Objects.equals(date, cours.date) && Objects.equals(heureDebut, cours.heureDebut) && Objects.equals(heureFin, cours.heureFin) && Objects.equals(enseignementCode, cours.enseignementCode);
+        return presentiel == cours.presentiel && enseignantId == cours.enseignantId && salleId == cours.salleId && Objects.equals(debutCours, cours.debutCours) && Objects.equals(finCours, cours.finCours) && Objects.equals(enseignementCode, cours.enseignementCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, heureDebut, heureFin, presentiel, enseignantId, salleId, enseignementCode);
+        return Objects.hash(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode);
     }
 }

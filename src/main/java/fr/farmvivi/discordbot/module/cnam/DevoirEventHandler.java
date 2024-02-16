@@ -191,13 +191,13 @@ public class DevoirEventHandler extends ListenerAdapter implements DevoirListene
             // Pour le
             LocalDate datePour;
             if (devoir.getIdCoursPour() != null) {
-                datePour = coursDAO.selectById(devoir.getIdCoursPour()).getDate();
+                datePour = coursDAO.selectById(devoir.getIdCoursPour()).getDebutCours().toLocalDate();
             } else {
                 datePour = devoir.getDatePour();
             }
 
             // Donné le
-            LocalDate dateDonne = coursDAO.selectById(devoir.getIdCoursDonne()).getDate();
+            LocalDate dateDonne = coursDAO.selectById(devoir.getIdCoursDonne()).getDebutCours().toLocalDate();
 
             // Message
             MessageCreateBuilder messageBuilder = new MessageCreateBuilder();

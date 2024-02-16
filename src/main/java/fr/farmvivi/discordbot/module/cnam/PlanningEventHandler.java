@@ -21,6 +21,7 @@ import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
@@ -122,9 +123,13 @@ public class PlanningEventHandler implements PlanningListener {
     }
 
     private EmbedBuilder buildCoursEmbed(EmbedBuilder baseEmbed, Cours cours, Salle salle, Enseignant enseignant, Enseignement enseignement) {
-        String description = "De **" + cours.getHeureDebut() + "** à **" + cours.getHeureFin() + "** (" + calculDuree(cours.getHeureDebut(), cours.getHeureFin()) + ") avec " + enseignant.getPrenom() + " " + enseignant.getNom() + " en " + salle.getNom();
+        LocalDate date = cours.getDebutCours().toLocalDate();
+        LocalTime heureDebut = cours.getDebutCours().toLocalTime();
+        LocalTime heureFin = cours.getFinCours().toLocalTime();
 
-        baseEmbed.setTitle(baseEmbed.build().getTitle() + " pour le " + cours.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE) + " " + cours.getDate().getDayOfMonth() + " " + cours.getDate().getMonth().getDisplayName(TextStyle.FULL, Locale.FRANCE) + " " + cours.getDate().getYear());
+        String description = "De **" + heureDebut + "** à **" + heureFin + "** (" + calculDuree(heureDebut, heureFin) + ") avec " + enseignant.getPrenom() + " " + enseignant.getNom() + " en " + salle.getNom();
+
+        baseEmbed.setTitle(baseEmbed.build().getTitle() + " pour le " + date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE) + " " + date.getDayOfMonth() + " " + date.getMonth().getDisplayName(TextStyle.FULL, Locale.FRANCE) + " " + date.getYear());
 
         return baseEmbed.addField(enseignement.getNom(), description, false);
     }
