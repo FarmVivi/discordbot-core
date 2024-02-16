@@ -13,14 +13,6 @@ public enum PlanningItemType {
         this.fromCSV = fromCSV;
     }
 
-    public String getNom() {
-        return nom;
-    }
-
-    public String getFromCSV() {
-        return fromCSV;
-    }
-
     /**
      * Get the PlanningItemType from the CSV value
      *
@@ -34,6 +26,14 @@ public enum PlanningItemType {
             }
         }
         return null;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public String getFromCSV() {
+        return fromCSV;
     }
 
     @Override

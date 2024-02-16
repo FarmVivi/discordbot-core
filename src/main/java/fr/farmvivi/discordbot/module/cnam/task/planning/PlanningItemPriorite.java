@@ -12,14 +12,6 @@ public enum PlanningItemPriorite {
         this.fromCSV = fromCSV;
     }
 
-    public String getNom() {
-        return nom;
-    }
-
-    public String getFromCSV() {
-        return fromCSV;
-    }
-
     /**
      * Get the PlanningItemPriorite from the CSV value
      *
@@ -33,6 +25,14 @@ public enum PlanningItemPriorite {
             }
         }
         return null;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public String getFromCSV() {
+        return fromCSV;
     }
 
     @Override
