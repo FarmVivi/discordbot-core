@@ -23,6 +23,7 @@ import fr.farmvivi.discordbot.module.cnam.events.salle.SalleCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
 import fr.farmvivi.discordbot.module.cnam.task.planning.PlanningItem;
+import fr.farmvivi.discordbot.module.cnam.task.planning.PlanningItemType;
 import fr.farmvivi.discordbot.module.cnam.task.planning.PlanningScrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,15 +57,15 @@ public class PlanningScrapperTask implements Runnable {
     public void run() {
         long start = System.currentTimeMillis();
 
-        // Parsing planning from HTML
-        logger.info("Parsing planning from HTML...");
+        // Parsing planning
+        logger.info("Parsing planning...");
 
         PlanningScrapper scrapper = new PlanningScrapper(codeScolarite, uid);
         List<PlanningItem> planningCoursses = scrapper.scrap();
         scrapper.close();
 
         if (planningCoursses == null) {
-            logger.error("Error while parsing planning from HTML");
+            logger.error("Error while parsing planning");
             return;
         }
 
@@ -96,7 +97,7 @@ public class PlanningScrapperTask implements Runnable {
         List<Enseignement> enseignements = new ArrayList<>();
         List<Cours> courss = new ArrayList<>();
 
-        // Iterate over all cours in the HTML
+        // Iterate over all cours
         for (PlanningItem planningItem : planningCoursses) {
             // Skip private cours
             if (planningItem.isPrive()) {
@@ -263,7 +264,7 @@ public class PlanningScrapperTask implements Runnable {
                 }
 
                 // Cours
-                cours = new Cours(planningItem.getDateDebut(), planningItem.getDateFin(), planningItem.isEmplacementPresentiel(), enseignant.getId(), salle.getId(), enseignement.getCode());
+                cours = new Cours(planningItem.getDateDebut(), planningItem.getDateFin(), planningItem.isEmplacementPresentiel(), planningItem.getType().equals(PlanningItemType.EXAMEN), enseignant.getId(), salle.getId(), enseignement.getCode());
                 // Si le cours est chargé en mémoire
                 if (courss.contains(cours)) {
                     cours = courss.get(courss.indexOf(cours));
@@ -298,7 +299,7 @@ public class PlanningScrapperTask implements Runnable {
                             }
 
                             // Mise à jour en base de données
-                            cours = new Cours(searchCours.getId(), cours.getDebutCours(), cours.getFinCours(), cours.isPresentiel(), cours.getEnseignantId(), cours.getSalleId(), cours.getEnseignementCode());
+                            cours = new Cours(searchCours.getId(), cours.getDebutCours(), cours.getFinCours(), cours.isPresentiel(), cours.isExamen(), cours.getEnseignantId(), cours.getSalleId(), cours.getEnseignementCode());
                             coursDAO.update(cours);
                             bddCourss.remove(searchCours);
 
@@ -354,8 +355,8 @@ public class PlanningScrapperTask implements Runnable {
              *******************************************************/
         }
 
-        // Delete all elements that are not in the HTML anymore
-        logger.info("Deleting elements that are not in the HTML anymore...");
+        // Delete all elements that are not present anymore
+        logger.info("Deleting elements that are not present anymore...");
 
         // Suppression des éléments non utilisés
         // Cours

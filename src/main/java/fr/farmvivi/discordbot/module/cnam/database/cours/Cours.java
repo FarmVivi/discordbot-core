@@ -11,19 +11,21 @@ public class Cours implements Comparable<Cours> {
     private LocalDateTime debutCours;
     private LocalDateTime finCours;
     private boolean presentiel;
+    private boolean examen;
     private int enseignantId;
     private int salleId;
     private String enseignementCode;
 
-    public Cours(LocalDateTime debutCours, LocalDateTime finCours, boolean presentiel, int enseignantId, int salleId, String enseignementCode) {
-        this(-1, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode);
+    public Cours(LocalDateTime debutCours, LocalDateTime finCours, boolean presentiel, boolean examen, int enseignantId, int salleId, String enseignementCode) {
+        this(-1, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode);
     }
 
-    public Cours(int id, LocalDateTime debutCours, LocalDateTime finCours, boolean presentiel, int enseignantId, int salleId, String enseignementCode) {
+    public Cours(int id, LocalDateTime debutCours, LocalDateTime finCours, boolean presentiel, boolean examen, int enseignantId, int salleId, String enseignementCode) {
         this.id = id;
         this.debutCours = debutCours;
         this.finCours = finCours;
         this.presentiel = presentiel;
+        this.examen = examen;
         this.enseignantId = enseignantId;
         this.salleId = salleId;
         this.enseignementCode = enseignementCode;
@@ -55,6 +57,14 @@ public class Cours implements Comparable<Cours> {
 
     public void setPresentiel(boolean presentiel) {
         this.presentiel = presentiel;
+    }
+
+    public boolean isExamen() {
+        return examen;
+    }
+
+    public void setExamen(boolean examen) {
+        this.examen = examen;
     }
 
     public int getEnseignantId() {
@@ -98,11 +108,11 @@ public class Cours implements Comparable<Cours> {
         if (o == null || getClass() != o.getClass()) return false;
         Cours cours = (Cours) o;
         if (id != -1 && id == cours.id) return true;
-        return presentiel == cours.presentiel && enseignantId == cours.enseignantId && salleId == cours.salleId && Objects.equals(debutCours, cours.debutCours) && Objects.equals(finCours, cours.finCours) && Objects.equals(enseignementCode, cours.enseignementCode);
+        return presentiel == cours.presentiel && examen == cours.examen && enseignantId == cours.enseignantId && salleId == cours.salleId && Objects.equals(debutCours, cours.debutCours) && Objects.equals(finCours, cours.finCours) && Objects.equals(enseignementCode, cours.enseignementCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode);
+        return Objects.hash(id, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode);
     }
 }

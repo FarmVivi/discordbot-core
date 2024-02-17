@@ -17,11 +17,12 @@ public class CoursDAO extends DAO<Cours, Integer> {
     @Override
     public Cours create(Cours obj) throws SQLException {
         try (Connection connection = db.getConnection();
-             PreparedStatement statement = connection.prepareStatement("INSERT INTO cours (debut_cours, fin_cours, presentiel, id_enseignant, id_salle, code_enseignement) VALUES (?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO cours (debut_cours, fin_cours, presentiel, examen, id_enseignant, id_salle, code_enseignement) VALUES (?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             LocalDateTime debutCours = obj.getDebutCours();
             LocalDateTime finCours = obj.getFinCours();
             boolean presentiel = obj.isPresentiel();
+            boolean examen = obj.isExamen();
             int enseignantId = obj.getEnseignantId();
             int salleId = obj.getSalleId();
             String enseignementCode = obj.getEnseignementCode();
@@ -29,9 +30,10 @@ public class CoursDAO extends DAO<Cours, Integer> {
             statement.setObject(1, debutCours);
             statement.setObject(2, finCours);
             statement.setBoolean(3, presentiel);
-            statement.setInt(4, enseignantId);
-            statement.setInt(5, salleId);
-            statement.setString(6, enseignementCode);
+            statement.setBoolean(4, examen);
+            statement.setInt(5, enseignantId);
+            statement.setInt(6, salleId);
+            statement.setString(7, enseignementCode);
 
             int affectedRows = statement.executeUpdate();
 
@@ -43,7 +45,7 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 if (generatedKeys.next()) {
                     int id = generatedKeys.getInt(1);
 
-                    return new Cours(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode);
+                    return new Cours(id, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode);
                 } else {
                     throw new SQLException("Creating cours failed, no ID obtained.");
                 }
@@ -65,11 +67,12 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 LocalDateTime debutCours = statement.getResultSet().getObject("debut_cours", LocalDateTime.class);
                 LocalDateTime finCours = statement.getResultSet().getObject("fin_cours", LocalDateTime.class);
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                boolean examen = statement.getResultSet().getBoolean("examen");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
                 int salleId = statement.getResultSet().getInt("id_salle");
                 String enseignementCode = statement.getResultSet().getString("code_enseignement");
 
-                cours.add(new Cours(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode));
+                cours.add(new Cours(id, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode));
             }
         }
 
@@ -91,11 +94,12 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 LocalDateTime debutCours = statement.getResultSet().getObject("debut_cours", LocalDateTime.class);
                 LocalDateTime finCours = statement.getResultSet().getObject("fin_cours", LocalDateTime.class);
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                boolean examen = statement.getResultSet().getBoolean("examen");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
                 int salleId = statement.getResultSet().getInt("id_salle");
                 String enseignementCode = statement.getResultSet().getString("code_enseignement");
 
-                cours.add(new Cours(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode));
+                cours.add(new Cours(id, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode));
             }
         }
 
@@ -116,11 +120,12 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 LocalDateTime debutCours = statement.getResultSet().getObject("debut_cours", LocalDateTime.class);
                 LocalDateTime finCours = statement.getResultSet().getObject("fin_cours", LocalDateTime.class);
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                boolean examen = statement.getResultSet().getBoolean("examen");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
                 int salleId = statement.getResultSet().getInt("id_salle");
                 String enseignementCode = statement.getResultSet().getString("code_enseignement");
 
-                cours.add(new Cours(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode));
+                cours.add(new Cours(id, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode));
             }
         }
 
@@ -142,11 +147,12 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 LocalDateTime debutCours = statement.getResultSet().getObject("debut_cours", LocalDateTime.class);
                 LocalDateTime finCours = statement.getResultSet().getObject("fin_cours", LocalDateTime.class);
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                boolean examen = statement.getResultSet().getBoolean("examen");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
                 int salleId = statement.getResultSet().getInt("id_salle");
                 String enseignementCode = statement.getResultSet().getString("code_enseignement");
 
-                cours.add(new Cours(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode));
+                cours.add(new Cours(id, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode));
             }
         }
 
@@ -168,9 +174,10 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 LocalDateTime debutCours = statement.getResultSet().getObject("debut_cours", LocalDateTime.class);
                 LocalDateTime finCours = statement.getResultSet().getObject("fin_cours", LocalDateTime.class);
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                boolean examen = statement.getResultSet().getBoolean("examen");
                 int salleId = statement.getResultSet().getInt("id_salle");
 
-                cours.add(new Cours(id, debutCours, finCours, presentiel, idEnseignant, salleId, enseignementCode));
+                cours.add(new Cours(id, debutCours, finCours, presentiel, examen, idEnseignant, salleId, enseignementCode));
             }
         }
 
@@ -189,11 +196,12 @@ public class CoursDAO extends DAO<Cours, Integer> {
                 LocalDateTime debutCours = statement.getResultSet().getObject("debut_cours", LocalDateTime.class);
                 LocalDateTime finCours = statement.getResultSet().getObject("fin_cours", LocalDateTime.class);
                 boolean presentiel = statement.getResultSet().getBoolean("presentiel");
+                boolean examen = statement.getResultSet().getBoolean("examen");
                 int enseignantId = statement.getResultSet().getInt("id_enseignant");
                 int salleId = statement.getResultSet().getInt("id_salle");
                 String enseignementCode = statement.getResultSet().getString("code_enseignement");
 
-                return new Cours(id, debutCours, finCours, presentiel, enseignantId, salleId, enseignementCode);
+                return new Cours(id, debutCours, finCours, presentiel, examen, enseignantId, salleId, enseignementCode);
             }
         }
 
@@ -203,12 +211,13 @@ public class CoursDAO extends DAO<Cours, Integer> {
     @Override
     public boolean update(Cours obj) throws SQLException {
         try (Connection connection = db.getConnection();
-             PreparedStatement statement = connection.prepareStatement("UPDATE cours SET debut_cours = ?, fin_cours = ?, presentiel = ?, id_enseignant = ?, id_salle = ?, code_enseignement = ? WHERE id_cours = ?")) {
+             PreparedStatement statement = connection.prepareStatement("UPDATE cours SET debut_cours = ?, fin_cours = ?, presentiel = ?, examen = ?, id_enseignant = ?, id_salle = ?, code_enseignement = ? WHERE id_cours = ?")) {
 
             int id = obj.getId();
             LocalDateTime debut = obj.getDebutCours();
             LocalDateTime fin = obj.getFinCours();
             boolean presentiel = obj.isPresentiel();
+            boolean examen = obj.isExamen();
             int enseignantId = obj.getEnseignantId();
             int salleId = obj.getSalleId();
             String enseignementCode = obj.getEnseignementCode();
@@ -216,10 +225,11 @@ public class CoursDAO extends DAO<Cours, Integer> {
             statement.setObject(1, debut);
             statement.setObject(2, fin);
             statement.setBoolean(3, presentiel);
-            statement.setInt(4, enseignantId);
-            statement.setInt(5, salleId);
-            statement.setString(6, enseignementCode);
-            statement.setInt(7, id);
+            statement.setBoolean(4, examen);
+            statement.setInt(5, enseignantId);
+            statement.setInt(6, salleId);
+            statement.setString(7, enseignementCode);
+            statement.setInt(8, id);
             int rowsAffected = statement.executeUpdate();
 
             if (rowsAffected < 1) {
