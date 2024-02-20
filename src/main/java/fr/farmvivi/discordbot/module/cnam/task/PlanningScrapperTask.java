@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PlanningScrapperTask implements Runnable {
+    private final int year;
     private final String codeScolarite;
     private final String uid;
     private final SalleDAO salleDAO;
@@ -44,7 +45,8 @@ public class PlanningScrapperTask implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(PlanningScrapperTask.class);
     private final List<PlanningListener> listeners = new LinkedList<>();
 
-    public PlanningScrapperTask(String codeScolarite, String uid, DatabaseAccess databaseAccess) {
+    public PlanningScrapperTask(int year, String codeScolarite, String uid, DatabaseAccess databaseAccess) {
+        this.year = year;
         this.codeScolarite = codeScolarite;
         this.uid = uid;
         this.salleDAO = new SalleDAO(databaseAccess);
@@ -60,7 +62,7 @@ public class PlanningScrapperTask implements Runnable {
         // Parsing planning
         logger.info("Parsing planning...");
 
-        PlanningScrapper scrapper = new PlanningScrapper(codeScolarite, uid);
+        PlanningScrapper scrapper = new PlanningScrapper(year, codeScolarite, uid);
         List<PlanningItem> planningCoursses = scrapper.scrap();
         scrapper.close();
 

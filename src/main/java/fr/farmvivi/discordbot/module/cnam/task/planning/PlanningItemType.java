@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.module.cnam.task.planning;
 
 public enum PlanningItemType {
     COURS("Cours", "Cours"),
+    TP("TP", "TP"),
     EXAMEN("Examen", "Exam"),
     ;
 

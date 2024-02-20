@@ -9,10 +9,12 @@ import fr.farmvivi.discordbot.module.cnam.command.AddDevoirCommand;
 import fr.farmvivi.discordbot.module.cnam.command.EditDevoirCommand;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningDailyPrintTask;
+import fr.farmvivi.discordbot.module.cnam.task.PlanningExporterTask;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningScrapperTask;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.forms.FormsModule;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,6 +29,7 @@ public class CnamModule extends Module {
     private final ScheduledExecutorService scheduler;
 
     private final PlanningScrapperTask planningScrapperTask;
+    private final PlanningExporterTask planningExporterTask;
     private final PlanningDailyPrintTask planningDailyPrintTask;
 
     private final DevoirEventHandler devoirEventHandler;
@@ -53,13 +56,28 @@ public class CnamModule extends Module {
             throw new RuntimeException(e);
         }
 
-        // Planning scrapper
+        // Scheduler
         this.scheduler = new ScheduledThreadPoolExecutor(1);
+
+        // Planning scrapper
         try {
             String planningCodeScolarite = configuration.getValue("CNAM_PLANNING_CODE_SCOLARITE");
             String planningUid = configuration.getValue("CNAM_PLANNING_UID");
+            int planningYear = Integer.parseInt(configuration.getValue("CNAM_PLANNING_YEAR"));
 
-            this.planningScrapperTask = new PlanningScrapperTask(planningCodeScolarite, planningUid, databaseManager.getDatabaseAccess());
+            this.planningScrapperTask = new PlanningScrapperTask(planningYear, planningCodeScolarite, planningUid, databaseManager.getDatabaseAccess());
+        } catch (Configuration.ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Planning exporter
+        try {
+            int planningYear = Integer.parseInt(configuration.getValue("CNAM_PLANNING_YEAR"));
+            String planningExportFilePath = configuration.getValue("CNAM_PLANNING_EXPORT_FILE_PATH");
+
+            File planningFile = new File(planningExportFilePath);
+
+            this.planningExporterTask = new PlanningExporterTask(planningYear, planningFile, databaseManager.getDatabaseAccess());
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -144,6 +162,17 @@ public class CnamModule extends Module {
 
             // Scrap planning after 1 minute, then every X minutes
             scheduler.scheduleAtFixedRate(planningScrapperTask, 1, scrapperTaskDelay, TimeUnit.MINUTES);
+        } catch (Configuration.ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        logger.info("Starting planning exporter task...");
+
+        try {
+            int exporterTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_EXPORTER_DELAY"));
+
+            // Export planning after 2 minutes, then every X minutes
+            scheduler.scheduleAtFixedRate(planningExporterTask, 2, exporterTaskDelay, TimeUnit.MINUTES);
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }

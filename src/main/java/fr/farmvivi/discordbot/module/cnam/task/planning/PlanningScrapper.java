@@ -5,8 +5,10 @@ import com.opencsv.exceptions.CsvValidationException;
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.jda.JDAManager;
 import org.htmlunit.*;
-import org.htmlunit.html.HtmlElement;
+import org.htmlunit.html.DomElement;
+import org.htmlunit.html.HtmlOption;
 import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlSelect;
 import org.htmlunit.javascript.SilentJavaScriptErrorListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class PlanningScrapper implements Closeable {
     private static final String PLANNING_URL = "https://senesi.gescicca.net/Planning.aspx?code_scolarite=%s&uid=%s";
 
+    private final int year;
     private final String codeScolarite;
     private final String uid;
 
@@ -35,7 +38,8 @@ public class PlanningScrapper implements Closeable {
     private HtmlPage webPage;
     private ByteArrayOutputStream csvFile;
 
-    public PlanningScrapper(String codeScolarite, String uid) {
+    public PlanningScrapper(int year, String codeScolarite, String uid) {
+        this.year = year;
         this.codeScolarite = codeScolarite;
         this.uid = uid;
     }
@@ -111,7 +115,46 @@ public class PlanningScrapper implements Closeable {
 
     private boolean downloadPlanningCSV() {
         // Recovering the loading logo
-        HtmlElement htmlLoadingLogoElement = webPage.getFirstByXPath("//*[@class=\"wait\"]");
+        DomElement htmlLoadingLogoElement = webPage.getFirstByXPath("//*[@class=\"wait\"]");
+
+        // Check that the loading logo is not visible
+        if (htmlLoadingLogoElement == null || htmlLoadingLogoElement.isDisplayed()) {
+            this.warnAdmins();
+            return false;
+        }
+
+        // Recovering the select to choose the year
+        DomElement htmlSelectYearElement = webPage.getElementById("m_c_planning_ddlANNSCO");
+
+        // Check that the select is present and is HtmlSelect
+        if (htmlSelectYearElement == null || !(htmlSelectYearElement instanceof HtmlSelect htmlSelectYear)) {
+            this.warnAdmins();
+            return false;
+        }
+
+        // Recovering the select option for the year
+        HtmlOption htmlSelectYearOption;
+        try {
+            htmlSelectYearOption = htmlSelectYear.getOptionByValue(String.valueOf(year));
+        } catch (ElementNotFoundException e) {
+            this.warnAdmins();
+            return false;
+        }
+
+        // Check that the option is present and is not disabled
+        if (htmlSelectYearOption == null || htmlSelectYearOption.isDisabled()) {
+            this.warnAdmins();
+            return false;
+        }
+
+        // Select the year
+        htmlSelectYear.setSelectedAttribute(htmlSelectYearOption, true);
+
+        // Wait for the page to load
+        webClient.waitForBackgroundJavaScript(60000);
+
+        // Refresh elements
+        htmlLoadingLogoElement = webPage.getFirstByXPath("//*[@class=\"wait\"]");
 
         // Check that the loading logo is not visible
         if (htmlLoadingLogoElement == null || htmlLoadingLogoElement.isDisplayed()) {
@@ -120,7 +163,7 @@ public class PlanningScrapper implements Closeable {
         }
 
         // Recovering the button to download CSV file
-        HtmlElement htmlBtnDownloadCSVElement = webPage.getFirstByXPath("//*[@id=\"m_c_planning_lbExporterPlanningCSV\"]");
+        DomElement htmlBtnDownloadCSVElement = webPage.getElementById("m_c_planning_lbExporterPlanningCSV");
 
         // Check that the button is present and has not changed (it should be " Planning au format CSV")
         if (htmlBtnDownloadCSVElement == null || !htmlBtnDownloadCSVElement.getVisibleText().equals(" Planning au format CSV")) {
@@ -285,8 +328,10 @@ public class PlanningScrapper implements Closeable {
         // A: Objet (ex. ACC002 - Cours 2h)
         String A = line[0];
 
-        String codeUE = A.substring(0, A.indexOf(" - "));
-        PlanningItemType type = PlanningItemType.fromCSV(A.substring(A.indexOf(" - ") + 3).split(" ")[0]);
+        String[] UESplit = A.split(" - ");
+        String codeUE = UESplit[0];
+        String[] UESplit2 = UESplit[1].split(" ");
+        PlanningItemType type = PlanningItemType.fromCSV(UESplit2[0]);
         if (type == null) {
             this.warnAdmins();
             return null;
@@ -394,8 +439,8 @@ public class PlanningScrapper implements Closeable {
         // R: Emplacement (ex. ), (ex. Distanciel     - Salle Salle virtuelle), (ex. CNAM 292 Rue Saint-Martin  75003 PARIS - Salle Salle 172)
         String R = line[17];
 
-        String emplacementAdresse = null;
-        String emplacementSalle = null;
+        String emplacementAdresse = "";
+        String emplacementSalle = "INCONNU";
         boolean emplacementPresentiel = true;
         if (R != null && !R.isEmpty()) {
             String[] emplacement = R.split(" - ");
