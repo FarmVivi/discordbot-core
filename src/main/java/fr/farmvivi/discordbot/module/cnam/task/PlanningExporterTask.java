@@ -22,10 +22,12 @@ import net.fortuna.ical4j.validate.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 
 public class PlanningExporterTask implements Runnable {
@@ -112,75 +114,6 @@ public class PlanningExporterTask implements Runnable {
                 }
             }
         }
-
-        // FIX EMPTY LINES
-        // Read the file and remove empty lines
-        // Write the file back
-        // This is a workaround for the ical4j library adding empty lines to the file
-        List<String> lines = new LinkedList<>();
-        FileReader fileReader = null;
-        BufferedReader bufferedReader = null;
-        try {
-            fileReader = new FileReader(planningFile);
-            bufferedReader = new BufferedReader(fileReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                if (!line.isBlank()) {
-                    lines.add(line);
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Error while removing empty lines from file", e);
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    logger.error("Error while closing buffered reader", e);
-                }
-            }
-            if (fileReader != null) {
-                try {
-                    fileReader.close();
-                } catch (IOException e) {
-                    logger.error("Error while closing file reader", e);
-                }
-            }
-        }
-
-        FileWriter fileWriter = null;
-        BufferedWriter bufferedWriter = null;
-        PrintWriter printWriter = null;
-        try {
-            fileWriter = new FileWriter(planningFile);
-            bufferedWriter = new BufferedWriter(fileWriter);
-            printWriter = new PrintWriter(bufferedWriter);
-            for (String line : lines) {
-                printWriter.println(line);
-            }
-            lines.clear();
-        } catch (IOException e) {
-            logger.error("Error while removing empty lines from file", e);
-        } finally {
-            if (printWriter != null) {
-                printWriter.close();
-            }
-            if (bufferedWriter != null) {
-                try {
-                    bufferedWriter.close();
-                } catch (IOException e) {
-                    logger.error("Error while closing buffered writer", e);
-                }
-            }
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close();
-                } catch (IOException e) {
-                    logger.error("Error while closing file writer", e);
-                }
-            }
-        }
-        // END FIX EMPTY LINES
 
         long finish = System.currentTimeMillis();
 
