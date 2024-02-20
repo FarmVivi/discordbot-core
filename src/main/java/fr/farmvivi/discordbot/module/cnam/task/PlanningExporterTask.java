@@ -14,6 +14,8 @@ import fr.farmvivi.discordbot.module.cnam.database.salle.SalleDAO;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.TextList;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
@@ -78,11 +80,14 @@ public class PlanningExporterTask implements Runnable {
         // Constructing planning with ical4j
         logger.info("Constructing planning...");
 
+        TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
         Calendar calendar = new Calendar();
         calendar.add(new ProdId("-//CnamBot//Planning 1.0//FR"));
         calendar.add(ImmutableVersion.VERSION_2_0);
         calendar.add(ImmutableCalScale.GREGORIAN);
+        calendar.add(registry.getTimeZone("Europe/Paris").getVTimeZone());
 
+        // Adding events
         for (Cours cours : bddCourss) {
             Enseignement enseignement = getEnseignementForCours(cours, bddEnseignements);
             Enseignant enseignant = getEnseignantForCours(cours, bddEnseignants);
