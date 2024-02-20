@@ -30,7 +30,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public class PlanningExporterTask implements Runnable {
@@ -82,13 +83,13 @@ public class PlanningExporterTask implements Runnable {
         logger.info("Constructing planning...");
 
         TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-        VTimeZone vtz = registry.getTimeZone("Europe/Paris").getVTimeZone();
+        VTimeZone vtz = registry.getTimeZone(ZoneId.systemDefault().getId()).getVTimeZone();
         Calendar calendar = new Calendar();
         calendar.add(new ProdId("-//CnamBot//Planning 1.0//FR"));
         calendar.add(ImmutableVersion.VERSION_2_0);
         calendar.add(ImmutableCalScale.GREGORIAN);
         // Timezone
-        calendar.add(new XProperty("X-WR-TIMEZONE", "Europe/Paris"));
+        calendar.add(new XProperty("X-WR-TIMEZONE", ZoneId.systemDefault().getId()));
         calendar.add(vtz);
 
         // Adding events
@@ -146,8 +147,8 @@ public class PlanningExporterTask implements Runnable {
         boolean examen = cours.isExamen();
         String[] categories = (examen ? new String[]{"CNAM", "Examen"} : new String[]{"CNAM", "Cours"});
         String titre = (examen ? "Examen" : "Cours") + " " + enseignement.getNom();
-        LocalDateTime dateDebut = cours.getDebutCours();
-        LocalDateTime dateFin = cours.getFinCours();
+        ZonedDateTime dateDebut = cours.getDebutCours().atZone(ZoneId.systemDefault());
+        ZonedDateTime dateFin = cours.getFinCours().atZone(ZoneId.systemDefault());
         StringBuilder description = new StringBuilder();
         if (salle != null) {
             description.append(salle.getNom()).append("\n");

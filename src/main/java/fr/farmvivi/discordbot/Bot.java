@@ -46,6 +46,9 @@ public class Bot {
         logger.info("System.getProperty('java.version') == '" + System.getProperty("java.version") + "'");
         logger.info("System.getProperty('java.vendor') == '" + System.getProperty("java.vendor") + "'");
         logger.info("System.getProperty('sun.arch.data.model') == '" + System.getProperty("sun.arch.data.model") + "'");
+        logger.info("System.getProperty('user.timezone') == '" + System.getProperty("user.timezone") + "'");
+        logger.info("System.getProperty('user.country') == '" + System.getProperty("user.country") + "'");
+        logger.info("System.getProperty('user.language') == '" + System.getProperty("user.language") + "'");
 
         instance = this;
 
