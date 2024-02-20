@@ -17,6 +17,7 @@ import net.fortuna.ical4j.model.TextList;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
 import net.fortuna.ical4j.model.property.immutable.ImmutableVersion;
@@ -81,11 +82,14 @@ public class PlanningExporterTask implements Runnable {
         logger.info("Constructing planning...");
 
         TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+        VTimeZone vtz = registry.getTimeZone("Europe/Paris").getVTimeZone();
         Calendar calendar = new Calendar();
         calendar.add(new ProdId("-//CnamBot//Planning 1.0//FR"));
         calendar.add(ImmutableVersion.VERSION_2_0);
         calendar.add(ImmutableCalScale.GREGORIAN);
-        calendar.add(registry.getTimeZone("Europe/Paris").getVTimeZone());
+        // Timezone
+        calendar.add(new XProperty("X-WR-TIMEZONE", "Europe/Paris"));
+        //calendar.add(vtz);
 
         // Adding events
         for (Cours cours : bddCourss) {
