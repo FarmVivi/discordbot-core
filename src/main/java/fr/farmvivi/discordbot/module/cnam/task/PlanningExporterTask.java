@@ -89,7 +89,7 @@ public class PlanningExporterTask implements Runnable {
         calendar.add(ImmutableCalScale.GREGORIAN);
         // Timezone
         calendar.add(new XProperty("X-WR-TIMEZONE", "Europe/Paris"));
-        //calendar.add(vtz);
+        calendar.add(vtz);
 
         // Adding events
         for (Cours cours : bddCourss) {
