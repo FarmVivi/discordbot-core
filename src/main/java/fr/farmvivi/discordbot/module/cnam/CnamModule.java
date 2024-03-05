@@ -7,6 +7,7 @@ import fr.farmvivi.discordbot.module.Module;
 import fr.farmvivi.discordbot.module.Modules;
 import fr.farmvivi.discordbot.module.cnam.command.AddDevoirCommand;
 import fr.farmvivi.discordbot.module.cnam.command.EditDevoirCommand;
+import fr.farmvivi.discordbot.module.cnam.command.RefreshPlanningCommand;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningDailyPrintTask;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningExporterTask;
@@ -184,6 +185,7 @@ public class CnamModule extends Module {
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
         commandsModule.registerCommand(module, new AddDevoirCommand(databaseManager, eventManager, formsModule));
         commandsModule.registerCommand(module, new EditDevoirCommand(databaseManager, eventManager, formsModule));
+        commandsModule.registerCommand(module, new RefreshPlanningCommand(planningScrapperDebouncer));
 
         // Starting planning scrapper task
         logger.info("Starting planning scrapper task...");
