@@ -1,8 +1,9 @@
 package fr.farmvivi.discordbot.module.cnam.events.enseignement;
 
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
+import fr.farmvivi.discordbot.utils.event.IEvent;
 
-public class EnseignementUpdateEvent {
+public class EnseignementUpdateEvent implements IEvent {
     private final Enseignement oldEnseignement;
     private final Enseignement newEnseignement;
 

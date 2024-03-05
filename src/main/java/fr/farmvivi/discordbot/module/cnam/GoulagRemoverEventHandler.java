@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam;
 
-import fr.farmvivi.discordbot.module.cnam.database.DatabaseAccess;
+import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.task.GoulagRemoverTask;
@@ -20,10 +20,10 @@ public class GoulagRemoverEventHandler extends ListenerAdapter {
     private final Role role;
     private final CoursDAO coursDAO;
 
-    public GoulagRemoverEventHandler(ScheduledExecutorService scheduler, Role role, DatabaseAccess databaseAccess) {
+    public GoulagRemoverEventHandler(ScheduledExecutorService scheduler, Role role, DatabaseManager databaseManager) {
         this.scheduler = scheduler;
         this.role = role;
-        this.coursDAO = new CoursDAO(databaseAccess);
+        this.coursDAO = new CoursDAO(databaseManager.getDatabaseAccess());
     }
 
     @Override

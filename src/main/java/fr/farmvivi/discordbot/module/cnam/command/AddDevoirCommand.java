@@ -1,29 +1,32 @@
 package fr.farmvivi.discordbot.module.cnam.command;
 
-import fr.farmvivi.discordbot.module.cnam.CnamModule;
-import fr.farmvivi.discordbot.module.cnam.DevoirEventHandler;
+import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
 import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
 import fr.farmvivi.discordbot.module.forms.Form;
+import fr.farmvivi.discordbot.module.forms.FormsModule;
+import fr.farmvivi.discordbot.utils.event.IEventManager;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;
 
 public class AddDevoirCommand extends Command {
-    private final CnamModule module;
-    private final DevoirEventHandler devoirEventHandler;
+    private final DatabaseManager databaseManager;
+    private final IEventManager eventManager;
+    private final FormsModule forms;
 
-    public AddDevoirCommand(CnamModule module, DevoirEventHandler devoirEventHandler) {
+    public AddDevoirCommand(DatabaseManager databaseManager, IEventManager eventManager, FormsModule forms) {
         super("devoir_add", CommandCategory.CNAM, "Ajouter un devoir");
 
         this.setGuildOnly(true);
 
-        this.module = module;
-        this.devoirEventHandler = devoirEventHandler;
+        this.databaseManager = databaseManager;
+        this.eventManager = eventManager;
+        this.forms = forms;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class AddDevoirCommand extends Command {
             return false;
 
         if (event.getOriginalEvent() instanceof IReplyCallback replyCallback) {
-            Form form = new AddDevoirForm(module, devoirEventHandler);
+            Form form = new AddDevoirForm(databaseManager, eventManager, forms);
             form.start(replyCallback);
         } else {
             reply.error("Une erreur est survenue lors de l'exécution de la commande.");

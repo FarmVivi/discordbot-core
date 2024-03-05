@@ -1,8 +1,9 @@
 package fr.farmvivi.discordbot.module.cnam.events.salle;
 
 import fr.farmvivi.discordbot.module.cnam.database.salle.Salle;
+import fr.farmvivi.discordbot.utils.event.IEvent;
 
-public class SalleUpdateEvent {
+public class SalleUpdateEvent implements IEvent {
     private final Salle oldSalle;
     private final Salle newSalle;
 

@@ -5,7 +5,6 @@ import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
 import fr.farmvivi.discordbot.module.cnam.database.salle.Salle;
-import fr.farmvivi.discordbot.module.cnam.events.PlanningListener;
 import fr.farmvivi.discordbot.module.cnam.events.cours.CoursCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.cours.CoursRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.cours.CoursUpdateEvent;
@@ -18,6 +17,8 @@ import fr.farmvivi.discordbot.module.cnam.events.enseignement.EnseignementUpdate
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
+import fr.farmvivi.discordbot.utils.Debouncer;
+import fr.farmvivi.discordbot.utils.event.SubscribeEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
@@ -27,70 +28,120 @@ import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
-public class PlanningEventHandler implements PlanningListener {
+public class PlanningEventHandler {
+    private final Debouncer planningExportDebouncer;
     private final TextChannel channel;
 
-    public PlanningEventHandler(TextChannel channel) {
+    public PlanningEventHandler(Debouncer planningExportDebouncer, TextChannel channel) {
+        this.planningExportDebouncer = planningExportDebouncer;
         this.channel = channel;
     }
 
-    @Override
+    @SubscribeEvent
     public void onSalleCreate(SalleCreateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildSalleEmbed(buildBaseCreateEmbed("Une nouvelle salle a été ajoutée"), event.getSalle()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onSalleRemove(SalleRemoveEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildSalleEmbed(buildBaseRemoveEmbed("Une salle a été supprimée"), event.getSalle()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onSalleUpdate(SalleUpdateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildSalleEmbed(buildBaseUpdateEmbed("Une salle a été modifiée"), event.getNewSalle()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onEnseignantCreate(EnseignantCreateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildEnseignantEmbed(buildBaseCreateEmbed("Un nouvel enseignant a été ajouté"), event.getEnseignant()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onEnseignantRemove(EnseignantRemoveEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildEnseignantEmbed(buildBaseRemoveEmbed("Un enseignant a été supprimé"), event.getEnseignant()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onEnseignantUpdate(EnseignantUpdateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildEnseignantEmbed(buildBaseUpdateEmbed("Un enseignant a été modifié"), event.getNewEnseignant()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onEnseignementCreate(EnseignementCreateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildEnseignementEmbed(buildBaseCreateEmbed("Un nouvel enseignement a été ajouté"), event.getEnseignement()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onEnseignementRemove(EnseignementRemoveEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildEnseignementEmbed(buildBaseRemoveEmbed("Un enseignement a été supprimé"), event.getEnseignement()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onEnseignementUpdate(EnseignementUpdateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildEnseignementEmbed(buildBaseUpdateEmbed("Un enseignement a été modifié"), event.getNewEnseignement()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onCoursCreate(CoursCreateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildCoursEmbed(buildBaseCreateEmbed("Un nouveau cours a été ajouté"), event.getCours(), event.getSalleCours(), event.getEnseignantCours(), event.getEnseignementCours()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onCoursRemove(CoursRemoveEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildCoursEmbed(buildBaseRemoveEmbed("Un cours a été supprimé"), event.getCours(), event.getSalleCours(), event.getEnseignantCours(), event.getEnseignementCours()).build()).queue();
     }
 
-    @Override
+    @SubscribeEvent
     public void onCoursUpdate(CoursUpdateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
+        // Send message in log channel
         channel.sendMessageEmbeds(buildCoursEmbed(buildBaseUpdateEmbed("Un cours a été modifié"), event.getNewCours(), event.getNewSalleCours(), event.getNewEnseignantCours(), event.getNewEnseignementCours()).build()).queue();
     }
 

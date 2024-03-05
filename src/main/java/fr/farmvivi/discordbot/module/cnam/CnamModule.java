@@ -13,6 +13,9 @@ import fr.farmvivi.discordbot.module.cnam.task.PlanningExporterTask;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningScrapperTask;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.forms.FormsModule;
+import fr.farmvivi.discordbot.utils.Debouncer;
+import fr.farmvivi.discordbot.utils.event.EventManager;
+import fr.farmvivi.discordbot.utils.event.IEventManager;
 
 import java.io.File;
 import java.time.Duration;
@@ -25,16 +28,20 @@ import java.util.concurrent.TimeUnit;
 
 public class CnamModule extends Module {
     private final Bot bot;
-    private final DatabaseManager databaseManager;
-    private final ScheduledExecutorService scheduler;
+    private DatabaseManager databaseManager;
+    private ScheduledExecutorService scheduler;
+    private IEventManager eventManager;
 
-    private final PlanningScrapperTask planningScrapperTask;
-    private final PlanningExporterTask planningExporterTask;
-    private final PlanningDailyPrintTask planningDailyPrintTask;
+    private PlanningScrapperTask planningScrapperTask;
+    private PlanningExporterTask planningExporterTask;
+    private PlanningDailyPrintTask planningDailyPrintTask;
 
-    private final DevoirEventHandler devoirEventHandler;
-    private GoulagRemoverEventHandler goulagRemoverEventHandler;
+    private Debouncer planningScrapperDebouncer;
+    private Debouncer planningExportDebouncer;
+
     private PlanningEventHandler planningEventHandler;
+    private DevoirEventHandler devoirEventHandler;
+    private GoulagRemoverEventHandler goulagRemoverEventHandler;
 
     private FormsModule formsModule;
 
@@ -42,7 +49,21 @@ public class CnamModule extends Module {
         super(Modules.CNAM);
 
         this.bot = bot;
+    }
 
+    @Override
+    public void onPreEnable() {
+        super.onPreEnable();
+
+        // Retrieve forms module
+        formsModule = (FormsModule) bot.getModulesManager().getModule(Modules.FORMS);
+
+        // Language
+        logger.info("Setting French locale");
+        Locale.setDefault(Locale.FRENCH);
+
+        // Database
+        logger.info("Setting up database from configuration...");
         Configuration configuration = bot.getConfiguration();
         try {
             String databaseHost = configuration.getValue("CNAM_DATABASE_HOST");
@@ -57,128 +78,126 @@ public class CnamModule extends Module {
         }
 
         // Scheduler
+        logger.info("Setting up scheduler...");
         this.scheduler = new ScheduledThreadPoolExecutor(1);
 
+        // Event manager
+        logger.info("Setting up event manager...");
+        this.eventManager = new EventManager();
+
         // Planning scrapper
+        logger.info("Setting up planning scrapper task...");
         try {
             String planningCodeScolarite = configuration.getValue("CNAM_PLANNING_CODE_SCOLARITE");
             String planningUid = configuration.getValue("CNAM_PLANNING_UID");
             int planningYear = Integer.parseInt(configuration.getValue("CNAM_PLANNING_YEAR"));
 
-            this.planningScrapperTask = new PlanningScrapperTask(planningYear, planningCodeScolarite, planningUid, databaseManager.getDatabaseAccess());
+            this.planningScrapperTask = new PlanningScrapperTask(planningYear, planningCodeScolarite, planningUid, eventManager, databaseManager);
+            this.planningScrapperDebouncer = new Debouncer(2500, () -> {
+                logger.info("Running planning scrapper task...");
+                scheduler.execute(planningScrapperTask);
+            });
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
 
         // Planning exporter
+        logger.info("Setting up planning exporter task...");
         try {
             int planningYear = Integer.parseInt(configuration.getValue("CNAM_PLANNING_YEAR"));
             String planningExportFilePath = configuration.getValue("CNAM_PLANNING_EXPORT_FILE_PATH");
 
             File planningFile = new File(planningExportFilePath);
 
-            this.planningExporterTask = new PlanningExporterTask(planningYear, planningFile, databaseManager.getDatabaseAccess());
+            this.planningExporterTask = new PlanningExporterTask(planningYear, planningFile, databaseManager);
+            this.planningExportDebouncer = new Debouncer(2500, () -> {
+                logger.info("Running planning exporter task...");
+                scheduler.execute(planningExporterTask);
+            });
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
 
         // Planning daily print
+        logger.info("Setting up planning daily print task...");
         try {
             String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_DAILY_CHANNEL_ID");
 
-            this.planningDailyPrintTask = new PlanningDailyPrintTask(JDAManager.getJDA().getTextChannelById(planningLogsChannelId), databaseManager.getDatabaseAccess());
+            this.planningDailyPrintTask = new PlanningDailyPrintTask(JDAManager.getJDA().getTextChannelById(planningLogsChannelId), databaseManager);
+        } catch (Configuration.ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Planning logs
+        logger.info("Setting up planning event handler...");
+        try {
+            String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_LOGS_CHANNEL_ID");
+
+            this.planningEventHandler = new PlanningEventHandler(planningExportDebouncer, JDAManager.getJDA().getTextChannelById(planningLogsChannelId));
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
 
         // Devoirs
+        logger.info("Setting up devoir event handler...");
         try {
             String devoirTODOChannelId = bot.getConfiguration().getValue("CNAM_DEVOIRS_TODO_CHANNEL_ID");
             String devoirAlertChannelId = bot.getConfiguration().getValue("CNAM_DEVOIRS_ALERT_CHANNEL_ID");
 
-            this.devoirEventHandler = new DevoirEventHandler(this, JDAManager.getJDA().getTextChannelById(devoirTODOChannelId), JDAManager.getJDA().getTextChannelById(devoirAlertChannelId));
+            this.devoirEventHandler = new DevoirEventHandler(databaseManager, planningExportDebouncer, JDAManager.getJDA().getTextChannelById(devoirTODOChannelId), JDAManager.getJDA().getTextChannelById(devoirAlertChannelId));
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
 
-    @Override
-    public void onPreEnable() {
-        super.onPreEnable();
+        // Goulag remover
+        logger.info("Setting up goulag remover event handler...");
+        try {
+            long goulagRoleId = Long.parseLong(bot.getConfiguration().getValue("GOULAG_ROLE"));
 
-        logger.info("Setting French locale");
-
-        Locale.setDefault(Locale.FRENCH);
+            this.goulagRemoverEventHandler = new GoulagRemoverEventHandler(scheduler, JDAManager.getJDA().getRoleById(goulagRoleId), databaseManager);
+        } catch (Configuration.ValueNotFoundException e) {
+            logger.warn("Failed to load goulag remover because Goulag module is not loaded");
+        }
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
 
+        // Connect to database
         logger.info("Connecting to database...");
-
         databaseManager.getDatabaseAccess().initPool();
 
+        // Registering listeners
         logger.info("Registering listeners...");
-
+        // JDA
         JDAManager.getJDA().addEventListener(devoirEventHandler);
-
-        try {
-            long goulagRoleId = Long.parseLong(bot.getConfiguration().getValue("GOULAG_ROLE"));
-
-            this.goulagRemoverEventHandler = new GoulagRemoverEventHandler(scheduler, JDAManager.getJDA().getRoleById(goulagRoleId), databaseManager.getDatabaseAccess());
+        if (goulagRemoverEventHandler != null) {
             JDAManager.getJDA().addEventListener(goulagRemoverEventHandler);
-        } catch (Configuration.ValueNotFoundException e) {
-            logger.warn("Failed to load goulag remover because Goulag module is not loaded");
         }
+        // Event manager
+        eventManager.register(planningEventHandler);
+        eventManager.register(devoirEventHandler);
 
-        try {
-            String planningLogsChannelId = bot.getConfiguration().getValue("CNAM_PLANNING_LOGS_CHANNEL_ID");
-
-            this.planningEventHandler = new PlanningEventHandler(JDAManager.getJDA().getTextChannelById(planningLogsChannelId));
-            planningScrapperTask.registerListener(planningEventHandler);
-        } catch (Configuration.ValueNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
+        // Registering commands
         logger.info("Registering commands...");
-
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
+        commandsModule.registerCommand(module, new AddDevoirCommand(databaseManager, eventManager, formsModule));
+        commandsModule.registerCommand(module, new EditDevoirCommand(databaseManager, eventManager, formsModule));
 
-        commandsModule.registerCommand(module, new AddDevoirCommand(this, devoirEventHandler));
-        commandsModule.registerCommand(module, new EditDevoirCommand(this, devoirEventHandler));
-    }
-
-    @Override
-    public void onPostEnable() {
-        super.onPostEnable();
-
-        formsModule = (FormsModule) bot.getModulesManager().getModule(Modules.FORMS);
-
+        // Starting planning scrapper task
         logger.info("Starting planning scrapper task...");
-
         try {
             int scrapperTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_SCRAPPER_DELAY"));
 
             // Scrap planning after 1 minute, then every X minutes
-            scheduler.scheduleAtFixedRate(planningScrapperTask, 1, scrapperTaskDelay, TimeUnit.MINUTES);
+            scheduler.scheduleAtFixedRate(planningScrapperDebouncer::debounce, 1, scrapperTaskDelay, TimeUnit.MINUTES);
         } catch (Configuration.ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-        logger.info("Starting planning exporter task...");
-
-        try {
-            int exporterTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_EXPORTER_DELAY"));
-
-            // Export planning after 2 minutes, then every X minutes
-            scheduler.scheduleAtFixedRate(planningExporterTask, 2, exporterTaskDelay, TimeUnit.MINUTES);
-        } catch (Configuration.ValueNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
+        // Starting planning daily print task
         logger.info("Starting planning daily print task...");
-
         try {
             int dailyPrintTaskDelay = Integer.parseInt(bot.getConfiguration().getValue("CNAM_PLANNING_DAILY_PRINT_HOUR"));
 
@@ -200,25 +219,24 @@ public class CnamModule extends Module {
     public void onPreDisable() {
         super.onPreDisable();
 
+        // Unregistering listeners
         logger.info("Unregistering event listener...");
-
+        // JDA
         JDAManager.getJDA().removeEventListener(devoirEventHandler);
         if (goulagRemoverEventHandler != null) {
             JDAManager.getJDA().removeEventListener(goulagRemoverEventHandler);
-            goulagRemoverEventHandler = null;
         }
-        if (planningEventHandler != null) {
-            planningScrapperTask.unregisterListener(planningEventHandler);
-            planningEventHandler = null;
-        }
+        // Event manager
+        eventManager.unregister(planningEventHandler);
+        eventManager.unregister(devoirEventHandler);
 
-        logger.info("Stopping planning scrapper...");
-
+        // Shutdown scheduler
+        logger.info("Shutting down scheduler...");
         scheduler.shutdown();
         try {
             scheduler.awaitTermination(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("Planning scrapper shutdown interrupted", e);
         }
         if (!scheduler.isTerminated()) {
             logger.warn("Planning scrapper didn't stop in time, forcing shutdown");
@@ -230,26 +248,17 @@ public class CnamModule extends Module {
     public void onDisable() {
         super.onDisable();
 
+        // Unregistering commands
         logger.info("Unregistering commands...");
-
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
-
         commandsModule.unregisterCommands(module);
 
+        // Unregistering forms
         logger.info("Unregistering forms...");
-
         formsModule.unregisterForms(module);
 
+        // Disconnect from database
         logger.info("Disconnecting from database...");
-
         databaseManager.getDatabaseAccess().closePool();
-    }
-
-    public DatabaseManager getDatabaseManager() {
-        return databaseManager;
-    }
-
-    public FormsModule getFormsModule() {
-        return formsModule;
     }
 }

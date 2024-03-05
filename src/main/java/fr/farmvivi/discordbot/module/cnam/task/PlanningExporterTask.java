@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam.task;
 
-import fr.farmvivi.discordbot.module.cnam.database.DatabaseAccess;
+import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.devoir.Devoir;
@@ -45,14 +45,14 @@ public class PlanningExporterTask implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(PlanningExporterTask.class);
 
-    public PlanningExporterTask(int year, File planningFile, DatabaseAccess databaseAccess) {
+    public PlanningExporterTask(int year, File planningFile, DatabaseManager databaseManager) {
         this.year = year;
         this.planningFile = planningFile;
-        this.salleDAO = new SalleDAO(databaseAccess);
-        this.enseignantDAO = new EnseignantDAO(databaseAccess);
-        this.enseignementDAO = new EnseignementDAO(databaseAccess);
-        this.coursDAO = new CoursDAO(databaseAccess);
-        this.devoirDAO = new DevoirDAO(databaseAccess);
+        this.salleDAO = new SalleDAO(databaseManager.getDatabaseAccess());
+        this.enseignantDAO = new EnseignantDAO(databaseManager.getDatabaseAccess());
+        this.enseignementDAO = new EnseignementDAO(databaseManager.getDatabaseAccess());
+        this.coursDAO = new CoursDAO(databaseManager.getDatabaseAccess());
+        this.devoirDAO = new DevoirDAO(databaseManager.getDatabaseAccess());
     }
 
     @Override

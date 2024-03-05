@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.module.cnam.task;
 
 import fr.farmvivi.discordbot.DiscordColor;
-import fr.farmvivi.discordbot.module.cnam.database.DatabaseAccess;
+import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
@@ -34,12 +34,12 @@ public class PlanningDailyPrintTask implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(PlanningDailyPrintTask.class);
 
-    public PlanningDailyPrintTask(TextChannel channel, DatabaseAccess databaseAccess) {
+    public PlanningDailyPrintTask(TextChannel channel, DatabaseManager databaseManager) {
         this.channel = channel;
-        this.coursDAO = new CoursDAO(databaseAccess);
-        this.enseignementDAO = new EnseignementDAO(databaseAccess);
-        this.enseignantDAO = new EnseignantDAO(databaseAccess);
-        this.salleDAO = new SalleDAO(databaseAccess);
+        this.coursDAO = new CoursDAO(databaseManager.getDatabaseAccess());
+        this.enseignementDAO = new EnseignementDAO(databaseManager.getDatabaseAccess());
+        this.enseignantDAO = new EnseignantDAO(databaseManager.getDatabaseAccess());
+        this.salleDAO = new SalleDAO(databaseManager.getDatabaseAccess());
     }
 
     @Override

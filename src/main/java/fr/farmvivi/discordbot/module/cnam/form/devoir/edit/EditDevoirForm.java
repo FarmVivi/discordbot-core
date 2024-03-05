@@ -1,8 +1,7 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.edit;
 
 import fr.farmvivi.discordbot.module.Modules;
-import fr.farmvivi.discordbot.module.cnam.CnamModule;
-import fr.farmvivi.discordbot.module.cnam.DevoirEventHandler;
+import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.devoir.Devoir;
@@ -15,14 +14,16 @@ import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirUpdateEvent;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.step.CoursDonneCurrentCoursFormStep;
 import fr.farmvivi.discordbot.module.forms.Form;
+import fr.farmvivi.discordbot.module.forms.FormsModule;
+import fr.farmvivi.discordbot.utils.event.IEventManager;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class EditDevoirForm extends Form implements DevoirForm {
-    private final CnamModule module;
-    private final DevoirEventHandler devoirEventHandler;
+    private final IEventManager eventManager;
+    private final FormsModule forms;
 
     private final DevoirDAO devoirDAO;
     private final CoursDAO coursDAO;
@@ -31,15 +32,15 @@ public class EditDevoirForm extends Form implements DevoirForm {
 
     private Devoir devoir;
 
-    public EditDevoirForm(CnamModule module, DevoirEventHandler devoirEventHandler) {
-        this.module = module;
-        this.devoirEventHandler = devoirEventHandler;
+    public EditDevoirForm(DatabaseManager databaseManager, IEventManager eventManager, FormsModule forms) {
+        this.eventManager = eventManager;
+        this.forms = forms;
 
         // DAOs
-        devoirDAO = new DevoirDAO(module.getDatabaseManager().getDatabaseAccess());
-        coursDAO = new CoursDAO(module.getDatabaseManager().getDatabaseAccess());
-        enseignementDAO = new EnseignementDAO(module.getDatabaseManager().getDatabaseAccess());
-        enseignantDAO = new EnseignantDAO(module.getDatabaseManager().getDatabaseAccess());
+        devoirDAO = new DevoirDAO(databaseManager.getDatabaseAccess());
+        coursDAO = new CoursDAO(databaseManager.getDatabaseAccess());
+        enseignementDAO = new EnseignementDAO(databaseManager.getDatabaseAccess());
+        enseignantDAO = new EnseignantDAO(databaseManager.getDatabaseAccess());
 
         // Steps
         addStep(new CoursDonneCurrentCoursFormStep(this, this));
@@ -47,13 +48,13 @@ public class EditDevoirForm extends Form implements DevoirForm {
 
     @Override
     public void start(IReplyCallback replyCallback) {
-        module.getFormsModule().registerForm(Modules.CNAM, this);
+        forms.registerForm(Modules.CNAM, this);
         nextStep(replyCallback);
     }
 
     @Override
     protected void finish(IReplyCallback event) {
-        module.getFormsModule().unregisterForm(Modules.CNAM, this);
+        forms.unregisterForm(Modules.CNAM, this);
 
         if (isCancelled()) {
             event.reply("> :x: Le formulaire a été annulé.").setEphemeral(true).queue();
@@ -67,7 +68,8 @@ public class EditDevoirForm extends Form implements DevoirForm {
 
         try {
             devoirDAO.update(devoir);
-            devoirEventHandler.onDevoirUpdate(new DevoirUpdateEvent(devoir));
+            DevoirUpdateEvent devoirUpdateEvent = new DevoirUpdateEvent(devoir);
+            eventManager.handleAsync(devoirUpdateEvent);
             event.reply("> :white_check_mark: Le devoir a été modifié.").setEphemeral(true).queue();
         } catch (SQLException e) {
             event.reply("> :x: Une erreur est survenue lors de la modification du devoir.").setEphemeral(true).queue();

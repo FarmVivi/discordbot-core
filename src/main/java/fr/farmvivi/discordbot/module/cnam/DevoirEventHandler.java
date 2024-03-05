@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.module.cnam;
 
 import fr.farmvivi.discordbot.DiscordColor;
+import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.devoir.Devoir;
@@ -15,10 +16,11 @@ import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.EnseignementDAO;
 import fr.farmvivi.discordbot.module.cnam.database.utilisateur.Utilisateur;
 import fr.farmvivi.discordbot.module.cnam.database.utilisateur.UtilisateurDAO;
-import fr.farmvivi.discordbot.module.cnam.events.DevoirListener;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirUpdateEvent;
+import fr.farmvivi.discordbot.utils.Debouncer;
+import fr.farmvivi.discordbot.utils.event.SubscribeEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -38,7 +40,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-public class DevoirEventHandler extends ListenerAdapter implements DevoirListener {
+public class DevoirEventHandler extends ListenerAdapter {
+    private final Debouncer planningExportDebouncer;
     private final TextChannel todoChannel;
     private final TextChannel alertChannel;
 
@@ -50,17 +53,18 @@ public class DevoirEventHandler extends ListenerAdapter implements DevoirListene
     private final EnseignementDAO enseignementDAO;
     private final EnseignantDAO enseignantDAO;
 
-    public DevoirEventHandler(CnamModule module, TextChannel todoChannel, TextChannel alertChannel) {
+    public DevoirEventHandler(DatabaseManager databaseManager, Debouncer planningExportDebouncer, TextChannel todoChannel, TextChannel alertChannel) {
+        this.planningExportDebouncer = planningExportDebouncer;
         this.todoChannel = todoChannel;
         this.alertChannel = alertChannel;
 
-        this.utilisateurDAO = new UtilisateurDAO(module.getDatabaseManager().getDatabaseAccess());
-        this.discordUserDAO = new DiscordUserDAO(module.getDatabaseManager().getDatabaseAccess());
-        this.devoirDAO = new DevoirDAO(module.getDatabaseManager().getDatabaseAccess());
-        this.devoirUtilisateurDAO = new DevoirUtilisateurDAO(module.getDatabaseManager().getDatabaseAccess());
-        this.coursDAO = new CoursDAO(module.getDatabaseManager().getDatabaseAccess());
-        this.enseignementDAO = new EnseignementDAO(module.getDatabaseManager().getDatabaseAccess());
-        this.enseignantDAO = new EnseignantDAO(module.getDatabaseManager().getDatabaseAccess());
+        this.utilisateurDAO = new UtilisateurDAO(databaseManager.getDatabaseAccess());
+        this.discordUserDAO = new DiscordUserDAO(databaseManager.getDatabaseAccess());
+        this.devoirDAO = new DevoirDAO(databaseManager.getDatabaseAccess());
+        this.devoirUtilisateurDAO = new DevoirUtilisateurDAO(databaseManager.getDatabaseAccess());
+        this.coursDAO = new CoursDAO(databaseManager.getDatabaseAccess());
+        this.enseignementDAO = new EnseignementDAO(databaseManager.getDatabaseAccess());
+        this.enseignantDAO = new EnseignantDAO(databaseManager.getDatabaseAccess());
     }
 
     @Override
@@ -168,8 +172,11 @@ public class DevoirEventHandler extends ListenerAdapter implements DevoirListene
         super.onMessageReactionRemoveEmoji(event);
     }
 
-    @Override
+    @SubscribeEvent
     public void onDevoirCreate(DevoirCreateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
+
         try {
             Devoir devoir = event.getDevoir();
 
@@ -244,14 +251,16 @@ public class DevoirEventHandler extends ListenerAdapter implements DevoirListene
         }
     }
 
-    @Override
-    public void onDevoirRemove(DevoirRemoveEvent event) {
-
+    @SubscribeEvent
+    public void onDevoirUpdate(DevoirUpdateEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
     }
 
-    @Override
-    public void onDevoirUpdate(DevoirUpdateEvent event) {
-
+    @SubscribeEvent
+    public void onDevoirRemove(DevoirRemoveEvent event) {
+        // Schedule planning export
+        planningExportDebouncer.debounce();
     }
 
     private String dateToShortString(LocalDate date) {

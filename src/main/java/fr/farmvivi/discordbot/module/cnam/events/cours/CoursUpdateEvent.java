@@ -4,8 +4,9 @@ import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
 import fr.farmvivi.discordbot.module.cnam.database.salle.Salle;
+import fr.farmvivi.discordbot.utils.event.IEvent;
 
-public class CoursUpdateEvent {
+public class CoursUpdateEvent implements IEvent {
     private final Cours oldCours;
     private final Cours newCours;
     private final Salle newSalleCours;

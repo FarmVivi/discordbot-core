@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam.task;
 
-import fr.farmvivi.discordbot.module.cnam.database.DatabaseAccess;
+import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
 import fr.farmvivi.discordbot.module.cnam.database.enseignant.Enseignant;
@@ -9,7 +9,6 @@ import fr.farmvivi.discordbot.module.cnam.database.enseignement.Enseignement;
 import fr.farmvivi.discordbot.module.cnam.database.enseignement.EnseignementDAO;
 import fr.farmvivi.discordbot.module.cnam.database.salle.Salle;
 import fr.farmvivi.discordbot.module.cnam.database.salle.SalleDAO;
-import fr.farmvivi.discordbot.module.cnam.events.PlanningListener;
 import fr.farmvivi.discordbot.module.cnam.events.cours.CoursCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.cours.CoursRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.cours.CoursUpdateEvent;
@@ -25,34 +24,35 @@ import fr.farmvivi.discordbot.module.cnam.events.salle.SalleUpdateEvent;
 import fr.farmvivi.discordbot.module.cnam.task.planning.PlanningItem;
 import fr.farmvivi.discordbot.module.cnam.task.planning.PlanningItemType;
 import fr.farmvivi.discordbot.module.cnam.task.planning.PlanningScrapper;
+import fr.farmvivi.discordbot.utils.event.IEventManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class PlanningScrapperTask implements Runnable {
     private final int year;
     private final String codeScolarite;
     private final String uid;
+    private final IEventManager eventManager;
     private final SalleDAO salleDAO;
     private final EnseignantDAO enseignantDAO;
     private final EnseignementDAO enseignementDAO;
     private final CoursDAO coursDAO;
 
     private final Logger logger = LoggerFactory.getLogger(PlanningScrapperTask.class);
-    private final List<PlanningListener> listeners = new LinkedList<>();
 
-    public PlanningScrapperTask(int year, String codeScolarite, String uid, DatabaseAccess databaseAccess) {
+    public PlanningScrapperTask(int year, String codeScolarite, String uid, IEventManager eventManager, DatabaseManager databaseManager) {
         this.year = year;
         this.codeScolarite = codeScolarite;
         this.uid = uid;
-        this.salleDAO = new SalleDAO(databaseAccess);
-        this.enseignantDAO = new EnseignantDAO(databaseAccess);
-        this.enseignementDAO = new EnseignementDAO(databaseAccess);
-        this.coursDAO = new CoursDAO(databaseAccess);
+        this.eventManager = eventManager;
+        this.salleDAO = new SalleDAO(databaseManager.getDatabaseAccess());
+        this.enseignantDAO = new EnseignantDAO(databaseManager.getDatabaseAccess());
+        this.enseignementDAO = new EnseignementDAO(databaseManager.getDatabaseAccess());
+        this.coursDAO = new CoursDAO(databaseManager.getDatabaseAccess());
     }
 
     @Override
@@ -137,9 +137,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Updating salle " + searchSalle.getId() + " \"" + searchSalle + "\" to " + salle.getId() + " \"" + salle + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onSalleUpdate(new SalleUpdateEvent(searchSalle, salle));
-                            }
+                            SalleUpdateEvent event = new SalleUpdateEvent(searchSalle, salle);
+                            eventManager.handleAsync(event);
 
                             // Mise à jour en base de données
                             salle = new Salle(searchSalle.getId(), salle.getNom(), salle.getAdresse());
@@ -151,9 +150,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Creating salle \"" + salle + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onSalleCreate(new SalleCreateEvent(salle));
-                            }
+                            SalleCreateEvent event = new SalleCreateEvent(salle);
+                            eventManager.handleAsync(event);
 
                             // Création en base de données
                             salle = salleDAO.create(salle);
@@ -187,9 +185,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Updating enseignant " + searchEnseignant.getId() + " \"" + searchEnseignant + "\" to " + enseignant.getId() + " \"" + enseignant + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onEnseignantUpdate(new EnseignantUpdateEvent(searchEnseignant, enseignant));
-                            }
+                            EnseignantUpdateEvent event = new EnseignantUpdateEvent(searchEnseignant, enseignant);
+                            eventManager.handleAsync(event);
 
                             // Mise à jour en base de données
                             enseignant = new Enseignant(searchEnseignant.getId(), enseignant.getNom(), enseignant.getPrenom());
@@ -201,9 +198,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Creating enseignant \"" + enseignant + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onEnseignantCreate(new EnseignantCreateEvent(enseignant));
-                            }
+                            EnseignantCreateEvent event = new EnseignantCreateEvent(enseignant);
+                            eventManager.handleAsync(event);
 
                             // Création en base de données
                             enseignant = enseignantDAO.create(enseignant);
@@ -237,9 +233,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Updating enseignement " + searchEnseignement.getCode() + " \"" + searchEnseignement + "\" to " + enseignement.getCode() + " \"" + enseignement + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onEnseignementUpdate(new EnseignementUpdateEvent(searchEnseignement, enseignement));
-                            }
+                            EnseignementUpdateEvent event = new EnseignementUpdateEvent(searchEnseignement, enseignement);
+                            eventManager.handleAsync(event);
 
                             // Mise à jour en base de données
                             enseignement = new Enseignement(searchEnseignement.getCode(), enseignement.getNom());
@@ -251,9 +246,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Creating enseignement \"" + enseignement + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onEnseignementCreate(new EnseignementCreateEvent(enseignement));
-                            }
+                            EnseignementCreateEvent event = new EnseignementCreateEvent(enseignement);
+                            eventManager.handleAsync(event);
 
                             // Création en base de données
                             enseignement = enseignementDAO.create(enseignement);
@@ -296,9 +290,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Updating cours " + searchCours.getId() + " \"" + searchCours + "\" to " + cours.getId() + " \"" + cours + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onCoursUpdate(new CoursUpdateEvent(searchCours, cours, salle, enseignant, enseignement));
-                            }
+                            CoursUpdateEvent event = new CoursUpdateEvent(searchCours, cours, salle, enseignant, enseignement);
+                            eventManager.handleAsync(event);
 
                             // Mise à jour en base de données
                             cours = new Cours(searchCours.getId(), cours.getDebutCours(), cours.getFinCours(), cours.isPresentiel(), cours.isExamen(), cours.getEnseignantId(), cours.getSalleId(), cours.getEnseignementCode());
@@ -310,9 +303,8 @@ public class PlanningScrapperTask implements Runnable {
                             logger.info("Creating cours \"" + cours + "\"");
 
                             // Envoi de l'événement
-                            for (PlanningListener listener : listeners) {
-                                listener.onCoursCreate(new CoursCreateEvent(cours, salle, enseignant, enseignement));
-                            }
+                            CoursCreateEvent event = new CoursCreateEvent(cours, salle, enseignant, enseignement);
+                            eventManager.handleAsync(event);
 
                             // Création en base de données
                             cours = coursDAO.create(cours);
@@ -380,9 +372,8 @@ public class PlanningScrapperTask implements Runnable {
             }
 
             // Envoi de l'événement
-            for (PlanningListener listener : listeners) {
-                listener.onCoursRemove(new CoursRemoveEvent(cours, salleCours, enseignantCours, enseignementCours));
-            }
+            CoursRemoveEvent event = new CoursRemoveEvent(cours, salleCours, enseignantCours, enseignementCours);
+            eventManager.handleAsync(event);
 
             // Suppression en base de données
             try {
@@ -398,9 +389,8 @@ public class PlanningScrapperTask implements Runnable {
             logger.info("Deleting salle " + salle.getId() + " \"" + salle + "\"");
 
             // Envoi de l'événement
-            for (PlanningListener listener : listeners) {
-                listener.onSalleRemove(new SalleRemoveEvent(salle));
-            }
+            SalleRemoveEvent event = new SalleRemoveEvent(salle);
+            eventManager.handleAsync(event);
 
             // Suppression en base de données
             try {
@@ -416,9 +406,8 @@ public class PlanningScrapperTask implements Runnable {
             logger.info("Deleting enseignant " + enseignant.getId() + " \"" + enseignant + "\"");
 
             // Envoi de l'événement
-            for (PlanningListener listener : listeners) {
-                listener.onEnseignantRemove(new EnseignantRemoveEvent(enseignant));
-            }
+            EnseignantRemoveEvent event = new EnseignantRemoveEvent(enseignant);
+            eventManager.handleAsync(event);
 
             // Suppression en base de données
             try {
@@ -434,9 +423,8 @@ public class PlanningScrapperTask implements Runnable {
             logger.info("Deleting enseignement " + enseignement.getCode() + " \"" + enseignement + "\"");
 
             // Envoi de l'événement
-            for (PlanningListener listener : listeners) {
-                listener.onEnseignementRemove(new EnseignementRemoveEvent(enseignement));
-            }
+            EnseignementRemoveEvent event = new EnseignementRemoveEvent(enseignement);
+            eventManager.handleAsync(event);
 
             // Suppression en base de données
             try {
@@ -449,13 +437,5 @@ public class PlanningScrapperTask implements Runnable {
         long finish = System.currentTimeMillis();
 
         logger.info("Done (" + (float) (finish - start) / 1000 + "s)!");
-    }
-
-    public void registerListener(PlanningListener listener) {
-        listeners.add(listener);
-    }
-
-    public void unregisterListener(PlanningListener listener) {
-        listeners.remove(listener);
     }
 }
