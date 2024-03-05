@@ -165,7 +165,12 @@ public class PlanningExporterTask implements Runnable {
 
         event.add(new Uid("cnam-" + year + "-" + id));
         if (examen) {
+            // Haute priorité pour les examens
             event.add(new Priority(Priority.VALUE_HIGH));
+            // Mettre en rouge pour les examens
+            Color color = new Color();
+            color.setValue("red");
+            event.add(color);
         }
         event.add(new Categories(new TextList(categories)));
         event.add(new Summary(titre));
