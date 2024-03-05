@@ -60,7 +60,7 @@ public class TrackScheduler extends AudioEventAdapter {
             }
 
             // Refresh player message
-            player.getMusicPlayerMessage().refreshMessage();
+            player.getMusicPlayerMessage().refresh();
         }
     }
 
@@ -131,7 +131,7 @@ public class TrackScheduler extends AudioEventAdapter {
         logger.info(String.format("[%s (%s)] Player paused", guild.getName(), guild.getId()));
 
         // Player was paused
-        this.player.getMusicPlayerMessage().refreshMessage();
+        this.player.getMusicPlayerMessage().refresh();
     }
 
     @Override
@@ -143,7 +143,7 @@ public class TrackScheduler extends AudioEventAdapter {
         logger.info(String.format("[%s (%s)] Player resumed", guild.getName(), guild.getId()));
 
         // Player was resumed
-        this.player.getMusicPlayerMessage().refreshMessage();
+        this.player.getMusicPlayerMessage().refresh();
     }
 
     @Override
@@ -155,7 +155,7 @@ public class TrackScheduler extends AudioEventAdapter {
         logger.info(String.format("[%s (%s)] Track started : \"%s\" (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri));
 
         // A track started playing
-        this.player.getMusicPlayerMessage().refreshMessage();
+        this.player.getMusicPlayerMessage().refresh();
 
         if (!this.player.isLoopQueueMode()) {
             JDAManager.getJDA().getPresence().setActivity(Activity.streaming(track.getInfo().title, track.getInfo().uri));
@@ -173,7 +173,7 @@ public class TrackScheduler extends AudioEventAdapter {
         logger.info(String.format("[%s (%s)] Track ended : \"%s\" (%s) (%s)", guild.getName(), guild.getId(), track.getInfo().title, track.getInfo().uri, endReason.name()));
 
         // End of the queue
-        this.player.getMusicPlayerMessage().refreshMessage();
+        this.player.getMusicPlayerMessage().refresh();
 
         if (endReason.mayStartNext) {
             // Start next track

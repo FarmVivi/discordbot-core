@@ -55,7 +55,7 @@ public class SeekCommand extends MusicCommand {
         }
 
         musicModule.getPlayer(guild).getAudioPlayer().getPlayingTrack().setPosition(startTime);
-        musicModule.getPlayer(guild).getMusicPlayerMessage().refreshMessage();
+        musicModule.getPlayer(guild).getMusicPlayerMessage().refresh();
         reply.success("Seek to **" + time + "**");
 
         reply.setEphemeral(true);

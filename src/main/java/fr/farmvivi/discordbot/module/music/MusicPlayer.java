@@ -88,7 +88,7 @@ public class MusicPlayer {
 
     public void clearQueue() {
         this.trackScheduler.getTracks().clear();
-        this.musicPlayerMessage.refreshMessage();
+        this.musicPlayerMessage.refresh();
 
         // Log : [<Guild name> (Guild id)] Queue cleared
         this.musicModule.getLogger().info(String.format("[%s (%s)] Queue cleared", this.guild.getName(), this.guild.getId()));
@@ -108,7 +108,7 @@ public class MusicPlayer {
         // Log : [<Guild name> (Guild id)] Volume changed to <volume>
         this.musicModule.getLogger().info(String.format("[%s (%s)] Volume changed to %d%%", this.guild.getName(), this.guild.getId(), volume));
 
-        this.musicPlayerMessage.refreshMessage();
+        this.musicPlayerMessage.refresh();
     }
 
     public void mute() {
@@ -144,7 +144,7 @@ public class MusicPlayer {
                 this.musicModule.getLogger().info(String.format("[%s (%s)] Loop queue mode disabled", this.guild.getName(), this.guild.getId()));
             }
 
-            this.musicPlayerMessage.refreshMessage();
+            this.musicPlayerMessage.refresh();
         }
     }
 
@@ -164,7 +164,7 @@ public class MusicPlayer {
                 this.musicModule.getLogger().info(String.format("[%s (%s)] Loop mode disabled", this.guild.getName(), this.guild.getId()));
             }
 
-            this.musicPlayerMessage.refreshMessage();
+            this.musicPlayerMessage.refresh();
         }
     }
 
@@ -184,7 +184,7 @@ public class MusicPlayer {
                 this.musicModule.getLogger().info(String.format("[%s (%s)] Shuffle mode disabled", this.guild.getName(), this.guild.getId()));
             }
 
-            this.musicPlayerMessage.refreshMessage();
+            this.musicPlayerMessage.refresh();
         }
     }
 
