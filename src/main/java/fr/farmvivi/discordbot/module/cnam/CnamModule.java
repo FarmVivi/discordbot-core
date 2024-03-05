@@ -94,7 +94,7 @@ public class CnamModule extends Module {
             int planningYear = Integer.parseInt(configuration.getValue("CNAM_PLANNING_YEAR"));
 
             this.planningScrapperTask = new PlanningScrapperTask(planningYear, planningCodeScolarite, planningUid, eventManager, databaseManager);
-            this.planningScrapperDebouncer = new Debouncer(2500, () -> {
+            this.planningScrapperDebouncer = new Debouncer(15000, () -> {
                 logger.info("Running planning scrapper task...");
                 scheduler.execute(planningScrapperTask);
             });
@@ -111,7 +111,7 @@ public class CnamModule extends Module {
             File planningFile = new File(planningExportFilePath);
 
             this.planningExporterTask = new PlanningExporterTask(planningYear, planningFile, databaseManager);
-            this.planningExportDebouncer = new Debouncer(2500, () -> {
+            this.planningExportDebouncer = new Debouncer(15000, () -> {
                 logger.info("Running planning exporter task...");
                 scheduler.execute(planningExporterTask);
             });
@@ -185,7 +185,7 @@ public class CnamModule extends Module {
         CommandsModule commandsModule = (CommandsModule) bot.getModulesManager().getModule(Modules.COMMANDS);
         commandsModule.registerCommand(module, new AddDevoirCommand(databaseManager, eventManager, formsModule));
         commandsModule.registerCommand(module, new EditDevoirCommand(databaseManager, eventManager, formsModule));
-        commandsModule.registerCommand(module, new RefreshPlanningCommand(planningScrapperDebouncer));
+        commandsModule.registerCommand(module, new RefreshPlanningCommand(planningScrapperDebouncer, planningExportDebouncer));
 
         // Starting planning scrapper task
         logger.info("Starting planning scrapper task...");
