@@ -11,16 +11,18 @@ import java.util.Map;
 
 public class RefreshPlanningCommand extends Command {
     private final Debouncer planningScraperDebouncer;
+    private final Debouncer planningExportDebouncer;
 
     private long lastRefresh = 0;
 
-    public RefreshPlanningCommand(Debouncer planningScraperDebouncer) {
+    public RefreshPlanningCommand(Debouncer planningScraperDebouncer, Debouncer planningExportDebouncer) {
         super("planning_refresh", CommandCategory.CNAM, "Forcer la mise à jour du planning");
 
         this.setAdminOnly(true);
         this.setGuildOnly(false);
 
         this.planningScraperDebouncer = planningScraperDebouncer;
+        this.planningExportDebouncer = planningExportDebouncer;
     }
 
     @Override
@@ -40,6 +42,9 @@ public class RefreshPlanningCommand extends Command {
 
         // Schedule planning scraping
         planningScraperDebouncer.debounce();
+
+        // Schedule planning export
+        planningExportDebouncer.debounce();
 
         // Update last refresh time
         lastRefresh = currentTime;
