@@ -53,9 +53,10 @@
 
         <!-- https://jitpack.io/#lavalink-devs/lavaplayer -->
         <dependency>
+            <!-- Temporary fix for the issue with the latest version of Lavaplayer -->
             <groupId>com.github.lavalink-devs.lavaplayer</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>main-d3a184a14d-1</version>
+            <version>afec211f05</version>
         </dependency>
 
         <!-- https://jitpack.io/#TopiSenpai/LavaSrc -->
