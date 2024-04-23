@@ -269,6 +269,9 @@ public class MusicModule extends Module {
                     //reply.addContent(String.format("[%s](%s) ajouté à la file d'attente.", track.getInfo().title, track.getInfo().uri));
                     EmbedBuilder embedBuilder = reply.createSuccessEmbed();
                     embedBuilder.setTitle("Musique ajoutée à la file d'attente");
+                    if (track.getInfo().artworkUrl != null) {
+                        embedBuilder.setThumbnail(track.getInfo().artworkUrl);
+                    }
                     embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
                     reply.addEmbeds(embedBuilder.build());
                     reply.replyNow();
@@ -294,6 +297,9 @@ public class MusicModule extends Module {
                     if (reply != null) {
                         EmbedBuilder embedBuilder = reply.createSuccessEmbed();
                         embedBuilder.setTitle("Musique ajoutée à la file d'attente");
+                        if (track.getInfo().artworkUrl != null) {
+                            embedBuilder.setThumbnail(track.getInfo().artworkUrl);
+                        }
                         embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
                         reply.addEmbeds(embedBuilder.build());
                         reply.replyNow();

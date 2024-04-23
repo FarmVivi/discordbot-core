@@ -86,6 +86,10 @@ public class MusicPlayerMessage {
             }
 
             if (track != null) {
+                // Add track thumbnail
+                if (track.getInfo().artworkUrl != null) {
+                    embedBuilder.setThumbnail(track.getInfo().artworkUrl);
+                }
                 // Add track info title (with link)
                 embedBuilder.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
                 if (!musicPlayer.getAudioPlayer().isPaused() && (musicPlayer.getQueueSize() == 0 || musicPlayer.isShuffleMode())) {

@@ -34,6 +34,9 @@ public class ReplayCommand extends MusicCommand {
 
         EmbedBuilder embed = reply.createSuccessEmbed();
         embed.setTitle("Musique rejoué");
+        if (currentTrack.getInfo().artworkUrl != null) {
+            embed.setThumbnail(currentTrack.getInfo().artworkUrl);
+        }
         embed.addField("Titre", String.format("[%s](%s)", currentTrack.getInfo().title, currentTrack.getInfo().uri), false);
         reply.addEmbeds(embed.build());
 

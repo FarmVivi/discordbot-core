@@ -36,6 +36,10 @@ public class NextCommand extends MusicCommand {
 
             embed.setTitle("Musique suivante");
 
+            if (track.getInfo().artworkUrl != null) {
+                embed.setThumbnail(track.getInfo().artworkUrl);
+            }
+
             embed.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
 
             reply.addEmbeds(embed.build());

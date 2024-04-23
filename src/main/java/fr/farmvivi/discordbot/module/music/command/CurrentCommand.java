@@ -36,6 +36,10 @@ public class CurrentCommand extends MusicCommand {
 
         embed.setTitle("Musique en cours de lecture");
 
+        if (track.getInfo().artworkUrl != null) {
+            embed.setThumbnail(track.getInfo().artworkUrl);
+        }
+
         embed.addField("Titre", String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri), false);
 
         if (track.getInfo().author != null) {
