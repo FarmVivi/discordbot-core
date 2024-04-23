@@ -59,6 +59,20 @@
             <version>afec211f05</version>
         </dependency>
 
+        <!-- https://jitpack.io/#lavalink-devs/youtube-source -->
+        <dependency>
+            <groupId>com.github.lavalink-devs.youtube-source</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+        <!-- https://jitpack.io/#lavalink-devs/youtube-source -->
+        <dependency>
+            <groupId>com.github.lavalink-devs.youtube-source</groupId>
+            <artifactId>lldevs</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
         <!-- https://jitpack.io/#TopiSenpai/LavaSrc -->
         <dependency>
             <groupId>com.github.TopiSenpai.LavaSrc</groupId>

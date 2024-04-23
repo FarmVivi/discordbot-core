@@ -15,10 +15,13 @@ import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.*;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
+import dev.lavalink.youtube.clients.AndroidWithThumbnail;
+import dev.lavalink.youtube.clients.MusicWithThumbnail;
+import dev.lavalink.youtube.clients.WebWithThumbnail;
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.jda.JDAManager;
@@ -85,14 +88,15 @@ public class MusicModule extends Module {
         // Remote sources
 
         // YouTube source provider
-        YoutubeAudioSourceManager youtubeAudioSourceManager;
+        //YoutubeAudioSourceManager youtubeAudioSourceManager;
+        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, new MusicWithThumbnail(), new WebWithThumbnail(), new AndroidWithThumbnail());
         try {
             String ytEmail = bot.getConfiguration().getValue("YOUTUBE_EMAIL");
             String ytPassword = bot.getConfiguration().getValue("YOUTUBE_PASSWORD");
-            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, ytEmail, ytPassword);
+            //youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, ytEmail, ytPassword);
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Playing restricted youtube videos will throws exceptions because no credentials provided : " + e.getLocalizedMessage());
-            youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, null, null);
+            //youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, null, null);
         }
         audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
 
