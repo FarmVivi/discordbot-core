@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.module.music;
 
 import com.github.topi314.lavasrc.applemusic.AppleMusicSourceManager;
 import com.github.topi314.lavasrc.deezer.DeezerAudioSourceManager;
+import com.github.topi314.lavasrc.flowerytts.FloweryTTSSourceManager;
 import com.github.topi314.lavasrc.mirror.DefaultMirroringAudioTrackResolver;
 import com.github.topi314.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
@@ -130,6 +131,9 @@ public class MusicModule extends Module {
         } catch (Configuration.ValueNotFoundException e) {
             logger.warn("Could not initialise apple music source provider because, " + e.getLocalizedMessage());
         }
+
+        // Flowery TTS source provider
+        audioPlayerManager.registerSourceManager(new FloweryTTSSourceManager("Bryson"));
 
         // SoundCloud source provider
         SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
