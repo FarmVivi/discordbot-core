@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.github.lavalink-devs.youtube-source</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
 
         <!-- https://jitpack.io/#lavalink-devs/youtube-source -->
