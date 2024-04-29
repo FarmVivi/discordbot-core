@@ -120,7 +120,7 @@
         <dependency>
             <groupId>org.mnode.ical4j</groupId>
             <artifactId>ical4j</artifactId>
-            <version>4.0.0-rc5</version>
+            <version>4.0.0-rc6</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
