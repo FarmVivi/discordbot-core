@@ -133,7 +133,14 @@ public class MusicModule extends Module {
         }
 
         // Flowery TTS source provider
-        audioPlayerManager.registerSourceManager(new FloweryTTSSourceManager("Bryson"));
+        try {
+            String floweryTTSVoice = bot.getConfiguration().getValue("FLOWERY_TTS_VOICE");
+
+            // create a new FloweryTTSSourceManager with the default providers
+            audioPlayerManager.registerSourceManager(new FloweryTTSSourceManager(floweryTTSVoice));
+        } catch (Configuration.ValueNotFoundException e) {
+            logger.warn("Could not initialise flowery tts source provider because, " + e.getLocalizedMessage());
+        }
 
         // SoundCloud source provider
         SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
