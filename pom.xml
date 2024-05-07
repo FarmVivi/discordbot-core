@@ -62,14 +62,14 @@
         <dependency>
             <groupId>com.github.lavalink-devs.youtube-source</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
 
         <!-- https://jitpack.io/#lavalink-devs/youtube-source -->
         <dependency>
             <groupId>com.github.lavalink-devs.youtube-source</groupId>
             <artifactId>lldevs</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
 
         <!-- https://jitpack.io/#TopiSenpai/LavaSrc -->
