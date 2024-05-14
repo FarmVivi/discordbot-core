@@ -37,6 +37,12 @@
         </repository>
 
         <repository>
+            <id>TopiWTF-releases</id>
+            <name>Topis Maven Repo</name>
+            <url>https://maven.topi.wtf/releases</url>
+        </repository>
+
+        <repository>
             <id>farmvivi</id>
             <name>farmvivi</name>
             <url>https://nexus.farmvivi.fr/repository/maven-releases/</url>
@@ -84,11 +90,18 @@
             <version>1.2.0</version>
         </dependency>
 
-        <!-- https://jitpack.io/#TopiSenpai/LavaSrc -->
+        <!-- https://maven.topi.wtf/#/releases/com/github/topi314/lavasrc/lavasrc -->
         <dependency>
-            <groupId>com.github.TopiSenpai.LavaSrc</groupId>
+            <groupId>com.github.topi314.lavasrc</groupId>
             <artifactId>lavasrc</artifactId>
-            <version>4.0.1</version>
+            <version>4.1.0</version>
+        </dependency>
+
+        <!-- https://maven.topi.wtf/#/releases/com/github/topi314/lavasrc/protocol-jvm -->
+        <dependency>
+            <groupId>com.github.topi314.lavasrc</groupId>
+            <artifactId>protocol-jvm</artifactId>
+            <version>4.1.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.sf.trove4j/trove4j -->
