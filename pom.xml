@@ -19,9 +19,9 @@
 
     <repositories>
         <repository>
-            <id>farmvivi</id>
-            <name>farmvivi</name>
-            <url>https://nexus.farmvivi.fr/repository/maven-releases/</url>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
 
         <repository>
@@ -31,13 +31,20 @@
         </repository>
 
         <repository>
+            <id>lavalink</id>
+            <name>lavalink</name>
+            <url>https://maven.lavalink.dev/releases</url>
+        </repository>
+
+        <repository>
+            <id>farmvivi</id>
+            <name>farmvivi</name>
+            <url>https://nexus.farmvivi.fr/repository/maven-releases/</url>
+        </repository>
+
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>maven_central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
     </repositories>
 
@@ -63,18 +70,18 @@
             <version>2.1.2</version>
         </dependency>
 
-        <!-- https://jitpack.io/#lavalink-devs/youtube-source -->
+        <!-- https://maven.lavalink.dev/#/releases/dev/lavalink/youtube/common -->
         <dependency>
-            <groupId>com.github.lavalink-devs.youtube-source</groupId>
+            <groupId>dev.lavalink.youtube</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.7</version>
+            <version>1.2.0</version>
         </dependency>
 
-        <!-- https://jitpack.io/#lavalink-devs/youtube-source -->
+        <!-- https://maven.lavalink.dev/#/releases/dev/lavalink/youtube/v2 -->
         <dependency>
-            <groupId>com.github.lavalink-devs.youtube-source</groupId>
-            <artifactId>lldevs</artifactId>
-            <version>1.0.7</version>
+            <groupId>dev.lavalink.youtube</groupId>
+            <artifactId>v2</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- https://jitpack.io/#TopiSenpai/LavaSrc -->
