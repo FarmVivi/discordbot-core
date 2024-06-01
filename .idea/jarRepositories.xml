@@ -2,6 +2,11 @@
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
+      <option name="id" value="lavalink" />
+      <option name="name" value="lavalink" />
+      <option name="url" value="https://maven.lavalink.dev/releases" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="farmvivi" />
       <option name="name" value="farmvivi" />
       <option name="url" value="https://nexus.farmvivi.fr/repository/maven-releases/" />
@@ -22,6 +27,11 @@
       <option name="url" value="https://jitpack.io" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="maven_central" />
+      <option name="name" value="Maven Central" />
+      <option name="url" value="https://repo.maven.apache.org/maven2/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Maven Central repository" />
       <option name="url" value="https://repo1.maven.org/maven2" />
@@ -35,6 +45,11 @@
       <option name="id" value="jitpack.io-farmvivi" />
       <option name="name" value="jitpack.io-farmvivi" />
       <option name="url" value="https://nexus.farmvivi.fr/repository/jitpack/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="TopiWTF-releases" />
+      <option name="name" value="Topis Maven Repo" />
+      <option name="url" value="https://maven.topi.wtf/releases" />
     </remote-repository>
   </component>
 </project>
