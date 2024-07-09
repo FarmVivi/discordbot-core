@@ -75,7 +75,7 @@
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>common</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.0</version>
         </dependency>
 
         <!-- https://maven.lavalink.dev/#/releases/dev/lavalink/youtube/v2 -->
