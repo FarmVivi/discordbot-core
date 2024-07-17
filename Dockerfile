@@ -1,7 +1,7 @@
 ################ Dev ################
 # Build stage will be used:
 # - as target for development (see devspace.yaml)
-FROM maven:3-eclipse-temurin-17-alpine as dev
+FROM maven:3.9.8-eclipse-temurin-17-alpine as dev
 
 # Create project directory (workdir)
 WORKDIR /app
@@ -11,7 +11,7 @@ WORKDIR /app
 # Build stage will be used:
 # - for building the application for production
 # - as target for development (see devspace.yaml)
-FROM maven:3-eclipse-temurin-17-alpine as build
+FROM maven:3.9.8-eclipse-temurin-17-alpine as build
 
 # Create project directory (workdir)
 WORKDIR /app
@@ -35,7 +35,7 @@ CMD ["./build.sh", "run"]
 ################ Production ################
 # Creates a minimal image for production using distroless base image
 # More info here: https://github.com/GoogleContainerTools/distroless
-FROM gcr.io/distroless/java17 as production
+FROM gcr.io/distroless/java17-debian12:latest as production
 
 # Create project directory (workdir)
 WORKDIR /app
