@@ -20,9 +20,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
-import dev.lavalink.youtube.clients.AndroidWithThumbnail;
-import dev.lavalink.youtube.clients.MusicWithThumbnail;
-import dev.lavalink.youtube.clients.WebWithThumbnail;
+import dev.lavalink.youtube.clients.*;
 import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.Configuration;
 import fr.farmvivi.discordbot.jda.JDAManager;
@@ -90,7 +88,17 @@ public class MusicModule extends Module {
 
         // YouTube source provider
         //YoutubeAudioSourceManager youtubeAudioSourceManager;
-        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true, new MusicWithThumbnail(), new WebWithThumbnail(), new AndroidWithThumbnail());
+        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true,
+                new MusicWithThumbnail(),
+                new WebWithThumbnail(),
+                new TvHtml5EmbeddedWithThumbnail(),
+                new IosWithThumbnail(),
+                new MediaConnectWithThumbnail(),
+                new AndroidWithThumbnail(),
+                new AndroidLiteWithThumbnail(),
+                new AndroidMusicWithThumbnail(),
+                new AndroidTestsuiteWithThumbnail()
+        );
         try {
             String ytEmail = bot.getConfiguration().getValue("YOUTUBE_EMAIL");
             String ytPassword = bot.getConfiguration().getValue("YOUTUBE_PASSWORD");
