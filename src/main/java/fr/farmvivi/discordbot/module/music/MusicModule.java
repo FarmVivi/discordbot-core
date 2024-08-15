@@ -91,6 +91,7 @@ public class MusicModule extends Module {
         YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true,
                 new MusicWithThumbnail(),
                 new WebWithThumbnail(),
+                new WebEmbeddedWithThumbnail(),
                 new TvHtml5EmbeddedWithThumbnail(),
                 new IosWithThumbnail(),
                 new MediaConnectWithThumbnail(),
