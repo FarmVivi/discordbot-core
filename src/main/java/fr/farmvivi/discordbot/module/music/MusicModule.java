@@ -90,15 +90,17 @@ public class MusicModule extends Module {
         //YoutubeAudioSourceManager youtubeAudioSourceManager;
         YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true,
                 new MusicWithThumbnail(),
+                new AndroidVrWithThumbnail(),
                 new WebWithThumbnail(),
                 new WebEmbeddedWithThumbnail(),
-                new TvHtml5EmbeddedWithThumbnail(),
+                new MWebWithThumbnail(),
                 new IosWithThumbnail(),
                 new MediaConnectWithThumbnail(),
                 new AndroidWithThumbnail(),
                 new AndroidLiteWithThumbnail(),
                 new AndroidMusicWithThumbnail(),
-                new AndroidTestsuiteWithThumbnail()
+                new AndroidTestsuiteWithThumbnail(),
+                new TvHtml5EmbeddedWithThumbnail()
         );
         try {
             String ytEmail = bot.getConfiguration().getValue("YOUTUBE_EMAIL");
