@@ -95,11 +95,8 @@ public class MusicModule extends Module {
                 new WebEmbeddedWithThumbnail(),
                 new MWebWithThumbnail(),
                 new IosWithThumbnail(),
-                new MediaConnectWithThumbnail(),
                 new AndroidWithThumbnail(),
-                new AndroidLiteWithThumbnail(),
                 new AndroidMusicWithThumbnail(),
-                new AndroidTestsuiteWithThumbnail(),
                 new TvHtml5EmbeddedWithThumbnail()
         );
         try {
