@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: "temurin"
+          cache: maven
 
       # Étape pour enlever "-SNAPSHOT" dans le pom.xml
       - name: Remove -SNAPSHOT from pom.xml
