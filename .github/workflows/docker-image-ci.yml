@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK
-        if: ${{ github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push' }}
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -22,7 +22,7 @@ jobs:
 
       # Étape pour enlever "-SNAPSHOT" dans le pom.xml
       - name: Remove -SNAPSHOT from pom.xml
-        if: ${{ github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push' }}
         run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false
 
       # Génération des tags Docker (optionnel)
@@ -59,7 +59,7 @@ jobs:
 
       # Déploiement de l'image Docker (optionnel)
       - name: Deploy
-        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push' }}
         uses: joelwmale/webhook-action@2.4.1
         with:
           url: ${{ secrets.DEPLOY_WEBHOOK_URL }}

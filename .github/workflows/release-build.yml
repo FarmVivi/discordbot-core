@@ -32,11 +32,9 @@ jobs:
         shell: bash
         run: echo "jar_name=$(basename $(ls target/discordbot-*.jar))" >> $GITHUB_OUTPUT
 
-      # Upload du .jar sur la release
+      # Upload du .jar sur la release GitHub
       - name: Upload JAR to release
-        uses: actions/upload-release-asset@v1
+        uses: csexton/release-asset-action@v3
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: target/${{ steps.find_jar.outputs.jar_name }}
-          asset_name: ${{ steps.find_jar.outputs.jar_name }}
-          asset_content_type: application/java-archive
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/${{ steps.find_jar.outputs.jar_name }}
