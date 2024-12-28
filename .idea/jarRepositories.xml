@@ -2,19 +2,9 @@
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
-      <option name="id" value="lavalink" />
-      <option name="name" value="lavalink" />
-      <option name="url" value="https://maven.lavalink.dev/releases" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="farmvivi" />
       <option name="name" value="farmvivi" />
       <option name="url" value="https://nexus.farmvivi.fr/repository/maven-releases/" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="dv8tion" />
-      <option name="name" value="m2-dv8tion" />
-      <option name="url" value="https://m2.dv8tion.net/releases" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
@@ -37,19 +27,44 @@
       <option name="url" value="https://repo1.maven.org/maven2" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="jboss.community" />
-      <option name="name" value="JBoss Community repository" />
-      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="jitpack.io-farmvivi" />
-      <option name="name" value="jitpack.io-farmvivi" />
-      <option name="url" value="https://nexus.farmvivi.fr/repository/jitpack/" />
+      <option name="id" value="farmvivi-wylog" />
+      <option name="name" value="farmvivi-wylog" />
+      <option name="url" value="https://maven.pkg.github.com/FarmVivi/WyLog" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="TopiWTF-releases" />
       <option name="name" value="Topis Maven Repo" />
       <option name="url" value="https://maven.topi.wtf/releases" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="lavalink" />
+      <option name="name" value="lavalink" />
+      <option name="url" value="https://maven.lavalink.dev/releases" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="dv8tion" />
+      <option name="name" value="m2-dv8tion" />
+      <option name="url" value="https://m2.dv8tion.net/releases" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="github-farmvivi" />
+      <option name="name" value="github-farmvivi" />
+      <option name="url" value="https://public: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@maven.pkg.github.com/FarmVivi/*" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="farmvivi-github" />
+      <option name="name" value="farmvivi-github" />
+      <option name="url" value="https://maven.pkg.github.com/FarmVivi/*" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jitpack.io-farmvivi" />
+      <option name="name" value="jitpack.io-farmvivi" />
+      <option name="url" value="https://nexus.farmvivi.fr/repository/jitpack/" />
     </remote-repository>
   </component>
 </project>
