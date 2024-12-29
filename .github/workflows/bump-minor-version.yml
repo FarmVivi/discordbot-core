@@ -1,0 +1,56 @@
+name: Bump Minor Maven version (manual trigger)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bump-minor-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: "temurin"
+          cache: maven
+
+      - name: Bump minor version
+        run: |
+          # 1) Récupération de la version Maven actuelle
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+          echo "Version actuelle : $CURRENT_VERSION"
+
+          # 2) Suppression du suffixe -SNAPSHOT (si présent) pour parser la version
+          BASE_VERSION=$(echo "$CURRENT_VERSION" | sed 's/-SNAPSHOT//')
+
+          # 3) Découpage en parties (MAJOR.MINOR.PATCH)
+          IFS='.' read -ra PARTS <<< "$BASE_VERSION"
+          MAJOR=${PARTS[0]}
+          MINOR=${PARTS[1]}
+          PATCH=${PARTS[2]}
+
+          # 4) Incrémentation du MINOR, remise du PATCH à 0
+          NEW_MINOR=$((MINOR + 1))
+          NEW_PATCH=0
+          NEW_VERSION="$MAJOR.$NEW_MINOR.$NEW_PATCH-SNAPSHOT"
+
+          echo "Nouvelle version (Minor bump) : $NEW_VERSION"
+
+          # 5) Mise à jour du pom.xml
+          mvn versions:set -DnewVersion="$NEW_VERSION" -DgenerateBackupPoms=false
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add pom.xml
+          git commit -m "chore: bump minor version to $NEW_VERSION" || echo "Aucun changement à commiter."
+
+      - name: Push changes
+        run: |
+          git push origin HEAD
