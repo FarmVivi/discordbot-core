@@ -5,6 +5,8 @@ permissions:
 
 on:
   workflow_dispatch:
+
+jobs:
   bump-minor-version:
     runs-on: ubuntu-latest
     steps:
