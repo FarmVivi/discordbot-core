@@ -2,7 +2,6 @@ name: Bump Patch Maven version (manual trigger)
 
 permissions:
   contents: write
-  actions: read
 
 on:
   workflow_dispatch:
