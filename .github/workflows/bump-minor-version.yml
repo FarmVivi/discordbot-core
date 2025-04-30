@@ -1,9 +1,10 @@
 name: Bump Minor Maven version (manual trigger)
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
-
-jobs:
   bump-minor-version:
     runs-on: ubuntu-latest
     steps:
