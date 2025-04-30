@@ -3,6 +3,9 @@ name: Bump Major Maven version (manual trigger)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   bump-major-version:
     runs-on: ubuntu-latest
