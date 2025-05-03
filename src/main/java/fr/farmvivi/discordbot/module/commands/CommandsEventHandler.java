@@ -4,13 +4,13 @@ import fr.farmvivi.discordbot.Configuration;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
@@ -53,7 +53,10 @@ public class CommandsEventHandler extends ListenerAdapter {
                     if (reply.isDiffer()) {
                         event.deferReply(reply.isEphemeral()).queue();
                     } else if (reply.isEmpty()) {
-                        event.reply("OK").flatMap(InteractionHook::deleteOriginal).queue();
+                        event.reply("OK")
+                                .map(hook -> hook.getCallbackResponse().getMessage())
+                                .flatMap(Message::delete)
+                                .queue();
                     } else {
                         event.reply(reply.build()).setEphemeral(reply.isEphemeral()).queue();
                     }
@@ -83,9 +86,10 @@ public class CommandsEventHandler extends ListenerAdapter {
             CommandReceivedEvent commandReceivedEvent = new CommandReceivedEvent(event, cmd);
 
             CommandMessageBuilder reply = new CommandMessageBuilder(event);
-            //reply.addContent("> **Cette commande est obsolète !**\n"
-            //        + "> Veuillez utiliser les commandes en commençant par **/** au lieu de **" + botConfig.cmdPrefix + "** !\n"
-            //        + "\n");
+            // reply.addContent("> **Cette commande est obsolète !**\n"
+            // + "> Veuillez utiliser les commandes en commençant par **/** au lieu de **" +
+            // botConfig.cmdPrefix + "** !\n"
+            // + "\n");
 
             for (Command command : commandsModule.getCommands()) {
                 List<String> commands = new ArrayList<>();
@@ -106,10 +110,14 @@ public class CommandsEventHandler extends ListenerAdapter {
                         int commandLength = CMD_PREFIX.length() + cmd.length() + 1;
 
                         if (message.length() <= commandLength && requiredArgs > 0) {
-                            /*reply.addContent("> **Erreur :** Vous devez spécifier des arguments !\n"
-                                    + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");*/
+                            /*
+                             * reply.addContent("> **Erreur :** Vous devez spécifier des arguments !\n"
+                             * + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " +
+                             * command.getArgsAsString() + "**");
+                             */
                             reply.error("Vous devez spécifier des arguments !\n"
-                                    + "Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
+                                    + "Utilisation : **" + CMD_PREFIX + command.getName() + " "
+                                    + command.getArgsAsString() + "**");
                             sendErrorMessage(event, reply);
                             return;
                         } else if (message.length() > commandLength) {
@@ -118,34 +126,44 @@ public class CommandsEventHandler extends ListenerAdapter {
 
                             // Si le nombre d'arguments est inférieur au nombre d'arguments requis
                             if (splitContent.length < requiredArgs) {
-                                /*reply.addContent("> **Erreur :** Vous n'avez pas fourni assez d'arguments !\n"
-                                        + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");*/
+                                /*
+                                 * reply.
+                                 * addContent("> **Erreur :** Vous n'avez pas fourni assez d'arguments !\n"
+                                 * + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " +
+                                 * command.getArgsAsString() + "**");
+                                 */
                                 reply.error("Vous n'avez pas fourni assez d'arguments !\n"
-                                        + "Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
+                                        + "Utilisation : **" + CMD_PREFIX + command.getName() + " "
+                                        + command.getArgsAsString() + "**");
                                 sendErrorMessage(event, reply);
                                 return;
                             }
 
                             int optionalArgs = splitContent.length - requiredArgs;
 
-                            // Correctif pour le cas où la commande ne prend seulement qu'un seul argument et que l'utilisateur met des espaces
+                            // Correctif pour le cas où la commande ne prend seulement qu'un seul argument
+                            // et que l'utilisateur met des espaces
                             if (command.getArgs().length == 1 && splitContent.length > 1) {
-                                splitContent = new String[]{content};
+                                splitContent = new String[] { content };
                                 if (requiredArgs == 1) {
                                     optionalArgs = 0;
                                 } else {
                                     optionalArgs = 1;
                                 }
                             } else
-                                // Si le nombre d'arguments est supérieur au nombre d'arguments possibles
-                                if (optionalArgs + requiredArgs > command.getArgs().length) {
-                                    /*reply.addContent("> **Erreur :** Vous avez fourni trop d'arguments !\n"
-                                            + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");*/
-                                    reply.error("Vous avez fourni trop d'arguments !\n"
-                                            + "Utilisation : **" + CMD_PREFIX + command.getName() + " " + command.getArgsAsString() + "**");
-                                    sendErrorMessage(event, reply);
-                                    return;
-                                }
+                            // Si le nombre d'arguments est supérieur au nombre d'arguments possibles
+                            if (optionalArgs + requiredArgs > command.getArgs().length) {
+                                /*
+                                 * reply.addContent("> **Erreur :** Vous avez fourni trop d'arguments !\n"
+                                 * + "> Utilisation : **" + CMD_PREFIX + command.getName() + " " +
+                                 * command.getArgsAsString() + "**");
+                                 */
+                                reply.error("Vous avez fourni trop d'arguments !\n"
+                                        + "Utilisation : **" + CMD_PREFIX + command.getName() + " "
+                                        + command.getArgsAsString() + "**");
+                                sendErrorMessage(event, reply);
+                                return;
+                            }
 
                             int valueIndex = 0;
                             for (int i = 0; i < command.getArgs().length; i++) {
@@ -171,36 +189,43 @@ public class CommandsEventHandler extends ListenerAdapter {
                                         case INTEGER -> parseInteger(option, dataObject, argValue);
                                         case BOOLEAN -> parseBoolean(option, dataObject, argValue);
                                         case USER ->
-                                                parseUser(option, dataObject, argValue, resolved, event.getJDA(), event.getGuild());
+                                            parseUser(option, dataObject, argValue, resolved, event.getJDA(),
+                                                    event.getGuild());
                                         case CHANNEL ->
-                                                parseChannel(option, dataObject, argValue, resolved, event.getGuild());
+                                            parseChannel(option, dataObject, argValue, resolved, event.getGuild());
                                         case ROLE ->
-                                                parseRole(option, dataObject, argValue, resolved, event.getGuild());
+                                            parseRole(option, dataObject, argValue, resolved, event.getGuild());
                                         case MENTIONABLE ->
-                                                parseMentionable(option, dataObject, argValue, resolved, event.getJDA(), event.getGuild());
+                                            parseMentionable(option, dataObject, argValue, resolved, event.getJDA(),
+                                                    event.getGuild());
                                         case NUMBER -> parseNumber(option, dataObject, argValue);
                                         default -> {
-                                            //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** est seulement compatible avec les commandes slash !");
-                                            reply.error("L'argument **" + option.getName() + "** est seulement compatible avec les commandes slash !");
+                                            // reply.addContent("> **Erreur :** L'argument **" + option.getName() + "**
+                                            // est seulement compatible avec les commandes slash !");
+                                            reply.error("L'argument **" + option.getName()
+                                                    + "** est seulement compatible avec les commandes slash !");
                                             sendErrorMessage(event, reply);
                                             return;
                                         }
                                     }
                                 } catch (CommandOptionParseErrorException e) {
-                                    //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                    // reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " +
+                                    // e.getMessage());
                                     reply.error("L'argument **" + option.getName() + "** " + e.getMessage());
                                     sendErrorMessage(event, reply);
                                     return;
                                 } catch (CommandOptionParseTypeException e) {
                                     if (option.isRequired()) {
-                                        //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                        // reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " +
+                                        // e.getMessage());
                                         reply.error("L'argument **" + option.getName() + "** " + e.getMessage());
                                         sendErrorMessage(event, reply);
                                         return;
                                     } else {
                                         optionalArgs++;
                                         if (optionalArgs >= command.getArgs().length - i) {
-                                            //reply.addContent("> **Erreur :** L'argument **" + option.getName() + "** " + e.getMessage());
+                                            // reply.addContent("> **Erreur :** L'argument **" + option.getName() + "**
+                                            // " + e.getMessage());
                                             reply.error("L'argument **" + option.getName() + "** " + e.getMessage());
                                             sendErrorMessage(event, reply);
                                             return;
@@ -211,7 +236,8 @@ public class CommandsEventHandler extends ListenerAdapter {
 
                                 valueIndex++;
 
-                                OptionMapping optionMapping = new OptionMapping(dataObject, resolved, event.getJDA(), event.getGuild());
+                                OptionMapping optionMapping = new OptionMapping(dataObject, resolved, event.getJDA(),
+                                        event.getGuild());
 
                                 args.put(option.getName(), optionMapping);
                             }
@@ -228,7 +254,11 @@ public class CommandsEventHandler extends ListenerAdapter {
                         MessageCreateAction messageAction = originalMessage.reply(reply.build());
                         if (reply.isEphemeral()) {
                             messageAction.delay(1, TimeUnit.MINUTES).flatMap(Message::delete).queue();
-                            originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
+                            if (!event.isFromType(ChannelType.PRIVATE) && !event.isFromType(ChannelType.GROUP)
+                                    && (event.getGuild() != null && event.getGuild().getSelfMember()
+                                            .hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE))) {
+                                originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
+                            }
                         } else {
                             messageAction.queue();
                         }
@@ -239,34 +269,40 @@ public class CommandsEventHandler extends ListenerAdapter {
         }
     }
 
-    private void parseString(OptionData option, DataObject dataObject, String argValue) throws CommandOptionParseErrorException {
+    private void parseString(OptionData option, DataObject dataObject, String argValue)
+            throws CommandOptionParseErrorException {
         if (argValue.startsWith("\"") && argValue.endsWith("\"")) {
             argValue = argValue.substring(1, argValue.length() - 1);
         }
         if (option.getMinLength() != null) {
             if (argValue.length() < option.getMinLength()) {
-                throw new CommandOptionParseErrorException("doit contenir au moins " + option.getMinLength() + " caractères ! (Vous avez fourni " + argValue.length() + " caractères)");
+                throw new CommandOptionParseErrorException("doit contenir au moins " + option.getMinLength()
+                        + " caractères ! (Vous avez fourni " + argValue.length() + " caractères)");
             }
         }
         if (option.getMaxLength() != null) {
             if (argValue.length() > option.getMaxLength()) {
-                throw new CommandOptionParseErrorException("doit contenir au plus " + option.getMaxLength() + " caractères ! (Vous avez fourni " + argValue.length() + " caractères)");
+                throw new CommandOptionParseErrorException("doit contenir au plus " + option.getMaxLength()
+                        + " caractères ! (Vous avez fourni " + argValue.length() + " caractères)");
             }
         }
         dataObject.put("value", argValue);
     }
 
-    private void parseInteger(OptionData option, DataObject dataObject, String argValue) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
+    private void parseInteger(OptionData option, DataObject dataObject, String argValue)
+            throws CommandOptionParseErrorException, CommandOptionParseTypeException {
         try {
             int value = Integer.parseInt(argValue);
             if (option.getMinValue() != null) {
                 if (value < option.getMinValue().intValue()) {
-                    throw new CommandOptionParseErrorException("doit être supérieur ou égal à " + option.getMinValue() + " !");
+                    throw new CommandOptionParseErrorException(
+                            "doit être supérieur ou égal à " + option.getMinValue() + " !");
                 }
             }
             if (option.getMaxValue() != null) {
                 if (value > option.getMaxValue().intValue()) {
-                    throw new CommandOptionParseErrorException("doit être inférieur ou égal à " + option.getMaxValue() + " !");
+                    throw new CommandOptionParseErrorException(
+                            "doit être inférieur ou égal à " + option.getMaxValue() + " !");
                 }
             }
             dataObject.put("value", value);
@@ -275,17 +311,20 @@ public class CommandsEventHandler extends ListenerAdapter {
         }
     }
 
-    private void parseBoolean(OptionData option, DataObject dataObject, String argValue) throws CommandOptionParseTypeException {
+    private void parseBoolean(OptionData option, DataObject dataObject, String argValue)
+            throws CommandOptionParseTypeException {
         if (argValue.equalsIgnoreCase("true") || argValue.equalsIgnoreCase("oui") || argValue.equalsIgnoreCase("yes")) {
             dataObject.put("value", true);
-        } else if (argValue.equalsIgnoreCase("false") || argValue.equalsIgnoreCase("non") || argValue.equalsIgnoreCase("no")) {
+        } else if (argValue.equalsIgnoreCase("false") || argValue.equalsIgnoreCase("non")
+                || argValue.equalsIgnoreCase("no")) {
             dataObject.put("value", false);
         } else {
             throw new CommandOptionParseTypeException("doit être un booléen !");
         }
     }
 
-    private void parseUser(OptionData option, DataObject dataObject, String argValue, TLongObjectMap<Object> resolved, JDA jda, Guild guild) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
+    private void parseUser(OptionData option, DataObject dataObject, String argValue, TLongObjectMap<Object> resolved,
+            JDA jda, Guild guild) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
         if (argValue.startsWith("<@") && argValue.endsWith(">")) {
             argValue = argValue.substring(2, argValue.length() - 1);
             if (argValue.startsWith("!")) {
@@ -317,7 +356,9 @@ public class CommandsEventHandler extends ListenerAdapter {
         }
     }
 
-    private void parseChannel(OptionData option, DataObject dataObject, String argValue, TLongObjectMap<Object> resolved, Guild guild) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
+    private void parseChannel(OptionData option, DataObject dataObject, String argValue,
+            TLongObjectMap<Object> resolved, Guild guild)
+            throws CommandOptionParseErrorException, CommandOptionParseTypeException {
         if (argValue.startsWith("<#") && argValue.endsWith(">")) {
             argValue = argValue.substring(2, argValue.length() - 1);
             try {
@@ -341,7 +382,8 @@ public class CommandsEventHandler extends ListenerAdapter {
         }
     }
 
-    private void parseRole(OptionData option, DataObject dataObject, String argValue, TLongObjectMap<Object> resolved, Guild guild) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
+    private void parseRole(OptionData option, DataObject dataObject, String argValue, TLongObjectMap<Object> resolved,
+            Guild guild) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
         if (argValue.startsWith("<@&") && argValue.endsWith(">")) {
             argValue = argValue.substring(3, argValue.length() - 1);
             try {
@@ -373,7 +415,9 @@ public class CommandsEventHandler extends ListenerAdapter {
         }
     }
 
-    private void parseMentionable(OptionData option, DataObject dataObject, String argValue, TLongObjectMap<Object> resolved, JDA jda, Guild guild) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
+    private void parseMentionable(OptionData option, DataObject dataObject, String argValue,
+            TLongObjectMap<Object> resolved, JDA jda, Guild guild)
+            throws CommandOptionParseErrorException, CommandOptionParseTypeException {
         try {
             parseRole(option, dataObject, argValue, resolved, guild);
         } catch (CommandOptionParseErrorException | CommandOptionParseTypeException e) {
@@ -381,30 +425,35 @@ public class CommandsEventHandler extends ListenerAdapter {
         }
     }
 
-    private void parseNumber(OptionData option, DataObject dataObject, String argValue) throws CommandOptionParseErrorException, CommandOptionParseTypeException {
+    private void parseNumber(OptionData option, DataObject dataObject, String argValue)
+            throws CommandOptionParseErrorException, CommandOptionParseTypeException {
         try {
             if (argValue.contains(".")) {
                 double value = Double.parseDouble(argValue);
                 if (option.getMinValue() != null) {
                     if (value < option.getMinValue().doubleValue()) {
-                        throw new CommandOptionParseErrorException("doit être supérieur ou égal à " + option.getMinValue() + " !");
+                        throw new CommandOptionParseErrorException(
+                                "doit être supérieur ou égal à " + option.getMinValue() + " !");
                     }
                 }
                 if (option.getMaxValue() != null) {
                     if (value > option.getMaxValue().doubleValue()) {
-                        throw new CommandOptionParseErrorException("doit être inférieur ou égal à " + option.getMaxValue() + " !");
+                        throw new CommandOptionParseErrorException(
+                                "doit être inférieur ou égal à " + option.getMaxValue() + " !");
                     }
                 }
             } else {
                 long value = Long.parseLong(argValue);
                 if (option.getMinValue() != null) {
                     if (value < option.getMinValue().longValue()) {
-                        throw new CommandOptionParseErrorException("doit être supérieur ou égal à " + option.getMinValue() + " !");
+                        throw new CommandOptionParseErrorException(
+                                "doit être supérieur ou égal à " + option.getMinValue() + " !");
                     }
                 }
                 if (option.getMaxValue() != null) {
                     if (value > option.getMaxValue().longValue()) {
-                        throw new CommandOptionParseErrorException("doit être inférieur ou égal à " + option.getMaxValue() + " !");
+                        throw new CommandOptionParseErrorException(
+                                "doit être inférieur ou égal à " + option.getMaxValue() + " !");
                     }
                 }
             }
