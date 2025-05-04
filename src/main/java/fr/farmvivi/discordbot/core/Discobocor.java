@@ -209,6 +209,9 @@ public class Discobocor {
         // 3. Connect to Discord
         try {
             discordAPI.connect().join();
+
+            // Set the startup activity right after connecting
+            discordAPI.setStartupActivity();
         } catch (Exception e) {
             logger.error("Failed to connect to Discord", e);
             System.exit(1);
@@ -220,6 +223,9 @@ public class Discobocor {
 
         // 5. Post-enable plugins
         pluginManager.postEnablePlugins();
+
+        // 6. Set the default activity after all plugins are enabled
+        discordAPI.setDefaultActivity();
     }
 
     /**
@@ -273,6 +279,9 @@ public class Discobocor {
         // Connect to Discord again
         try {
             discordAPI.connect().join();
+
+            // Set the startup activity during reload
+            discordAPI.setStartupActivity();
         } catch (Exception e) {
             logger.error("Failed to reconnect to Discord during reload", e);
             return;
@@ -281,6 +290,9 @@ public class Discobocor {
         // Complete plugin enabling
         pluginManager.enablePlugins();
         pluginManager.postEnablePlugins();
+
+        // Set the default activity after reload is complete
+        discordAPI.setDefaultActivity();
 
         logger.info("Complete plugin reload finished successfully!");
     }
