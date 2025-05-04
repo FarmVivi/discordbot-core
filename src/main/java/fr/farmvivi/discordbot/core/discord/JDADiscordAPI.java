@@ -1,8 +1,10 @@
 package fr.farmvivi.discordbot.core.discord;
 
+import fr.farmvivi.discordbot.core.Discobocor;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
@@ -80,7 +82,6 @@ public class JDADiscordAPI implements DiscordAPI {
         try {
             jda.shutdown();
             jda = null;
-            listeners.clear();
             logger.info("Disconnected from Discord");
             future.complete(null);
         } catch (Exception e) {
@@ -94,5 +95,25 @@ public class JDADiscordAPI implements DiscordAPI {
     @Override
     public boolean isConnected() {
         return jda != null && jda.getStatus() == JDA.Status.CONNECTED;
+    }
+
+    @Override
+    public Activity getDefaultActivity() {
+        return Activity.playing("v" + Discobocor.VERSION);
+    }
+
+    @Override
+    public void setDefaultActivity() {
+        if (isConnected()) {
+            jda.getPresence().setActivity(getDefaultActivity());
+        }
+    }
+
+    @Override
+    public boolean isDefaultActivity() {
+        if (!isConnected() || jda.getPresence().getActivity() == null) {
+            return false;
+        }
+        return jda.getPresence().getActivity().equals(getDefaultActivity());
     }
 }

@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.api.discord;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Activity;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -35,4 +36,23 @@ public interface DiscordAPI {
      * @return true if connected
      */
     boolean isConnected();
+
+    /**
+     * Gets the default activity for the bot.
+     *
+     * @return the default activity
+     */
+    Activity getDefaultActivity();
+
+    /**
+     * Sets the bot's activity to the default activity.
+     */
+    void setDefaultActivity();
+
+    /**
+     * Checks if the bot is currently displaying the default activity.
+     *
+     * @return true if the current activity is the default activity
+     */
+    boolean isDefaultActivity();
 }
