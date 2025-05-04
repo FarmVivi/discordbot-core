@@ -31,16 +31,40 @@ public abstract class AbstractPlugin implements Plugin {
     }
 
     @Override
+    public void onPreEnable() {
+        logger.info("Pre-enabling {} v{}", getName(), getVersion());
+        // Plugins can override this to configure Discord settings
+    }
+
+    @Override
     public void onEnable() {
         logger.info("Enabling {} v{}", getName(), getVersion());
+        // Plugins implement their main initialization here
+    }
+
+    @Override
+    public void onPostEnable() {
+        logger.info("Post-enabling {} v{}", getName(), getVersion());
+        // Plugins can interact with other plugins here
+    }
+
+    @Override
+    public void onPreDisable() {
+        logger.info("Pre-disabling {} v{}", getName(), getVersion());
+        // Plugins prepare for shutdown here
     }
 
     @Override
     public void onDisable() {
         logger.info("Disabling {} v{}", getName(), getVersion());
-
         // Désenregistrement automatique de tous les écouteurs
         eventManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onPostDisable() {
+        logger.info("Post-disabling {} v{}", getName(), getVersion());
+        // Final cleanup after all plugins have been disabled
     }
 
     @Override
