@@ -42,38 +42,6 @@ public interface DiscordAPI {
     void unregisterAllListeners(Plugin plugin);
 
     /**
-     * Registers a slash command.
-     *
-     * @param command the command to register
-     * @param plugin  the plugin registering the command
-     * @return a CompletableFuture that completes when the command is registered
-     */
-    CompletableFuture<Void> registerCommand(SlashCommandData command, Plugin plugin);
-
-    /**
-     * Unregisters a slash command.
-     *
-     * @param name the name of the command to unregister
-     * @return a CompletableFuture that completes when the command is unregistered
-     */
-    CompletableFuture<Void> unregisterCommand(String name);
-
-    /**
-     * Unregisters all slash commands from a specific plugin.
-     *
-     * @param plugin the plugin whose commands should be unregistered
-     * @return a CompletableFuture that completes when all commands are unregistered
-     */
-    CompletableFuture<Void> unregisterAllCommands(Plugin plugin);
-
-    /**
-     * Gets all registered slash commands.
-     *
-     * @return a list of all registered slash commands
-     */
-    List<SlashCommandData> getRegisteredCommands();
-
-    /**
      * Connects to Discord.
      *
      * @return a CompletableFuture that completes when connected

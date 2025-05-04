@@ -6,7 +6,6 @@ import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
@@ -29,8 +28,6 @@ public class JDADiscordAPI implements DiscordAPI {
     private JDA jda;
 
     private final Map<ListenerAdapter, Object> listeners = new ConcurrentHashMap<>();
-    private final Map<String, Object> commands = new ConcurrentHashMap<>();
-    private final Map<String, SlashCommandData> commandsData = new ConcurrentHashMap<>();
 
     /**
      * Creates a new JDADiscordAPI.
@@ -83,69 +80,6 @@ public class JDADiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public CompletableFuture<Void> registerCommand(SlashCommandData command, Plugin plugin) {
-        if (jda != null) {
-            commands.put(command.getName(), plugin);
-            commandsData.put(command.getName(), command);
-            logger.debug("Registered command: {}", command.getName());
-
-            return updateCommands();
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public CompletableFuture<Void> unregisterCommand(String name) {
-        if (jda != null && commands.containsKey(name)) {
-            commands.remove(name);
-            commandsData.remove(name);
-            logger.debug("Unregistered command: {}", name);
-
-            return updateCommands();
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public CompletableFuture<Void> unregisterAllCommands(Plugin plugin) {
-        if (jda != null) {
-            List<String> toRemove = new ArrayList<>();
-            for (Map.Entry<String, Object> entry : commands.entrySet()) {
-                if (entry.getValue() == plugin) {
-                    toRemove.add(entry.getKey());
-                }
-            }
-
-            for (String name : toRemove) {
-                commands.remove(name);
-                commandsData.remove(name);
-                logger.debug("Unregistered command: {}", name);
-            }
-
-            return updateCommands();
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /**
-     * Updates the commands with Discord.
-     *
-     * @return a CompletableFuture that completes when the commands are updated
-     */
-    private CompletableFuture<Void> updateCommands() {
-        if (jda != null) {
-            return jda.updateCommands().addCommands(new ArrayList<>(commandsData.values())).submit()
-                    .thenApply(v -> null);
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public List<SlashCommandData> getRegisteredCommands() {
-        return new ArrayList<>(commandsData.values());
-    }
-
-    @Override
     public CompletableFuture<Void> connect() {
         if (jda != null) {
             return CompletableFuture.completedFuture(null);
@@ -193,8 +127,6 @@ public class JDADiscordAPI implements DiscordAPI {
             jda.shutdown();
             jda = null;
             listeners.clear();
-            commands.clear();
-            commandsData.clear();
             logger.info("Disconnected from Discord");
             future.complete(null);
         } catch (Exception e) {
