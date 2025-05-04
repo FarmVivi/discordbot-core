@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.core.plugin;
 
-import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
@@ -30,7 +29,10 @@ public class PluginManager implements PluginLoader {
     private final File pluginsFolder;
     private final EventManager eventManager;
     private final DiscordAPI discordAPI;
-    private final Configuration coreConfig;
+
+    //--------------------------------------------------------------------
+    // CONSTRUCTORS AND INITIALIZATION
+    //--------------------------------------------------------------------
 
     /**
      * Creates a new plugin manager.
@@ -38,18 +40,153 @@ public class PluginManager implements PluginLoader {
      * @param pluginsFolder the folder where plugins are stored
      * @param eventManager  the event manager
      * @param discordAPI    the Discord API
-     * @param coreConfig    the core configuration
      */
-    public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI, Configuration coreConfig) {
+    public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
-        this.coreConfig = coreConfig;
 
         if (!pluginsFolder.exists()) {
             pluginsFolder.mkdirs();
         }
     }
+
+    //--------------------------------------------------------------------
+    // PLUGIN LOADER INTERFACE IMPLEMENTATION
+    //--------------------------------------------------------------------
+
+    @Override
+    public Plugin loadPlugin(String jarFile) {
+        File file = new File(jarFile);
+        if (!file.exists()) {
+            logger.error("Plugin file does not exist: {}", jarFile);
+            return null;
+        }
+
+        try (JarFile jar = new JarFile(file)) {
+            // Look for plugin.yml
+            JarEntry entry = jar.getJarEntry("plugin.yml");
+            if (entry == null) {
+                logger.error("Plugin does not contain plugin.yml: {}", jarFile);
+                return null;
+            }
+
+            // Parse plugin.yml to get the main class
+            PluginDescriptionFile description = new PluginDescriptionFile(jar.getInputStream(entry));
+
+            // Create the class loader
+            URL[] urls = {file.toURI().toURL()};
+            PluginClassLoader classLoader = new PluginClassLoader(urls, getClass().getClassLoader());
+
+            // Load the main class
+            Class<?> mainClass = classLoader.loadClass(description.getMain());
+            if (!Plugin.class.isAssignableFrom(mainClass)) {
+                logger.error("Main class does not implement Plugin: {}", description.getMain());
+                classLoader.close();
+                return null;
+            }
+
+            // Instantiate the plugin
+            Plugin plugin = (Plugin) mainClass.getDeclaredConstructor().newInstance();
+
+            // Create the plugin context
+            PluginContextImpl context = new PluginContextImpl(
+                    LoggerFactory.getLogger(description.getName()),
+                    eventManager,
+                    discordAPI,
+                    new PluginConfiguration(description.getName()),
+                    new File(pluginsFolder, description.getName()).getAbsolutePath(),
+                    this,
+                    classLoader
+            );
+
+            // Initialize the plugin
+            plugin.onLoad(context);
+
+            // Store the classloader
+            classLoaders.put(description.getName(), classLoader);
+
+            return plugin;
+        } catch (Exception e) {
+            logger.error("Failed to load plugin: {}", jarFile, e);
+            return null;
+        }
+    }
+
+    @Override
+    public boolean enablePlugin(Plugin plugin) {
+        if (plugin.getStatus() != PluginStatus.LOADED) {
+            logger.warn("Cannot enable plugin {}: not in LOADED state", plugin.getName());
+            return false;
+        }
+
+        try {
+            // Follow the proper sequence
+            plugin.setStatus(PluginStatus.PRE_ENABLE);
+            plugin.onPreEnable();
+
+            plugin.setStatus(PluginStatus.ENABLE);
+            plugin.onEnable();
+
+            plugin.setStatus(PluginStatus.POST_ENABLE);
+            plugin.onPostEnable();
+
+            plugin.setStatus(PluginStatus.ENABLED);
+            logger.info("Plugin enabled: {} v{}", plugin.getName(), plugin.getVersion());
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to enable plugin: {}", plugin.getName(), e);
+            plugin.setStatus(PluginStatus.LOADED);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean disablePlugin(Plugin plugin) {
+        if (plugin.getStatus() != PluginStatus.ENABLED) {
+            logger.warn("Cannot disable plugin {}: not in ENABLED state", plugin.getName());
+            return false;
+        }
+
+        try {
+            // Follow the proper sequence
+            plugin.setStatus(PluginStatus.PRE_DISABLE);
+            plugin.onPreDisable();
+
+            plugin.setStatus(PluginStatus.DISABLE);
+            plugin.onDisable();
+
+            plugin.setStatus(PluginStatus.POST_DISABLE);
+            plugin.onPostDisable();
+
+            plugin.setStatus(PluginStatus.DISABLED);
+            logger.info("Plugin disabled: {}", plugin.getName());
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to disable plugin: {}", plugin.getName(), e);
+            plugin.setStatus(PluginStatus.ENABLED);
+            return false;
+        }
+    }
+
+    @Override
+    public Plugin getPlugin(String name) {
+        return plugins.get(name);
+    }
+
+    @Override
+    public List<Plugin> getPlugins() {
+        return new ArrayList<>(plugins.values());
+    }
+
+    @Override
+    public boolean isPluginLoaded(String name) {
+        return plugins.containsKey(name);
+    }
+
+    //--------------------------------------------------------------------
+    // PLUGIN DISCOVERY AND LOADING
+    //--------------------------------------------------------------------
 
     /**
      * Scans plugin JARs to collect metadata without loading them.
@@ -148,89 +285,9 @@ public class PluginManager implements PluginLoader {
         logger.info("Plugin loading complete: {} loaded successfully, {} failed", successCount, failedCount);
     }
 
-    /**
-     * Checks if a plugin has all its dependencies loaded.
-     *
-     * @param pluginName the name of the plugin
-     * @return true if all dependencies are loaded, false otherwise
-     */
-    public boolean hasAllDependenciesLoaded(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return false;
-        }
-
-        // Check hard dependencies
-        for (String dependency : description.getDependencies()) {
-            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
-                logger.warn("Plugin {} depends on {}, which is not loaded", pluginName, dependency);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Gets the names of all missing dependencies for a plugin.
-     *
-     * @param pluginName the name of the plugin
-     * @return list of missing dependency names
-     */
-    public List<String> getMissingDependencies(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return List.of();
-        }
-
-        List<String> missing = new ArrayList<>();
-        for (String dependency : description.getDependencies()) {
-            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
-                missing.add(dependency);
-            }
-        }
-
-        return missing;
-    }
-
-    /**
-     * Gets a set of all plugins that failed to load.
-     *
-     * @return set of failed plugin names
-     */
-    public Set<String> getFailedPlugins() {
-        return Collections.unmodifiableSet(failedPlugins);
-    }
-
-    /**
-     * Gets the dependencies of a plugin.
-     *
-     * @param pluginName the name of the plugin
-     * @return list of dependency names, or empty list if the plugin doesn't exist
-     */
-    public List<String> getPluginDependencies(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return List.of();
-        }
-
-        return description.getDependencies();
-    }
-
-    /**
-     * Gets the soft dependencies of a plugin.
-     *
-     * @param pluginName the name of the plugin
-     * @return list of soft dependency names, or empty list if the plugin doesn't exist
-     */
-    public List<String> getPluginSoftDependencies(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return List.of();
-        }
-
-        return description.getSoftDependencies();
-    }
+    //--------------------------------------------------------------------
+    // PLUGIN LIFECYCLE MANAGEMENT
+    //--------------------------------------------------------------------
 
     /**
      * Pre-enables all loaded plugins in dependency order.
@@ -357,75 +414,6 @@ public class PluginManager implements PluginLoader {
     }
 
     /**
-     * Gets a list of plugin names in dependency order.
-     *
-     * @return list of plugin names
-     */
-    private List<String> getPluginsInDependencyOrder() {
-        // For already loaded plugins, we can use the current order
-        // This helps maintain consistency if this method is called multiple times
-        List<String> pluginNames = new ArrayList<>(plugins.keySet());
-
-        // Create a simplified dependency graph
-        Map<String, Set<String>> dependencyGraph = new HashMap<>();
-        for (String pluginName : pluginNames) {
-            Set<String> dependencies = new HashSet<>();
-            PluginDescriptionFile desc = pluginDescriptions.get(pluginName);
-            if (desc != null) {
-                dependencies.addAll(desc.getDependencies());
-            }
-            dependencyGraph.put(pluginName, dependencies);
-        }
-
-        // Perform a topological sort
-        List<String> result = new ArrayList<>();
-        Set<String> visited = new HashSet<>();
-        Set<String> visiting = new HashSet<>();
-
-        for (String pluginName : pluginNames) {
-            if (!visited.contains(pluginName)) {
-                topologicalVisit(pluginName, dependencyGraph, visited, visiting, result);
-            }
-        }
-
-        // Reverse to get dependency order (dependencies first)
-        Collections.reverse(result);
-        return result;
-    }
-
-    /**
-     * Helper method for topological sort.
-     */
-    private void topologicalVisit(
-            String pluginName,
-            Map<String, Set<String>> graph,
-            Set<String> visited,
-            Set<String> visiting,
-            List<String> result
-    ) {
-        visiting.add(pluginName);
-
-        Set<String> dependencies = graph.get(pluginName);
-        if (dependencies != null) {
-            for (String dependency : dependencies) {
-                if (!visited.contains(dependency) && plugins.containsKey(dependency)) {
-                    if (visiting.contains(dependency)) {
-                        // Circular dependency detected, but continue anyway
-                        logger.warn("Circular dependency detected: {} <-> {}",
-                                pluginName, dependency);
-                        continue;
-                    }
-                    topologicalVisit(dependency, graph, visited, visiting, result);
-                }
-            }
-        }
-
-        visiting.remove(pluginName);
-        visited.add(pluginName);
-        result.add(pluginName);
-    }
-
-    /**
      * Pre-disables all enabled plugins in reverse dependency order.
      */
     public void preDisablePlugins() {
@@ -536,21 +524,9 @@ public class PluginManager implements PluginLoader {
         failedPlugins.clear();
     }
 
-    /**
-     * Gets a list of plugin names in reverse dependency order (dependents before dependencies).
-     *
-     * @return list of plugin names
-     */
-    private List<String> getPluginsInReverseDependencyOrder() {
-        // Get the dependency order first
-        List<String> dependencyOrder = getPluginsInDependencyOrder();
-
-        // Reverse it to get the reverse dependency order
-        List<String> reverseDependencyOrder = new ArrayList<>(dependencyOrder);
-        Collections.reverse(reverseDependencyOrder);
-
-        return reverseDependencyOrder;
-    }
+    //--------------------------------------------------------------------
+    // PLUGIN RELOAD OPERATIONS
+    //--------------------------------------------------------------------
 
     /**
      * Reloads all plugins.
@@ -683,132 +659,180 @@ public class PluginManager implements PluginLoader {
         }
     }
 
-    @Override
-    public Plugin loadPlugin(String jarFile) {
-        File file = new File(jarFile);
-        if (!file.exists()) {
-            logger.error("Plugin file does not exist: {}", jarFile);
-            return null;
-        }
+    //--------------------------------------------------------------------
+    // DEPENDENCY MANAGEMENT
+    //--------------------------------------------------------------------
 
-        try (JarFile jar = new JarFile(file)) {
-            // Look for plugin.yml
-            JarEntry entry = jar.getJarEntry("plugin.yml");
-            if (entry == null) {
-                logger.error("Plugin does not contain plugin.yml: {}", jarFile);
-                return null;
+    /**
+     * Gets a list of plugin names in dependency order.
+     *
+     * @return list of plugin names
+     */
+    private List<String> getPluginsInDependencyOrder() {
+        // For already loaded plugins, we can use the current order
+        // This helps maintain consistency if this method is called multiple times
+        List<String> pluginNames = new ArrayList<>(plugins.keySet());
+
+        // Create a simplified dependency graph
+        Map<String, Set<String>> dependencyGraph = new HashMap<>();
+        for (String pluginName : pluginNames) {
+            Set<String> dependencies = new HashSet<>();
+            PluginDescriptionFile desc = pluginDescriptions.get(pluginName);
+            if (desc != null) {
+                dependencies.addAll(desc.getDependencies());
             }
+            dependencyGraph.put(pluginName, dependencies);
+        }
 
-            // Parse plugin.yml to get the main class
-            PluginDescriptionFile description = new PluginDescriptionFile(jar.getInputStream(entry));
+        // Perform a topological sort
+        List<String> result = new ArrayList<>();
+        Set<String> visited = new HashSet<>();
+        Set<String> visiting = new HashSet<>();
 
-            // Create the class loader
-            URL[] urls = {file.toURI().toURL()};
-            PluginClassLoader classLoader = new PluginClassLoader(urls, getClass().getClassLoader());
-
-            // Load the main class
-            Class<?> mainClass = classLoader.loadClass(description.getMain());
-            if (!Plugin.class.isAssignableFrom(mainClass)) {
-                logger.error("Main class does not implement Plugin: {}", description.getMain());
-                classLoader.close();
-                return null;
+        for (String pluginName : pluginNames) {
+            if (!visited.contains(pluginName)) {
+                topologicalVisit(pluginName, dependencyGraph, visited, visiting, result);
             }
-
-            // Instantiate the plugin
-            Plugin plugin = (Plugin) mainClass.getDeclaredConstructor().newInstance();
-
-            // Create the plugin context
-            PluginContextImpl context = new PluginContextImpl(
-                    LoggerFactory.getLogger(description.getName()),
-                    eventManager,
-                    discordAPI,
-                    new PluginConfiguration(description.getName()),
-                    new File(pluginsFolder, description.getName()).getAbsolutePath(),
-                    this,
-                    classLoader
-            );
-
-            // Initialize the plugin
-            plugin.onLoad(context);
-
-            // Store the classloader
-            classLoaders.put(description.getName(), classLoader);
-
-            return plugin;
-        } catch (Exception e) {
-            logger.error("Failed to load plugin: {}", jarFile, e);
-            return null;
         }
+
+        // Reverse to get dependency order (dependencies first)
+        Collections.reverse(result);
+        return result;
     }
 
-    @Override
-    public boolean enablePlugin(Plugin plugin) {
-        if (plugin.getStatus() != PluginStatus.LOADED) {
-            logger.warn("Cannot enable plugin {}: not in LOADED state", plugin.getName());
+    /**
+     * Gets a list of plugin names in reverse dependency order (dependents before dependencies).
+     *
+     * @return list of plugin names
+     */
+    private List<String> getPluginsInReverseDependencyOrder() {
+        // Get the dependency order first
+        List<String> dependencyOrder = getPluginsInDependencyOrder();
+
+        // Reverse it to get the reverse dependency order
+        List<String> reverseDependencyOrder = new ArrayList<>(dependencyOrder);
+        Collections.reverse(reverseDependencyOrder);
+
+        return reverseDependencyOrder;
+    }
+
+    /**
+     * Helper method for topological sort.
+     */
+    private void topologicalVisit(
+            String pluginName,
+            Map<String, Set<String>> graph,
+            Set<String> visited,
+            Set<String> visiting,
+            List<String> result
+    ) {
+        visiting.add(pluginName);
+
+        Set<String> dependencies = graph.get(pluginName);
+        if (dependencies != null) {
+            for (String dependency : dependencies) {
+                if (!visited.contains(dependency) && plugins.containsKey(dependency)) {
+                    if (visiting.contains(dependency)) {
+                        // Circular dependency detected, but continue anyway
+                        logger.warn("Circular dependency detected: {} <-> {}",
+                                pluginName, dependency);
+                        continue;
+                    }
+                    topologicalVisit(dependency, graph, visited, visiting, result);
+                }
+            }
+        }
+
+        visiting.remove(pluginName);
+        visited.add(pluginName);
+        result.add(pluginName);
+    }
+
+    /**
+     * Checks if a plugin has all its dependencies loaded.
+     *
+     * @param pluginName the name of the plugin
+     * @return true if all dependencies are loaded, false otherwise
+     */
+    public boolean hasAllDependenciesLoaded(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
             return false;
         }
 
-        try {
-            // Follow the proper sequence
-            plugin.setStatus(PluginStatus.PRE_ENABLE);
-            plugin.onPreEnable();
-
-            plugin.setStatus(PluginStatus.ENABLE);
-            plugin.onEnable();
-
-            plugin.setStatus(PluginStatus.POST_ENABLE);
-            plugin.onPostEnable();
-
-            plugin.setStatus(PluginStatus.ENABLED);
-            logger.info("Plugin enabled: {} v{}", plugin.getName(), plugin.getVersion());
-            return true;
-        } catch (Exception e) {
-            logger.error("Failed to enable plugin: {}", plugin.getName(), e);
-            plugin.setStatus(PluginStatus.LOADED);
-            return false;
-        }
-    }
-
-    @Override
-    public boolean disablePlugin(Plugin plugin) {
-        if (plugin.getStatus() != PluginStatus.ENABLED) {
-            logger.warn("Cannot disable plugin {}: not in ENABLED state", plugin.getName());
-            return false;
+        // Check hard dependencies
+        for (String dependency : description.getDependencies()) {
+            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
+                logger.warn("Plugin {} depends on {}, which is not loaded", pluginName, dependency);
+                return false;
+            }
         }
 
-        try {
-            // Follow the proper sequence
-            plugin.setStatus(PluginStatus.PRE_DISABLE);
-            plugin.onPreDisable();
+        return true;
+    }
 
-            plugin.setStatus(PluginStatus.DISABLE);
-            plugin.onDisable();
+    //--------------------------------------------------------------------
+    // UTILITY METHODS
+    //--------------------------------------------------------------------
 
-            plugin.setStatus(PluginStatus.POST_DISABLE);
-            plugin.onPostDisable();
-
-            plugin.setStatus(PluginStatus.DISABLED);
-            logger.info("Plugin disabled: {}", plugin.getName());
-            return true;
-        } catch (Exception e) {
-            logger.error("Failed to disable plugin: {}", plugin.getName(), e);
-            plugin.setStatus(PluginStatus.ENABLED);
-            return false;
+    /**
+     * Gets the names of all missing dependencies for a plugin.
+     *
+     * @param pluginName the name of the plugin
+     * @return list of missing dependency names
+     */
+    public List<String> getMissingDependencies(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
+            return List.of();
         }
+
+        List<String> missing = new ArrayList<>();
+        for (String dependency : description.getDependencies()) {
+            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
+                missing.add(dependency);
+            }
+        }
+
+        return missing;
     }
 
-    @Override
-    public Plugin getPlugin(String name) {
-        return plugins.get(name);
+    /**
+     * Gets a set of all plugins that failed to load.
+     *
+     * @return set of failed plugin names
+     */
+    public Set<String> getFailedPlugins() {
+        return Collections.unmodifiableSet(failedPlugins);
     }
 
-    @Override
-    public List<Plugin> getPlugins() {
-        return new ArrayList<>(plugins.values());
+    /**
+     * Gets the dependencies of a plugin.
+     *
+     * @param pluginName the name of the plugin
+     * @return list of dependency names, or empty list if the plugin doesn't exist
+     */
+    public List<String> getPluginDependencies(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
+            return List.of();
+        }
+
+        return description.getDependencies();
     }
 
-    @Override
-    public boolean isPluginLoaded(String name) {
-        return plugins.containsKey(name);
+    /**
+     * Gets the soft dependencies of a plugin.
+     *
+     * @param pluginName the name of the plugin
+     * @return list of soft dependency names, or empty list if the plugin doesn't exist
+     */
+    public List<String> getPluginSoftDependencies(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
+            return List.of();
+        }
+
+        return description.getSoftDependencies();
     }
 }

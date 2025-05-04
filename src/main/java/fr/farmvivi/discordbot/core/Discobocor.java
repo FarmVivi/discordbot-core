@@ -150,7 +150,7 @@ public class Discobocor {
         discordAPI = new JDADiscordAPI(token);
 
         // Create the plugin manager
-        pluginManager = new PluginManager(pluginsFolder, eventManager, discordAPI, coreConfig);
+        pluginManager = new PluginManager(pluginsFolder, eventManager, discordAPI);
 
         return true;
     }
