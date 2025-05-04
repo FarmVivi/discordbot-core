@@ -131,7 +131,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.10</version>
+            <version>5.11</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j -->
