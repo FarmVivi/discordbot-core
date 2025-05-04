@@ -47,6 +47,32 @@ public interface DiscordAPI {
     boolean isConnected();
 
     /**
+     * Gets the startup activity for the bot.
+     *
+     * @return the startup activity
+     */
+    Activity getStartupActivity();
+
+    /**
+     * Sets the bot's activity to a startup activity with away status.
+     */
+    void setStartupActivity();
+
+    /**
+     * Sets the bot's activity to a startup activity with the specified activity.
+     *
+     * @param activity the activity to set
+     */
+    void setStartupActivity(Activity activity);
+
+    /**
+     * Checks if the bot is currently displaying the startup activity.
+     *
+     * @return true if the current activity is the startup activity
+     */
+    boolean isStartupActivity();
+
+    /**
      * Gets the default activity for the bot.
      *
      * @return the default activity
@@ -57,6 +83,13 @@ public interface DiscordAPI {
      * Sets the bot's activity to the default activity.
      */
     void setDefaultActivity();
+
+    /**
+     * Sets the bot's activity to the default activity with the specified activity.
+     *
+     * @param activity the activity to set
+     */
+    void setDefaultActivity(Activity activity);
 
     /**
      * Checks if the bot is currently displaying the default activity.

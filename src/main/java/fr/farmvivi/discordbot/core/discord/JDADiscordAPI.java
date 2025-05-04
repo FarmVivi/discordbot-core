@@ -21,6 +21,8 @@ public class JDADiscordAPI implements DiscordAPI {
     private final String token;
     private JDA jda;
     private JDABuilder builder;
+    private Activity startupActivity = Activity.playing("starting...");
+    private Activity defaultActivity = Activity.playing("v" + Discobocor.VERSION);
 
     /**
      * Creates a new JDADiscordAPI.
@@ -117,8 +119,39 @@ public class JDADiscordAPI implements DiscordAPI {
     }
 
     @Override
+    public Activity getStartupActivity() {
+        return startupActivity;
+    }
+
+    @Override
+    public void setStartupActivity() {
+        if (isConnected()) {
+            jda.getPresence().setActivity(getStartupActivity());
+        }
+    }
+
+    @Override
+    public void setStartupActivity(Activity activity) {
+        if (activity == null) {
+            throw new IllegalArgumentException("Activity cannot be null");
+        }
+
+        this.startupActivity = activity;
+
+        setStartupActivity();
+    }
+
+    @Override
+    public boolean isStartupActivity() {
+        if (!isConnected() || jda.getPresence().getActivity() == null) {
+            return false;
+        }
+        return jda.getPresence().getActivity().equals(getStartupActivity());
+    }
+
+    @Override
     public Activity getDefaultActivity() {
-        return Activity.playing("v" + Discobocor.VERSION);
+        return defaultActivity;
     }
 
     @Override
@@ -126,6 +159,17 @@ public class JDADiscordAPI implements DiscordAPI {
         if (isConnected()) {
             jda.getPresence().setActivity(getDefaultActivity());
         }
+    }
+
+    @Override
+    public void setDefaultActivity(Activity activity) {
+        if (activity == null) {
+            throw new IllegalArgumentException("Activity cannot be null");
+        }
+
+        this.defaultActivity = activity;
+
+        setDefaultActivity();
     }
 
     @Override
