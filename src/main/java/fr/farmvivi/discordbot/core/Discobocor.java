@@ -166,9 +166,7 @@ public class Discobocor {
             Files.writeString(Path.of(configFile.getAbsolutePath()),
                     "# Discord Bot Configuration\n" +
                             "discord:\n" +
-                            "  token: YOUR_BOT_TOKEN\n" +
-                            "  admins:\n" +
-                            "    - '123456789012345678' # Discord user ID\n"
+                            "  token: YOUR_BOT_TOKEN\n"
             );
             logger.info("Created default config.yml");
             logger.info("Please edit config.yml and restart the bot");
