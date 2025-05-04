@@ -4,6 +4,7 @@ import fr.farmvivi.discordbot.core.Discobocor;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -21,8 +22,12 @@ public class JDADiscordAPI implements DiscordAPI {
     private final String token;
     private JDA jda;
     private JDABuilder builder;
-    private Activity startupActivity = Activity.playing("starting...");
+    private Activity startupActivity = Activity.playing("starting up...");
+    private OnlineStatus startupStatus = OnlineStatus.IDLE;
     private Activity defaultActivity = Activity.playing("v" + Discobocor.VERSION);
+    private OnlineStatus defaultStatus = OnlineStatus.ONLINE;
+    private Activity shutdownActivity = Activity.playing("shutting down...");
+    private OnlineStatus shutdownStatus = OnlineStatus.DO_NOT_DISTURB;
 
     /**
      * Creates a new JDADiscordAPI.
@@ -97,6 +102,16 @@ public class JDADiscordAPI implements DiscordAPI {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         try {
+            // Set shutdown presence before disconnecting
+            setShutdownPresence();
+
+            // Give a short delay for the presence to update
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+
             jda.shutdown();
             jda = null;
 
@@ -124,29 +139,45 @@ public class JDADiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void setStartupActivity() {
+    public OnlineStatus getStartupStatus() {
+        return startupStatus;
+    }
+
+    @Override
+    public void setStartupPresence() {
         if (isConnected()) {
-            jda.getPresence().setActivity(getStartupActivity());
+            jda.getPresence().setPresence(startupStatus, startupActivity);
+            logger.debug("Set startup presence: {} with status {}",
+                    startupActivity.getName(), startupStatus);
         }
     }
 
     @Override
-    public void setStartupActivity(Activity activity) {
+    public void setStartupPresence(Activity activity, OnlineStatus status) {
         if (activity == null) {
             throw new IllegalArgumentException("Activity cannot be null");
         }
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
 
         this.startupActivity = activity;
+        this.startupStatus = status;
 
-        setStartupActivity();
+        setStartupPresence();
     }
 
     @Override
-    public boolean isStartupActivity() {
-        if (!isConnected() || jda.getPresence().getActivity() == null) {
+    public boolean isStartupPresence() {
+        if (!isConnected()) {
             return false;
         }
-        return jda.getPresence().getActivity().equals(getStartupActivity());
+
+        Activity currentActivity = jda.getPresence().getActivity();
+        OnlineStatus currentStatus = jda.getPresence().getStatus();
+
+        return currentStatus == startupStatus &&
+                (currentActivity != null && currentActivity.equals(startupActivity));
     }
 
     @Override
@@ -155,28 +186,91 @@ public class JDADiscordAPI implements DiscordAPI {
     }
 
     @Override
-    public void setDefaultActivity() {
+    public OnlineStatus getDefaultStatus() {
+        return defaultStatus;
+    }
+
+    @Override
+    public void setDefaultPresence() {
         if (isConnected()) {
-            jda.getPresence().setActivity(getDefaultActivity());
+            jda.getPresence().setPresence(defaultStatus, defaultActivity);
+            logger.debug("Set default presence: {} with status {}",
+                    defaultActivity.getName(), defaultStatus);
         }
     }
 
     @Override
-    public void setDefaultActivity(Activity activity) {
+    public void setDefaultPresence(Activity activity, OnlineStatus status) {
         if (activity == null) {
             throw new IllegalArgumentException("Activity cannot be null");
         }
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
 
         this.defaultActivity = activity;
+        this.defaultStatus = status;
 
-        setDefaultActivity();
+        setDefaultPresence();
     }
 
     @Override
-    public boolean isDefaultActivity() {
-        if (!isConnected() || jda.getPresence().getActivity() == null) {
+    public boolean isDefaultPresence() {
+        if (!isConnected()) {
             return false;
         }
-        return jda.getPresence().getActivity().equals(getDefaultActivity());
+
+        Activity currentActivity = jda.getPresence().getActivity();
+        OnlineStatus currentStatus = jda.getPresence().getStatus();
+
+        return currentStatus == defaultStatus &&
+                (currentActivity != null && currentActivity.equals(defaultActivity));
+    }
+
+    @Override
+    public Activity getShutdownActivity() {
+        return shutdownActivity;
+    }
+
+    @Override
+    public OnlineStatus getShutdownStatus() {
+        return shutdownStatus;
+    }
+
+    @Override
+    public void setShutdownPresence() {
+        if (isConnected()) {
+            jda.getPresence().setPresence(shutdownStatus, shutdownActivity);
+            logger.debug("Set shutdown presence: {} with status {}",
+                    shutdownActivity.getName(), shutdownStatus);
+        }
+    }
+
+    @Override
+    public void setShutdownPresence(Activity activity, OnlineStatus status) {
+        if (activity == null) {
+            throw new IllegalArgumentException("Activity cannot be null");
+        }
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+
+        this.shutdownActivity = activity;
+        this.shutdownStatus = status;
+
+        setShutdownPresence();
+    }
+
+    @Override
+    public boolean isShutdownPresence() {
+        if (!isConnected()) {
+            return false;
+        }
+
+        Activity currentActivity = jda.getPresence().getActivity();
+        OnlineStatus currentStatus = jda.getPresence().getStatus();
+
+        return currentStatus == shutdownStatus &&
+                (currentActivity != null && currentActivity.equals(shutdownActivity));
     }
 }

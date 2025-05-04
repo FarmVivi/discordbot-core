@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.core.api.discord;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
 import java.util.concurrent.CompletableFuture;
@@ -54,23 +55,31 @@ public interface DiscordAPI {
     Activity getStartupActivity();
 
     /**
-     * Sets the bot's activity to a startup activity with away status.
+     * Gets the startup online status for the bot.
+     *
+     * @return the startup online status
      */
-    void setStartupActivity();
+    OnlineStatus getStartupStatus();
 
     /**
-     * Sets the bot's activity to a startup activity with the specified activity.
+     * Sets the bot's presence to a startup state (activity + online status).
+     */
+    void setStartupPresence();
+
+    /**
+     * Sets the bot's startup presence with the specified activity and status.
      *
      * @param activity the activity to set
+     * @param status   the online status to set
      */
-    void setStartupActivity(Activity activity);
+    void setStartupPresence(Activity activity, OnlineStatus status);
 
     /**
-     * Checks if the bot is currently displaying the startup activity.
+     * Checks if the bot is currently displaying the startup presence.
      *
-     * @return true if the current activity is the startup activity
+     * @return true if the current presence matches the startup presence
      */
-    boolean isStartupActivity();
+    boolean isStartupPresence();
 
     /**
      * Gets the default activity for the bot.
@@ -80,21 +89,63 @@ public interface DiscordAPI {
     Activity getDefaultActivity();
 
     /**
-     * Sets the bot's activity to the default activity.
+     * Gets the default online status for the bot.
+     *
+     * @return the default online status
      */
-    void setDefaultActivity();
+    OnlineStatus getDefaultStatus();
 
     /**
-     * Sets the bot's activity to the default activity with the specified activity.
+     * Sets the bot's presence to the default state (activity + online status).
+     */
+    void setDefaultPresence();
+
+    /**
+     * Sets the bot's default presence with the specified activity and status.
      *
      * @param activity the activity to set
+     * @param status   the online status to set
      */
-    void setDefaultActivity(Activity activity);
+    void setDefaultPresence(Activity activity, OnlineStatus status);
 
     /**
-     * Checks if the bot is currently displaying the default activity.
+     * Checks if the bot is currently displaying the default presence.
      *
-     * @return true if the current activity is the default activity
+     * @return true if the current presence matches the default presence
      */
-    boolean isDefaultActivity();
+    boolean isDefaultPresence();
+
+    /**
+     * Gets the shutdown activity for the bot.
+     *
+     * @return the shutdown activity
+     */
+    Activity getShutdownActivity();
+
+    /**
+     * Gets the shutdown online status for the bot.
+     *
+     * @return the shutdown online status
+     */
+    OnlineStatus getShutdownStatus();
+
+    /**
+     * Sets the bot's presence to a shutdown state (activity + online status).
+     */
+    void setShutdownPresence();
+
+    /**
+     * Sets the bot's shutdown presence with the specified activity and status.
+     *
+     * @param activity the activity to set
+     * @param status   the online status to set
+     */
+    void setShutdownPresence(Activity activity, OnlineStatus status);
+
+    /**
+     * Checks if the bot is currently displaying the shutdown presence.
+     *
+     * @return true if the current presence matches the shutdown presence
+     */
+    boolean isShutdownPresence();
 }
