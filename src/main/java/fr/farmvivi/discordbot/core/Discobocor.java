@@ -30,7 +30,7 @@ public class Discobocor {
     private static PluginManager pluginManager;
     private static DiscordAPI discordAPI;
     private static SimpleEventManager eventManager;
-    private static EnvAwareYamlConfiguration coreConfig;
+    private static Configuration coreConfig;
 
     static {
         Properties properties = new Properties();
@@ -131,7 +131,7 @@ public class Discobocor {
         // Check if the token is set
         String token;
         try {
-            token = coreConfig.getStringWithEnvFallback("discord.token");
+            token = coreConfig.getString("discord.token");
             if (token == null || token.equals("YOUR_BOT_TOKEN")) {
                 logger.error("Please set your bot token in config.yml");
                 System.exit(1);
