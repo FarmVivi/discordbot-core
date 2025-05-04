@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot;
+package fr.farmvivi.discordbot.core.util;
 
 import java.awt.*;
 

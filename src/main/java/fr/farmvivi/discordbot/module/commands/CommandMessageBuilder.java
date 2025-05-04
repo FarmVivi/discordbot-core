@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.module.commands;
 
-import fr.farmvivi.discordbot.DiscordColor;
+import fr.farmvivi.discordbot.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;

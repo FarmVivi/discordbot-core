@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.module.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import fr.farmvivi.discordbot.DiscordColor;
-import fr.farmvivi.discordbot.utils.Debouncer;
+import fr.farmvivi.discordbot.core.util.DiscordColor;
+import fr.farmvivi.discordbot.core.util.Debouncer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;

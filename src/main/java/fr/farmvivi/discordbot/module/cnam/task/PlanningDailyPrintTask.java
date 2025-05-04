@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam.task;
 
-import fr.farmvivi.discordbot.DiscordColor;
+import fr.farmvivi.discordbot.core.util.DiscordColor;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;

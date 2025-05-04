@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam;
 
-import fr.farmvivi.discordbot.DiscordColor;
+import fr.farmvivi.discordbot.core.util.DiscordColor;
 import fr.farmvivi.discordbot.module.cnam.database.DatabaseManager;
 import fr.farmvivi.discordbot.module.cnam.database.cours.Cours;
 import fr.farmvivi.discordbot.module.cnam.database.cours.CoursDAO;
@@ -19,7 +19,7 @@ import fr.farmvivi.discordbot.module.cnam.database.utilisateur.UtilisateurDAO;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirCreateEvent;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirRemoveEvent;
 import fr.farmvivi.discordbot.module.cnam.events.devoir.DevoirUpdateEvent;
-import fr.farmvivi.discordbot.utils.Debouncer;
+import fr.farmvivi.discordbot.core.util.Debouncer;
 import fr.farmvivi.discordbot.utils.event.SubscribeEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;

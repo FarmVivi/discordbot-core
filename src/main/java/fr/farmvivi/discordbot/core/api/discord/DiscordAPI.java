@@ -1,8 +1,6 @@
 package fr.farmvivi.discordbot.core.api.discord;
 
-import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -16,28 +14,6 @@ public interface DiscordAPI {
      * @return the JDA instance
      */
     JDA getJDA();
-
-    /**
-     * Registers a Discord event listener.
-     *
-     * @param listener the listener to register
-     * @param plugin   the plugin registering the listener
-     */
-    void registerListener(ListenerAdapter listener, Plugin plugin);
-
-    /**
-     * Unregisters a Discord event listener.
-     *
-     * @param listener the listener to unregister
-     */
-    void unregisterListener(ListenerAdapter listener);
-
-    /**
-     * Unregisters all Discord event listeners from a specific plugin.
-     *
-     * @param plugin the plugin whose listeners should be unregistered
-     */
-    void unregisterAllListeners(Plugin plugin);
 
     /**
      * Connects to Discord.

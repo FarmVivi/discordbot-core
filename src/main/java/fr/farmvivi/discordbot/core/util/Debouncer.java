@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.utils;
+package fr.farmvivi.discordbot.core.util;
 
 import java.util.Timer;
 import java.util.TimerTask;

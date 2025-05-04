@@ -4,7 +4,7 @@ import fr.farmvivi.discordbot.module.commands.Command;
 import fr.farmvivi.discordbot.module.commands.CommandCategory;
 import fr.farmvivi.discordbot.module.commands.CommandMessageBuilder;
 import fr.farmvivi.discordbot.module.commands.CommandReceivedEvent;
-import fr.farmvivi.discordbot.utils.Debouncer;
+import fr.farmvivi.discordbot.core.util.Debouncer;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.Map;

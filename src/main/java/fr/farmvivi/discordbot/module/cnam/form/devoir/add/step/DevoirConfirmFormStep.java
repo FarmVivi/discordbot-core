@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.module.cnam.form.devoir.add.step;
 
-import fr.farmvivi.discordbot.DiscordColor;
+import fr.farmvivi.discordbot.core.util.DiscordColor;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.DevoirForm;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.add.AddDevoirForm;
 import fr.farmvivi.discordbot.module.cnam.form.devoir.edit.EditDevoirForm;

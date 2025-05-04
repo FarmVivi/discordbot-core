@@ -14,7 +14,7 @@
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mainClass>fr.farmvivi.discordbot.core.Main</project.mainClass>
+        <project.mainClass>fr.farmvivi.discordbot.core.Discobocor</project.mainClass>
     </properties>
 
     <repositories>

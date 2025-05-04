@@ -14,7 +14,7 @@ import fr.farmvivi.discordbot.module.cnam.task.PlanningExporterTask;
 import fr.farmvivi.discordbot.module.cnam.task.PlanningScrapperTask;
 import fr.farmvivi.discordbot.module.commands.CommandsModule;
 import fr.farmvivi.discordbot.module.forms.FormsModule;
-import fr.farmvivi.discordbot.utils.Debouncer;
+import fr.farmvivi.discordbot.core.util.Debouncer;
 import fr.farmvivi.discordbot.utils.event.EventManager;
 import fr.farmvivi.discordbot.utils.event.IEventManager;
 
