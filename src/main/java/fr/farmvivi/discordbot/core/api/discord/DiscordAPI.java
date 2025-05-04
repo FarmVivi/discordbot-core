@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.api.discord;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 
 import java.util.concurrent.CompletableFuture;
@@ -12,12 +13,20 @@ public interface DiscordAPI {
     /**
      * Gets the underlying JDA instance.
      *
-     * @return the JDA instance
+     * @return the JDA instance or null if not connected
      */
     JDA getJDA();
 
     /**
-     * Connects to Discord.
+     * Gets the JDABuilder instance that will be used to connect.
+     * This can be modified by plugins in their pre-enable phase.
+     *
+     * @return the JDABuilder instance
+     */
+    JDABuilder getBuilder();
+
+    /**
+     * Connects to Discord using the configured JDABuilder.
      *
      * @return a CompletableFuture that completes when connected
      */

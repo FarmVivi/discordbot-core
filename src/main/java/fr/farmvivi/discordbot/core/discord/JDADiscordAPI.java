@@ -20,6 +20,7 @@ public class JDADiscordAPI implements DiscordAPI {
 
     private final String token;
     private JDA jda;
+    private JDABuilder builder;
 
     /**
      * Creates a new JDADiscordAPI.
@@ -28,6 +29,35 @@ public class JDADiscordAPI implements DiscordAPI {
      */
     public JDADiscordAPI(String token) {
         this.token = token;
+
+        // Initialize the builder with default settings
+        initializeBuilder();
+    }
+
+    /**
+     * Initializes the JDABuilder with default settings.
+     */
+    private void initializeBuilder() {
+        builder = JDABuilder.createDefault(token)
+                .enableIntents(
+                        GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_PRESENCES,
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.GUILD_VOICE_STATES
+                )
+                .enableCache(
+                        CacheFlag.MEMBER_OVERRIDES,
+                        CacheFlag.VOICE_STATE,
+                        CacheFlag.EMOJI,
+                        CacheFlag.ACTIVITY
+                )
+                .setAutoReconnect(true);
+    }
+
+    @Override
+    public JDABuilder getBuilder() {
+        return builder;
     }
 
     @Override
@@ -44,22 +74,7 @@ public class JDADiscordAPI implements DiscordAPI {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         try {
-            JDABuilder builder = JDABuilder.createDefault(token)
-                    .enableIntents(
-                            GatewayIntent.GUILD_MEMBERS,
-                            GatewayIntent.GUILD_PRESENCES,
-                            GatewayIntent.GUILD_MESSAGES,
-                            GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                            GatewayIntent.GUILD_VOICE_STATES
-                    )
-                    .enableCache(
-                            CacheFlag.MEMBER_OVERRIDES,
-                            CacheFlag.VOICE_STATE,
-                            CacheFlag.EMOJI,
-                            CacheFlag.ACTIVITY
-                    )
-                    .setAutoReconnect(true);
-
+            // Use the builder that might have been modified by plugins
             jda = builder.build().awaitReady();
             logger.info("Connected to Discord as {}", jda.getSelfUser().getAsTag());
             future.complete(null);
@@ -82,6 +97,10 @@ public class JDADiscordAPI implements DiscordAPI {
         try {
             jda.shutdown();
             jda = null;
+
+            // Reinitialize the builder for future connections
+            initializeBuilder();
+
             logger.info("Disconnected from Discord");
             future.complete(null);
         } catch (Exception e) {
