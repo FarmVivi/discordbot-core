@@ -6,14 +6,15 @@
 
     <groupId>fr.farmvivi.discordbot</groupId>
     <artifactId>discordbot</artifactId>
-    <version>2.3.25-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
 
-    <name>DiscordBot</name>
+    <name>DiscordBot Core</name>
+    <description>Core framework for Discord Bot with plugin support</description>
 
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mainClass>fr.farmvivi.discordbot.Main</project.mainClass>
+        <project.mainClass>fr.farmvivi.discordbot.core.Main</project.mainClass>
     </properties>
 
     <repositories>
@@ -27,18 +28,6 @@
             <id>dv8tion</id>
             <name>m2-dv8tion</name>
             <url>https://m2.dv8tion.net/releases</url>
-        </repository>
-
-        <repository>
-            <id>lavalink</id>
-            <name>lavalink</name>
-            <url>https://maven.lavalink.dev/releases</url>
-        </repository>
-
-        <repository>
-            <id>TopiWTF-releases</id>
-            <name>Topis Maven Repo</name>
-            <url>https://maven.topi.wtf/releases</url>
         </repository>
 
         <repository>
@@ -63,89 +52,11 @@
             <version>5.5.0</version>
         </dependency>
 
-        <!-- https://maven.lavalink.dev/#/releases/dev/arbjerg/lavaplayer -->
+        <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
         <dependency>
-            <groupId>dev.arbjerg</groupId>
-            <artifactId>lavaplayer</artifactId>
-            <version>2.2.3</version>
-        </dependency>
-
-        <!-- https://maven.lavalink.dev/#/releases/dev/lavalink/youtube/common -->
-        <dependency>
-            <groupId>dev.lavalink.youtube</groupId>
-            <artifactId>common</artifactId>
-            <version>1.13.0</version>
-        </dependency>
-
-        <!-- https://maven.lavalink.dev/#/releases/dev/lavalink/youtube/v2 -->
-        <dependency>
-            <groupId>dev.lavalink.youtube</groupId>
-            <artifactId>v2</artifactId>
-            <version>1.13.0</version>
-        </dependency>
-
-        <!-- https://maven.topi.wtf/#/releases/com/github/topi314/lavasrc/lavasrc -->
-        <dependency>
-            <groupId>com.github.topi314.lavasrc</groupId>
-            <artifactId>lavasrc</artifactId>
-            <version>4.6.0</version>
-        </dependency>
-
-        <!-- https://maven.topi.wtf/#/releases/com/github/topi314/lavasrc/protocol-jvm -->
-        <dependency>
-            <groupId>com.github.topi314.lavasrc</groupId>
-            <artifactId>protocol-jvm</artifactId>
-            <version>4.6.0</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/net.sf.trove4j/trove4j -->
-        <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>6.3.0</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>3.5.3</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.htmlunit/htmlunit -->
-        <dependency>
-            <groupId>org.htmlunit</groupId>
-            <artifactId>htmlunit</artifactId>
-            <version>4.11.1</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>5.10</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j -->
-        <dependency>
-            <groupId>org.mnode.ical4j</groupId>
-            <artifactId>ical4j</artifactId>
-            <version>4.1.1</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.13.1</version>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.4</version>
         </dependency>
     </dependencies>
 

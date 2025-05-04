@@ -1,0 +1,487 @@
+package fr.farmvivi.discordbot.core.event;
+
+import fr.farmvivi.discordbot.core.api.event.*;
+import fr.farmvivi.discordbot.core.api.plugin.Plugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Simple implementation of EventManager with explicit plugin management.
+ */
+public class SimpleEventManager implements EventManager {
+    private static final Logger logger = LoggerFactory.getLogger(SimpleEventManager.class);
+
+    // Map: Event Type -> Priority -> List of RegisteredListeners
+    private final Map<Class<? extends Event>, Map<EventPriority, List<RegisteredListener>>> eventTypeMap = new ConcurrentHashMap<>();
+
+    // Map: Plugin -> Set of Listeners owned by that plugin
+    private final Map<Plugin, Set<Object>> pluginListenersMap = new ConcurrentHashMap<>();
+
+    // Map: Listener -> RegisteredListener (for fast lookup)
+    private final Map<Object, Set<RegisteredListener>> listenerHandlersMap = new ConcurrentHashMap<>();
+
+    // Map: Listener -> Plugin (for ownership tracking)
+    private final Map<Object, Plugin> listenerOwnerMap = new ConcurrentHashMap<>();
+
+    // Statistics
+    private final AtomicInteger totalRegisteredHandlers = new AtomicInteger(0);
+
+    // Thread pool for async event handling
+    private final ExecutorService asyncExecutor = Executors.newCachedThreadPool(r -> {
+        Thread thread = new Thread(r, "EventManager-AsyncWorker");
+        thread.setDaemon(true);
+        return thread;
+    });
+
+    @Override
+    public void registerListener(Object listener, Plugin plugin) {
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener cannot be null");
+        }
+
+        if (plugin == null) {
+            throw new IllegalArgumentException("Plugin cannot be null");
+        }
+
+        // Check if listener is already registered
+        if (listenerOwnerMap.containsKey(listener)) {
+            logger.warn("Listener {} is already registered by plugin {}",
+                    listener.getClass().getName(), listenerOwnerMap.get(listener).getClass().getName());
+            return;
+        }
+
+        // Initialize the listener handlers set if not exists
+        Set<RegisteredListener> registeredHandlers = new HashSet<>();
+
+        // Find methods with @EventHandler annotation
+        for (Method method : listener.getClass().getMethods()) {
+            if (!method.isAnnotationPresent(EventHandler.class)) {
+                continue;
+            }
+
+            // Validate method signature
+            if (method.getParameterCount() != 1) {
+                logger.warn("Method {} in {} has @EventHandler but does not have exactly one parameter",
+                        method.getName(), listener.getClass().getName());
+                continue;
+            }
+
+            Class<?> parameterType = method.getParameterTypes()[0];
+            if (!Event.class.isAssignableFrom(parameterType)) {
+                logger.warn("Method {} in {} has @EventHandler but its parameter is not an Event",
+                        method.getName(), listener.getClass().getName());
+                continue;
+            }
+
+            @SuppressWarnings("unchecked")
+            Class<? extends Event> eventType = (Class<? extends Event>) parameterType;
+
+            // Get the event handler annotation
+            EventHandler annotation = method.getAnnotation(EventHandler.class);
+            EventPriority priority = annotation.priority();
+            boolean ignoreCancelled = annotation.ignoreCancelled();
+
+            // Create a registered listener
+            RegisteredListener registeredListener = new RegisteredListener(
+                    listener, method, eventType, priority, ignoreCancelled, plugin);
+
+            // Add to the event type map
+            eventTypeMap.computeIfAbsent(eventType, k -> new EnumMap<>(EventPriority.class))
+                    .computeIfAbsent(priority, k -> new ArrayList<>())
+                    .add(registeredListener);
+
+            // Add to the registered handlers
+            registeredHandlers.add(registeredListener);
+
+            // Increment the counter
+            totalRegisteredHandlers.incrementAndGet();
+
+            logger.debug("Registered event handler: {}#{} in {} for event {} (owned by {})",
+                    method.getName(),
+                    priority,
+                    listener.getClass().getSimpleName(),
+                    eventType.getSimpleName(),
+                    plugin.getClass().getSimpleName());
+        }
+
+        // If any handlers were registered, track the listener
+        if (!registeredHandlers.isEmpty()) {
+            // Store the registered handlers
+            listenerHandlersMap.put(listener, registeredHandlers);
+
+            // Track ownership
+            listenerOwnerMap.put(listener, plugin);
+
+            // Add to the plugin listeners map
+            pluginListenersMap.computeIfAbsent(plugin, k -> ConcurrentHashMap.newKeySet()).add(listener);
+
+            logger.info("Registered listener {} with {} event handlers (owned by {})",
+                    listener.getClass().getSimpleName(),
+                    registeredHandlers.size(),
+                    plugin.getClass().getSimpleName());
+        } else {
+            logger.warn("Listener {} has no @EventHandler methods", listener.getClass().getName());
+        }
+    }
+
+    @Override
+    public boolean unregisterListener(Object listener) {
+        if (listener == null) {
+            return false;
+        }
+
+        // Check if listener is registered
+        Set<RegisteredListener> handlers = listenerHandlersMap.get(listener);
+        if (handlers == null || handlers.isEmpty()) {
+            return false;
+        }
+
+        // Get the owning plugin
+        Object plugin = listenerOwnerMap.get(listener);
+
+        // Remove all registered handlers
+        for (RegisteredListener handler : handlers) {
+            // Get the event map
+            Map<EventPriority, List<RegisteredListener>> priorityMap = eventTypeMap.get(handler.getEventType());
+            if (priorityMap != null) {
+                // Get the priority list
+                List<RegisteredListener> priorityList = priorityMap.get(handler.getPriority());
+                if (priorityList != null) {
+                    // Remove the handler
+                    priorityList.remove(handler);
+
+                    // Decrement the counter
+                    totalRegisteredHandlers.decrementAndGet();
+
+                    // Clean up empty lists
+                    if (priorityList.isEmpty()) {
+                        priorityMap.remove(handler.getPriority());
+                    }
+
+                    // Clean up empty maps
+                    if (priorityMap.isEmpty()) {
+                        eventTypeMap.remove(handler.getEventType());
+                    }
+                }
+            }
+        }
+
+        // Remove from the listener handlers map
+        listenerHandlersMap.remove(listener);
+
+        // Remove ownership
+        listenerOwnerMap.remove(listener);
+
+        // Remove from the plugin listeners map
+        if (plugin != null) {
+            Set<Object> pluginListeners = pluginListenersMap.get(plugin);
+            if (pluginListeners != null) {
+                pluginListeners.remove(listener);
+
+                // Clean up empty sets
+                if (pluginListeners.isEmpty()) {
+                    pluginListenersMap.remove(plugin);
+                }
+            }
+        }
+
+        logger.info("Unregistered listener {} with {} handlers",
+                listener.getClass().getSimpleName(), handlers.size());
+
+        return true;
+    }
+
+    @Override
+    public int unregisterAll(Plugin plugin) {
+        if (plugin == null) {
+            return 0;
+        }
+
+        // Get the listeners for this plugin
+        Set<Object> listeners = pluginListenersMap.get(plugin);
+        if (listeners == null || listeners.isEmpty()) {
+            return 0;
+        }
+
+        // Make a copy to avoid concurrent modification
+        Set<Object> listenersCopy = new HashSet<>(listeners);
+
+        // Unregister each listener
+        int count = 0;
+        for (Object listener : listenersCopy) {
+            if (unregisterListener(listener)) {
+                count++;
+            }
+        }
+
+        // Make sure the plugin is removed from the map
+        pluginListenersMap.remove(plugin);
+
+        logger.info("Unregistered all {} listeners for plugin {}", count, plugin.getClass().getSimpleName());
+
+        return count;
+    }
+
+    @Override
+    public <T extends Event> T fireEvent(T event) {
+        if (event == null) {
+            throw new IllegalArgumentException("Event cannot be null");
+        }
+
+        // Get the event type
+        Class<? extends Event> eventType = event.getClass();
+
+        // Get the priority map for this event type
+        Map<EventPriority, List<RegisteredListener>> priorityMap = eventTypeMap.get(eventType);
+        if (priorityMap == null || priorityMap.isEmpty()) {
+            return event;
+        }
+
+        // Check if event is cancellable
+        boolean isCancelled = event instanceof Cancellable && ((Cancellable) event).isCancelled();
+
+        // Call handlers in order of priority
+        for (EventPriority priority : EventPriority.values()) {
+            List<RegisteredListener> handlers = priorityMap.get(priority);
+            if (handlers == null || handlers.isEmpty()) {
+                continue;
+            }
+
+            // Make a copy to avoid concurrent modification
+            List<RegisteredListener> handlersCopy = new ArrayList<>(handlers);
+
+            for (RegisteredListener handler : handlersCopy) {
+                // Skip if event is cancelled and handler doesn't ignore cancelled events
+                if (isCancelled && !handler.isIgnoreCancelled()) {
+                    continue;
+                }
+
+                try {
+                    // Call the handler
+                    handler.callEvent(event);
+
+                    // Update cancellation status if changed
+                    if (event instanceof Cancellable) {
+                        isCancelled = ((Cancellable) event).isCancelled();
+                    }
+                } catch (Throwable t) {
+                    logger.error("Error dispatching event {} to listener {} (owned by {})",
+                            eventType.getSimpleName(),
+                            handler.getListener().getClass().getSimpleName(),
+                            handler.getPlugin().getClass().getSimpleName(),
+                            t);
+                }
+            }
+        }
+
+        return event;
+    }
+
+    @Override
+    public void fireEventAsync(Event event) {
+        if (event == null) {
+            throw new IllegalArgumentException("Event cannot be null");
+        }
+
+        asyncExecutor.submit(() -> {
+            try {
+                fireEvent(event);
+            } catch (Throwable t) {
+                logger.error("Error in async event dispatch for {}", event.getClass().getSimpleName(), t);
+            }
+        });
+    }
+
+    @Override
+    public Set<Object> getRegisteredListeners(Plugin plugin) {
+        if (plugin == null) {
+            return Collections.emptySet();
+        }
+
+        Set<Object> listeners = pluginListenersMap.get(plugin);
+        if (listeners == null) {
+            return Collections.emptySet();
+        }
+
+        return new HashSet<>(listeners);
+    }
+
+    @Override
+    public Plugin getOwningPlugin(Object listener) {
+        if (listener == null) {
+            return null;
+        }
+
+        return listenerOwnerMap.get(listener);
+    }
+
+    @Override
+    public boolean isListenerRegistered(Object listener) {
+        if (listener == null) {
+            return false;
+        }
+
+        return listenerOwnerMap.containsKey(listener);
+    }
+
+    /**
+     * Gets the total number of registered event handlers.
+     *
+     * @return the total number of registered event handlers
+     */
+    public int getTotalHandlerCount() {
+        return totalRegisteredHandlers.get();
+    }
+
+    /**
+     * Gets the number of registered event handlers for a specific event type.
+     *
+     * @param eventType the event type
+     * @return the number of registered event handlers for the event type
+     */
+    public int getHandlerCount(Class<? extends Event> eventType) {
+        if (eventType == null) {
+            return 0;
+        }
+
+        Map<EventPriority, List<RegisteredListener>> priorityMap = eventTypeMap.get(eventType);
+        if (priorityMap == null) {
+            return 0;
+        }
+
+        int count = 0;
+        for (List<RegisteredListener> handlers : priorityMap.values()) {
+            count += handlers.size();
+        }
+
+        return count;
+    }
+
+    /**
+     * Shuts down the event manager, canceling any pending async events.
+     */
+    public void shutdown() {
+        asyncExecutor.shutdownNow();
+    }
+
+    /**
+     * Represents a registered event listener.
+     */
+    private static class RegisteredListener {
+        private final Object listener;
+        private final Method method;
+        private final Class<? extends Event> eventType;
+        private final EventPriority priority;
+        private final boolean ignoreCancelled;
+        private final Object plugin;
+
+        /**
+         * Creates a new registered event listener.
+         *
+         * @param listener        the listener
+         * @param method          the method
+         * @param eventType       the event type
+         * @param priority        the priority
+         * @param ignoreCancelled whether to ignore cancelled events
+         * @param plugin          the plugin that registered the listener
+         */
+        public RegisteredListener(Object listener, Method method, Class<? extends Event> eventType,
+                                  EventPriority priority, boolean ignoreCancelled, Object plugin) {
+            this.listener = listener;
+            this.method = method;
+            this.eventType = eventType;
+            this.priority = priority;
+            this.ignoreCancelled = ignoreCancelled;
+            this.plugin = plugin;
+
+            // Make the method accessible for faster invocation
+            method.setAccessible(true);
+        }
+
+        /**
+         * Calls the event listener.
+         *
+         * @param event the event
+         * @throws Exception if there's an error calling the listener
+         */
+        public void callEvent(Event event) throws Exception {
+            if (eventType.isAssignableFrom(event.getClass())) {
+                method.invoke(listener, event);
+            }
+        }
+
+        /**
+         * Gets the listener.
+         *
+         * @return the listener
+         */
+        public Object getListener() {
+            return listener;
+        }
+
+        /**
+         * Gets the method.
+         *
+         * @return the method
+         */
+        public Method getMethod() {
+            return method;
+        }
+
+        /**
+         * Gets the event type.
+         *
+         * @return the event type
+         */
+        public Class<? extends Event> getEventType() {
+            return eventType;
+        }
+
+        /**
+         * Gets the priority.
+         *
+         * @return the priority
+         */
+        public EventPriority getPriority() {
+            return priority;
+        }
+
+        /**
+         * Checks if the listener ignores cancelled events.
+         *
+         * @return true if the listener ignores cancelled events
+         */
+        public boolean isIgnoreCancelled() {
+            return ignoreCancelled;
+        }
+
+        /**
+         * Gets the plugin that registered the listener.
+         *
+         * @return the plugin
+         */
+        public Object getPlugin() {
+            return plugin;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            RegisteredListener that = (RegisteredListener) o;
+            return listener.equals(that.listener) && method.equals(that.method);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(listener, method);
+        }
+    }
+}
