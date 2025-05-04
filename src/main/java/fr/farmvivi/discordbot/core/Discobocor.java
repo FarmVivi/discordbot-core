@@ -2,7 +2,7 @@ package fr.farmvivi.discordbot.core;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
-import fr.farmvivi.discordbot.core.config.YamlConfiguration;
+import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
 import fr.farmvivi.discordbot.core.plugin.PluginManager;
@@ -30,7 +30,7 @@ public class Discobocor {
     private static PluginManager pluginManager;
     private static DiscordAPI discordAPI;
     private static SimpleEventManager eventManager;
-    private static Configuration coreConfig;
+    private static EnvAwareYamlConfiguration coreConfig;
 
     static {
         Properties properties = new Properties();
@@ -121,7 +121,7 @@ public class Discobocor {
 
         // Load the configuration
         try {
-            coreConfig = new YamlConfiguration(configFile);
+            coreConfig = new EnvAwareYamlConfiguration(configFile);
         } catch (Exception e) {
             logger.error("Failed to load config.yml", e);
             System.exit(1);
@@ -131,7 +131,7 @@ public class Discobocor {
         // Check if the token is set
         String token;
         try {
-            token = coreConfig.getString("discord.token");
+            token = coreConfig.getStringWithEnvFallback("discord.token");
             if (token == null || token.equals("YOUR_BOT_TOKEN")) {
                 logger.error("Please set your bot token in config.yml");
                 System.exit(1);
@@ -167,7 +167,6 @@ public class Discobocor {
                     "# Discord Bot Configuration\n" +
                             "discord:\n" +
                             "  token: YOUR_BOT_TOKEN\n" +
-                            "  prefix: '!'\n" +
                             "  admins:\n" +
                             "    - '123456789012345678' # Discord user ID\n"
             );
