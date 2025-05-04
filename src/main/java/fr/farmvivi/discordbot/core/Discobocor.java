@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.core;
 
-import fr.farmvivi.discordbot.Bot;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.config.YamlConfiguration;
@@ -29,7 +28,7 @@ public class Discobocor {
     static {
         Properties properties = new Properties();
         try {
-            properties.load(Bot.class.getClassLoader().getResourceAsStream("project.properties"));
+            properties.load(Discobocor.class.getClassLoader().getResourceAsStream("project.properties"));
         } catch (IOException e) {
             System.out.println("ERROR: Cannot read properties file !");
             System.exit(1);
@@ -151,8 +150,6 @@ public class Discobocor {
             System.exit(1);
             return;
         }
-
-
 
         // Load and enable plugins
         pluginManager.loadPlugins();
