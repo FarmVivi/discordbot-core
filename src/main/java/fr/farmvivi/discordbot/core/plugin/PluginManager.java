@@ -24,6 +24,9 @@ public class PluginManager implements PluginLoader {
 
     private final Map<String, Plugin> plugins = new HashMap<>();
     private final Map<String, PluginClassLoader> classLoaders = new HashMap<>();
+    private final Map<String, PluginDescriptionFile> pluginDescriptions = new HashMap<>();
+    private final Map<String, String> pluginJarPaths = new HashMap<>();
+    private final Set<String> failedPlugins = new HashSet<>();
     private final File pluginsFolder;
     private final EventManager eventManager;
     private final DiscordAPI discordAPI;
@@ -49,10 +52,15 @@ public class PluginManager implements PluginLoader {
     }
 
     /**
-     * Loads all plugins from the plugins folder.
+     * Scans plugin JARs to collect metadata without loading them.
      */
-    public void loadPlugins() {
-        logger.info("Loading plugins from {}", pluginsFolder.getAbsolutePath());
+    private void scanPlugins() {
+        logger.info("Scanning plugins in {}", pluginsFolder.getAbsolutePath());
+
+        // Clear previous state
+        pluginDescriptions.clear();
+        pluginJarPaths.clear();
+        failedPlugins.clear();
 
         File[] files = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar"));
         if (files == null) {
@@ -61,158 +69,454 @@ public class PluginManager implements PluginLoader {
         }
 
         for (File file : files) {
-            try {
-                Plugin plugin = loadPlugin(file.getAbsolutePath());
-                if (plugin != null) {
-                    plugins.put(plugin.getName(), plugin);
-                    logger.info("Loaded plugin: {} v{}", plugin.getName(), plugin.getVersion());
+            try (JarFile jar = new JarFile(file)) {
+                // Look for plugin.yml
+                JarEntry entry = jar.getJarEntry("plugin.yml");
+                if (entry == null) {
+                    logger.error("Plugin does not contain plugin.yml: {}", file.getName());
+                    continue;
                 }
+
+                // Parse plugin.yml to get the plugin metadata
+                PluginDescriptionFile description = new PluginDescriptionFile(jar.getInputStream(entry));
+                String pluginName = description.getName();
+
+                // Store metadata
+                pluginDescriptions.put(pluginName, description);
+                pluginJarPaths.put(pluginName, file.getAbsolutePath());
+
+                logger.debug("Scanned plugin: {} v{}", pluginName, description.getVersion());
             } catch (Exception e) {
-                logger.error("Failed to load plugin: {}", file.getName(), e);
+                logger.error("Failed to scan plugin: {}", file.getName(), e);
             }
         }
+
+        logger.info("Scanned {} plugins", pluginDescriptions.size());
     }
 
     /**
-     * Pre-enables all loaded plugins.
+     * Loads all plugins from the plugins folder in dependency order.
+     */
+    public void loadPlugins() {
+        // First, scan all plugins to get their metadata
+        scanPlugins();
+
+        // Resolve dependencies to determine load order
+        PluginDependencyResolver resolver = new PluginDependencyResolver(pluginDescriptions);
+        List<String> loadOrder = resolver.resolve();
+
+        // Log plugins with issues
+        Set<String> missingDeps = resolver.getMissingDependencies();
+        if (!missingDeps.isEmpty()) {
+            for (String plugin : missingDeps) {
+                failedPlugins.add(plugin);
+                logger.warn("Plugin {} has missing dependencies and won't be loaded", plugin);
+            }
+        }
+
+        Set<String> circularDeps = resolver.getCircularDependencies();
+        if (!circularDeps.isEmpty()) {
+            logger.warn("Detected circular dependencies among plugins: {}", circularDeps);
+            logger.warn("These plugins will be loaded but might not function correctly");
+        }
+
+        // Load plugins in the determined order
+        for (String pluginName : loadOrder) {
+            if (failedPlugins.contains(pluginName)) {
+                continue; // Skip failed plugins
+            }
+
+            String jarPath = pluginJarPaths.get(pluginName);
+            try {
+                Plugin plugin = loadPlugin(jarPath);
+                if (plugin != null) {
+                    plugins.put(pluginName, plugin);
+                    logger.info("Loaded plugin: {} v{}", pluginName, plugin.getVersion());
+                } else {
+                    failedPlugins.add(pluginName);
+                    logger.error("Failed to load plugin: {}", pluginName);
+                }
+            } catch (Exception e) {
+                failedPlugins.add(pluginName);
+                logger.error("Error loading plugin: {}", pluginName, e);
+            }
+        }
+
+        // Log summary
+        int successCount = plugins.size();
+        int failedCount = failedPlugins.size();
+        logger.info("Plugin loading complete: {} loaded successfully, {} failed", successCount, failedCount);
+    }
+
+    /**
+     * Checks if a plugin has all its dependencies loaded.
+     *
+     * @param pluginName the name of the plugin
+     * @return true if all dependencies are loaded, false otherwise
+     */
+    public boolean hasAllDependenciesLoaded(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
+            return false;
+        }
+
+        // Check hard dependencies
+        for (String dependency : description.getDependencies()) {
+            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
+                logger.warn("Plugin {} depends on {}, which is not loaded", pluginName, dependency);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets the names of all missing dependencies for a plugin.
+     *
+     * @param pluginName the name of the plugin
+     * @return list of missing dependency names
+     */
+    public List<String> getMissingDependencies(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
+            return List.of();
+        }
+
+        List<String> missing = new ArrayList<>();
+        for (String dependency : description.getDependencies()) {
+            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
+                missing.add(dependency);
+            }
+        }
+
+        return missing;
+    }
+
+    /**
+     * Gets a set of all plugins that failed to load.
+     *
+     * @return set of failed plugin names
+     */
+    public Set<String> getFailedPlugins() {
+        return Collections.unmodifiableSet(failedPlugins);
+    }
+
+    /**
+     * Gets the dependencies of a plugin.
+     *
+     * @param pluginName the name of the plugin
+     * @return list of dependency names, or empty list if the plugin doesn't exist
+     */
+    public List<String> getPluginDependencies(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
+            return List.of();
+        }
+
+        return description.getDependencies();
+    }
+
+    /**
+     * Gets the soft dependencies of a plugin.
+     *
+     * @param pluginName the name of the plugin
+     * @return list of soft dependency names, or empty list if the plugin doesn't exist
+     */
+    public List<String> getPluginSoftDependencies(String pluginName) {
+        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
+        if (description == null) {
+            return List.of();
+        }
+
+        return description.getSoftDependencies();
+    }
+
+    /**
+     * Pre-enables all loaded plugins in dependency order.
      * This is when plugins can configure the JDABuilder before Discord connection.
      */
     public void preEnablePlugins() {
         logger.info("Pre-enabling plugins...");
 
-        for (Plugin plugin : plugins.values()) {
+        // Get plugins in dependency order
+        List<String> orderedPluginNames = getPluginsInDependencyOrder();
+
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null || plugin.getStatus() != PluginStatus.LOADED) {
+                continue;
+            }
+
+            // Verify dependencies for extra safety
+            if (!hasAllDependenciesLoaded(pluginName)) {
+                List<String> missing = getMissingDependencies(pluginName);
+                logger.error("Cannot pre-enable plugin {}: missing dependencies {}", pluginName, missing);
+                failedPlugins.add(pluginName);
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.LOADED) {
-                    plugin.setStatus(PluginStatus.PRE_ENABLE);
-                    plugin.onPreEnable();
-                    logger.debug("Pre-enabled plugin: {}", plugin.getName());
-                }
+                plugin.setStatus(PluginStatus.PRE_ENABLE);
+                plugin.onPreEnable();
+                logger.debug("Pre-enabled plugin: {}", pluginName);
             } catch (Exception e) {
-                logger.error("Error during pre-enable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during pre-enable of plugin: {}", pluginName, e);
                 plugin.setStatus(PluginStatus.LOADED);
+                failedPlugins.add(pluginName);
             }
         }
+
+        logger.info("Pre-enabled {} plugins",
+                orderedPluginNames.size() - failedPlugins.size());
     }
 
     /**
-     * Enables all pre-enabled plugins.
+     * Enables all pre-enabled plugins in dependency order.
      * This is called after Discord connection is established.
      */
     public void enablePlugins() {
         logger.info("Enabling plugins...");
 
-        for (Plugin plugin : plugins.values()) {
+        // Get plugins in dependency order
+        List<String> orderedPluginNames = getPluginsInDependencyOrder();
+
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null ||
+                    plugin.getStatus() != PluginStatus.PRE_ENABLE ||
+                    failedPlugins.contains(pluginName)) {
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.PRE_ENABLE) {
-                    plugin.setStatus(PluginStatus.ENABLE);
-                    plugin.onEnable();
-                    logger.debug("Enabled plugin: {}", plugin.getName());
-                }
+                plugin.setStatus(PluginStatus.ENABLE);
+                plugin.onEnable();
+                logger.debug("Enabled plugin: {}", pluginName);
             } catch (Exception e) {
-                logger.error("Error during enable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during enable of plugin: {}", pluginName, e);
                 plugin.setStatus(PluginStatus.PRE_ENABLE);
+                failedPlugins.add(pluginName);
             }
         }
+
+        logger.info("Enabled {} plugins",
+                orderedPluginNames.size() - failedPlugins.size());
     }
 
     /**
-     * Post-enables all enabled plugins.
+     * Post-enables all enabled plugins in dependency order.
      */
     public void postEnablePlugins() {
         logger.info("Post-enabling plugins...");
 
-        for (Plugin plugin : plugins.values()) {
+        // Get plugins in dependency order
+        List<String> orderedPluginNames = getPluginsInDependencyOrder();
+
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null ||
+                    plugin.getStatus() != PluginStatus.ENABLE ||
+                    failedPlugins.contains(pluginName)) {
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.ENABLE) {
-                    plugin.setStatus(PluginStatus.POST_ENABLE);
-                    plugin.onPostEnable();
-                    logger.debug("Post-enabled plugin: {}", plugin.getName());
-                }
+                plugin.setStatus(PluginStatus.POST_ENABLE);
+                plugin.onPostEnable();
+                logger.debug("Post-enabled plugin: {}", pluginName);
             } catch (Exception e) {
-                logger.error("Error during post-enable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during post-enable of plugin: {}", pluginName, e);
+                failedPlugins.add(pluginName);
             }
         }
 
         // Final pass: mark as enabled
-        for (Plugin plugin : plugins.values()) {
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null ||
+                    plugin.getStatus() != PluginStatus.POST_ENABLE ||
+                    failedPlugins.contains(pluginName)) {
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.POST_ENABLE) {
-                    plugin.setStatus(PluginStatus.ENABLED);
-                    logger.info("Plugin fully enabled: {} v{}", plugin.getName(), plugin.getVersion());
-                }
+                plugin.setStatus(PluginStatus.ENABLED);
+                logger.info("Plugin fully enabled: {} v{}", pluginName, plugin.getVersion());
             } catch (Exception e) {
-                logger.error("Error during final enable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during final enable of plugin: {}", pluginName, e);
+                failedPlugins.add(pluginName);
             }
         }
+
+        // Log summary
+        int enabledCount = (int) plugins.values().stream()
+                .filter(p -> p.getStatus() == PluginStatus.ENABLED)
+                .count();
+        logger.info("Post-enable complete: {} plugins fully enabled", enabledCount);
     }
 
     /**
-     * Pre-disables all enabled plugins.
+     * Gets a list of plugin names in dependency order.
+     *
+     * @return list of plugin names
+     */
+    private List<String> getPluginsInDependencyOrder() {
+        // For already loaded plugins, we can use the current order
+        // This helps maintain consistency if this method is called multiple times
+        List<String> pluginNames = new ArrayList<>(plugins.keySet());
+
+        // Create a simplified dependency graph
+        Map<String, Set<String>> dependencyGraph = new HashMap<>();
+        for (String pluginName : pluginNames) {
+            Set<String> dependencies = new HashSet<>();
+            PluginDescriptionFile desc = pluginDescriptions.get(pluginName);
+            if (desc != null) {
+                dependencies.addAll(desc.getDependencies());
+            }
+            dependencyGraph.put(pluginName, dependencies);
+        }
+
+        // Perform a topological sort
+        List<String> result = new ArrayList<>();
+        Set<String> visited = new HashSet<>();
+        Set<String> visiting = new HashSet<>();
+
+        for (String pluginName : pluginNames) {
+            if (!visited.contains(pluginName)) {
+                topologicalVisit(pluginName, dependencyGraph, visited, visiting, result);
+            }
+        }
+
+        // Reverse to get dependency order (dependencies first)
+        Collections.reverse(result);
+        return result;
+    }
+
+    /**
+     * Helper method for topological sort.
+     */
+    private void topologicalVisit(
+            String pluginName,
+            Map<String, Set<String>> graph,
+            Set<String> visited,
+            Set<String> visiting,
+            List<String> result
+    ) {
+        visiting.add(pluginName);
+
+        Set<String> dependencies = graph.get(pluginName);
+        if (dependencies != null) {
+            for (String dependency : dependencies) {
+                if (!visited.contains(dependency) && plugins.containsKey(dependency)) {
+                    if (visiting.contains(dependency)) {
+                        // Circular dependency detected, but continue anyway
+                        logger.warn("Circular dependency detected: {} <-> {}",
+                                pluginName, dependency);
+                        continue;
+                    }
+                    topologicalVisit(dependency, graph, visited, visiting, result);
+                }
+            }
+        }
+
+        visiting.remove(pluginName);
+        visited.add(pluginName);
+        result.add(pluginName);
+    }
+
+    /**
+     * Pre-disables all enabled plugins in reverse dependency order.
      */
     public void preDisablePlugins() {
         logger.info("Pre-disabling plugins...");
 
-        for (Plugin plugin : plugins.values()) {
+        // Get plugins in reverse dependency order (dependents first)
+        List<String> orderedPluginNames = getPluginsInReverseDependencyOrder();
+
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null || plugin.getStatus() != PluginStatus.ENABLED) {
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.ENABLED) {
-                    plugin.setStatus(PluginStatus.PRE_DISABLE);
-                    plugin.onPreDisable();
-                    logger.debug("Pre-disabled plugin: {}", plugin.getName());
-                }
+                plugin.setStatus(PluginStatus.PRE_DISABLE);
+                plugin.onPreDisable();
+                logger.debug("Pre-disabled plugin: {}", pluginName);
             } catch (Exception e) {
-                logger.error("Error during pre-disable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during pre-disable of plugin: {}", pluginName, e);
+                // Continue with disabling anyway
             }
         }
     }
 
     /**
-     * Disables all pre-disabled plugins.
+     * Disables all pre-disabled plugins in reverse dependency order.
      */
     public void disablePlugins() {
         logger.info("Disabling plugins...");
 
+        // Get plugins in reverse dependency order
+        List<String> orderedPluginNames = getPluginsInReverseDependencyOrder();
+
         // Call onDisable
-        for (Plugin plugin : plugins.values()) {
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null || plugin.getStatus() != PluginStatus.PRE_DISABLE) {
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.PRE_DISABLE) {
-                    plugin.setStatus(PluginStatus.DISABLE);
-                    plugin.onDisable();
-                    logger.debug("Disabled plugin: {}", plugin.getName());
-                }
+                plugin.setStatus(PluginStatus.DISABLE);
+                plugin.onDisable();
+                logger.debug("Disabled plugin: {}", pluginName);
             } catch (Exception e) {
-                logger.error("Error during disable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during disable of plugin: {}", pluginName, e);
+                // Continue with disabling anyway
             }
         }
     }
 
     /**
-     * Post-disables all disabled plugins.
+     * Post-disables all disabled plugins in reverse dependency order.
      */
     public void postDisablePlugins() {
         logger.info("Post-disabling plugins...");
 
+        // Get plugins in reverse dependency order
+        List<String> orderedPluginNames = getPluginsInReverseDependencyOrder();
+
         // Post-disable phase
-        for (Plugin plugin : plugins.values()) {
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null || plugin.getStatus() != PluginStatus.DISABLE) {
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.DISABLE) {
-                    plugin.setStatus(PluginStatus.POST_DISABLE);
-                    plugin.onPostDisable();
-                    logger.debug("Post-disabled plugin: {}", plugin.getName());
-                }
+                plugin.setStatus(PluginStatus.POST_DISABLE);
+                plugin.onPostDisable();
+                logger.debug("Post-disabled plugin: {}", pluginName);
             } catch (Exception e) {
-                logger.error("Error during post-disable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during post-disable of plugin: {}", pluginName, e);
+                // Continue with disabling anyway
             }
         }
 
         // Final pass: mark as disabled and clean up
-        for (Plugin plugin : plugins.values()) {
+        for (String pluginName : orderedPluginNames) {
+            Plugin plugin = plugins.get(pluginName);
+            if (plugin == null || plugin.getStatus() != PluginStatus.POST_DISABLE) {
+                continue;
+            }
+
             try {
-                if (plugin.getStatus() == PluginStatus.POST_DISABLE) {
-                    plugin.setStatus(PluginStatus.DISABLED);
-                    logger.info("Plugin fully disabled: {}", plugin.getName());
-                }
+                plugin.setStatus(PluginStatus.DISABLED);
+                logger.info("Plugin fully disabled: {}", pluginName);
             } catch (Exception e) {
-                logger.error("Error during final disable of plugin: {}", plugin.getName(), e);
+                logger.error("Error during final disable of plugin: {}", pluginName, e);
+                // Continue with disabling anyway
             }
         }
 
@@ -227,6 +531,25 @@ public class PluginManager implements PluginLoader {
 
         plugins.clear();
         classLoaders.clear();
+        pluginDescriptions.clear();
+        pluginJarPaths.clear();
+        failedPlugins.clear();
+    }
+
+    /**
+     * Gets a list of plugin names in reverse dependency order (dependents before dependencies).
+     *
+     * @return list of plugin names
+     */
+    private List<String> getPluginsInReverseDependencyOrder() {
+        // Get the dependency order first
+        List<String> dependencyOrder = getPluginsInDependencyOrder();
+
+        // Reverse it to get the reverse dependency order
+        List<String> reverseDependencyOrder = new ArrayList<>(dependencyOrder);
+        Collections.reverse(reverseDependencyOrder);
+
+        return reverseDependencyOrder;
     }
 
     /**
