@@ -3,6 +3,7 @@ package fr.farmvivi.discordbot.core.api.plugin;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import org.slf4j.Logger;
 
 /**
@@ -17,6 +18,7 @@ public abstract class AbstractPlugin implements Plugin {
     protected DiscordAPI discordAPI;
     protected Configuration configuration;
     protected String dataFolder;
+    protected LanguageManager languageManager;
 
     @Override
     public void onLoad(PluginContext context) {
@@ -26,6 +28,10 @@ public abstract class AbstractPlugin implements Plugin {
         this.discordAPI = context.getDiscordAPI();
         this.configuration = context.getConfiguration();
         this.dataFolder = context.getDataFolder();
+        this.languageManager = context.getLanguageManager();
+
+        // Register the plugin's namespace for language keys
+        languageManager.registerNamespace(getName().toLowerCase());
 
         logger.info("Loading {} v{}", getName(), getVersion());
     }

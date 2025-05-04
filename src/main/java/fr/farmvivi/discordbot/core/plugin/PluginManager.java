@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.core.plugin;
 
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.api.plugin.PluginLoader;
 import fr.farmvivi.discordbot.core.api.plugin.PluginStatus;
@@ -29,6 +30,7 @@ public class PluginManager implements PluginLoader {
     private final File pluginsFolder;
     private final EventManager eventManager;
     private final DiscordAPI discordAPI;
+    private final LanguageManager languageManager;
 
     //--------------------------------------------------------------------
     // CONSTRUCTORS AND INITIALIZATION
@@ -37,14 +39,16 @@ public class PluginManager implements PluginLoader {
     /**
      * Creates a new plugin manager.
      *
-     * @param pluginsFolder the folder where plugins are stored
-     * @param eventManager  the event manager
-     * @param discordAPI    the Discord API
+     * @param pluginsFolder   the folder where plugins are stored
+     * @param eventManager    the event manager
+     * @param discordAPI      the Discord API
+     * @param languageManager the language manager
      */
-    public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI) {
+    public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI, LanguageManager languageManager) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
+        this.languageManager = languageManager;
 
         if (!pluginsFolder.exists()) {
             pluginsFolder.mkdirs();
@@ -97,7 +101,8 @@ public class PluginManager implements PluginLoader {
                     new PluginConfiguration(description.getName()),
                     new File(pluginsFolder, description.getName()).getAbsolutePath(),
                     this,
-                    classLoader
+                    classLoader,
+                    languageManager
             );
 
             // Initialize the plugin
