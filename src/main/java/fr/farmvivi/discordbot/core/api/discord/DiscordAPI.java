@@ -3,9 +3,7 @@ package fr.farmvivi.discordbot.core.api.discord;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
