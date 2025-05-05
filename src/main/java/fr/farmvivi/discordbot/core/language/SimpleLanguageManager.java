@@ -153,44 +153,80 @@ public class SimpleLanguageManager implements LanguageManager {
             return key;
         }
 
-        // 1. Try to get from runtime translations
+        // Cascade de recherche de traduction:
+        String translation;
+
+        // 1. Essayer dans la locale spécifiée dans le dossier runtime
+        translation = getTranslationFromRuntime(namespace, locale, actualKey);
+        if (translation != null) return translation;
+
+        // 2. Essayer dans la locale spécifiée dans les ressources par défaut
+        translation = getTranslationFromResources(namespace, locale, actualKey);
+        if (translation != null) return translation;
+
+        // 3. Si la locale n'est pas l'anglais, essayer dans la locale anglaise du dossier runtime
+        if (!locale.getLanguage().equals("en")) {
+            Locale englishLocale = Locale.forLanguageTag("en-US");
+            translation = getTranslationFromRuntime(namespace, englishLocale, actualKey);
+            if (translation != null) return translation;
+
+            // 4. Essayer dans la locale anglaise des ressources par défaut
+            translation = getTranslationFromResources(namespace, englishLocale, actualKey);
+            if (translation != null) return translation;
+        }
+
+        // 5. Si la locale n'est pas la locale par défaut, essayer dans la locale par défaut du runtime
+        if (!locale.equals(defaultLocale)) {
+            translation = getTranslationFromRuntime(namespace, defaultLocale, actualKey);
+            if (translation != null) return translation;
+
+            // 6. Essayer dans la locale par défaut des ressources
+            translation = getTranslationFromResources(namespace, defaultLocale, actualKey);
+            if (translation != null) return translation;
+        }
+
+        // 7. Si tout échoue, retourner la clé elle-même et logger un avertissement
+        logger.debug("Translation not found for key: {} in locale: {} (namespace: {})",
+                actualKey, locale.toLanguageTag(), namespace);
+        return key;
+    }
+
+    /**
+     * Recherche une traduction dans les fichiers du dossier runtime.
+     *
+     * @param namespace le namespace
+     * @param locale    la locale
+     * @param key       la clé
+     * @return la traduction, ou null si non trouvée
+     */
+    private String getTranslationFromRuntime(String namespace, Locale locale, String key) {
         Map<Locale, Map<String, String>> namespaceTranslations = translations.get(namespace);
         if (namespaceTranslations != null) {
-            // Try to get the translation for the specified locale
             Map<String, String> localeTranslations = namespaceTranslations.get(locale);
-            if (localeTranslations != null && localeTranslations.containsKey(actualKey)) {
-                return localeTranslations.get(actualKey);
-            }
-
-            // If the locale is not the default locale, try to fall back to the default locale
-            if (!locale.equals(defaultLocale)) {
-                localeTranslations = namespaceTranslations.get(defaultLocale);
-                if (localeTranslations != null && localeTranslations.containsKey(actualKey)) {
-                    return localeTranslations.get(actualKey);
-                }
+            if (localeTranslations != null && localeTranslations.containsKey(key)) {
+                return localeTranslations.get(key);
             }
         }
+        return null;
+    }
 
-        // 2. Try to get from default resources
+    /**
+     * Recherche une traduction dans les ressources par défaut.
+     *
+     * @param namespace le namespace
+     * @param locale    la locale
+     * @param key       la clé
+     * @return la traduction, ou null si non trouvée
+     */
+    private String getTranslationFromResources(String namespace, Locale locale, String key) {
         Map<Locale, Map<String, String>> namespaceDefaultTranslations = defaultTranslations.get(namespace);
         if (namespaceDefaultTranslations != null) {
-            // Try to get the translation for the specified locale
             Map<String, String> localeDefaultTranslations = namespaceDefaultTranslations.get(locale);
-            if (localeDefaultTranslations != null && localeDefaultTranslations.containsKey(actualKey)) {
-                return localeDefaultTranslations.get(actualKey);
-            }
-
-            // If the locale is not the default locale, try to fall back to the default locale
-            if (!locale.equals(defaultLocale)) {
-                localeDefaultTranslations = namespaceDefaultTranslations.get(defaultLocale);
-                if (localeDefaultTranslations != null && localeDefaultTranslations.containsKey(actualKey)) {
-                    return localeDefaultTranslations.get(actualKey);
-                }
+            if (localeDefaultTranslations != null && localeDefaultTranslations.containsKey(key)) {
+                return localeDefaultTranslations.get(key);
             }
         }
-
-        // If all else fails, return the key
-        return key;
+        return null;
     }
 
     @Override
