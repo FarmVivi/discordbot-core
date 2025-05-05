@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.plugin;
 
 import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
+import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -33,6 +34,7 @@ public class PluginManager implements PluginLoader {
     private final DiscordAPI discordAPI;
     private final LanguageManager languageManager;
     private final DataStorageProvider dataStorageProvider;
+    private final BinaryStorageProvider binaryStorageProvider;
 
     //--------------------------------------------------------------------
     // CONSTRUCTORS AND INITIALIZATION
@@ -41,19 +43,22 @@ public class PluginManager implements PluginLoader {
     /**
      * Creates a new plugin manager.
      *
-     * @param pluginsFolder       the folder where plugins are stored
-     * @param eventManager        the event manager
-     * @param discordAPI          the Discord API
-     * @param languageManager     the language manager
-     * @param dataStorageProvider the data storage provider
+     * @param pluginsFolder         the folder where plugins are stored
+     * @param eventManager          the event manager
+     * @param discordAPI            the Discord API
+     * @param languageManager       the language manager
+     * @param dataStorageProvider   the data storage provider
+     * @param binaryStorageProvider the binary storage provider
      */
     public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI,
-                         LanguageManager languageManager, DataStorageProvider dataStorageProvider) {
+                         LanguageManager languageManager, DataStorageProvider dataStorageProvider,
+                         BinaryStorageProvider binaryStorageProvider) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
         this.languageManager = languageManager;
         this.dataStorageProvider = dataStorageProvider;
+        this.binaryStorageProvider = binaryStorageProvider;
 
         if (!pluginsFolder.exists()) {
             pluginsFolder.mkdirs();
@@ -108,7 +113,8 @@ public class PluginManager implements PluginLoader {
                     this,
                     classLoader,
                     languageManager,
-                    dataStorageProvider
+                    dataStorageProvider,
+                    binaryStorageProvider
             );
 
             // Initialize the plugin

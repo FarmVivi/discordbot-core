@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.core.api.plugin;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
+import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -75,4 +76,11 @@ public interface PluginContext {
      * @return the data storage provider
      */
     DataStorageProvider getDataStorageProvider();
+
+    /**
+     * Gets the binary storage provider for large file storage.
+     *
+     * @return the binary storage provider
+     */
+    BinaryStorageProvider getBinaryStorageProvider();
 }

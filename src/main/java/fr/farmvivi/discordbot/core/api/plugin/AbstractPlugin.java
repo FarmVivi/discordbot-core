@@ -1,6 +1,8 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
+import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
+import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -19,6 +21,8 @@ public abstract class AbstractPlugin implements Plugin {
     protected Configuration configuration;
     protected String dataFolder;
     protected LanguageManager languageManager;
+    protected DataStorageProvider dataStorageProvider;
+    protected BinaryStorageProvider binaryStorageProvider;
 
     @Override
     public void onLoad(PluginContext context) {
@@ -29,6 +33,8 @@ public abstract class AbstractPlugin implements Plugin {
         this.configuration = context.getConfiguration();
         this.dataFolder = context.getDataFolder();
         this.languageManager = context.getLanguageManager();
+        this.dataStorageProvider = context.getDataStorageProvider();
+        this.binaryStorageProvider = context.getBinaryStorageProvider();
 
         // Register the plugin's namespace for language keys
         languageManager.registerNamespace(getName().toLowerCase());

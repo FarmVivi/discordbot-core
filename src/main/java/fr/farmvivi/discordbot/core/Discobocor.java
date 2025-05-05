@@ -2,10 +2,12 @@ package fr.farmvivi.discordbot.core;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
+import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
 import fr.farmvivi.discordbot.core.data.DataStorageFactory;
+import fr.farmvivi.discordbot.core.data.binary.BinaryStorageFactory;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
 import fr.farmvivi.discordbot.core.language.LanguageFileManager;
@@ -18,8 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -39,6 +43,7 @@ public class Discobocor {
     private static Configuration coreConfig;
     private static LanguageManager languageManager;
     private static DataStorageProvider dataStorageProvider;
+    private static BinaryStorageProvider binaryStorageProvider;
 
     static {
         Properties properties = new Properties();
@@ -178,8 +183,14 @@ public class Discobocor {
                 DataStorageProvider.StorageType.FILE
         );
 
+        // Create the binary storage provider
+        binaryStorageProvider = BinaryStorageFactory.createBinaryStorageProvider(
+                coreConfig,
+                BinaryStorageProvider.StorageType.FILE
+        );
+
         // Create the plugin manager
-        pluginManager = new PluginManager(pluginsFolder, eventManager, discordAPI, languageManager, dataStorageProvider);
+        pluginManager = new PluginManager(pluginsFolder, eventManager, discordAPI, languageManager, dataStorageProvider, binaryStorageProvider);
 
         return true;
     }
@@ -206,7 +217,20 @@ public class Discobocor {
                             "    db:\n" +
                             "      url: jdbc:mysql://localhost:3306/discordbot\n" +
                             "      username: username\n" +
-                            "      password: password\n"
+                            "      password: password\n\n" +
+                            "  # Binary storage settings for large files\n" +
+                            "  binary:\n" +
+                            "    storage:\n" +
+                            "      type: FILE  # Options: FILE, S3\n" +
+                            "      file:\n" +
+                            "        folder: binary\n" +
+                            "      s3:\n" +
+                            "        bucket: your-bucket-name\n" +
+                            "        region: eu-west-3\n" +
+                            "        access_key: your-access-key\n" +
+                            "        secret_key: your-secret-key\n" +
+                            "        endpoint: https://s3.amazonaws.com  # Optional, for S3-compatible services\n" +
+                            "        prefix: discordbot  # Optional, folder prefix in bucket\n"
             );
             logger.info("Created default config.yml");
             logger.info("Please edit config.yml and restart the bot");
@@ -291,6 +315,11 @@ public class Discobocor {
         // 6. Close the data storage provider
         if (dataStorageProvider != null && !dataStorageProvider.close()) {
             logger.error("Failed to close data storage provider");
+        }
+
+        // 7. Close the binary storage provider
+        if (binaryStorageProvider != null && !binaryStorageProvider.close()) {
+            logger.error("Failed to close binary storage provider");
         }
     }
 
@@ -382,6 +411,15 @@ public class Discobocor {
      */
     public static DataStorageProvider getDataStorageProvider() {
         return dataStorageProvider;
+    }
+
+    /**
+     * Gets the binary storage provider.
+     *
+     * @return the binary storage provider
+     */
+    public static BinaryStorageProvider getBinaryStorageProvider() {
+        return binaryStorageProvider;
     }
 
     /**
