@@ -1,9 +1,11 @@
 package fr.farmvivi.discordbot.core;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
+import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
+import fr.farmvivi.discordbot.core.data.DataStorageFactory;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
 import fr.farmvivi.discordbot.core.language.LanguageFileManager;
@@ -36,6 +38,7 @@ public class Discobocor {
     private static SimpleEventManager eventManager;
     private static Configuration coreConfig;
     private static LanguageManager languageManager;
+    private static DataStorageProvider dataStorageProvider;
 
     static {
         Properties properties = new Properties();
@@ -169,8 +172,14 @@ public class Discobocor {
         // Create the Discord API
         discordAPI = new JDADiscordAPI(token);
 
+        // Create the data storage provider
+        dataStorageProvider = DataStorageFactory.createStorageProvider(
+                coreConfig,
+                DataStorageProvider.StorageType.FILE
+        );
+
         // Create the plugin manager
-        pluginManager = new PluginManager(pluginsFolder, eventManager, discordAPI, languageManager);
+        pluginManager = new PluginManager(pluginsFolder, eventManager, discordAPI, languageManager, dataStorageProvider);
 
         return true;
     }
@@ -189,7 +198,15 @@ public class Discobocor {
                             "  token: YOUR_BOT_TOKEN\n\n" +
                             "# Language settings\n" +
                             "language:\n" +
-                            "  default: en-US\n"
+                            "  default: en-US\n\n" +
+                            "# Data storage settings\n" +
+                            "data:\n" +
+                            "  storage:\n" +
+                            "    type: FILE  # Options: FILE, DB\n" +
+                            "    db:\n" +
+                            "      url: jdbc:mysql://localhost:3306/discordbot\n" +
+                            "      username: username\n" +
+                            "      password: password\n"
             );
             logger.info("Created default config.yml");
             logger.info("Please edit config.yml and restart the bot");
@@ -270,6 +287,11 @@ public class Discobocor {
 
         // 5. Shutdown the event manager
         eventManager.shutdown();
+
+        // 6. Close the data storage provider
+        if (dataStorageProvider != null && !dataStorageProvider.close()) {
+            logger.error("Failed to close data storage provider");
+        }
     }
 
     /**
@@ -351,6 +373,15 @@ public class Discobocor {
      */
     public static SimpleEventManager getEventManager() {
         return eventManager;
+    }
+
+    /**
+     * Gets the data storage provider.
+     *
+     * @return the data storage provider
+     */
+    public static DataStorageProvider getDataStorageProvider() {
+        return dataStorageProvider;
     }
 
     /**

@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.plugin;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
+import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -13,5 +14,6 @@ import org.slf4j.Logger;
  */
 record PluginContextImpl(Logger getLogger, EventManager getEventManager, DiscordAPI getDiscordAPI,
                          Configuration getConfiguration, String getDataFolder, PluginLoader getPluginLoader,
-                         ClassLoader getClassLoader, LanguageManager getLanguageManager) implements PluginContext {
+                         ClassLoader getClassLoader, LanguageManager getLanguageManager,
+                         DataStorageProvider getDataStorageProvider) implements PluginContext {
 }

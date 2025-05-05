@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.core.plugin;
 
+import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -31,6 +32,7 @@ public class PluginManager implements PluginLoader {
     private final EventManager eventManager;
     private final DiscordAPI discordAPI;
     private final LanguageManager languageManager;
+    private final DataStorageProvider dataStorageProvider;
 
     //--------------------------------------------------------------------
     // CONSTRUCTORS AND INITIALIZATION
@@ -39,16 +41,19 @@ public class PluginManager implements PluginLoader {
     /**
      * Creates a new plugin manager.
      *
-     * @param pluginsFolder   the folder where plugins are stored
-     * @param eventManager    the event manager
-     * @param discordAPI      the Discord API
-     * @param languageManager the language manager
+     * @param pluginsFolder       the folder where plugins are stored
+     * @param eventManager        the event manager
+     * @param discordAPI          the Discord API
+     * @param languageManager     the language manager
+     * @param dataStorageProvider the data storage provider
      */
-    public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI, LanguageManager languageManager) {
+    public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI,
+                         LanguageManager languageManager, DataStorageProvider dataStorageProvider) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
         this.languageManager = languageManager;
+        this.dataStorageProvider = dataStorageProvider;
 
         if (!pluginsFolder.exists()) {
             pluginsFolder.mkdirs();
@@ -102,7 +107,8 @@ public class PluginManager implements PluginLoader {
                     new File(pluginsFolder, description.getName()).getAbsolutePath(),
                     this,
                     classLoader,
-                    languageManager
+                    languageManager,
+                    dataStorageProvider
             );
 
             // Initialize the plugin
