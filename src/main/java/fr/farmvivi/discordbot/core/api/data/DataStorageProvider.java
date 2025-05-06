@@ -27,13 +27,6 @@ public interface DataStorageProvider {
     UserGuildStorage getUserGuildStorage();
 
     /**
-     * Type de stockage disponible.
-     */
-    enum StorageType {
-        FILE, DB
-    }
-
-    /**
      * Récupère le type de stockage utilisé.
      *
      * @return le type de stockage
@@ -53,4 +46,11 @@ public interface DataStorageProvider {
      * @return true si l'opération a réussi, false sinon
      */
     boolean close();
+
+    /**
+     * Type de stockage disponible.
+     */
+    enum StorageType {
+        FILE, DB
+    }
 }

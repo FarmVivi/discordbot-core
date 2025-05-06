@@ -197,20 +197,20 @@ public class YamlConfiguration implements Configuration {
     }
 
     /**
-     * Sets the configuration file.
-     *
-     * @param configFile the configuration file
-     */
-    public void setConfigFile(File configFile) {
-        this.configFile = configFile;
-    }
-
-    /**
      * Gets the configuration file.
      *
      * @return the configuration file
      */
     public File getConfigFile() {
         return configFile;
+    }
+
+    /**
+     * Sets the configuration file.
+     *
+     * @param configFile the configuration file
+     */
+    public void setConfigFile(File configFile) {
+        this.configFile = configFile;
     }
 }

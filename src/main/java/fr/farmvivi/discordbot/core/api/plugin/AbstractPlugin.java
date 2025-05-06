@@ -13,7 +13,6 @@ import org.slf4j.Logger;
  * Plugins can extend this class instead of implementing the Plugin interface directly.
  */
 public abstract class AbstractPlugin implements Plugin {
-    private PluginStatus status = PluginStatus.LOADED;
     protected PluginContext context;
     protected Logger logger;
     protected EventManager eventManager;
@@ -23,6 +22,7 @@ public abstract class AbstractPlugin implements Plugin {
     protected LanguageManager languageManager;
     protected DataStorageProvider dataStorageProvider;
     protected BinaryStorageProvider binaryStorageProvider;
+    private PluginStatus status = PluginStatus.LOADED;
 
     @Override
     public void onLoad(PluginContext context) {

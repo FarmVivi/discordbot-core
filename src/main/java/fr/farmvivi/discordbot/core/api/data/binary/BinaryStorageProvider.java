@@ -10,13 +10,6 @@ package fr.farmvivi.discordbot.core.api.data.binary;
  */
 public interface BinaryStorageProvider {
     /**
-     * Enum representing the available types of binary storage backends.
-     */
-    enum StorageType {
-        FILE, S3
-    }
-
-    /**
      * Gets the global storage.
      * This storage is accessible by all users and guilds.
      *
@@ -65,4 +58,11 @@ public interface BinaryStorageProvider {
      * @return true if closed successfully, false otherwise
      */
     boolean close();
+
+    /**
+     * Enum representing the available types of binary storage backends.
+     */
+    enum StorageType {
+        FILE, S3
+    }
 }
