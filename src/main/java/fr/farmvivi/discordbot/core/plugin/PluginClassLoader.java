@@ -16,7 +16,10 @@ public class PluginClassLoader extends URLClassLoader {
             "fr.farmvivi.discordbot.core",
             "org.slf4j",
             "org.yaml.snakeyaml",
-            "net.dv8tion.jda.api"
+            "com.google.gson",
+            "net.dv8tion.jda.api",
+            "com.zaxxer.hikari",
+            "software.amazon.awssdk"
     );
 
     private final Set<String> seenPackages = new CopyOnWriteArraySet<>();
