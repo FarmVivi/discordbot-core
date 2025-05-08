@@ -8,7 +8,9 @@ import fr.farmvivi.discordbot.core.api.language.PluginLanguageAdapter;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.permissions.PluginPermissionAdapter;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.core.api.storage.PluginDataStorageAdapter;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
+import fr.farmvivi.discordbot.core.api.storage.binary.PluginBinaryStorageAdapter;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -33,6 +35,8 @@ public abstract class AbstractPlugin implements Plugin {
     // Plugin-specific managers
     protected PluginPermissionAdapter pluginPermissionAdapter;
     protected PluginLanguageAdapter pluginLanguageAdapter;
+    protected PluginDataStorageAdapter pluginDataStorageAdapter;
+    protected PluginBinaryStorageAdapter pluginBinaryStorageAdapter;
 
     // Plugin state
     private PluginLifecycle lifecycle = PluginLifecycle.DISCOVERED;
@@ -53,6 +57,8 @@ public abstract class AbstractPlugin implements Plugin {
         // Initialize plugin-specific managers
         this.pluginLanguageAdapter = new PluginLanguageAdapter(this, languageManager);
         this.pluginPermissionAdapter = new PluginPermissionAdapter(this, permissionManager, languageManager);
+        this.pluginDataStorageAdapter = new PluginDataStorageAdapter(this, dataStorageManager);
+        this.pluginBinaryStorageAdapter = new PluginBinaryStorageAdapter(this, binaryStorageManager);
 
         // Create data directory if it doesn't exist
         File dataDir = new File(dataFolder);
@@ -137,6 +143,28 @@ public abstract class AbstractPlugin implements Plugin {
      */
     public PluginLanguageAdapter getPluginLanguageManager() {
         return pluginLanguageAdapter;
+    }
+
+    /**
+     * Gets the plugin-specific data storage adapter.
+     * This provides convenient methods for storing and retrieving data
+     * specifically for this plugin with automatic namespacing.
+     *
+     * @return the plugin data storage adapter
+     */
+    public PluginDataStorageAdapter getPluginDataStorage() {
+        return pluginDataStorageAdapter;
+    }
+
+    /**
+     * Gets the plugin-specific binary storage adapter.
+     * This provides convenient methods for storing and retrieving binary files
+     * specifically for this plugin with automatic namespacing.
+     *
+     * @return the plugin binary storage adapter
+     */
+    public PluginBinaryStorageAdapter getPluginBinaryStorage() {
+        return pluginBinaryStorageAdapter;
     }
 
     /**
