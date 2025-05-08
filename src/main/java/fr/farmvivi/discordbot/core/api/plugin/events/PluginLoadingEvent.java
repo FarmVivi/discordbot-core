@@ -1,7 +1,6 @@
-package fr.farmvivi.discordbot.core.language.events;
+package fr.farmvivi.discordbot.core.api.plugin.events;
 
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
-import fr.farmvivi.discordbot.core.plugin.events.PluginEvent;
 
 /**
  * Event fired when a plugin is loading.

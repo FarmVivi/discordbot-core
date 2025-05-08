@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.core.plugin.events;
+package fr.farmvivi.discordbot.core.api.plugin.events;
 
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 

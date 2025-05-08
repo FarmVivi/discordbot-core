@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.core.language.events;
+package fr.farmvivi.discordbot.core.api.language.events;
 
 import java.util.Locale;
 

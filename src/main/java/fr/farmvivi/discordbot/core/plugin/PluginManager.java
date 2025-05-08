@@ -9,8 +9,8 @@ import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.api.plugin.PluginLoader;
 import fr.farmvivi.discordbot.core.api.plugin.PluginStatus;
-import fr.farmvivi.discordbot.core.language.events.PluginLoadingEvent;
-import fr.farmvivi.discordbot.core.plugin.events.*;
+import fr.farmvivi.discordbot.core.api.plugin.events.PluginLoadingEvent;
+import fr.farmvivi.discordbot.core.api.plugin.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

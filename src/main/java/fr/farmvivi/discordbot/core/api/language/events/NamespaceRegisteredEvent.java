@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.core.language.events;
+package fr.farmvivi.discordbot.core.api.language.events;
 
 /**
  * Event fired when a language namespace is registered.
