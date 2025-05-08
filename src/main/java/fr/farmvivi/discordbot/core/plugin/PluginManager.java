@@ -5,6 +5,7 @@ import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.api.plugin.PluginLoader;
 import fr.farmvivi.discordbot.core.api.plugin.PluginStatus;
@@ -35,6 +36,7 @@ public class PluginManager implements PluginLoader {
     private final LanguageManager languageManager;
     private final DataStorageProvider dataStorageProvider;
     private final BinaryStorageProvider binaryStorageProvider;
+    private final PermissionManager permissionManager;
 
     //--------------------------------------------------------------------
     // CONSTRUCTORS AND INITIALIZATION
@@ -49,16 +51,18 @@ public class PluginManager implements PluginLoader {
      * @param languageManager       the language manager
      * @param dataStorageProvider   the data storage provider
      * @param binaryStorageProvider the binary storage provider
+     * @param permissionManager     the permission manager
      */
     public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI,
                          LanguageManager languageManager, DataStorageProvider dataStorageProvider,
-                         BinaryStorageProvider binaryStorageProvider) {
+                         BinaryStorageProvider binaryStorageProvider, PermissionManager permissionManager) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
         this.languageManager = languageManager;
         this.dataStorageProvider = dataStorageProvider;
         this.binaryStorageProvider = binaryStorageProvider;
+        this.permissionManager = permissionManager;
 
         if (!pluginsFolder.exists()) {
             pluginsFolder.mkdirs();
@@ -114,7 +118,8 @@ public class PluginManager implements PluginLoader {
                     classLoader,
                     languageManager,
                     dataStorageProvider,
-                    binaryStorageProvider
+                    binaryStorageProvider,
+                    permissionManager
             );
 
             // Initialize the plugin
@@ -175,6 +180,10 @@ public class PluginManager implements PluginLoader {
 
             plugin.setStatus(PluginStatus.POST_DISABLE);
             plugin.onPostDisable();
+
+            // Unregister events and permissions
+            eventManager.unregisterAll(plugin);
+            unregisterPluginPermissions(plugin);
 
             plugin.setStatus(PluginStatus.DISABLED);
             logger.info("Plugin disabled: {}", plugin.getName());
@@ -851,5 +860,20 @@ public class PluginManager implements PluginLoader {
         }
 
         return description.getSoftDependencies();
+    }
+
+    /**
+     * Unregisters all permissions owned by a plugin.
+     * This is called when a plugin is disabled.
+     *
+     * @param plugin the plugin to unregister permissions for
+     * @return the number of permissions unregistered
+     */
+    private int unregisterPluginPermissions(Plugin plugin) {
+        if (plugin == null) {
+            return 0;
+        }
+
+        return permissionManager.unregisterPermissions(plugin);
     }
 }

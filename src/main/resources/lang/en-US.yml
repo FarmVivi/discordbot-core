@@ -1,0 +1,21 @@
+permissions:
+  error:
+    denied: "Permission denied: {0}"
+    not_found: "Permission not found: {0}"
+  command:
+    set:
+      success: "Permission {0} set to {1} for user {2}"
+      success_guild: "Permission {0} set to {1} for user {2} in guild {3}"
+    clear:
+      success: "All permissions cleared for user {0}"
+      success_guild: "All permissions cleared for user {0} in guild {1}"
+    list:
+      header: "Permissions for user {0}:"
+      header_guild: "Permissions for user {0} in guild {1}:"
+      entry: "- {0}: {1}"
+      none: "No permissions found"
+  info:
+    registered: "Registered permissions:"
+    entry: "- {0}: {1} (Default: {2})"
+    none: "No registered permissions"
+    plugin_permissions: "Permissions for plugin {0}:"

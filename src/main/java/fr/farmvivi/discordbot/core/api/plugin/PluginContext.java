@@ -6,6 +6,7 @@ import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import org.slf4j.Logger;
 
 /**
@@ -83,4 +84,11 @@ public interface PluginContext {
      * @return the binary storage provider
      */
     BinaryStorageProvider getBinaryStorageProvider();
+
+    /**
+     * Gets the permission manager for registering and checking permissions.
+     *
+     * @return the permission manager
+     */
+    PermissionManager getPermissionManager();
 }
