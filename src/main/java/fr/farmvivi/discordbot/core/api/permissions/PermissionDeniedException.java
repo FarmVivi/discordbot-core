@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.core.permissions;
+package fr.farmvivi.discordbot.core.api.permissions;
 
 /**
  * Exception thrown when a user does not have a required permission.
