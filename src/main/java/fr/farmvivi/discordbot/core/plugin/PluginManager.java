@@ -9,6 +9,8 @@ import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.api.plugin.PluginLoader;
 import fr.farmvivi.discordbot.core.api.plugin.PluginStatus;
+import fr.farmvivi.discordbot.core.language.events.PluginLoadingEvent;
+import fr.farmvivi.discordbot.core.plugin.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +109,12 @@ public class PluginManager implements PluginLoader {
             // Instantiate the plugin
             Plugin plugin = (Plugin) mainClass.getDeclaredConstructor().newInstance();
 
+            // Fire the plugin loading event
+            if (eventManager != null) {
+                PluginLoadingEvent loadingEvent = new PluginLoadingEvent(plugin);
+                eventManager.fireEvent(loadingEvent);
+            }
+
             // Create the plugin context
             PluginContextImpl context = new PluginContextImpl(
                     LoggerFactory.getLogger(description.getName()),
@@ -128,6 +136,12 @@ public class PluginManager implements PluginLoader {
             // Store the classloader
             classLoaders.put(description.getName(), classLoader);
 
+            // Fire the plugin loaded event
+            if (eventManager != null) {
+                PluginLoadedEvent loadedEvent = new PluginLoadedEvent(plugin);
+                eventManager.fireEvent(loadedEvent);
+            }
+
             return plugin;
         } catch (Exception e) {
             logger.error("Failed to load plugin: {}", jarFile, e);
@@ -142,18 +156,49 @@ public class PluginManager implements PluginLoader {
             return false;
         }
 
+        // Fire the plugin enable event - check if any listeners want to prevent enabling
+        if (eventManager != null) {
+            PluginEnableEvent enableEvent = new PluginEnableEvent(plugin);
+            eventManager.fireEvent(enableEvent);
+
+            if (enableEvent.isCancelled()) {
+                logger.warn("Plugin {} enable was cancelled by a listener", plugin.getName());
+                return false;
+            }
+        }
+
         try {
             // Follow the proper sequence
+            PluginStatus oldStatus = plugin.getStatus();
+
+            // Pre-enable phase
             plugin.setStatus(PluginStatus.PRE_ENABLE);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_ENABLE);
             plugin.onPreEnable();
 
+            // Enable phase
+            oldStatus = plugin.getStatus();
             plugin.setStatus(PluginStatus.ENABLE);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLE);
             plugin.onEnable();
 
+            // Post-enable phase
+            oldStatus = plugin.getStatus();
             plugin.setStatus(PluginStatus.POST_ENABLE);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_ENABLE);
             plugin.onPostEnable();
 
+            // Mark as fully enabled
+            oldStatus = plugin.getStatus();
             plugin.setStatus(PluginStatus.ENABLED);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLED);
+
+            // Fire the plugin enabled event
+            if (eventManager != null) {
+                PluginEnabledEvent enabledEvent = new PluginEnabledEvent(plugin);
+                eventManager.fireEvent(enabledEvent);
+            }
+
             logger.info("Plugin enabled: {} v{}", plugin.getName(), plugin.getVersion());
             return true;
         } catch (Exception e) {
@@ -170,22 +215,57 @@ public class PluginManager implements PluginLoader {
             return false;
         }
 
+        // Fire the plugin disable event - check if any listeners want to prevent disabling
+        if (eventManager != null) {
+            PluginDisableEvent disableEvent = new PluginDisableEvent(plugin);
+            eventManager.fireEvent(disableEvent);
+
+            if (disableEvent.isCancelled()) {
+                logger.warn("Plugin {} disable was cancelled by a listener", plugin.getName());
+                return false;
+            }
+        }
+
         try {
             // Follow the proper sequence
+            PluginStatus oldStatus = plugin.getStatus();
+
+            // Pre-disable phase
             plugin.setStatus(PluginStatus.PRE_DISABLE);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_DISABLE);
             plugin.onPreDisable();
 
+            // Disable phase
+            oldStatus = plugin.getStatus();
             plugin.setStatus(PluginStatus.DISABLE);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLE);
             plugin.onDisable();
 
+            // Post-disable phase
+            oldStatus = plugin.getStatus();
             plugin.setStatus(PluginStatus.POST_DISABLE);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_DISABLE);
             plugin.onPostDisable();
 
             // Unregister events and permissions
-            eventManager.unregisterAll(plugin);
-            unregisterPluginPermissions(plugin);
+            if (eventManager != null) {
+                eventManager.unregisterAll(plugin);
+            }
+            if (permissionManager != null) {
+                permissionManager.unregisterPermissions(plugin);
+            }
 
+            // Mark as fully disabled
+            oldStatus = plugin.getStatus();
             plugin.setStatus(PluginStatus.DISABLED);
+            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLED);
+
+            // Fire the plugin disabled event
+            if (eventManager != null) {
+                PluginDisabledEvent disabledEvent = new PluginDisabledEvent(plugin);
+                eventManager.fireEvent(disabledEvent);
+            }
+
             logger.info("Plugin disabled: {}", plugin.getName());
             return true;
         } catch (Exception e) {
@@ -340,7 +420,9 @@ public class PluginManager implements PluginLoader {
             }
 
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.PRE_ENABLE);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_ENABLE);
                 plugin.onPreEnable();
                 logger.debug("Pre-enabled plugin: {}", pluginName);
             } catch (Exception e) {
@@ -372,8 +454,22 @@ public class PluginManager implements PluginLoader {
                 continue;
             }
 
+            // Fire the plugin enable event
+            if (eventManager != null) {
+                PluginEnableEvent enableEvent = new PluginEnableEvent(plugin);
+                eventManager.fireEvent(enableEvent);
+
+                if (enableEvent.isCancelled()) {
+                    logger.warn("Plugin {} enable cancelled by a listener", pluginName);
+                    failedPlugins.add(pluginName);
+                    continue;
+                }
+            }
+
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.ENABLE);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLE);
                 plugin.onEnable();
                 logger.debug("Enabled plugin: {}", pluginName);
             } catch (Exception e) {
@@ -405,7 +501,9 @@ public class PluginManager implements PluginLoader {
             }
 
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.POST_ENABLE);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_ENABLE);
                 plugin.onPostEnable();
                 logger.debug("Post-enabled plugin: {}", pluginName);
             } catch (Exception e) {
@@ -424,7 +522,16 @@ public class PluginManager implements PluginLoader {
             }
 
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.ENABLED);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLED);
+
+                // Fire the plugin enabled event
+                if (eventManager != null) {
+                    PluginEnabledEvent enabledEvent = new PluginEnabledEvent(plugin);
+                    eventManager.fireEvent(enabledEvent);
+                }
+
                 logger.info("Plugin fully enabled: {} v{}", pluginName, plugin.getVersion());
             } catch (Exception e) {
                 logger.error("Error during final enable of plugin: {}", pluginName, e);
@@ -454,8 +561,21 @@ public class PluginManager implements PluginLoader {
                 continue;
             }
 
+            // Fire the plugin disable event
+            if (eventManager != null) {
+                PluginDisableEvent disableEvent = new PluginDisableEvent(plugin);
+                eventManager.fireEvent(disableEvent);
+
+                if (disableEvent.isCancelled()) {
+                    logger.warn("Plugin {} disable cancelled by a listener", pluginName);
+                    continue;
+                }
+            }
+
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.PRE_DISABLE);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_DISABLE);
                 plugin.onPreDisable();
                 logger.debug("Pre-disabled plugin: {}", pluginName);
             } catch (Exception e) {
@@ -482,7 +602,9 @@ public class PluginManager implements PluginLoader {
             }
 
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.DISABLE);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLE);
                 plugin.onDisable();
                 logger.debug("Disabled plugin: {}", pluginName);
             } catch (Exception e) {
@@ -509,7 +631,9 @@ public class PluginManager implements PluginLoader {
             }
 
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.POST_DISABLE);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_DISABLE);
                 plugin.onPostDisable();
                 logger.debug("Post-disabled plugin: {}", pluginName);
             } catch (Exception e) {
@@ -526,11 +650,25 @@ public class PluginManager implements PluginLoader {
             }
 
             try {
+                PluginStatus oldStatus = plugin.getStatus();
                 plugin.setStatus(PluginStatus.DISABLED);
+                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLED);
+
+                // Fire the plugin disabled event
+                if (eventManager != null) {
+                    PluginDisabledEvent disabledEvent = new PluginDisabledEvent(plugin);
+                    eventManager.fireEvent(disabledEvent);
+                }
+
                 logger.info("Plugin fully disabled: {}", pluginName);
             } catch (Exception e) {
                 logger.error("Error during final disable of plugin: {}", pluginName, e);
                 // Continue with disabling anyway
+            }
+
+            // Unregister event types for this plugin
+            if (eventManager != null) {
+                eventManager.unregisterEventTypes(plugin);
             }
         }
 
@@ -638,13 +776,10 @@ public class PluginManager implements PluginLoader {
 
         // Disable the plugin in proper sequence
         if (plugin.getStatus() == PluginStatus.ENABLED) {
-            plugin.setStatus(PluginStatus.PRE_DISABLE);
-            plugin.onPreDisable();
-            plugin.setStatus(PluginStatus.DISABLE);
-            plugin.onDisable();
-            plugin.setStatus(PluginStatus.POST_DISABLE);
-            plugin.onPostDisable();
-            plugin.setStatus(PluginStatus.DISABLED);
+            if (!disablePlugin(plugin)) {
+                logger.error("Failed to disable plugin {} for reload", pluginName);
+                return false;
+            }
         }
 
         // Remove the plugin
@@ -664,14 +799,11 @@ public class PluginManager implements PluginLoader {
             if (newPlugin != null) {
                 plugins.put(newPlugin.getName(), newPlugin);
 
-                // Enable the plugin in proper sequence
-                newPlugin.setStatus(PluginStatus.PRE_ENABLE);
-                newPlugin.onPreEnable();
-                newPlugin.setStatus(PluginStatus.ENABLE);
-                newPlugin.onEnable();
-                newPlugin.setStatus(PluginStatus.POST_ENABLE);
-                newPlugin.onPostEnable();
-                newPlugin.setStatus(PluginStatus.ENABLED);
+                // Enable the plugin
+                if (!enablePlugin(newPlugin)) {
+                    logger.error("Failed to enable reloaded plugin: {}", pluginName);
+                    return false;
+                }
 
                 logger.info("Successfully reloaded plugin: {} v{}", newPlugin.getName(), newPlugin.getVersion());
                 return true;
@@ -863,17 +995,16 @@ public class PluginManager implements PluginLoader {
     }
 
     /**
-     * Unregisters all permissions owned by a plugin.
-     * This is called when a plugin is disabled.
+     * Fires a plugin status change event.
      *
-     * @param plugin the plugin to unregister permissions for
-     * @return the number of permissions unregistered
+     * @param plugin    the plugin
+     * @param oldStatus the old status
+     * @param newStatus the new status
      */
-    private int unregisterPluginPermissions(Plugin plugin) {
-        if (plugin == null) {
-            return 0;
+    private void firePluginStatusChangeEvent(Plugin plugin, PluginStatus oldStatus, PluginStatus newStatus) {
+        if (eventManager != null) {
+            PluginStatusChangeEvent event = new PluginStatusChangeEvent(plugin, oldStatus, newStatus);
+            eventManager.fireEvent(event);
         }
-
-        return permissionManager.unregisterPermissions(plugin);
     }
 }

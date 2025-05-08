@@ -6,9 +6,10 @@ import java.util.Set;
 
 /**
  * Interface for the event management system.
- * This is used to register event listeners and fire events.
+ * This is used to register event listeners, fire events,
+ * and manage event types.
  */
-public interface EventManager {
+public interface EventManager extends EventRegistry {
     /**
      * Registers an event listener.
      * The listener will be unregistered automatically when the plugin is disabled.
