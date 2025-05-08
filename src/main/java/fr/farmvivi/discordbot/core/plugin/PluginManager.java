@@ -1,7 +1,5 @@
 package fr.farmvivi.discordbot.core.plugin;
 
-import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
-import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -9,8 +7,9 @@ import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.api.plugin.PluginLoader;
 import fr.farmvivi.discordbot.core.api.plugin.PluginStatus;
-import fr.farmvivi.discordbot.core.api.plugin.events.PluginLoadingEvent;
 import fr.farmvivi.discordbot.core.api.plugin.events.*;
+import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +35,8 @@ public class PluginManager implements PluginLoader {
     private final EventManager eventManager;
     private final DiscordAPI discordAPI;
     private final LanguageManager languageManager;
-    private final DataStorageProvider dataStorageProvider;
-    private final BinaryStorageProvider binaryStorageProvider;
+    private final DataStorageManager dataStorageManager;
+    private final BinaryStorageManager binaryStorageManager;
     private final PermissionManager permissionManager;
 
     //--------------------------------------------------------------------
@@ -47,23 +46,23 @@ public class PluginManager implements PluginLoader {
     /**
      * Creates a new plugin manager.
      *
-     * @param pluginsFolder         the folder where plugins are stored
-     * @param eventManager          the event manager
-     * @param discordAPI            the Discord API
-     * @param languageManager       the language manager
-     * @param dataStorageProvider   the data storage provider
-     * @param binaryStorageProvider the binary storage provider
-     * @param permissionManager     the permission manager
+     * @param pluginsFolder        the folder where plugins are stored
+     * @param eventManager         the event manager
+     * @param discordAPI           the Discord API
+     * @param languageManager      the language manager
+     * @param dataStorageManager   the data storage manager
+     * @param binaryStorageManager the binary storage manager
+     * @param permissionManager    the permission manager
      */
     public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI,
-                         LanguageManager languageManager, DataStorageProvider dataStorageProvider,
-                         BinaryStorageProvider binaryStorageProvider, PermissionManager permissionManager) {
+                         LanguageManager languageManager, DataStorageManager dataStorageManager,
+                         BinaryStorageManager binaryStorageManager, PermissionManager permissionManager) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
         this.languageManager = languageManager;
-        this.dataStorageProvider = dataStorageProvider;
-        this.binaryStorageProvider = binaryStorageProvider;
+        this.dataStorageManager = dataStorageManager;
+        this.binaryStorageManager = binaryStorageManager;
         this.permissionManager = permissionManager;
 
         if (!pluginsFolder.exists()) {
@@ -125,8 +124,8 @@ public class PluginManager implements PluginLoader {
                     this,
                     classLoader,
                     languageManager,
-                    dataStorageProvider,
-                    binaryStorageProvider,
+                    dataStorageManager,
+                    binaryStorageManager,
                     permissionManager
             );
 

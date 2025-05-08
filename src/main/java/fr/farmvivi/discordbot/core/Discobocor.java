@@ -1,20 +1,20 @@
 package fr.farmvivi.discordbot.core;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
-import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
-import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
+import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
-import fr.farmvivi.discordbot.core.data.DataStorageFactory;
-import fr.farmvivi.discordbot.core.data.binary.BinaryStorageFactory;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
 import fr.farmvivi.discordbot.core.language.LanguageFileManager;
 import fr.farmvivi.discordbot.core.language.SimpleLanguageManager;
 import fr.farmvivi.discordbot.core.permissions.SimplePermissionManager;
 import fr.farmvivi.discordbot.core.plugin.PluginManager;
+import fr.farmvivi.discordbot.core.storage.StorageFactory;
+import fr.farmvivi.discordbot.core.storage.binary.BinaryStorageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +42,8 @@ public class Discobocor {
     private static SimpleEventManager eventManager;
     private static Configuration coreConfig;
     private static LanguageManager languageManager;
-    private static DataStorageProvider dataStorageProvider;
-    private static BinaryStorageProvider binaryStorageProvider;
+    private static DataStorageManager dataStorageManager;
+    private static BinaryStorageManager binaryStorageManager;
     private static SimplePermissionManager permissionManager;
 
     static {
@@ -178,20 +178,14 @@ public class Discobocor {
         // Create the Discord API
         discordAPI = new JDADiscordAPI(token);
 
-        // Create the data storage provider
-        dataStorageProvider = DataStorageFactory.createStorageProvider(
-                coreConfig,
-                DataStorageProvider.StorageType.FILE
-        );
+        // Create the data storage manager
+        dataStorageManager = StorageFactory.createStorageManager(coreConfig, eventManager);
 
-        // Create the binary storage provider
-        binaryStorageProvider = BinaryStorageFactory.createBinaryStorageProvider(
-                coreConfig,
-                BinaryStorageProvider.StorageType.FILE
-        );
+        // Create the binary storage manager
+        binaryStorageManager = BinaryStorageFactory.createBinaryStorageManager(coreConfig, eventManager);
 
         // Create the permission manager
-        permissionManager = new SimplePermissionManager(eventManager, dataStorageProvider);
+        permissionManager = new SimplePermissionManager(eventManager, dataStorageManager);
 
         // Create the plugin manager
         pluginManager = new PluginManager(
@@ -199,8 +193,8 @@ public class Discobocor {
                 eventManager,
                 discordAPI,
                 languageManager,
-                dataStorageProvider,
-                binaryStorageProvider,
+                dataStorageManager,
+                binaryStorageManager,
                 permissionManager
         );
 
@@ -328,12 +322,12 @@ public class Discobocor {
         permissionManager.clearCaches();
 
         // 7. Close the data storage provider
-        if (dataStorageProvider != null && !dataStorageProvider.close()) {
+        if (dataStorageManager != null && !dataStorageManager.close()) {
             logger.error("Failed to close data storage provider");
         }
 
         // 8. Close the binary storage provider
-        if (binaryStorageProvider != null && !binaryStorageProvider.close()) {
+        if (binaryStorageManager != null && !binaryStorageManager.close()) {
             logger.error("Failed to close binary storage provider");
         }
     }
@@ -420,21 +414,21 @@ public class Discobocor {
     }
 
     /**
-     * Gets the data storage provider.
+     * Gets the data storage manager.
      *
-     * @return the data storage provider
+     * @return the data storage manager
      */
-    public static DataStorageProvider getDataStorageProvider() {
-        return dataStorageProvider;
+    public static DataStorageManager getDataStorageManager() {
+        return dataStorageManager;
     }
 
     /**
-     * Gets the binary storage provider.
+     * Gets the binary storage manager.
      *
-     * @return the binary storage provider
+     * @return the binary storage manager
      */
-    public static BinaryStorageProvider getBinaryStorageProvider() {
-        return binaryStorageProvider;
+    public static BinaryStorageManager getBinaryStorageManager() {
+        return binaryStorageManager;
     }
 
     /**

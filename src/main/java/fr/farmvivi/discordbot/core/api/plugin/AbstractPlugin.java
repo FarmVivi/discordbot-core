@@ -1,14 +1,14 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
-import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
-import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.language.PluginLanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.permissions.PluginPermissionManager;
+import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import org.slf4j.Logger;
 
 /**
@@ -23,8 +23,8 @@ public abstract class AbstractPlugin implements Plugin {
     protected Configuration configuration;
     protected String dataFolder;
     protected LanguageManager languageManager;
-    protected DataStorageProvider dataStorageProvider;
-    protected BinaryStorageProvider binaryStorageProvider;
+    protected DataStorageManager dataStorageManager;
+    protected BinaryStorageManager binaryStorageManager;
     protected PermissionManager permissionManager;
     protected PluginPermissionManager pluginPermissionManager;
     protected PluginLanguageManager pluginLanguageManager;
@@ -40,8 +40,8 @@ public abstract class AbstractPlugin implements Plugin {
         this.configuration = context.getConfiguration();
         this.dataFolder = context.getDataFolder();
         this.languageManager = context.getLanguageManager();
-        this.dataStorageProvider = context.getDataStorageProvider();
-        this.binaryStorageProvider = context.getBinaryStorageProvider();
+        this.dataStorageManager = context.getDataStorageManager();
+        this.binaryStorageManager = context.getBinaryStorageManager();
         this.permissionManager = context.getPermissionManager();
 
         this.pluginLanguageManager = new PluginLanguageManager(this, languageManager);

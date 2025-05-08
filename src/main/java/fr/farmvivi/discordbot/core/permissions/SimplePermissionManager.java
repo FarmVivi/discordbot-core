@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.core.permissions;
 
-import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.permissions.Permission;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionDefault;
@@ -8,6 +7,7 @@ import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.permissions.events.PermissionChangeEvent;
 import fr.farmvivi.discordbot.core.api.permissions.events.PermissionCheckEvent;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
+import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public class SimplePermissionManager implements PermissionManager {
     private static final String PERMISSION_KEY_PREFIX = "permission.";
 
     private final EventManager eventManager;
-    private final DataStorageProvider storageProvider;
+    private final DataStorageManager dataStorageManager;
 
     // Maps permission name to Permission object
     private final Map<String, Permission> registeredPermissions = new ConcurrentHashMap<>();
@@ -42,12 +42,12 @@ public class SimplePermissionManager implements PermissionManager {
     /**
      * Creates a new permission manager.
      *
-     * @param eventManager    the event manager
-     * @param storageProvider the data storage provider
+     * @param eventManager       the event manager
+     * @param dataStorageManager the data storage manager
      */
-    public SimplePermissionManager(EventManager eventManager, DataStorageProvider storageProvider) {
+    public SimplePermissionManager(EventManager eventManager, DataStorageManager dataStorageManager) {
         this.eventManager = eventManager;
-        this.storageProvider = storageProvider;
+        this.dataStorageManager = dataStorageManager;
     }
 
     @Override
@@ -100,8 +100,8 @@ public class SimplePermissionManager implements PermissionManager {
         }
 
         // Check storage
-        Boolean storedValue = storageProvider.getUserStorage()
-                .getUserData(userId, PERMISSION_KEY_PREFIX + permission, Boolean.class)
+        Boolean storedValue = dataStorageManager.getUserStorage(userId)
+                .get(PERMISSION_KEY_PREFIX + permission, Boolean.class)
                 .orElse(null);
 
         boolean result;
@@ -148,8 +148,8 @@ public class SimplePermissionManager implements PermissionManager {
         }
 
         // Check storage
-        Boolean storedValue = storageProvider.getUserGuildStorage()
-                .getUserGuildData(userId, guildId, PERMISSION_KEY_PREFIX + permission, Boolean.class)
+        Boolean storedValue = dataStorageManager.getUserGuildStorage(userId, guildId)
+                .get(PERMISSION_KEY_PREFIX + permission, Boolean.class)
                 .orElse(null);
 
         if (storedValue != null) {
@@ -176,8 +176,8 @@ public class SimplePermissionManager implements PermissionManager {
         eventManager.fireEvent(event);
 
         // Store new value
-        storageProvider.getUserStorage()
-                .setUserData(userId, PERMISSION_KEY_PREFIX + permission, value);
+        dataStorageManager.getUserStorage(userId)
+                .set(PERMISSION_KEY_PREFIX + permission, value);
 
         // Update cache
         Map<String, Boolean> userPerms = userPermissionCache.computeIfAbsent(userId,
@@ -202,8 +202,8 @@ public class SimplePermissionManager implements PermissionManager {
         eventManager.fireEvent(event);
 
         // Store new value
-        storageProvider.getUserGuildStorage()
-                .setUserGuildData(userId, guildId, PERMISSION_KEY_PREFIX + permission, value);
+        dataStorageManager.getUserGuildStorage(userId, guildId)
+                .set(PERMISSION_KEY_PREFIX + permission, value);
 
         // Update cache
         Map<String, Map<String, Boolean>> userGuilds = userGuildPermissionCache
@@ -225,14 +225,14 @@ public class SimplePermissionManager implements PermissionManager {
         }
 
         // Get all permission keys for this user
-        Set<String> keys = storageProvider.getUserStorage().getUserKeys(userId);
+        Set<String> keys = dataStorageManager.getUserStorage(userId).getKeys();
         List<String> permKeys = keys.stream()
                 .filter(key -> key.startsWith(PERMISSION_KEY_PREFIX))
                 .collect(Collectors.toList());
 
         // Remove each permission
         for (String key : permKeys) {
-            storageProvider.getUserStorage().removeUserData(userId, key);
+            dataStorageManager.getUserStorage(userId).remove(key);
         }
 
         // Clear cache
@@ -248,8 +248,8 @@ public class SimplePermissionManager implements PermissionManager {
         }
 
         // Get all permission keys for this user in this guild
-        Set<String> keys = storageProvider.getUserGuildStorage()
-                .getUserGuildKeys(userId, guildId);
+        Set<String> keys = dataStorageManager.getUserGuildStorage(userId, guildId)
+                .getKeys();
 
         List<String> permKeys = keys.stream()
                 .filter(key -> key.startsWith(PERMISSION_KEY_PREFIX))
@@ -257,8 +257,8 @@ public class SimplePermissionManager implements PermissionManager {
 
         // Remove each permission
         for (String key : permKeys) {
-            storageProvider.getUserGuildStorage()
-                    .removeUserGuildData(userId, guildId, key);
+            dataStorageManager.getUserGuildStorage(userId, guildId)
+                    .remove(key);
         }
 
         // Clear cache
@@ -282,15 +282,15 @@ public class SimplePermissionManager implements PermissionManager {
         }
 
         // Get from storage
-        Set<String> keys = storageProvider.getUserStorage().getUserKeys(userId);
+        Set<String> keys = dataStorageManager.getUserStorage(userId).getKeys();
         Map<String, Boolean> permissions = new HashMap<>();
 
         // Process only permission keys
         for (String key : keys) {
             if (key.startsWith(PERMISSION_KEY_PREFIX)) {
                 String permName = key.substring(PERMISSION_KEY_PREFIX.length());
-                Boolean value = storageProvider.getUserStorage()
-                        .getUserData(userId, key, Boolean.class)
+                Boolean value = dataStorageManager.getUserStorage(userId)
+                        .get(key, Boolean.class)
                         .orElse(null);
 
                 if (value != null) {
@@ -309,8 +309,8 @@ public class SimplePermissionManager implements PermissionManager {
         }
 
         // Get from storage
-        Set<String> keys = storageProvider.getUserGuildStorage()
-                .getUserGuildKeys(userId, guildId);
+        Set<String> keys = dataStorageManager.getUserGuildStorage(userId, guildId)
+                .getKeys();
 
         Map<String, Boolean> permissions = new HashMap<>();
 
@@ -318,8 +318,8 @@ public class SimplePermissionManager implements PermissionManager {
         for (String key : keys) {
             if (key.startsWith(PERMISSION_KEY_PREFIX)) {
                 String permName = key.substring(PERMISSION_KEY_PREFIX.length());
-                Boolean value = storageProvider.getUserGuildStorage()
-                        .getUserGuildData(userId, guildId, key, Boolean.class)
+                Boolean value = dataStorageManager.getUserGuildStorage(userId, guildId)
+                        .get(key, Boolean.class)
                         .orElse(null);
 
                 if (value != null) {
@@ -406,12 +406,12 @@ public class SimplePermissionManager implements PermissionManager {
     private boolean isOperator(String userId, String guildId) {
         // For now, we'll use a simple check against the storage
         if (guildId != null) {
-            return storageProvider.getUserGuildStorage()
-                    .getUserGuildData(userId, guildId, "isOperator", Boolean.class)
+            return dataStorageManager.getUserGuildStorage(userId, guildId)
+                    .get("isOperator", Boolean.class)
                     .orElse(false);
         } else {
-            return storageProvider.getUserStorage()
-                    .getUserData(userId, "isOperator", Boolean.class)
+            return dataStorageManager.getUserStorage(userId)
+                    .get("isOperator", Boolean.class)
                     .orElse(false);
         }
     }

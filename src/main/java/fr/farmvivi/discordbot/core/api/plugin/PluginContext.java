@@ -1,12 +1,12 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
 import fr.farmvivi.discordbot.core.api.config.Configuration;
-import fr.farmvivi.discordbot.core.api.data.DataStorageProvider;
-import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
+import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import org.slf4j.Logger;
 
 /**
@@ -72,18 +72,18 @@ public interface PluginContext {
     LanguageManager getLanguageManager();
 
     /**
-     * Gets the data storage provider for persistent data.
+     * Gets the data storage manager for persistent data.
      *
-     * @return the data storage provider
+     * @return the data storage manager
      */
-    DataStorageProvider getDataStorageProvider();
+    DataStorageManager getDataStorageManager();
 
     /**
-     * Gets the binary storage provider for large file storage.
+     * Gets the binary storage manager for large file storage.
      *
-     * @return the binary storage provider
+     * @return the binary storage manager
      */
-    BinaryStorageProvider getBinaryStorageProvider();
+    BinaryStorageManager getBinaryStorageManager();
 
     /**
      * Gets the permission manager for registering and checking permissions.
