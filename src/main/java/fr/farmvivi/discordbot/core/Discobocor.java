@@ -332,51 +332,6 @@ public class Discobocor {
     }
 
     /**
-     * Reloads all plugins.
-     * This will disable and re-enable all plugins.
-     */
-    public static void reloadPlugins() {
-        logger.info("Starting complete plugin reload...");
-
-        // Disable plugins
-        pluginManager.preDisablePlugins();
-        pluginManager.disablePlugins();
-        pluginManager.postDisablePlugins();
-
-        // Disconnect from Discord
-        try {
-            discordAPI.disconnect().join();
-        } catch (Exception e) {
-            logger.error("Failed to disconnect from Discord during reload", e);
-            return;
-        }
-
-        // Load and pre-enable plugins
-        pluginManager.loadPlugins();
-        pluginManager.preEnablePlugins();
-
-        // Connect to Discord again
-        try {
-            discordAPI.connect().join();
-
-            // Set the startup presence during reload
-            discordAPI.setStartupPresence();
-        } catch (Exception e) {
-            logger.error("Failed to reconnect to Discord during reload", e);
-            return;
-        }
-
-        // Complete plugin enabling
-        pluginManager.enablePlugins();
-        pluginManager.postEnablePlugins();
-
-        // Set the default presence after reload is complete
-        discordAPI.setDefaultPresence();
-
-        logger.info("Complete plugin reload finished successfully!");
-    }
-
-    /**
      * Gets the language manager.
      *
      * @return the language manager

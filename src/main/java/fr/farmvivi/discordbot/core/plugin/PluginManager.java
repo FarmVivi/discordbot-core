@@ -517,6 +517,105 @@ public class PluginManager implements PluginLoader, Closeable {
     }
 
     /**
+     * Reloads all plugins completely.
+     * This will disable all plugins, reconnect to Discord, and re-enable all plugins.
+     *
+     * @return true if reload was successful, false otherwise
+     */
+    public boolean reloadPlugins() {
+        logger.info("Starting complete plugin reload...");
+        long startTime = System.currentTimeMillis();
+
+        // Save plugin state if needed (e.g. configs)
+        if (dataStorageManager != null) {
+            dataStorageManager.saveAll();
+        }
+
+        // Step 1: Disable plugins in proper sequence
+        logger.info("Disabling plugins...");
+        preDisablePlugins();
+        disablePlugins();
+        postDisablePlugins();
+
+        // Step 2: Disconnect from Discord
+        logger.info("Disconnecting from Discord...");
+        try {
+            discordAPI.setShutdownPresence();
+            discordAPI.disconnect().join();
+        } catch (Exception e) {
+            logger.error("Failed to disconnect from Discord during reload", e);
+            logger.warn("Continuing reload, but Discord reconnection may fail");
+        }
+
+        // Step 3: Clear event handlers and clean up resources
+        logger.info("Cleaning up resources...");
+        if (eventManager != null) {
+            for (Plugin plugin : plugins.values()) {
+                eventManager.unregisterAll(plugin);
+            }
+        }
+
+        // Step 4: Reload plugins
+        logger.info("Reloading plugins...");
+        try {
+            // Scan and load all plugins
+            loadPlugins();
+        } catch (Exception e) {
+            logger.error("Error during plugin loading phase", e);
+            // Continue anyway, some plugins might have loaded successfully
+        }
+
+        // Step 5: Pre-enable plugins (configure Discord)
+        logger.info("Pre-enabling plugins...");
+        preEnablePlugins();
+
+        // Step 6: Reconnect to Discord
+        logger.info("Reconnecting to Discord...");
+        boolean discordConnected = false;
+        try {
+            discordAPI.connect().join();
+            discordAPI.setStartupPresence();
+            discordConnected = true;
+        } catch (Exception e) {
+            logger.error("Failed to reconnect to Discord after reload", e);
+            logger.warn("Plugins requiring Discord features may not function properly");
+        }
+
+        // Step 7: Complete enabling plugins
+        if (discordConnected) {
+            logger.info("Enabling plugins...");
+            try {
+                enablePlugins();
+                postEnablePlugins();
+
+                // Set default presence
+                discordAPI.setDefaultPresence();
+            } catch (Exception e) {
+                logger.error("Error during plugin enabling phase", e);
+                return false;
+            }
+        } else {
+            logger.error("Skipping plugin enable phase due to Discord connection failure");
+            return false;
+        }
+
+        // Step 8: Calculate and log statistics
+        int totalPlugins = plugins.size();
+        int enabledPlugins = (int) plugins.values().stream()
+                .filter(p -> p.getLifecycle() == PluginLifecycle.ENABLED)
+                .count();
+        int failedPlugins = totalPlugins - enabledPlugins;
+
+        long endTime = System.currentTimeMillis();
+        double reloadTime = (endTime - startTime) / 1000.0;
+
+        logger.info("Plugin reload completed in {:.2f} seconds: {} total plugins, {} enabled, {} failed",
+                reloadTime, totalPlugins, enabledPlugins, failedPlugins);
+
+        return enabledPlugins > 0 && discordConnected;
+    }
+
+    /**
      * Scans plugin JARs to collect metadata without loading them.
      */
     private void scanPlugins() {
