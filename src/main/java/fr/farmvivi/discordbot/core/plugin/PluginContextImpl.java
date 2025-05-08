@@ -12,12 +12,19 @@ import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import org.slf4j.Logger;
 
 /**
- * Implementation of PluginContext.
+ * Implementation of PluginContext that provides access to core services.
  */
-record PluginContextImpl(Logger getLogger, EventManager getEventManager, DiscordAPI getDiscordAPI,
-                         Configuration getConfiguration, String getDataFolder, PluginLoader getPluginLoader,
-                         ClassLoader getClassLoader, LanguageManager getLanguageManager,
-                         DataStorageManager getDataStorageManager, BinaryStorageManager getBinaryStorageManager,
-                         PermissionManager getPermissionManager)
-        implements PluginContext {
+public record PluginContextImpl(
+        Logger getLogger,
+        EventManager getEventManager,
+        DiscordAPI getDiscordAPI,
+        Configuration getConfiguration,
+        String getDataFolder,
+        PluginLoader getPluginLoader,
+        ClassLoader getClassLoader,
+        LanguageManager getLanguageManager,
+        DataStorageManager getDataStorageManager,
+        BinaryStorageManager getBinaryStorageManager,
+        PermissionManager getPermissionManager
+) implements PluginContext {
 }

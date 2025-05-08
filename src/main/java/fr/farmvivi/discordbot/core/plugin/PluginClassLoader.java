@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Custom class loader for loading plugin classes.
- * This class loader has isolated dependencies for each plugin
- * while still allowing them to access the core API.
+ * Custom class loader for loading plugin classes with proper isolation.
  */
 public class PluginClassLoader extends URLClassLoader {
+    // Core packages that should always be loaded from the parent class loader
     private static final Set<String> CORE_PACKAGES = Set.of(
             "fr.farmvivi.discordbot.core",
             "org.slf4j",
@@ -22,16 +21,31 @@ public class PluginClassLoader extends URLClassLoader {
             "software.amazon.awssdk"
     );
 
-    private final Set<String> seenPackages = new CopyOnWriteArraySet<>();
+    // Packages we've seen in this plugin
+    private final Set<String> seenPackages = ConcurrentHashMap.newKeySet();
+
+    // The plugin descriptor for this class loader
+    private final PluginDescriptor descriptor;
 
     /**
      * Creates a new plugin class loader.
      *
-     * @param urls   the URLs to load classes from
-     * @param parent the parent class loader
+     * @param urls       the URLs from which to load classes and resources
+     * @param parent     the parent class loader for delegation
+     * @param descriptor the plugin descriptor
      */
-    public PluginClassLoader(URL[] urls, ClassLoader parent) {
+    public PluginClassLoader(URL[] urls, ClassLoader parent, PluginDescriptor descriptor) {
         super(urls, parent);
+        this.descriptor = descriptor;
+    }
+
+    /**
+     * Gets the plugin descriptor associated with this class loader.
+     *
+     * @return the plugin descriptor
+     */
+    public PluginDescriptor getDescriptor() {
+        return descriptor;
     }
 
     @Override
@@ -43,13 +57,11 @@ public class PluginClassLoader extends URLClassLoader {
         }
 
         // Get the package name
-        String packageName = name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : "";
+        String packageName = getPackageName(name);
 
         // Core packages are always loaded by the parent class loader
-        for (String corePackage : CORE_PACKAGES) {
-            if (packageName.startsWith(corePackage)) {
-                return super.loadClass(name, resolve);
-            }
+        if (isCorePackage(packageName)) {
+            return super.loadClass(name, resolve);
         }
 
         try {
@@ -78,6 +90,19 @@ public class PluginClassLoader extends URLClassLoader {
         }
 
         return loadedClass;
+    }
+
+    private String getPackageName(String className) {
+        return className.contains(".") ? className.substring(0, className.lastIndexOf('.')) : "";
+    }
+
+    private boolean isCorePackage(String packageName) {
+        for (String corePackage : CORE_PACKAGES) {
+            if (packageName.startsWith(corePackage)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

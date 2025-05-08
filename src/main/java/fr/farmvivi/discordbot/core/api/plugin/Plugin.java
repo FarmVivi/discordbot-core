@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
 /**
- * Base interface for all Discord bot plugins.
- * Each plugin must implement this interface to be detected and loaded.
+ * Core interface for all Discord bot plugins.
+ * All plugins must implement this interface to be detected and loaded.
  */
 public interface Plugin {
     /**
@@ -21,16 +21,20 @@ public interface Plugin {
 
     /**
      * Called when the plugin is being loaded.
+     * Initialize basic resources here, but avoid interacting with other plugins.
      *
-     * @param pluginContext the context in which this plugin operates
+     * @param context the context providing access to core services
      */
-    void onLoad(PluginContext pluginContext);
+    void onLoad(PluginContext context);
 
     /**
      * Called during the pre-enable phase.
      * This is where plugins can configure Discord settings before connection.
+     * Default implementation does nothing.
      */
-    void onPreEnable();
+    default void onPreEnable() {
+        // Default implementation does nothing
+    }
 
     /**
      * Called during the enable phase.
@@ -41,14 +45,20 @@ public interface Plugin {
     /**
      * Called during the post-enable phase.
      * This is where plugins can interact with other plugins.
+     * Default implementation does nothing.
      */
-    void onPostEnable();
+    default void onPostEnable() {
+        // Default implementation does nothing
+    }
 
     /**
      * Called during the pre-disable phase.
      * This is where plugins prepare for shutdown.
+     * Default implementation does nothing.
      */
-    void onPreDisable();
+    default void onPreDisable() {
+        // Default implementation does nothing
+    }
 
     /**
      * Called during the disable phase.
@@ -59,20 +69,24 @@ public interface Plugin {
     /**
      * Called during the post-disable phase.
      * Final cleanup after all plugins have been disabled.
+     * Default implementation does nothing.
      */
-    void onPostDisable();
+    default void onPostDisable() {
+        // Default implementation does nothing
+    }
 
     /**
-     * Gets the current status of the plugin.
+     * Gets the current lifecycle state of the plugin.
      *
-     * @return the plugin's status
+     * @return the plugin's lifecycle state
      */
-    PluginStatus getStatus();
+    PluginLifecycle getLifecycle();
 
     /**
-     * Sets the status of the plugin.
+     * Sets the lifecycle state of the plugin.
+     * This should only be called by the plugin system.
      *
-     * @param status the new status
+     * @param lifecycle the new lifecycle state
      */
-    void setStatus(PluginStatus status);
+    void setLifecycle(PluginLifecycle lifecycle);
 }

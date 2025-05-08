@@ -11,11 +11,14 @@ import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import org.slf4j.Logger;
 
+import java.io.File;
+
 /**
  * Convenience base class for plugins.
- * Plugins can extend this class instead of implementing the Plugin interface directly.
+ * Provides common functionality and access to core services.
  */
 public abstract class AbstractPlugin implements Plugin {
+    // Core services
     protected PluginContext context;
     protected Logger logger;
     protected EventManager eventManager;
@@ -26,10 +29,13 @@ public abstract class AbstractPlugin implements Plugin {
     protected DataStorageManager dataStorageManager;
     protected BinaryStorageManager binaryStorageManager;
     protected PermissionManager permissionManager;
+
+    // Plugin-specific managers
     protected PluginPermissionManager pluginPermissionManager;
     protected PluginLanguageManager pluginLanguageManager;
 
-    private PluginStatus status = PluginStatus.LOADED;
+    // Plugin state
+    private PluginLifecycle lifecycle = PluginLifecycle.DISCOVERED;
 
     @Override
     public void onLoad(PluginContext context) {
@@ -44,8 +50,15 @@ public abstract class AbstractPlugin implements Plugin {
         this.binaryStorageManager = context.getBinaryStorageManager();
         this.permissionManager = context.getPermissionManager();
 
+        // Initialize plugin-specific managers
         this.pluginLanguageManager = new PluginLanguageManager(this, languageManager);
         this.pluginPermissionManager = new PluginPermissionManager(this, permissionManager, languageManager);
+
+        // Create data directory if it doesn't exist
+        File dataDir = new File(dataFolder);
+        if (!dataDir.exists() && !dataDir.mkdirs()) {
+            logger.warn("Failed to create data directory for plugin: {}", getName());
+        }
 
         logger.info("Loading {} v{}", getName(), getVersion());
     }
@@ -53,48 +66,47 @@ public abstract class AbstractPlugin implements Plugin {
     @Override
     public void onPreEnable() {
         logger.info("Pre-enabling {} v{}", getName(), getVersion());
-        // Plugins can override this to configure Discord settings
     }
 
     @Override
     public void onEnable() {
         logger.info("Enabling {} v{}", getName(), getVersion());
-        // Plugins implement their main initialization here
     }
 
     @Override
     public void onPostEnable() {
         logger.info("Post-enabling {} v{}", getName(), getVersion());
-        // Plugins can interact with other plugins here
     }
 
     @Override
     public void onPreDisable() {
         logger.info("Pre-disabling {} v{}", getName(), getVersion());
-        // Plugins prepare for shutdown here
     }
 
     @Override
     public void onDisable() {
         logger.info("Disabling {} v{}", getName(), getVersion());
-        // Désenregistrement automatique de tous les écouteurs
-        eventManager.unregisterListener(this);
+
+        // Automatically unregister all event handlers
+        if (eventManager != null) {
+            eventManager.unregisterListener(this);
+            eventManager.unregisterAll(this);
+        }
     }
 
     @Override
     public void onPostDisable() {
         logger.info("Post-disabling {} v{}", getName(), getVersion());
-        // Final cleanup after all plugins have been disabled
     }
 
     @Override
-    public PluginStatus getStatus() {
-        return status;
+    public PluginLifecycle getLifecycle() {
+        return lifecycle;
     }
 
     @Override
-    public void setStatus(PluginStatus status) {
-        this.status = status;
+    public void setLifecycle(PluginLifecycle lifecycle) {
+        this.lifecycle = lifecycle;
     }
 
     /**
@@ -125,5 +137,14 @@ public abstract class AbstractPlugin implements Plugin {
      */
     public PluginLanguageManager getPluginLanguageManager() {
         return pluginLanguageManager;
+    }
+
+    /**
+     * Returns whether this plugin is currently enabled.
+     *
+     * @return true if this plugin is enabled
+     */
+    public boolean isEnabled() {
+        return lifecycle == PluginLifecycle.ENABLED;
     }
 }

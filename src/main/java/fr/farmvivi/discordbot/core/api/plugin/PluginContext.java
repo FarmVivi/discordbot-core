@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 
 /**
  * Provides access to core functionality and services for plugins.
- * This is passed to plugins during initialization to provide them
- * with access to the bot's core services.
  */
 public interface PluginContext {
     /**
@@ -44,7 +42,7 @@ public interface PluginContext {
     Configuration getConfiguration();
 
     /**
-     * Gets a data folder for the plugin to store its files.
+     * Gets the data folder path for the plugin to store its files.
      *
      * @return the plugin's data folder path
      */
@@ -56,13 +54,6 @@ public interface PluginContext {
      * @return the plugin loader
      */
     PluginLoader getPluginLoader();
-
-    /**
-     * Gets the class loader for this plugin.
-     *
-     * @return the plugin's class loader
-     */
-    ClassLoader getClassLoader();
 
     /**
      * Gets the language manager for internationalization.

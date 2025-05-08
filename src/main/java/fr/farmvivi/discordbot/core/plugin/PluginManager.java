@@ -5,32 +5,30 @@ import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
+import fr.farmvivi.discordbot.core.api.plugin.PluginLifecycle;
 import fr.farmvivi.discordbot.core.api.plugin.PluginLoader;
-import fr.farmvivi.discordbot.core.api.plugin.PluginStatus;
 import fr.farmvivi.discordbot.core.api.plugin.events.*;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * Implementation of PluginLoader that loads and manages plugins.
+ * Main implementation of PluginLoader that manages the plugin lifecycle.
  */
-public class PluginManager implements PluginLoader {
+public class PluginManager implements PluginLoader, Closeable {
     private static final Logger logger = LoggerFactory.getLogger(PluginManager.class);
 
-    private final Map<String, Plugin> plugins = new HashMap<>();
-    private final Map<String, PluginClassLoader> classLoaders = new HashMap<>();
-    private final Map<String, PluginDescriptionFile> pluginDescriptions = new HashMap<>();
-    private final Map<String, String> pluginJarPaths = new HashMap<>();
-    private final Set<String> failedPlugins = new HashSet<>();
+    // Core services
     private final File pluginsFolder;
     private final EventManager eventManager;
     private final DiscordAPI discordAPI;
@@ -39,9 +37,12 @@ public class PluginManager implements PluginLoader {
     private final BinaryStorageManager binaryStorageManager;
     private final PermissionManager permissionManager;
 
-    //--------------------------------------------------------------------
-    // CONSTRUCTORS AND INITIALIZATION
-    //--------------------------------------------------------------------
+    // Plugin tracking
+    private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
+    private final Map<String, PluginClassLoader> classLoaders = new ConcurrentHashMap<>();
+    private final Map<String, PluginDescriptor> pluginDescriptors = new ConcurrentHashMap<>();
+    private final Map<String, String> pluginJarPaths = new ConcurrentHashMap<>();
+    private final Set<String> failedPlugins = ConcurrentHashMap.newKeySet();
 
     /**
      * Creates a new plugin manager.
@@ -54,9 +55,14 @@ public class PluginManager implements PluginLoader {
      * @param binaryStorageManager the binary storage manager
      * @param permissionManager    the permission manager
      */
-    public PluginManager(File pluginsFolder, EventManager eventManager, DiscordAPI discordAPI,
-                         LanguageManager languageManager, DataStorageManager dataStorageManager,
-                         BinaryStorageManager binaryStorageManager, PermissionManager permissionManager) {
+    public PluginManager(
+            File pluginsFolder,
+            EventManager eventManager,
+            DiscordAPI discordAPI,
+            LanguageManager languageManager,
+            DataStorageManager dataStorageManager,
+            BinaryStorageManager binaryStorageManager,
+            PermissionManager permissionManager) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
@@ -65,14 +71,10 @@ public class PluginManager implements PluginLoader {
         this.binaryStorageManager = binaryStorageManager;
         this.permissionManager = permissionManager;
 
-        if (!pluginsFolder.exists()) {
-            pluginsFolder.mkdirs();
+        if (!pluginsFolder.exists() && !pluginsFolder.mkdirs()) {
+            logger.warn("Failed to create plugins folder: {}", pluginsFolder.getAbsolutePath());
         }
     }
-
-    //--------------------------------------------------------------------
-    // PLUGIN LOADER INTERFACE IMPLEMENTATION
-    //--------------------------------------------------------------------
 
     @Override
     public Plugin loadPlugin(String jarFile) {
@@ -90,17 +92,17 @@ public class PluginManager implements PluginLoader {
                 return null;
             }
 
-            // Parse plugin.yml to get the main class
-            PluginDescriptionFile description = new PluginDescriptionFile(jar.getInputStream(entry));
+            // Parse plugin.yml
+            PluginDescriptor descriptor = PluginDescriptor.fromYaml(jar.getInputStream(entry));
 
             // Create the class loader
             URL[] urls = {file.toURI().toURL()};
-            PluginClassLoader classLoader = new PluginClassLoader(urls, getClass().getClassLoader());
+            PluginClassLoader classLoader = new PluginClassLoader(urls, getClass().getClassLoader(), descriptor);
 
             // Load the main class
-            Class<?> mainClass = classLoader.loadClass(description.getMain());
+            Class<?> mainClass = classLoader.loadClass(descriptor.main());
             if (!Plugin.class.isAssignableFrom(mainClass)) {
-                logger.error("Main class does not implement Plugin: {}", description.getMain());
+                logger.error("Main class does not implement Plugin: {}", descriptor.main());
                 classLoader.close();
                 return null;
             }
@@ -116,11 +118,11 @@ public class PluginManager implements PluginLoader {
 
             // Create the plugin context
             PluginContextImpl context = new PluginContextImpl(
-                    LoggerFactory.getLogger(description.getName()),
+                    LoggerFactory.getLogger(descriptor.name()),
                     eventManager,
                     discordAPI,
-                    new PluginConfiguration(description.getName()),
-                    new File(pluginsFolder, description.getName()).getAbsolutePath(),
+                    new PluginConfiguration(descriptor.name()),
+                    new File(pluginsFolder, descriptor.name()).getAbsolutePath(),
                     this,
                     classLoader,
                     languageManager,
@@ -130,10 +132,14 @@ public class PluginManager implements PluginLoader {
             );
 
             // Initialize the plugin
+            plugin.setLifecycle(PluginLifecycle.LOADED);
             plugin.onLoad(context);
 
             // Store the classloader
-            classLoaders.put(description.getName(), classLoader);
+            classLoaders.put(descriptor.name(), classLoader);
+
+            // Store the descriptor
+            pluginDescriptors.put(descriptor.name(), descriptor);
 
             // Fire the plugin loaded event
             if (eventManager != null) {
@@ -150,7 +156,7 @@ public class PluginManager implements PluginLoader {
 
     @Override
     public boolean enablePlugin(Plugin plugin) {
-        if (plugin.getStatus() != PluginStatus.LOADED) {
+        if (plugin.getLifecycle() != PluginLifecycle.LOADED) {
             logger.warn("Cannot enable plugin {}: not in LOADED state", plugin.getName());
             return false;
         }
@@ -167,30 +173,15 @@ public class PluginManager implements PluginLoader {
         }
 
         try {
-            // Follow the proper sequence
-            PluginStatus oldStatus = plugin.getStatus();
+            // Follow the proper lifecycle
+            executeLifecyclePhase(plugin, PluginLifecycle.PRE_ENABLING, Plugin::onPreEnable);
+            executeLifecyclePhase(plugin, PluginLifecycle.ENABLING, Plugin::onEnable);
+            executeLifecyclePhase(plugin, PluginLifecycle.POST_ENABLING, Plugin::onPostEnable);
 
-            // Pre-enable phase
-            plugin.setStatus(PluginStatus.PRE_ENABLE);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_ENABLE);
-            plugin.onPreEnable();
-
-            // Enable phase
-            oldStatus = plugin.getStatus();
-            plugin.setStatus(PluginStatus.ENABLE);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLE);
-            plugin.onEnable();
-
-            // Post-enable phase
-            oldStatus = plugin.getStatus();
-            plugin.setStatus(PluginStatus.POST_ENABLE);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_ENABLE);
-            plugin.onPostEnable();
-
-            // Mark as fully enabled
-            oldStatus = plugin.getStatus();
-            plugin.setStatus(PluginStatus.ENABLED);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLED);
+            // Set to enabled
+            PluginLifecycle oldLifecycle = plugin.getLifecycle();
+            plugin.setLifecycle(PluginLifecycle.ENABLED);
+            fireLifecycleChangeEvent(plugin, oldLifecycle, PluginLifecycle.ENABLED);
 
             // Fire the plugin enabled event
             if (eventManager != null) {
@@ -202,14 +193,14 @@ public class PluginManager implements PluginLoader {
             return true;
         } catch (Exception e) {
             logger.error("Failed to enable plugin: {}", plugin.getName(), e);
-            plugin.setStatus(PluginStatus.LOADED);
+            plugin.setLifecycle(PluginLifecycle.ERROR);
             return false;
         }
     }
 
     @Override
     public boolean disablePlugin(Plugin plugin) {
-        if (plugin.getStatus() != PluginStatus.ENABLED) {
+        if (plugin.getLifecycle() != PluginLifecycle.ENABLED) {
             logger.warn("Cannot disable plugin {}: not in ENABLED state", plugin.getName());
             return false;
         }
@@ -226,27 +217,12 @@ public class PluginManager implements PluginLoader {
         }
 
         try {
-            // Follow the proper sequence
-            PluginStatus oldStatus = plugin.getStatus();
+            // Follow the proper lifecycle
+            executeLifecyclePhase(plugin, PluginLifecycle.PRE_DISABLING, Plugin::onPreDisable);
+            executeLifecyclePhase(plugin, PluginLifecycle.DISABLING, Plugin::onDisable);
+            executeLifecyclePhase(plugin, PluginLifecycle.POST_DISABLING, Plugin::onPostDisable);
 
-            // Pre-disable phase
-            plugin.setStatus(PluginStatus.PRE_DISABLE);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_DISABLE);
-            plugin.onPreDisable();
-
-            // Disable phase
-            oldStatus = plugin.getStatus();
-            plugin.setStatus(PluginStatus.DISABLE);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLE);
-            plugin.onDisable();
-
-            // Post-disable phase
-            oldStatus = plugin.getStatus();
-            plugin.setStatus(PluginStatus.POST_DISABLE);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_DISABLE);
-            plugin.onPostDisable();
-
-            // Unregister events and permissions
+            // Cleanup
             if (eventManager != null) {
                 eventManager.unregisterAll(plugin);
             }
@@ -254,10 +230,10 @@ public class PluginManager implements PluginLoader {
                 permissionManager.unregisterPermissions(plugin);
             }
 
-            // Mark as fully disabled
-            oldStatus = plugin.getStatus();
-            plugin.setStatus(PluginStatus.DISABLED);
-            firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLED);
+            // Set to disabled
+            PluginLifecycle oldLifecycle = plugin.getLifecycle();
+            plugin.setLifecycle(PluginLifecycle.DISABLED);
+            fireLifecycleChangeEvent(plugin, oldLifecycle, PluginLifecycle.DISABLED);
 
             // Fire the plugin disabled event
             if (eventManager != null) {
@@ -269,7 +245,7 @@ public class PluginManager implements PluginLoader {
             return true;
         } catch (Exception e) {
             logger.error("Failed to disable plugin: {}", plugin.getName(), e);
-            plugin.setStatus(PluginStatus.ENABLED);
+            plugin.setLifecycle(PluginLifecycle.ERROR);
             return false;
         }
     }
@@ -289,53 +265,6 @@ public class PluginManager implements PluginLoader {
         return plugins.containsKey(name);
     }
 
-    //--------------------------------------------------------------------
-    // PLUGIN DISCOVERY AND LOADING
-    //--------------------------------------------------------------------
-
-    /**
-     * Scans plugin JARs to collect metadata without loading them.
-     */
-    private void scanPlugins() {
-        logger.info("Scanning plugins in {}", pluginsFolder.getAbsolutePath());
-
-        // Clear previous state
-        pluginDescriptions.clear();
-        pluginJarPaths.clear();
-        failedPlugins.clear();
-
-        File[] files = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar"));
-        if (files == null) {
-            logger.warn("Failed to list files in plugins folder");
-            return;
-        }
-
-        for (File file : files) {
-            try (JarFile jar = new JarFile(file)) {
-                // Look for plugin.yml
-                JarEntry entry = jar.getJarEntry("plugin.yml");
-                if (entry == null) {
-                    logger.error("Plugin does not contain plugin.yml: {}", file.getName());
-                    continue;
-                }
-
-                // Parse plugin.yml to get the plugin metadata
-                PluginDescriptionFile description = new PluginDescriptionFile(jar.getInputStream(entry));
-                String pluginName = description.getName();
-
-                // Store metadata
-                pluginDescriptions.put(pluginName, description);
-                pluginJarPaths.put(pluginName, file.getAbsolutePath());
-
-                logger.debug("Scanned plugin: {} v{}", pluginName, description.getVersion());
-            } catch (Exception e) {
-                logger.error("Failed to scan plugin: {}", file.getName(), e);
-            }
-        }
-
-        logger.info("Scanned {} plugins", pluginDescriptions.size());
-    }
-
     /**
      * Loads all plugins from the plugins folder in dependency order.
      */
@@ -344,23 +273,11 @@ public class PluginManager implements PluginLoader {
         scanPlugins();
 
         // Resolve dependencies to determine load order
-        PluginDependencyResolver resolver = new PluginDependencyResolver(pluginDescriptions);
+        DependencyResolver resolver = new DependencyResolver(pluginDescriptors);
         List<String> loadOrder = resolver.resolve();
 
-        // Log plugins with issues
-        Set<String> missingDeps = resolver.getMissingDependencies();
-        if (!missingDeps.isEmpty()) {
-            for (String plugin : missingDeps) {
-                failedPlugins.add(plugin);
-                logger.warn("Plugin {} has missing dependencies and won't be loaded", plugin);
-            }
-        }
-
-        Set<String> circularDeps = resolver.getCircularDependencies();
-        if (!circularDeps.isEmpty()) {
-            logger.warn("Detected circular dependencies among plugins: {}", circularDeps);
-            logger.warn("These plugins will be loaded but might not function correctly");
-        }
+        // Add missing dependencies to failed list
+        failedPlugins.addAll(resolver.getMissingDependencies());
 
         // Load plugins in the determined order
         for (String pluginName : loadOrder) {
@@ -390,96 +307,40 @@ public class PluginManager implements PluginLoader {
         logger.info("Plugin loading complete: {} loaded successfully, {} failed", successCount, failedCount);
     }
 
-    //--------------------------------------------------------------------
-    // PLUGIN LIFECYCLE MANAGEMENT
-    //--------------------------------------------------------------------
-
     /**
      * Pre-enables all loaded plugins in dependency order.
-     * This is when plugins can configure the JDABuilder before Discord connection.
      */
     public void preEnablePlugins() {
         logger.info("Pre-enabling plugins...");
-
-        // Get plugins in dependency order
-        List<String> orderedPluginNames = getPluginsInDependencyOrder();
-
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null || plugin.getStatus() != PluginStatus.LOADED) {
-                continue;
-            }
-
-            // Verify dependencies for extra safety
-            if (!hasAllDependenciesLoaded(pluginName)) {
-                List<String> missing = getMissingDependencies(pluginName);
-                logger.error("Cannot pre-enable plugin {}: missing dependencies {}", pluginName, missing);
-                failedPlugins.add(pluginName);
-                continue;
-            }
-
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.PRE_ENABLE);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_ENABLE);
-                plugin.onPreEnable();
-                logger.debug("Pre-enabled plugin: {}", pluginName);
-            } catch (Exception e) {
-                logger.error("Error during pre-enable of plugin: {}", pluginName, e);
-                plugin.setStatus(PluginStatus.LOADED);
-                failedPlugins.add(pluginName);
+        for (Plugin plugin : getPluginsInOrder()) {
+            if (plugin.getLifecycle() == PluginLifecycle.LOADED && !failedPlugins.contains(plugin.getName())) {
+                try {
+                    executeLifecyclePhase(plugin, PluginLifecycle.PRE_ENABLING, Plugin::onPreEnable);
+                } catch (Exception e) {
+                    logger.error("Error pre-enabling plugin: {}", plugin.getName(), e);
+                    failedPlugins.add(plugin.getName());
+                    plugin.setLifecycle(PluginLifecycle.ERROR);
+                }
             }
         }
-
-        logger.info("Pre-enabled {} plugins",
-                orderedPluginNames.size() - failedPlugins.size());
     }
 
     /**
      * Enables all pre-enabled plugins in dependency order.
-     * This is called after Discord connection is established.
      */
     public void enablePlugins() {
         logger.info("Enabling plugins...");
-
-        // Get plugins in dependency order
-        List<String> orderedPluginNames = getPluginsInDependencyOrder();
-
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null ||
-                    plugin.getStatus() != PluginStatus.PRE_ENABLE ||
-                    failedPlugins.contains(pluginName)) {
-                continue;
-            }
-
-            // Fire the plugin enable event
-            if (eventManager != null) {
-                PluginEnableEvent enableEvent = new PluginEnableEvent(plugin);
-                eventManager.fireEvent(enableEvent);
-
-                if (enableEvent.isCancelled()) {
-                    logger.warn("Plugin {} enable cancelled by a listener", pluginName);
-                    failedPlugins.add(pluginName);
-                    continue;
+        for (Plugin plugin : getPluginsInOrder()) {
+            if (plugin.getLifecycle() == PluginLifecycle.PRE_ENABLING && !failedPlugins.contains(plugin.getName())) {
+                try {
+                    executeLifecyclePhase(plugin, PluginLifecycle.ENABLING, Plugin::onEnable);
+                } catch (Exception e) {
+                    logger.error("Error enabling plugin: {}", plugin.getName(), e);
+                    failedPlugins.add(plugin.getName());
+                    plugin.setLifecycle(PluginLifecycle.ERROR);
                 }
             }
-
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.ENABLE);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLE);
-                plugin.onEnable();
-                logger.debug("Enabled plugin: {}", pluginName);
-            } catch (Exception e) {
-                logger.error("Error during enable of plugin: {}", pluginName, e);
-                plugin.setStatus(PluginStatus.PRE_ENABLE);
-                failedPlugins.add(pluginName);
-            }
         }
-
-        logger.info("Enabled {} plugins",
-                orderedPluginNames.size() - failedPlugins.size());
     }
 
     /**
@@ -487,62 +348,29 @@ public class PluginManager implements PluginLoader {
      */
     public void postEnablePlugins() {
         logger.info("Post-enabling plugins...");
+        for (Plugin plugin : getPluginsInOrder()) {
+            if (plugin.getLifecycle() == PluginLifecycle.ENABLING && !failedPlugins.contains(plugin.getName())) {
+                try {
+                    executeLifecyclePhase(plugin, PluginLifecycle.POST_ENABLING, Plugin::onPostEnable);
 
-        // Get plugins in dependency order
-        List<String> orderedPluginNames = getPluginsInDependencyOrder();
+                    // Mark as fully enabled
+                    PluginLifecycle oldLifecycle = plugin.getLifecycle();
+                    plugin.setLifecycle(PluginLifecycle.ENABLED);
+                    fireLifecycleChangeEvent(plugin, oldLifecycle, PluginLifecycle.ENABLED);
 
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null ||
-                    plugin.getStatus() != PluginStatus.ENABLE ||
-                    failedPlugins.contains(pluginName)) {
-                continue;
-            }
+                    // Fire enabled event
+                    if (eventManager != null) {
+                        eventManager.fireEvent(new PluginEnabledEvent(plugin));
+                    }
 
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.POST_ENABLE);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_ENABLE);
-                plugin.onPostEnable();
-                logger.debug("Post-enabled plugin: {}", pluginName);
-            } catch (Exception e) {
-                logger.error("Error during post-enable of plugin: {}", pluginName, e);
-                failedPlugins.add(pluginName);
-            }
-        }
-
-        // Final pass: mark as enabled
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null ||
-                    plugin.getStatus() != PluginStatus.POST_ENABLE ||
-                    failedPlugins.contains(pluginName)) {
-                continue;
-            }
-
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.ENABLED);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.ENABLED);
-
-                // Fire the plugin enabled event
-                if (eventManager != null) {
-                    PluginEnabledEvent enabledEvent = new PluginEnabledEvent(plugin);
-                    eventManager.fireEvent(enabledEvent);
+                    logger.info("Plugin fully enabled: {} v{}", plugin.getName(), plugin.getVersion());
+                } catch (Exception e) {
+                    logger.error("Error post-enabling plugin: {}", plugin.getName(), e);
+                    failedPlugins.add(plugin.getName());
+                    plugin.setLifecycle(PluginLifecycle.ERROR);
                 }
-
-                logger.info("Plugin fully enabled: {} v{}", pluginName, plugin.getVersion());
-            } catch (Exception e) {
-                logger.error("Error during final enable of plugin: {}", pluginName, e);
-                failedPlugins.add(pluginName);
             }
         }
-
-        // Log summary
-        int enabledCount = (int) plugins.values().stream()
-                .filter(p -> p.getStatus() == PluginStatus.ENABLED)
-                .count();
-        logger.info("Post-enable complete: {} plugins fully enabled", enabledCount);
     }
 
     /**
@@ -550,36 +378,14 @@ public class PluginManager implements PluginLoader {
      */
     public void preDisablePlugins() {
         logger.info("Pre-disabling plugins...");
-
-        // Get plugins in reverse dependency order (dependents first)
-        List<String> orderedPluginNames = getPluginsInReverseDependencyOrder();
-
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null || plugin.getStatus() != PluginStatus.ENABLED) {
-                continue;
-            }
-
-            // Fire the plugin disable event
-            if (eventManager != null) {
-                PluginDisableEvent disableEvent = new PluginDisableEvent(plugin);
-                eventManager.fireEvent(disableEvent);
-
-                if (disableEvent.isCancelled()) {
-                    logger.warn("Plugin {} disable cancelled by a listener", pluginName);
-                    continue;
+        for (Plugin plugin : getPluginsInReverseOrder()) {
+            if (plugin.getLifecycle() == PluginLifecycle.ENABLED) {
+                try {
+                    executeLifecyclePhase(plugin, PluginLifecycle.PRE_DISABLING, Plugin::onPreDisable);
+                } catch (Exception e) {
+                    logger.error("Error pre-disabling plugin: {}", plugin.getName(), e);
+                    // Continue anyway
                 }
-            }
-
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.PRE_DISABLE);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.PRE_DISABLE);
-                plugin.onPreDisable();
-                logger.debug("Pre-disabled plugin: {}", pluginName);
-            } catch (Exception e) {
-                logger.error("Error during pre-disable of plugin: {}", pluginName, e);
-                // Continue with disabling anyway
             }
         }
     }
@@ -589,26 +395,14 @@ public class PluginManager implements PluginLoader {
      */
     public void disablePlugins() {
         logger.info("Disabling plugins...");
-
-        // Get plugins in reverse dependency order
-        List<String> orderedPluginNames = getPluginsInReverseDependencyOrder();
-
-        // Call onDisable
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null || plugin.getStatus() != PluginStatus.PRE_DISABLE) {
-                continue;
-            }
-
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.DISABLE);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLE);
-                plugin.onDisable();
-                logger.debug("Disabled plugin: {}", pluginName);
-            } catch (Exception e) {
-                logger.error("Error during disable of plugin: {}", pluginName, e);
-                // Continue with disabling anyway
+        for (Plugin plugin : getPluginsInReverseOrder()) {
+            if (plugin.getLifecycle() == PluginLifecycle.PRE_DISABLING) {
+                try {
+                    executeLifecyclePhase(plugin, PluginLifecycle.DISABLING, Plugin::onDisable);
+                } catch (Exception e) {
+                    logger.error("Error disabling plugin: {}", plugin.getName(), e);
+                    // Continue anyway
+                }
             }
         }
     }
@@ -618,132 +412,38 @@ public class PluginManager implements PluginLoader {
      */
     public void postDisablePlugins() {
         logger.info("Post-disabling plugins...");
+        for (Plugin plugin : getPluginsInReverseOrder()) {
+            if (plugin.getLifecycle() == PluginLifecycle.DISABLING) {
+                try {
+                    executeLifecyclePhase(plugin, PluginLifecycle.POST_DISABLING, Plugin::onPostDisable);
 
-        // Get plugins in reverse dependency order
-        List<String> orderedPluginNames = getPluginsInReverseDependencyOrder();
+                    // Mark as fully disabled
+                    PluginLifecycle oldLifecycle = plugin.getLifecycle();
+                    plugin.setLifecycle(PluginLifecycle.DISABLED);
+                    fireLifecycleChangeEvent(plugin, oldLifecycle, PluginLifecycle.DISABLED);
 
-        // Post-disable phase
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null || plugin.getStatus() != PluginStatus.DISABLE) {
-                continue;
-            }
+                    // Fire disabled event
+                    if (eventManager != null) {
+                        eventManager.fireEvent(new PluginDisabledEvent(plugin));
+                    }
 
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.POST_DISABLE);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.POST_DISABLE);
-                plugin.onPostDisable();
-                logger.debug("Post-disabled plugin: {}", pluginName);
-            } catch (Exception e) {
-                logger.error("Error during post-disable of plugin: {}", pluginName, e);
-                // Continue with disabling anyway
-            }
-        }
-
-        // Final pass: mark as disabled and clean up
-        for (String pluginName : orderedPluginNames) {
-            Plugin plugin = plugins.get(pluginName);
-            if (plugin == null || plugin.getStatus() != PluginStatus.POST_DISABLE) {
-                continue;
-            }
-
-            try {
-                PluginStatus oldStatus = plugin.getStatus();
-                plugin.setStatus(PluginStatus.DISABLED);
-                firePluginStatusChangeEvent(plugin, oldStatus, PluginStatus.DISABLED);
-
-                // Fire the plugin disabled event
-                if (eventManager != null) {
-                    PluginDisabledEvent disabledEvent = new PluginDisabledEvent(plugin);
-                    eventManager.fireEvent(disabledEvent);
+                    logger.info("Plugin fully disabled: {}", plugin.getName());
+                } catch (Exception e) {
+                    logger.error("Error post-disabling plugin: {}", plugin.getName(), e);
+                    // Continue anyway
                 }
-
-                logger.info("Plugin fully disabled: {}", pluginName);
-            } catch (Exception e) {
-                logger.error("Error during final disable of plugin: {}", pluginName, e);
-                // Continue with disabling anyway
-            }
-
-            // Unregister event types for this plugin
-            if (eventManager != null) {
-                eventManager.unregisterEventTypes(plugin);
             }
         }
 
-        // Clean up classloaders
-        for (PluginClassLoader classLoader : classLoaders.values()) {
-            try {
-                classLoader.close();
-            } catch (IOException e) {
-                logger.error("Error closing classloader", e);
-            }
-        }
-
-        plugins.clear();
-        classLoaders.clear();
-        pluginDescriptions.clear();
-        pluginJarPaths.clear();
-        failedPlugins.clear();
-    }
-
-    //--------------------------------------------------------------------
-    // PLUGIN RELOAD OPERATIONS
-    //--------------------------------------------------------------------
-
-    /**
-     * Reloads all plugins.
-     * This will disable all plugins, then load and enable them again.
-     */
-    public void reloadPlugins() {
-        logger.info("Reloading all plugins...");
-
-        // Save plugin names for logging
-        Set<String> oldPluginNames = new HashSet<>(plugins.keySet());
-
-        // Disable all plugins in the proper sequence
-        preDisablePlugins();
-        disablePlugins();
-        postDisablePlugins();
-
-        // Load and enable plugins
-        loadPlugins();
-        preEnablePlugins();
-        // Note: Connection to Discord should happen here in Discobocor
-
-        // Load and enable plugins
-        Set<String> newPluginNames = plugins.keySet();
-
-        // Log removed plugins
-        Set<String> removedPlugins = new HashSet<>(oldPluginNames);
-        removedPlugins.removeAll(newPluginNames);
-        if (!removedPlugins.isEmpty()) {
-            logger.info("The following plugins were removed during reload: {}", String.join(", ", removedPlugins));
-        }
-
-        // Log new plugins
-        Set<String> addedPlugins = new HashSet<>(newPluginNames);
-        addedPlugins.removeAll(oldPluginNames);
-        if (!addedPlugins.isEmpty()) {
-            logger.info("The following plugins were added during reload: {}", String.join(", ", addedPlugins));
-        }
-    }
-
-    /**
-     * Completes the reload process by enabling and post-enabling plugins.
-     * This should be called after Discord has been reconnected.
-     */
-    public void completeReload() {
-        enablePlugins();
-        postEnablePlugins();
-        logger.info("Plugin reload complete!");
+        // Cleanup resources
+        cleanupResources();
     }
 
     /**
      * Reloads a specific plugin.
      *
      * @param pluginName the name of the plugin to reload
-     * @return true if the plugin was successfully reloaded, false otherwise
+     * @return true if successful, false otherwise
      */
     public boolean reloadPlugin(String pluginName) {
         logger.info("Reloading plugin: {}", pluginName);
@@ -773,8 +473,8 @@ public class PluginManager implements PluginLoader {
             return false;
         }
 
-        // Disable the plugin in proper sequence
-        if (plugin.getStatus() == PluginStatus.ENABLED) {
+        // Disable the plugin
+        if (plugin.getLifecycle() == PluginLifecycle.ENABLED) {
             if (!disablePlugin(plugin)) {
                 logger.error("Failed to disable plugin {} for reload", pluginName);
                 return false;
@@ -816,194 +516,155 @@ public class PluginManager implements PluginLoader {
         }
     }
 
-    //--------------------------------------------------------------------
-    // DEPENDENCY MANAGEMENT
-    //--------------------------------------------------------------------
-
     /**
-     * Gets a list of plugin names in dependency order.
-     *
-     * @return list of plugin names
+     * Scans plugin JARs to collect metadata without loading them.
      */
-    private List<String> getPluginsInDependencyOrder() {
-        // For already loaded plugins, we can use the current order
-        // This helps maintain consistency if this method is called multiple times
-        List<String> pluginNames = new ArrayList<>(plugins.keySet());
+    private void scanPlugins() {
+        logger.info("Scanning plugins in {}", pluginsFolder.getAbsolutePath());
 
-        // Create a simplified dependency graph
-        Map<String, Set<String>> dependencyGraph = new HashMap<>();
-        for (String pluginName : pluginNames) {
-            Set<String> dependencies = new HashSet<>();
-            PluginDescriptionFile desc = pluginDescriptions.get(pluginName);
-            if (desc != null) {
-                dependencies.addAll(desc.getDependencies());
-            }
-            dependencyGraph.put(pluginName, dependencies);
+        // Clear previous state
+        pluginDescriptors.clear();
+        pluginJarPaths.clear();
+        failedPlugins.clear();
+
+        File[] files = pluginsFolder.listFiles((dir, name) -> name.endsWith(".jar"));
+        if (files == null) {
+            logger.warn("Failed to list files in plugins folder");
+            return;
         }
 
-        // Perform a topological sort
-        List<String> result = new ArrayList<>();
-        Set<String> visited = new HashSet<>();
-        Set<String> visiting = new HashSet<>();
-
-        for (String pluginName : pluginNames) {
-            if (!visited.contains(pluginName)) {
-                topologicalVisit(pluginName, dependencyGraph, visited, visiting, result);
-            }
-        }
-
-        // Reverse to get dependency order (dependencies first)
-        Collections.reverse(result);
-        return result;
-    }
-
-    /**
-     * Gets a list of plugin names in reverse dependency order (dependents before dependencies).
-     *
-     * @return list of plugin names
-     */
-    private List<String> getPluginsInReverseDependencyOrder() {
-        // Get the dependency order first
-        List<String> dependencyOrder = getPluginsInDependencyOrder();
-
-        // Reverse it to get the reverse dependency order
-        List<String> reverseDependencyOrder = new ArrayList<>(dependencyOrder);
-        Collections.reverse(reverseDependencyOrder);
-
-        return reverseDependencyOrder;
-    }
-
-    /**
-     * Helper method for topological sort.
-     */
-    private void topologicalVisit(
-            String pluginName,
-            Map<String, Set<String>> graph,
-            Set<String> visited,
-            Set<String> visiting,
-            List<String> result
-    ) {
-        visiting.add(pluginName);
-
-        Set<String> dependencies = graph.get(pluginName);
-        if (dependencies != null) {
-            for (String dependency : dependencies) {
-                if (!visited.contains(dependency) && plugins.containsKey(dependency)) {
-                    if (visiting.contains(dependency)) {
-                        // Circular dependency detected, but continue anyway
-                        logger.warn("Circular dependency detected: {} <-> {}",
-                                pluginName, dependency);
-                        continue;
-                    }
-                    topologicalVisit(dependency, graph, visited, visiting, result);
+        for (File file : files) {
+            try (JarFile jar = new JarFile(file)) {
+                // Look for plugin.yml
+                JarEntry entry = jar.getJarEntry("plugin.yml");
+                if (entry == null) {
+                    logger.error("Plugin does not contain plugin.yml: {}", file.getName());
+                    continue;
                 }
+
+                // Parse plugin.yml
+                PluginDescriptor descriptor = PluginDescriptor.fromYaml(jar.getInputStream(entry));
+
+                // Store metadata
+                pluginDescriptors.put(descriptor.name(), descriptor);
+                pluginJarPaths.put(descriptor.name(), file.getAbsolutePath());
+
+                logger.debug("Scanned plugin: {} v{}", descriptor.name(), descriptor.version());
+            } catch (Exception e) {
+                logger.error("Failed to scan plugin: {}", file.getName(), e);
             }
         }
 
-        visiting.remove(pluginName);
-        visited.add(pluginName);
-        result.add(pluginName);
+        logger.info("Scanned {} plugins", pluginDescriptors.size());
     }
 
     /**
-     * Checks if a plugin has all its dependencies loaded.
+     * Executes a specific lifecycle phase for a plugin.
      *
-     * @param pluginName the name of the plugin
-     * @return true if all dependencies are loaded, false otherwise
+     * @param plugin       the plugin
+     * @param newLifecycle the new lifecycle state
+     * @param action       the action to perform
      */
-    public boolean hasAllDependenciesLoaded(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return false;
-        }
-
-        // Check hard dependencies
-        for (String dependency : description.getDependencies()) {
-            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
-                logger.warn("Plugin {} depends on {}, which is not loaded", pluginName, dependency);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    //--------------------------------------------------------------------
-    // UTILITY METHODS
-    //--------------------------------------------------------------------
-
-    /**
-     * Gets the names of all missing dependencies for a plugin.
-     *
-     * @param pluginName the name of the plugin
-     * @return list of missing dependency names
-     */
-    public List<String> getMissingDependencies(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return List.of();
-        }
-
-        List<String> missing = new ArrayList<>();
-        for (String dependency : description.getDependencies()) {
-            if (!plugins.containsKey(dependency) || failedPlugins.contains(dependency)) {
-                missing.add(dependency);
-            }
-        }
-
-        return missing;
+    private void executeLifecyclePhase(Plugin plugin, PluginLifecycle newLifecycle, PluginAction action) {
+        PluginLifecycle oldLifecycle = plugin.getLifecycle();
+        plugin.setLifecycle(newLifecycle);
+        fireLifecycleChangeEvent(plugin, oldLifecycle, newLifecycle);
+        action.execute(plugin);
     }
 
     /**
-     * Gets a set of all plugins that failed to load.
+     * Fires a lifecycle change event.
      *
-     * @return set of failed plugin names
+     * @param plugin       the plugin
+     * @param oldLifecycle the old lifecycle state
+     * @param newLifecycle the new lifecycle state
      */
-    public Set<String> getFailedPlugins() {
-        return Collections.unmodifiableSet(failedPlugins);
-    }
-
-    /**
-     * Gets the dependencies of a plugin.
-     *
-     * @param pluginName the name of the plugin
-     * @return list of dependency names, or empty list if the plugin doesn't exist
-     */
-    public List<String> getPluginDependencies(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return List.of();
-        }
-
-        return description.getDependencies();
-    }
-
-    /**
-     * Gets the soft dependencies of a plugin.
-     *
-     * @param pluginName the name of the plugin
-     * @return list of soft dependency names, or empty list if the plugin doesn't exist
-     */
-    public List<String> getPluginSoftDependencies(String pluginName) {
-        PluginDescriptionFile description = pluginDescriptions.get(pluginName);
-        if (description == null) {
-            return List.of();
-        }
-
-        return description.getSoftDependencies();
-    }
-
-    /**
-     * Fires a plugin status change event.
-     *
-     * @param plugin    the plugin
-     * @param oldStatus the old status
-     * @param newStatus the new status
-     */
-    private void firePluginStatusChangeEvent(Plugin plugin, PluginStatus oldStatus, PluginStatus newStatus) {
+    private void fireLifecycleChangeEvent(Plugin plugin, PluginLifecycle oldLifecycle, PluginLifecycle newLifecycle) {
         if (eventManager != null) {
-            PluginStatusChangeEvent event = new PluginStatusChangeEvent(plugin, oldStatus, newStatus);
+            PluginLifecycleChangeEvent event = new PluginLifecycleChangeEvent(plugin, oldLifecycle, newLifecycle);
             eventManager.fireEvent(event);
         }
+    }
+
+    /**
+     * Gets plugins in dependency order.
+     *
+     * @return ordered list of plugins
+     */
+    private List<Plugin> getPluginsInOrder() {
+        // Create a map of plugin names to plugin instances
+        Map<String, Plugin> pluginMap = new HashMap<>();
+        for (Plugin plugin : plugins.values()) {
+            pluginMap.put(plugin.getName(), plugin);
+        }
+
+        // Resolve dependencies
+        DependencyResolver resolver = new DependencyResolver(pluginDescriptors);
+        List<String> orderedNames = resolver.resolve();
+
+        // Create ordered list of plugin instances
+        List<Plugin> orderedPlugins = new ArrayList<>();
+        for (String name : orderedNames) {
+            Plugin plugin = pluginMap.get(name);
+            if (plugin != null) {
+                orderedPlugins.add(plugin);
+            }
+        }
+
+        return orderedPlugins;
+    }
+
+    /**
+     * Gets plugins in reverse dependency order.
+     *
+     * @return ordered list of plugins
+     */
+    private List<Plugin> getPluginsInReverseOrder() {
+        List<Plugin> orderedPlugins = getPluginsInOrder();
+        Collections.reverse(orderedPlugins);
+        return orderedPlugins;
+    }
+
+    /**
+     * Cleans up resources when shutting down.
+     */
+    private void cleanupResources() {
+        // Unregister all event handlers
+        if (eventManager != null) {
+            for (Plugin plugin : plugins.values()) {
+                eventManager.unregisterAll(plugin);
+            }
+        }
+
+        // Close class loaders
+        for (PluginClassLoader classLoader : classLoaders.values()) {
+            try {
+                classLoader.close();
+            } catch (IOException e) {
+                logger.error("Error closing classloader", e);
+            }
+        }
+
+        // Clear collections
+        plugins.clear();
+        classLoaders.clear();
+        pluginDescriptors.clear();
+        pluginJarPaths.clear();
+        failedPlugins.clear();
+    }
+
+    @Override
+    public void close() {
+        preDisablePlugins();
+        disablePlugins();
+        postDisablePlugins();
+    }
+
+    /**
+     * Functional interface for plugin lifecycle actions.
+     */
+    @FunctionalInterface
+    private interface PluginAction {
+        void execute(Plugin plugin);
     }
 }

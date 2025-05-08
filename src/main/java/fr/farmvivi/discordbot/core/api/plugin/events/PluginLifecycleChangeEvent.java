@@ -1,15 +1,15 @@
 package fr.farmvivi.discordbot.core.api.plugin.events;
 
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
-import fr.farmvivi.discordbot.core.api.plugin.PluginStatus;
+import fr.farmvivi.discordbot.core.api.plugin.PluginLifecycle;
 
 /**
- * Event fired when a plugin's status changes.
+ * Event fired when a plugin's lifecycle changes.
  * This can be used to track the lifecycle of a plugin.
  */
-public class PluginStatusChangeEvent extends PluginEvent {
-    private final PluginStatus oldStatus;
-    private final PluginStatus newStatus;
+public class PluginLifecycleChangeEvent extends PluginEvent {
+    private final PluginLifecycle oldStatus;
+    private final PluginLifecycle newStatus;
 
     /**
      * Creates a new plugin status change event.
@@ -18,7 +18,7 @@ public class PluginStatusChangeEvent extends PluginEvent {
      * @param oldStatus the old status
      * @param newStatus the new status
      */
-    public PluginStatusChangeEvent(Plugin plugin, PluginStatus oldStatus, PluginStatus newStatus) {
+    public PluginLifecycleChangeEvent(Plugin plugin, PluginLifecycle oldStatus, PluginLifecycle newStatus) {
         super(plugin);
         this.oldStatus = oldStatus;
         this.newStatus = newStatus;
@@ -29,7 +29,7 @@ public class PluginStatusChangeEvent extends PluginEvent {
      *
      * @return the old status
      */
-    public PluginStatus getOldStatus() {
+    public PluginLifecycle getOldStatus() {
         return oldStatus;
     }
 
@@ -38,7 +38,7 @@ public class PluginStatusChangeEvent extends PluginEvent {
      *
      * @return the new status
      */
-    public PluginStatus getNewStatus() {
+    public PluginLifecycle getNewStatus() {
         return newStatus;
     }
 }

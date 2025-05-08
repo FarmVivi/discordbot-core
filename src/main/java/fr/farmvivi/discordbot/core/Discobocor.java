@@ -299,36 +299,35 @@ public class Discobocor {
      * Shuts down the bot using the proper sequence.
      */
     private static void shutdownBot() {
-        // 1. Pre-disable plugins
-        pluginManager.preDisablePlugins();
-
-        // 2. Disable plugins
-        pluginManager.disablePlugins();
-
-        // 3. Post-disable plugins
-        pluginManager.postDisablePlugins();
-
-        // 4. Disconnect from Discord (setShutdownPresence is called inside disconnect)
-        try {
-            discordAPI.disconnect().join();
-        } catch (Exception e) {
-            logger.error("Failed to disconnect from Discord", e);
+        // Use the new close() method which handles the full shutdown sequence
+        if (pluginManager != null) {
+            try {
+                pluginManager.close();
+            } catch (Exception e) {
+                logger.error("Error during plugin shutdown", e);
+            }
         }
 
-        // 5. Shutdown the event manager
-        eventManager.shutdown();
-
-        // 6. Clear caches in the permission manager
-        permissionManager.clearCaches();
-
-        // 7. Close the data storage provider
-        if (dataStorageManager != null && !dataStorageManager.close()) {
-            logger.error("Failed to close data storage provider");
+        // Disconnect from Discord
+        if (discordAPI != null) {
+            try {
+                discordAPI.disconnect().join();
+            } catch (Exception e) {
+                logger.error("Failed to disconnect from Discord", e);
+            }
         }
 
-        // 8. Close the binary storage provider
-        if (binaryStorageManager != null && !binaryStorageManager.close()) {
-            logger.error("Failed to close binary storage provider");
+        // Shutdown other services
+        if (eventManager != null) {
+            eventManager.shutdown();
+        }
+
+        if (dataStorageManager != null) {
+            dataStorageManager.close();
+        }
+
+        if (binaryStorageManager != null) {
+            binaryStorageManager.close();
         }
     }
 
