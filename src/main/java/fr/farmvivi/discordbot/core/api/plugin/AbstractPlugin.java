@@ -7,7 +7,7 @@ import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
-import fr.farmvivi.discordbot.core.permissions.PluginPermissionManager;
+import fr.farmvivi.discordbot.core.api.permissions.PluginPermissionManager;
 import org.slf4j.Logger;
 
 /**
