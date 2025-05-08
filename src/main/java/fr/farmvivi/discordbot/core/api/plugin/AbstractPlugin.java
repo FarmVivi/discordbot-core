@@ -6,6 +6,7 @@ import fr.farmvivi.discordbot.core.api.data.binary.BinaryStorageProvider;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.core.api.language.PluginLanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.permissions.PluginPermissionManager;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ public abstract class AbstractPlugin implements Plugin {
     protected BinaryStorageProvider binaryStorageProvider;
     protected PermissionManager permissionManager;
     protected PluginPermissionManager pluginPermissionManager;
+    protected PluginLanguageManager pluginLanguageManager;
 
     private PluginStatus status = PluginStatus.LOADED;
 
@@ -42,10 +44,7 @@ public abstract class AbstractPlugin implements Plugin {
         this.binaryStorageProvider = context.getBinaryStorageProvider();
         this.permissionManager = context.getPermissionManager();
 
-        // Register the plugin's namespace for language keys
-        languageManager.registerNamespace(getName().toLowerCase());
-
-        // Create a plugin permission manager for this plugin
+        this.pluginLanguageManager = new PluginLanguageManager(this, languageManager);
         this.pluginPermissionManager = new PluginPermissionManager(this, permissionManager, languageManager);
 
         logger.info("Loading {} v{}", getName(), getVersion());
@@ -116,5 +115,15 @@ public abstract class AbstractPlugin implements Plugin {
      */
     public PluginPermissionManager getPluginPermissionManager() {
         return pluginPermissionManager;
+    }
+
+    /**
+     * Gets the plugin-specific language manager.
+     * This provides convenient methods for translating strings specifically for this plugin.
+     *
+     * @return the plugin language manager
+     */
+    public PluginLanguageManager getPluginLanguageManager() {
+        return pluginLanguageManager;
     }
 }
