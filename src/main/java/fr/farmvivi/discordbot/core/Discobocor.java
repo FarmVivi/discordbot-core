@@ -9,7 +9,7 @@ import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
-import fr.farmvivi.discordbot.core.language.LanguageFileManager;
+import fr.farmvivi.discordbot.core.language.LanguageFileLoader;
 import fr.farmvivi.discordbot.core.language.SimpleLanguageManager;
 import fr.farmvivi.discordbot.core.permissions.SimplePermissionManager;
 import fr.farmvivi.discordbot.core.plugin.PluginManager;
@@ -169,8 +169,8 @@ public class Discobocor {
         languageManager = new SimpleLanguageManager(defaultLocale);
 
         // Create the language file manager
-        LanguageFileManager languageFileManager = new LanguageFileManager(languageManager, new File("lang"));
-        languageFileManager.loadLanguageFiles();
+        LanguageFileLoader languageFileLoader = new LanguageFileLoader(languageManager, new File("lang"));
+        languageFileLoader.loadLanguageFiles();
 
         // Create the event manager
         eventManager = new SimpleEventManager();

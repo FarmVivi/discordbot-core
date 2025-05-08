@@ -10,7 +10,7 @@ import java.util.Set;
  * Manager for plugin-specific permissions.
  * This provides a convenient way for plugins to register and check their own permissions.
  */
-public class PluginPermissionManager {
+public class PluginPermissionAdapter {
     private final Plugin plugin;
     private final PermissionManager permissionManager;
     private final LanguageManager languageManager;
@@ -23,7 +23,7 @@ public class PluginPermissionManager {
      * @param permissionManager the permission manager
      * @param languageManager   the language manager
      */
-    public PluginPermissionManager(Plugin plugin, PermissionManager permissionManager, LanguageManager languageManager) {
+    public PluginPermissionAdapter(Plugin plugin, PermissionManager permissionManager, LanguageManager languageManager) {
         this.plugin = plugin;
         this.permissionManager = permissionManager;
         this.languageManager = languageManager;

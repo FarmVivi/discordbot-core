@@ -8,7 +8,7 @@ import java.util.Locale;
  * A simplified language manager for plugins.
  * This class wraps the core language manager and handles namespace prefixing automatically.
  */
-public class PluginLanguageManager {
+public class PluginLanguageAdapter {
     private final LanguageManager languageManager;
     private final String namespace;
     private final Plugin plugin;
@@ -19,7 +19,7 @@ public class PluginLanguageManager {
      * @param plugin          the plugin
      * @param languageManager the core language manager
      */
-    public PluginLanguageManager(Plugin plugin, LanguageManager languageManager) {
+    public PluginLanguageAdapter(Plugin plugin, LanguageManager languageManager) {
         this.plugin = plugin;
         this.languageManager = languageManager;
         this.namespace = plugin.getName().toLowerCase();

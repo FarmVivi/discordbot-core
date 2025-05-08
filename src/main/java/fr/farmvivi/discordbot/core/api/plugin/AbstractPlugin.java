@@ -4,9 +4,9 @@ import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
-import fr.farmvivi.discordbot.core.api.language.PluginLanguageManager;
+import fr.farmvivi.discordbot.core.api.language.PluginLanguageAdapter;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
-import fr.farmvivi.discordbot.core.api.permissions.PluginPermissionManager;
+import fr.farmvivi.discordbot.core.api.permissions.PluginPermissionAdapter;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import org.slf4j.Logger;
@@ -31,8 +31,8 @@ public abstract class AbstractPlugin implements Plugin {
     protected PermissionManager permissionManager;
 
     // Plugin-specific managers
-    protected PluginPermissionManager pluginPermissionManager;
-    protected PluginLanguageManager pluginLanguageManager;
+    protected PluginPermissionAdapter pluginPermissionAdapter;
+    protected PluginLanguageAdapter pluginLanguageAdapter;
 
     // Plugin state
     private PluginLifecycle lifecycle = PluginLifecycle.DISCOVERED;
@@ -51,8 +51,8 @@ public abstract class AbstractPlugin implements Plugin {
         this.permissionManager = context.getPermissionManager();
 
         // Initialize plugin-specific managers
-        this.pluginLanguageManager = new PluginLanguageManager(this, languageManager);
-        this.pluginPermissionManager = new PluginPermissionManager(this, permissionManager, languageManager);
+        this.pluginLanguageAdapter = new PluginLanguageAdapter(this, languageManager);
+        this.pluginPermissionAdapter = new PluginPermissionAdapter(this, permissionManager, languageManager);
 
         // Create data directory if it doesn't exist
         File dataDir = new File(dataFolder);
@@ -125,8 +125,8 @@ public abstract class AbstractPlugin implements Plugin {
      *
      * @return the plugin permission manager
      */
-    public PluginPermissionManager getPluginPermissionManager() {
-        return pluginPermissionManager;
+    public PluginPermissionAdapter getPluginPermissionManager() {
+        return pluginPermissionAdapter;
     }
 
     /**
@@ -135,8 +135,8 @@ public abstract class AbstractPlugin implements Plugin {
      *
      * @return the plugin language manager
      */
-    public PluginLanguageManager getPluginLanguageManager() {
-        return pluginLanguageManager;
+    public PluginLanguageAdapter getPluginLanguageManager() {
+        return pluginLanguageAdapter;
     }
 
     /**

@@ -15,8 +15,8 @@ import java.util.Map;
  * Gestionnaire des fichiers de langue.
  * Cette classe est responsable du chargement des fichiers de langue depuis le dossier runtime.
  */
-public class LanguageFileManager {
-    private static final Logger logger = LoggerFactory.getLogger(LanguageFileManager.class);
+public class LanguageFileLoader {
+    private static final Logger logger = LoggerFactory.getLogger(LanguageFileLoader.class);
     private final LanguageManager languageManager;
     private final File langFolder;
 
@@ -26,7 +26,7 @@ public class LanguageFileManager {
      * @param languageManager le gestionnaire de langue
      * @param langFolder      le dossier contenant les fichiers de langue
      */
-    public LanguageFileManager(LanguageManager languageManager, File langFolder) {
+    public LanguageFileLoader(LanguageManager languageManager, File langFolder) {
         this.languageManager = languageManager;
         this.langFolder = langFolder;
     }
