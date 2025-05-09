@@ -8,7 +8,6 @@ on:
       - master
       - develop
       - 'releases/**'
-      - 'branch-**'
   pull_request:
       types: [opened, synchronize, reopened]
   workflow_dispatch:  # Permet de lancer manuellement le workflow
