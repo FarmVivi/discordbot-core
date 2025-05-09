@@ -1,11 +1,15 @@
 package fr.farmvivi.discordbot.core;
 
+import fr.farmvivi.discordbot.core.api.audio.AudioFactory;
+import fr.farmvivi.discordbot.core.api.audio.AudioManager;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
+import fr.farmvivi.discordbot.core.audio.BasicAudioFactory;
+import fr.farmvivi.discordbot.core.audio.SimpleAudioManager;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
@@ -45,6 +49,8 @@ public class Discobocor {
     private static DataStorageManager dataStorageManager;
     private static BinaryStorageManager binaryStorageManager;
     private static SimplePermissionManager permissionManager;
+    private static AudioManager audioManager;
+    private static AudioFactory audioFactory;
 
     static {
         Properties properties = new Properties();
@@ -186,6 +192,12 @@ public class Discobocor {
 
         // Create the permission manager
         permissionManager = new SimplePermissionManager(eventManager, dataStorageManager);
+        
+        // Create the audio factory
+        audioFactory = new BasicAudioFactory();
+        
+        // Create the audio manager
+        audioManager = new SimpleAudioManager(discordAPI, eventManager);
 
         // Create the plugin manager
         pluginManager = new PluginManager(
@@ -195,7 +207,9 @@ public class Discobocor {
                 languageManager,
                 dataStorageManager,
                 binaryStorageManager,
-                permissionManager
+                permissionManager,
+                audioManager,
+                audioFactory
         );
 
         return true;
@@ -236,7 +250,14 @@ public class Discobocor {
                             "        access_key: your-access-key\n" +
                             "        secret_key: your-secret-key\n" +
                             "        endpoint: https://s3.amazonaws.com  # Optional, for S3-compatible services\n" +
-                            "        prefix: discordbot  # Optional, folder prefix in bucket\n"
+                            "        prefix: discordbot  # Optional, folder prefix in bucket\n" +
+                            "\n" +
+                            "# Audio settings\n" +
+                            "audio:\n" +
+                            "  # Enable audio functionality\n" +
+                            "  enabled: true\n" +
+                            "  # Default speaking mode (VOICE, SOUNDSHARE, PRIORITY_SPEAKER)\n" +
+                            "  speaking_mode: VOICE\n"
             );
             logger.info("Created default config.yml");
             logger.info("Please edit config.yml and restart the bot");
@@ -314,6 +335,15 @@ public class Discobocor {
                 discordAPI.disconnect().join();
             } catch (Exception e) {
                 logger.error("Failed to disconnect from Discord", e);
+            }
+        }
+        
+        // Close audio manager
+        if (audioManager != null) {
+            try {
+                audioManager.close();
+            } catch (Exception e) {
+                logger.error("Failed to close audio manager", e);
             }
         }
 
@@ -401,5 +431,23 @@ public class Discobocor {
      */
     public static PermissionManager getPermissionManager() {
         return permissionManager;
+    }
+    
+    /**
+     * Gets the audio manager.
+     *
+     * @return the audio manager
+     */
+    public static AudioManager getAudioManager() {
+        return audioManager;
+    }
+    
+    /**
+     * Gets the audio factory.
+     *
+     * @return the audio factory
+     */
+    public static AudioFactory getAudioFactory() {
+        return audioFactory;
     }
 }
