@@ -31,7 +31,7 @@ public interface AudioFactory {
      * This handler is used to receive audio from a voice channel.
      *
      * @param receiveCombined Whether to receive combined audio
-     * @param receiveUser Whether to receive user audio
+     * @param receiveUser     Whether to receive user audio
      * @return A new audio receive handler
      */
     AudioReceiveHandler createAudioReceiveHandler(boolean receiveCombined, boolean receiveUser);
@@ -58,7 +58,7 @@ public interface AudioFactory {
      * This handler can process audio from multiple users.
      *
      * @param receiveCombined Whether to receive combined audio
-     * @param receiveUser Whether to receive user audio
+     * @param receiveUser     Whether to receive user audio
      * @return A new multi-user audio receive handler
      */
     MultiUserAudioReceiveHandler createMultiUserAudioReceiveHandler(boolean receiveCombined, boolean receiveUser);

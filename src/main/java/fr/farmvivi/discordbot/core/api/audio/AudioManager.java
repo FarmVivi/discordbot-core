@@ -50,7 +50,7 @@ public interface AudioManager extends Closeable {
      * Registers an audio send handler for a guild.
      * This handler is used to send audio to a voice channel.
      *
-     * @param guild The guild
+     * @param guild   The guild
      * @param handler The audio send handler
      * @return true if the operation was successful, false otherwise
      */
@@ -60,7 +60,7 @@ public interface AudioManager extends Closeable {
      * Registers an audio receive handler for a guild.
      * This handler is used to receive audio from a voice channel.
      *
-     * @param guild The guild
+     * @param guild   The guild
      * @param handler The audio receive handler
      * @return true if the operation was successful, false otherwise
      */

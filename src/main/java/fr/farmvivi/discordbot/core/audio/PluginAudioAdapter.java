@@ -1,8 +1,7 @@
 package fr.farmvivi.discordbot.core.audio;
 
 import fr.farmvivi.discordbot.core.api.audio.*;
-import fr.farmvivi.discordbot.core.api.permissions.Permission;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
+import fr.farmvivi.discordbot.core.audio.handlers.BasicAudioSendHandler;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.audio.SpeakingMode;
@@ -13,7 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -25,71 +27,28 @@ public class PluginAudioAdapter implements PluginAudioAPI {
 
     private final AudioManager audioManager;
     private final AudioFactory audioFactory;
-    private final PermissionManager permissionManager;
-    private final String pluginId;
-    private final Permission joinPermission;
-    private final Permission leavePermission;
-    private final Permission sendPermission;
-    private final Permission receivePermission;
+    private final String pluginId; // Keeping plugin ID for logging purposes
 
     /**
      * Creates a new PluginAudioAdapter.
      *
      * @param audioManager The audio manager
      * @param audioFactory The audio factory
-     * @param permissionManager The permission manager
-     * @param pluginId The plugin ID
+     * @param pluginId     The plugin ID
      */
-    public PluginAudioAdapter(AudioManager audioManager, AudioFactory audioFactory, 
-                              PermissionManager permissionManager, String pluginId) {
+    public PluginAudioAdapter(AudioManager audioManager, AudioFactory audioFactory, String pluginId) {
         this.audioManager = audioManager;
         this.audioFactory = audioFactory;
-        this.permissionManager = permissionManager;
         this.pluginId = pluginId;
-        
-        // Create permissions
-        this.joinPermission = permissionManager.registerPermission(
-                pluginId + ".audio.join", 
-                "Allows joining voice channels",
-                permissionManager.getDefaultAllow()
-        );
-        
-        this.leavePermission = permissionManager.registerPermission(
-                pluginId + ".audio.leave", 
-                "Allows leaving voice channels",
-                permissionManager.getDefaultAllow()
-        );
-        
-        this.sendPermission = permissionManager.registerPermission(
-                pluginId + ".audio.send", 
-                "Allows sending audio to voice channels",
-                permissionManager.getDefaultAllow()
-        );
-        
-        this.receivePermission = permissionManager.registerPermission(
-                pluginId + ".audio.receive", 
-                "Allows receiving audio from voice channels",
-                permissionManager.getDefaultAllow()
-        );
     }
 
     @Override
     public boolean joinVoiceChannel(VoiceChannel voiceChannel) {
-        if (!permissionManager.hasPermission(pluginId, joinPermission)) {
-            logger.warn("Plugin {} does not have permission to join voice channels", pluginId);
-            return false;
-        }
-        
         return audioManager.joinVoiceChannel(voiceChannel);
     }
 
     @Override
     public boolean leaveVoiceChannel(Guild guild) {
-        if (!permissionManager.hasPermission(pluginId, leavePermission)) {
-            logger.warn("Plugin {} does not have permission to leave voice channels", pluginId);
-            return false;
-        }
-        
         return audioManager.leaveVoiceChannel(guild);
     }
 
@@ -135,41 +94,21 @@ public class PluginAudioAdapter implements PluginAudioAPI {
 
     @Override
     public boolean registerAudioSendHandler(Guild guild, AudioSendHandler handler) {
-        if (!permissionManager.hasPermission(pluginId, sendPermission)) {
-            logger.warn("Plugin {} does not have permission to send audio", pluginId);
-            return false;
-        }
-        
         return audioManager.registerAudioSendHandler(guild, handler);
     }
 
     @Override
     public boolean registerAudioReceiveHandler(Guild guild, AudioReceiveHandler handler) {
-        if (!permissionManager.hasPermission(pluginId, receivePermission)) {
-            logger.warn("Plugin {} does not have permission to receive audio", pluginId);
-            return false;
-        }
-        
         return audioManager.registerAudioReceiveHandler(guild, handler);
     }
 
     @Override
     public boolean unregisterAudioSendHandler(Guild guild) {
-        if (!permissionManager.hasPermission(pluginId, sendPermission)) {
-            logger.warn("Plugin {} does not have permission to send audio", pluginId);
-            return false;
-        }
-        
         return audioManager.unregisterAudioSendHandler(guild);
     }
 
     @Override
     public boolean unregisterAudioReceiveHandler(Guild guild) {
-        if (!permissionManager.hasPermission(pluginId, receivePermission)) {
-            logger.warn("Plugin {} does not have permission to receive audio", pluginId);
-            return false;
-        }
-        
         return audioManager.unregisterAudioReceiveHandler(guild);
     }
 
@@ -185,79 +124,65 @@ public class PluginAudioAdapter implements PluginAudioAPI {
 
     @Override
     public Optional<MixingAudioSendHandler> setupMixingAudio(Guild guild, SpeakingMode speakingMode) {
-        if (!permissionManager.hasPermission(pluginId, sendPermission)) {
-            logger.warn("Plugin {} does not have permission to send audio", pluginId);
-            return Optional.empty();
-        }
-        
         // Create and register a mixing audio handler
         MixingAudioSendHandler handler = createMixingAudioSendHandler(speakingMode);
-        
+
         if (registerAudioSendHandler(guild, handler)) {
             return Optional.of(handler);
         }
-        
+
         return Optional.empty();
     }
 
     @Override
-    public Optional<MultiUserAudioReceiveHandler> setupMultiUserAudio(Guild guild, Consumer<byte[]> combinedAudioHandler, 
-                                                                     Map<String, Consumer<byte[]>> userAudioHandlers) {
-        if (!permissionManager.hasPermission(pluginId, receivePermission)) {
-            logger.warn("Plugin {} does not have permission to receive audio", pluginId);
-            return Optional.empty();
-        }
-        
+    public Optional<MultiUserAudioReceiveHandler> setupMultiUserAudio(Guild guild,
+                                                                      Consumer<byte[]> combinedAudioHandler,
+                                                                      Map<String, Consumer<byte[]>> userAudioHandlers) {
         // Create a multi-user audio handler
         boolean receiveCombined = combinedAudioHandler != null;
         boolean receiveUser = userAudioHandlers != null && !userAudioHandlers.isEmpty();
-        
+
         MultiUserAudioReceiveHandler handler = createMultiUserAudioReceiveHandler(receiveCombined, receiveUser);
-        
+
         // Configure the handler
         if (receiveCombined) {
             handler.setCombinedAudioHandler(combinedAudioHandler);
         }
-        
+
         if (receiveUser) {
             userAudioHandlers.forEach(handler::addUserAudioHandler);
         }
-        
+
         // Register the handler
         if (registerAudioReceiveHandler(guild, handler)) {
             return Optional.of(handler);
         }
-        
+
         return Optional.empty();
     }
 
     @Override
     public Set<User> getSpeakingUsers(Guild guild) {
         Optional<AudioReceiveHandler> handlerOpt = getAudioReceiveHandler(guild);
-        
+
         if (handlerOpt.isPresent() && handlerOpt.get() instanceof MultiUserAudioReceiveHandler multiHandler) {
             return multiHandler.getSpeakingUsers();
         }
-        
+
         return Collections.emptySet();
     }
 
     @Override
     public boolean queueAudio(Guild guild, byte[] data) {
-        if (!permissionManager.hasPermission(pluginId, sendPermission)) {
-            logger.warn("Plugin {} does not have permission to send audio", pluginId);
-            return false;
-        }
-        
         Optional<AudioSendHandler> handlerOpt = getAudioSendHandler(guild);
-        
+
         // If no handler exists or it's not our type, create a basic one
         if (handlerOpt.isEmpty() || !(handlerOpt.get() instanceof BasicAudioSendHandler)) {
             BasicAudioSendHandler handler = (BasicAudioSendHandler) createAudioSendHandler();
             if (!registerAudioSendHandler(guild, handler)) {
                 return false;
             }
-            
+
             handler.queueAudio(data);
             return true;
         } else {
@@ -269,62 +194,52 @@ public class PluginAudioAdapter implements PluginAudioAPI {
 
     @Override
     public boolean queueAudioToSource(Guild guild, String sourceId, byte[] data) {
-        if (!permissionManager.hasPermission(pluginId, sendPermission)) {
-            logger.warn("Plugin {} does not have permission to send audio", pluginId);
-            return false;
-        }
-        
         Optional<AudioSendHandler> handlerOpt = getAudioSendHandler(guild);
-        
+
         // If no handler exists or it's not a mixing handler, create one
         if (handlerOpt.isEmpty() || !(handlerOpt.get() instanceof MixingAudioSendHandler)) {
             MixingAudioSendHandler handler = createMixingAudioSendHandler();
             if (!registerAudioSendHandler(guild, handler)) {
                 return false;
             }
-            
+
             handler.addAudioSource(sourceId);
             return handler.queueAudio(sourceId, data);
         } else {
             // Use existing handler
             MixingAudioSendHandler mixingHandler = (MixingAudioSendHandler) handlerOpt.get();
-            
+
             // Add source if it doesn't exist
             if (!mixingHandler.getAudioSources().contains(sourceId)) {
                 mixingHandler.addAudioSource(sourceId);
             }
-            
+
             return mixingHandler.queueAudio(sourceId, data);
         }
     }
 
     @Override
     public boolean queueAudioToSource(Guild guild, String sourceId, ByteBuffer buffer) {
-        if (!permissionManager.hasPermission(pluginId, sendPermission)) {
-            logger.warn("Plugin {} does not have permission to send audio", pluginId);
-            return false;
-        }
-        
         Optional<AudioSendHandler> handlerOpt = getAudioSendHandler(guild);
-        
+
         // If no handler exists or it's not a mixing handler, create one
         if (handlerOpt.isEmpty() || !(handlerOpt.get() instanceof MixingAudioSendHandler)) {
             MixingAudioSendHandler handler = createMixingAudioSendHandler();
             if (!registerAudioSendHandler(guild, handler)) {
                 return false;
             }
-            
+
             handler.addAudioSource(sourceId);
             return handler.queueAudio(sourceId, buffer);
         } else {
             // Use existing handler
             MixingAudioSendHandler mixingHandler = (MixingAudioSendHandler) handlerOpt.get();
-            
+
             // Add source if it doesn't exist
             if (!mixingHandler.getAudioSources().contains(sourceId)) {
                 mixingHandler.addAudioSource(sourceId);
             }
-            
+
             return mixingHandler.queueAudio(sourceId, buffer);
         }
     }

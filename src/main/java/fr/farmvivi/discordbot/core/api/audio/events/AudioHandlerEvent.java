@@ -14,7 +14,7 @@ public abstract class AudioHandlerEvent extends AudioEvent implements Cancellabl
      *
      * @param guild The guild where the event occurred
      */
-    public AudioHandlerEvent(Guild guild) {
+    protected AudioHandlerEvent(Guild guild) {
         super(guild);
     }
 

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Guild;
 /**
  * Base class for all audio-related events.
  */
-public abstract class AudioEvent extends Event {
+public abstract class AudioEvent implements Event {
     private final Guild guild;
 
     /**
@@ -14,7 +14,7 @@ public abstract class AudioEvent extends Event {
      *
      * @param guild The guild where the event occurred
      */
-    public AudioEvent(Guild guild) {
+    protected AudioEvent(Guild guild) {
         this.guild = guild;
     }
 

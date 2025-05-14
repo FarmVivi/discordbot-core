@@ -17,18 +17,18 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
     private static final Logger logger = LoggerFactory.getLogger(SimpleMixingAudioSendHandler.class);
     private static final int BUFFER_CAPACITY = 200; // Capacity limiter per source
-    
+
     protected final Map<String, Queue<ByteBuffer>> sourceQueues;
     protected final Map<String, ReentrantLock> sourceLocks;
     protected final SpeakingMode speakingMode;
-    
+
     /**
      * Creates a new SimpleMixingAudioSendHandler with default speaking mode (VOICE).
      */
     public SimpleMixingAudioSendHandler() {
         this(SpeakingMode.VOICE);
     }
-    
+
     /**
      * Creates a new SimpleMixingAudioSendHandler with a specific speaking mode.
      *
@@ -52,15 +52,15 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
         if (!canProvide()) {
             return null;
         }
-        
+
         // Get audio from all sources with data
         List<ByteBuffer> buffers = new ArrayList<>();
-        
+
         for (Map.Entry<String, Queue<ByteBuffer>> entry : sourceQueues.entrySet()) {
             String sourceId = entry.getKey();
             Queue<ByteBuffer> queue = entry.getValue();
             ReentrantLock lock = sourceLocks.get(sourceId);
-            
+
             try {
                 lock.lock();
                 if (!queue.isEmpty()) {
@@ -74,17 +74,17 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
                 lock.unlock();
             }
         }
-        
+
         // No data available
         if (buffers.isEmpty()) {
             return null;
         }
-        
+
         // If only one source had data, return it directly
         if (buffers.size() == 1) {
             return buffers.get(0);
         }
-        
+
         // Mix audio from all sources
         return mixAudio(buffers);
     }
@@ -101,18 +101,18 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
         for (ByteBuffer buffer : buffers) {
             minSize = Math.min(minSize, buffer.remaining());
         }
-        
+
         // Create output buffer
         ByteBuffer mixed = ByteBuffer.allocate(minSize);
-        
+
         // Mix audio samples
         short[] sampleMix = new short[minSize / 2]; // 16-bit samples (2 bytes per sample)
-        
+
         for (ByteBuffer buffer : buffers) {
             for (int i = 0; i < minSize / 2; i++) {
                 // Read 16-bit sample
                 short sample = buffer.getShort();
-                
+
                 // Add to mix, avoiding overflow
                 int mixedSample = sampleMix[i] + sample;
                 if (mixedSample > Short.MAX_VALUE) {
@@ -124,12 +124,12 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
             }
             buffer.rewind(); // Rewind for next use
         }
-        
+
         // Write mixed samples to output buffer
         for (short sample : sampleMix) {
             mixed.putShort(sample);
         }
-        
+
         mixed.flip();
         return mixed;
     }
@@ -140,16 +140,11 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
     }
 
     @Override
-    public Set<SpeakingMode> getSpeakingModes() {
-        return Set.of(speakingMode);
-    }
-
-    @Override
     public boolean addAudioSource(String sourceId) {
         if (sourceQueues.containsKey(sourceId)) {
             return false; // Source already exists
         }
-        
+
         sourceQueues.put(sourceId, new ArrayDeque<>());
         sourceLocks.put(sourceId, new ReentrantLock());
         logger.debug("Added audio source: {}", sourceId);
@@ -161,7 +156,7 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
         if (!sourceQueues.containsKey(sourceId)) {
             return false; // Source doesn't exist
         }
-        
+
         ReentrantLock lock = sourceLocks.get(sourceId);
         try {
             lock.lock();
@@ -184,7 +179,7 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
         if (data == null || data.length == 0) {
             return false;
         }
-        
+
         return queueAudio(sourceId, ByteBuffer.wrap(data));
     }
 
@@ -193,10 +188,10 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
         if (buffer == null || !buffer.hasRemaining()) {
             return false;
         }
-        
+
         Queue<ByteBuffer> queue = sourceQueues.get(sourceId);
         ReentrantLock lock = sourceLocks.get(sourceId);
-        
+
         if (queue == null || lock == null) {
             // Add source if it doesn't exist
             if (!addAudioSource(sourceId)) {
@@ -205,16 +200,16 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
             queue = sourceQueues.get(sourceId);
             lock = sourceLocks.get(sourceId);
         }
-        
+
         try {
             lock.lock();
-            
+
             // Check if we're at capacity to prevent memory issues
             if (queue.size() >= BUFFER_CAPACITY) {
                 logger.warn("Audio queue for source {} is at capacity ({}), dropping oldest packet", sourceId, BUFFER_CAPACITY);
                 queue.poll(); // Remove oldest packet
             }
-            
+
             queue.add(buffer);
             return true;
         } finally {
@@ -226,11 +221,11 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
     public boolean clearSourceQueue(String sourceId) {
         Queue<ByteBuffer> queue = sourceQueues.get(sourceId);
         ReentrantLock lock = sourceLocks.get(sourceId);
-        
+
         if (queue == null || lock == null) {
             return false; // Source doesn't exist
         }
-        
+
         try {
             lock.lock();
             queue.clear();
@@ -251,11 +246,11 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
     public boolean hasQueuedAudio(String sourceId) {
         Queue<ByteBuffer> queue = sourceQueues.get(sourceId);
         ReentrantLock lock = sourceLocks.get(sourceId);
-        
+
         if (queue == null || lock == null) {
             return false; // Source doesn't exist
         }
-        
+
         try {
             lock.lock();
             return !queue.isEmpty();
@@ -268,11 +263,11 @@ public class SimpleMixingAudioSendHandler implements MixingAudioSendHandler {
     public int getQueueSize(String sourceId) {
         Queue<ByteBuffer> queue = sourceQueues.get(sourceId);
         ReentrantLock lock = sourceLocks.get(sourceId);
-        
+
         if (queue == null || lock == null) {
             return 0; // Source doesn't exist
         }
-        
+
         try {
             lock.lock();
             return queue.size();

@@ -37,7 +37,7 @@ public interface MixingAudioSendHandler extends AudioSendHandler {
      * Queues audio data for a specific source.
      *
      * @param sourceId The source identifier
-     * @param data The audio data to queue
+     * @param data     The audio data to queue
      * @return true if the data was queued, false if the source doesn't exist
      */
     boolean queueAudio(String sourceId, byte[] data);
@@ -46,7 +46,7 @@ public interface MixingAudioSendHandler extends AudioSendHandler {
      * Queues audio data for a specific source.
      *
      * @param sourceId The source identifier
-     * @param buffer The audio data to queue
+     * @param buffer   The audio data to queue
      * @return true if the data was queued, false if the source doesn't exist
      */
     boolean queueAudio(String sourceId, ByteBuffer buffer);

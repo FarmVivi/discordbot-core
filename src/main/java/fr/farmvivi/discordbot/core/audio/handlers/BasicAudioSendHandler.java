@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -55,22 +54,17 @@ public class BasicAudioSendHandler implements AudioSendHandler {
         } finally {
             queueLock.unlock();
         }
-        
+
         if (buffer != null) {
             buffer.flip();
         }
-        
+
         return buffer;
     }
 
     @Override
     public boolean isOpus() {
         return false; // Using PCM audio, not Opus-encoded
-    }
-
-    @Override
-    public Set<SpeakingMode> getSpeakingModes() {
-        return Set.of(speakingMode);
     }
 
     /**
@@ -82,16 +76,16 @@ public class BasicAudioSendHandler implements AudioSendHandler {
         if (data == null || data.length == 0) {
             return;
         }
-        
+
         try {
             queueLock.lock();
-            
+
             // Check if we're at capacity to prevent memory issues
             if (queue.size() >= BUFFER_CAPACITY) {
                 logger.warn("Audio queue is at capacity ({}), dropping oldest packet", BUFFER_CAPACITY);
                 queue.poll(); // Remove oldest packet
             }
-            
+
             queue.add(ByteBuffer.wrap(data));
         } finally {
             queueLock.unlock();
@@ -107,16 +101,16 @@ public class BasicAudioSendHandler implements AudioSendHandler {
         if (buffer == null || !buffer.hasRemaining()) {
             return;
         }
-        
+
         try {
             queueLock.lock();
-            
+
             // Check if we're at capacity to prevent memory issues
             if (queue.size() >= BUFFER_CAPACITY) {
                 logger.warn("Audio queue is at capacity ({}), dropping oldest packet", BUFFER_CAPACITY);
                 queue.poll(); // Remove oldest packet
             }
-            
+
             queue.add(buffer);
         } finally {
             queueLock.unlock();

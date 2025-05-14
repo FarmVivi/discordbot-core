@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
@@ -70,7 +69,7 @@ public interface PluginAudioAPI {
      * Creates a basic audio receive handler.
      *
      * @param receiveCombined Whether to receive combined audio
-     * @param receiveUser Whether to receive user audio
+     * @param receiveUser     Whether to receive user audio
      * @return A new audio receive handler
      */
     AudioReceiveHandler createAudioReceiveHandler(boolean receiveCombined, boolean receiveUser);
@@ -94,7 +93,7 @@ public interface PluginAudioAPI {
      * Creates a multi-user audio receive handler.
      *
      * @param receiveCombined Whether to receive combined audio
-     * @param receiveUser Whether to receive user audio
+     * @param receiveUser     Whether to receive user audio
      * @return A new multi-user audio receive handler
      */
     MultiUserAudioReceiveHandler createMultiUserAudioReceiveHandler(boolean receiveCombined, boolean receiveUser);
@@ -102,7 +101,7 @@ public interface PluginAudioAPI {
     /**
      * Registers an audio send handler for a guild.
      *
-     * @param guild The guild
+     * @param guild   The guild
      * @param handler The audio send handler
      * @return true if registered successfully, false otherwise
      */
@@ -111,7 +110,7 @@ public interface PluginAudioAPI {
     /**
      * Registers an audio receive handler for a guild.
      *
-     * @param guild The guild
+     * @param guild   The guild
      * @param handler The audio receive handler
      * @return true if registered successfully, false otherwise
      */
@@ -153,7 +152,7 @@ public interface PluginAudioAPI {
      * Sets up a mixing audio handler for a guild.
      * This is a convenience method for creating and registering a mixing audio handler.
      *
-     * @param guild The guild
+     * @param guild        The guild
      * @param speakingMode The speaking mode
      * @return The created mixing audio handler, or empty if the operation failed
      */
@@ -163,14 +162,14 @@ public interface PluginAudioAPI {
      * Sets up a multi-user audio receive handler for a guild.
      * This is a convenience method for creating and registering a multi-user audio handler.
      *
-     * @param guild The guild
+     * @param guild                The guild
      * @param combinedAudioHandler Handler for combined audio
-     * @param userAudioHandlers Handlers for specific users' audio
+     * @param userAudioHandlers    Handlers for specific users' audio
      * @return The created multi-user audio handler, or empty if the operation failed
      */
-    Optional<MultiUserAudioReceiveHandler> setupMultiUserAudio(Guild guild, 
-                                                              Consumer<byte[]> combinedAudioHandler,
-                                                              Map<String, Consumer<byte[]>> userAudioHandlers);
+    Optional<MultiUserAudioReceiveHandler> setupMultiUserAudio(Guild guild,
+                                                               Consumer<byte[]> combinedAudioHandler,
+                                                               Map<String, Consumer<byte[]>> userAudioHandlers);
 
     /**
      * Gets the users currently speaking in a guild's voice channel.
@@ -185,7 +184,7 @@ public interface PluginAudioAPI {
      * This is a convenience method that creates or uses an existing send handler.
      *
      * @param guild The guild
-     * @param data The audio data
+     * @param data  The audio data
      * @return true if the data was queued successfully, false otherwise
      */
     boolean queueAudio(Guild guild, byte[] data);
@@ -194,9 +193,9 @@ public interface PluginAudioAPI {
      * Queues audio data to a specific source in a mixing audio handler.
      * This is a convenience method that creates or uses an existing mixing audio handler.
      *
-     * @param guild The guild
+     * @param guild    The guild
      * @param sourceId The source identifier
-     * @param data The audio data
+     * @param data     The audio data
      * @return true if the data was queued successfully, false otherwise
      */
     boolean queueAudioToSource(Guild guild, String sourceId, byte[] data);
@@ -205,9 +204,9 @@ public interface PluginAudioAPI {
      * Queues audio data to a specific source in a mixing audio handler.
      * This is a convenience method that creates or uses an existing mixing audio handler.
      *
-     * @param guild The guild
+     * @param guild    The guild
      * @param sourceId The source identifier
-     * @param buffer The audio data
+     * @param buffer   The audio data
      * @return true if the data was queued successfully, false otherwise
      */
     boolean queueAudioToSource(Guild guild, String sourceId, ByteBuffer buffer);

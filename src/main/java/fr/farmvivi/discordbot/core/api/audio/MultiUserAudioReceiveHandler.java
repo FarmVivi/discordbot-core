@@ -29,7 +29,7 @@ public interface MultiUserAudioReceiveHandler extends AudioReceiveHandler {
     /**
      * Adds a handler for a specific user's audio.
      *
-     * @param userId The user ID
+     * @param userId  The user ID
      * @param handler The handler for the user's audio
      */
     void addUserAudioHandler(String userId, Consumer<byte[]> handler);
