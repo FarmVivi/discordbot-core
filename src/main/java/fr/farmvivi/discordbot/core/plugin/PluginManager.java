@@ -1,7 +1,5 @@
 package fr.farmvivi.discordbot.core.plugin;
 
-import fr.farmvivi.discordbot.core.api.audio.AudioFactory;
-import fr.farmvivi.discordbot.core.api.audio.AudioManager;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -12,7 +10,6 @@ import fr.farmvivi.discordbot.core.api.plugin.PluginLoader;
 import fr.farmvivi.discordbot.core.api.plugin.events.*;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
-import fr.farmvivi.discordbot.core.audio.PluginAudioAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +36,6 @@ public class PluginManager implements PluginLoader, Closeable {
     private final DataStorageManager dataStorageManager;
     private final BinaryStorageManager binaryStorageManager;
     private final PermissionManager permissionManager;
-    private final AudioManager audioManager;
-    private final AudioFactory audioFactory;
 
     // Plugin tracking
     private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
@@ -59,8 +54,6 @@ public class PluginManager implements PluginLoader, Closeable {
      * @param dataStorageManager   the data storage manager
      * @param binaryStorageManager the binary storage manager
      * @param permissionManager    the permission manager
-     * @param audioManager         the audio manager
-     * @param audioFactory         the audio factory
      */
     public PluginManager(
             File pluginsFolder,
@@ -69,9 +62,7 @@ public class PluginManager implements PluginLoader, Closeable {
             LanguageManager languageManager,
             DataStorageManager dataStorageManager,
             BinaryStorageManager binaryStorageManager,
-            PermissionManager permissionManager,
-            AudioManager audioManager,
-            AudioFactory audioFactory) {
+            PermissionManager permissionManager) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
@@ -79,8 +70,6 @@ public class PluginManager implements PluginLoader, Closeable {
         this.dataStorageManager = dataStorageManager;
         this.binaryStorageManager = binaryStorageManager;
         this.permissionManager = permissionManager;
-        this.audioManager = audioManager;
-        this.audioFactory = audioFactory;
 
         if (!pluginsFolder.exists() && !pluginsFolder.mkdirs()) {
             logger.warn("Failed to create plugins folder: {}", pluginsFolder.getAbsolutePath());
@@ -139,8 +128,7 @@ public class PluginManager implements PluginLoader, Closeable {
                     languageManager,
                     dataStorageManager,
                     binaryStorageManager,
-                    permissionManager,
-                    new PluginAudioAdapter(audioManager, audioFactory, descriptor.name())
+                    permissionManager
             );
 
             // Initialize the plugin

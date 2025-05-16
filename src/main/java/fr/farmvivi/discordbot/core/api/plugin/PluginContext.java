@@ -1,6 +1,5 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
-import fr.farmvivi.discordbot.core.api.audio.PluginAudioAPI;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
@@ -83,11 +82,4 @@ public interface PluginContext {
      * @return the permission manager
      */
     PermissionManager getPermissionManager();
-
-    /**
-     * Gets the audio API for the plugin.
-     *
-     * @return the plugin audio API
-     */
-    PluginAudioAPI getAudioAPI();
 }
