@@ -199,8 +199,3 @@ dev.txt
 
 # Ignore run directory containing configs
 run
-
-# Ignore DevSpace cache and log folder
-.devspace/
-# Ignore DevSpace config
-devspace.yaml

@@ -26,11 +26,11 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      # On récupère le vrai nom du .jar (ex: discordbot-1.2.3.jar)
+      # On récupère le vrai nom du .jar (ex: discordbot-core-1.2.3.jar)
       - name: Find built jar name
         id: find_jar
         shell: bash
-        run: echo "jar_name=$(basename $(ls target/discordbot-*.jar))" >> $GITHUB_OUTPUT
+        run: echo "jar_name=$(basename $(ls target/discordbot-core-*.jar))" >> $GITHUB_OUTPUT
 
       # Upload du .jar sur la release GitHub
       - name: Upload JAR to release
