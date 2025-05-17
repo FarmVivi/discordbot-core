@@ -22,18 +22,7 @@ Le service audio est accessible via le `PluginContext` :
 public void onLoad(PluginContext context) {
     super.onLoad(context);
     
-    // Vérifie si le service audio est disponible
-    if (audioService != null) {
-        // Le service audio est disponible
-    }
-}
-```
-
-Si vous utilisez `AbstractPlugin`, vous pouvez simplement utiliser :
-
-```java
-if (isAudioAvailable()) {
-    // Le service audio est disponible
+    context.getAudioService();
 }
 ```
 
@@ -207,8 +196,6 @@ Dans le fichier `config.yml`, vous pouvez configurer le comportement audio :
 
 ```yaml
 audio:
-  # Activer la fonctionnalité audio
-  enabled: true
   # Mode d'envoi par défaut (VOICE, SOUNDSHARE, PRIORITY_SPEAKER)
   speaking_mode: VOICE
 ```

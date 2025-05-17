@@ -40,12 +40,6 @@ public class AudioExamplePlugin extends AbstractPlugin {
 
     @Override
     public void onEnable() {
-        // Vérifie si le service audio est disponible
-        if (!isAudioAvailable()) {
-            logger.warn("Le service audio n'est pas disponible ! Le plugin ne fonctionnera pas correctement.");
-            return;
-        }
-
         logger.info("Plugin exemple audio activé !");
     }
 
@@ -76,8 +70,6 @@ public class AudioExamplePlugin extends AbstractPlugin {
     public void onGuildVoiceJoin(GuildVoiceUpdateEvent event) {
         // Vérifie si l'utilisateur a rejoint un salon vocal (channelJoined != null && channelLeft == null)
         if (event.getChannelJoined() == null) return;
-        // Vérifie si le service audio est disponible
-        if (!isAudioAvailable()) return;
 
         Guild guild = event.getGuild();
         String guildId = guild.getId();
@@ -118,8 +110,6 @@ public class AudioExamplePlugin extends AbstractPlugin {
     public void onGuildVoiceLeave(GuildVoiceUpdateEvent event) {
         // Vérifie si l'utilisateur a quitté un salon vocal (channelLeft != null)
         if (event.getChannelLeft() == null) return;
-        // Vérifie si le service audio est disponible
-        if (!isAudioAvailable()) return;
 
         Guild guild = event.getGuild();
         String guildId = guild.getId();

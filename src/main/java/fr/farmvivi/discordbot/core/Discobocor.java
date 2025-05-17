@@ -191,13 +191,7 @@ public class Discobocor {
         permissionManager = new SimplePermissionManager(eventManager, dataStorageManager);
 
         // Create the audio service
-        boolean audioEnabled = coreConfig.getBoolean("audio.enabled", true);
-        if (audioEnabled) {
-            audioService = new AudioServiceImpl(eventManager);
-            logger.info("Audio service initialized");
-        } else {
-            logger.info("Audio service disabled in config");
-        }
+        audioService = new AudioServiceImpl(eventManager);
 
         // Create the plugin manager
         pluginManager = new PluginManager(
@@ -253,8 +247,6 @@ public class Discobocor {
                             "\n" +
                             "# Audio settings\n" +
                             "audio:\n" +
-                            "  # Enable audio functionality\n" +
-                            "  enabled: true\n" +
                             "  # Default speaking mode (VOICE, SOUNDSHARE, PRIORITY_SPEAKER)\n" +
                             "  speaking_mode: VOICE\n"
             );

@@ -178,13 +178,4 @@ public abstract class AbstractPlugin implements Plugin {
     public boolean isEnabled() {
         return lifecycle == PluginLifecycle.ENABLED;
     }
-    
-    /**
-     * Vérifie si le service audio est disponible.
-     *
-     * @return true si le service audio est disponible
-     */
-    protected boolean isAudioAvailable() {
-        return audioService != null;
-    }
 }
