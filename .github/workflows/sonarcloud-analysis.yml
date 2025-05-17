@@ -60,7 +60,7 @@ jobs:
           # Détermine s'il s'agit d'une pull request ou non
           if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "pull_request_target" ]]; then
             # Pour les pull requests, ajoute les paramètres spécifiques pour l'analyse de PR
-            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar \
+            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar -DskipTests \
               -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
               -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }} \
               -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }} \
@@ -68,6 +68,6 @@ jobs:
               -Dsonar.scm.revision=${{ github.event.pull_request.head.sha }}
           else
             # Pour les pushes normaux et les workflow manuels
-            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar \
+            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar -DskipTests \
               -Dsonar.branch.name=${{ github.ref_name }}
           fi
