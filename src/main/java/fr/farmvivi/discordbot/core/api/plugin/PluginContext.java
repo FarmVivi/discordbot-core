@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
+import fr.farmvivi.discordbot.core.api.audio.AudioService;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
@@ -82,4 +83,11 @@ public interface PluginContext {
      * @return the permission manager
      */
     PermissionManager getPermissionManager();
+    
+    /**
+     * Gets the audio service for managing audio connections.
+     *
+     * @return the audio service, or null if audio is disabled
+     */
+    AudioService getAudioService();
 }

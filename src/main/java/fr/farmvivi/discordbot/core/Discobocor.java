@@ -1,11 +1,13 @@
 package fr.farmvivi.discordbot.core;
 
+import fr.farmvivi.discordbot.core.api.audio.AudioService;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
+import fr.farmvivi.discordbot.core.audio.AudioServiceImpl;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
@@ -45,6 +47,7 @@ public class Discobocor {
     private static DataStorageManager dataStorageManager;
     private static BinaryStorageManager binaryStorageManager;
     private static SimplePermissionManager permissionManager;
+    private static AudioService audioService;
 
     static {
         Properties properties = new Properties();
@@ -187,6 +190,15 @@ public class Discobocor {
         // Create the permission manager
         permissionManager = new SimplePermissionManager(eventManager, dataStorageManager);
 
+        // Create the audio service
+        boolean audioEnabled = coreConfig.getBoolean("audio.enabled", true);
+        if (audioEnabled) {
+            audioService = new AudioServiceImpl(eventManager);
+            logger.info("Audio service initialized");
+        } else {
+            logger.info("Audio service disabled in config");
+        }
+
         // Create the plugin manager
         pluginManager = new PluginManager(
                 pluginsFolder,
@@ -195,7 +207,8 @@ public class Discobocor {
                 languageManager,
                 dataStorageManager,
                 binaryStorageManager,
-                permissionManager
+                permissionManager,
+                audioService
         );
 
         return true;
@@ -408,5 +421,14 @@ public class Discobocor {
      */
     public static PermissionManager getPermissionManager() {
         return permissionManager;
+    }
+
+    /**
+     * Gets the audio service.
+     *
+     * @return the audio service, or null if audio is disabled
+     */
+    public static AudioService getAudioService() {
+        return audioService;
     }
 }

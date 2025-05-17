@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.core.plugin;
 
+import fr.farmvivi.discordbot.core.api.audio.AudioService;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -36,6 +37,7 @@ public class PluginManager implements PluginLoader, Closeable {
     private final DataStorageManager dataStorageManager;
     private final BinaryStorageManager binaryStorageManager;
     private final PermissionManager permissionManager;
+    private final AudioService audioService;
 
     // Plugin tracking
     private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
@@ -62,7 +64,8 @@ public class PluginManager implements PluginLoader, Closeable {
             LanguageManager languageManager,
             DataStorageManager dataStorageManager,
             BinaryStorageManager binaryStorageManager,
-            PermissionManager permissionManager) {
+            PermissionManager permissionManager,
+            AudioService audioService) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
@@ -70,6 +73,7 @@ public class PluginManager implements PluginLoader, Closeable {
         this.dataStorageManager = dataStorageManager;
         this.binaryStorageManager = binaryStorageManager;
         this.permissionManager = permissionManager;
+        this.audioService = audioService;
 
         if (!pluginsFolder.exists() && !pluginsFolder.mkdirs()) {
             logger.warn("Failed to create plugins folder: {}", pluginsFolder.getAbsolutePath());
@@ -128,7 +132,8 @@ public class PluginManager implements PluginLoader, Closeable {
                     languageManager,
                     dataStorageManager,
                     binaryStorageManager,
-                    permissionManager
+                    permissionManager,
+                    audioService
             );
 
             // Initialize the plugin
@@ -228,6 +233,9 @@ public class PluginManager implements PluginLoader, Closeable {
             }
             if (permissionManager != null) {
                 permissionManager.unregisterPermissions(plugin);
+            }
+            if (audioService != null) {
+                audioService.closeAllConnectionsForPlugin(plugin);
             }
 
             // Set to disabled

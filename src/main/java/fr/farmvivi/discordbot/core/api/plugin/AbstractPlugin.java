@@ -1,5 +1,6 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
+import fr.farmvivi.discordbot.core.api.audio.AudioService;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
@@ -31,6 +32,7 @@ public abstract class AbstractPlugin implements Plugin {
     protected DataStorageManager dataStorageManager;
     protected BinaryStorageManager binaryStorageManager;
     protected PermissionManager permissionManager;
+    protected AudioService audioService;
 
     // Plugin-specific managers
     protected PluginPermissionAdapter pluginPermissionAdapter;
@@ -53,6 +55,7 @@ public abstract class AbstractPlugin implements Plugin {
         this.dataStorageManager = context.getDataStorageManager();
         this.binaryStorageManager = context.getBinaryStorageManager();
         this.permissionManager = context.getPermissionManager();
+        this.audioService = context.getAudioService();
 
         // Initialize plugin-specific managers
         this.pluginLanguageAdapter = new PluginLanguageAdapter(this, languageManager);
@@ -174,5 +177,14 @@ public abstract class AbstractPlugin implements Plugin {
      */
     public boolean isEnabled() {
         return lifecycle == PluginLifecycle.ENABLED;
+    }
+    
+    /**
+     * Vérifie si le service audio est disponible.
+     *
+     * @return true si le service audio est disponible
+     */
+    protected boolean isAudioAvailable() {
+        return audioService != null;
     }
 }
