@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount for local development (uncomment when developing)
+      #- ./src:/app/src
+      # Mount for application data persistence
+      - ./data:/app/data
+      - ./plugins:/app/plugins
+      - ./config.yml:/app/config.yml
+    environment:
+      - JAVA_OPTS=-Xmx1G
+      # Add your environment variables here
+      #- DISCORD_TOKEN=your_token_here

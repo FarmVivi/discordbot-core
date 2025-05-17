@@ -18,13 +18,21 @@ jobs:
           distribution: "temurin"
           cache: maven
 
+      # Cache Maven packages
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
       # Étape pour enlever "-SNAPSHOT" dans le pom.xml
       - name: Remove -SNAPSHOT from pom.xml
         run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false
 
       # Construction Maven
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: mvn package -DskipTests
 
       # On récupère le vrai nom du .jar (ex: discordbot-core-1.2.3.jar)
       - name: Find built jar name
@@ -34,7 +42,6 @@ jobs:
 
       # Upload du .jar sur la release GitHub
       - name: Upload JAR to release
-        uses: csexton/release-asset-action@v3
+        uses: softprops/action-gh-release@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ steps.find_jar.outputs.jar_name }}
+          files: target/${{ steps.find_jar.outputs.jar_name }}
