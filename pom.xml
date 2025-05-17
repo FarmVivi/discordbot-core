@@ -20,6 +20,8 @@
         <sonar.projectKey>FarmVivi_discordbot-core</sonar.projectKey>
         <sonar.organization>farmvivi</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <!-- Skip sonar analysis by default - enable with -Psonar profile -->
+        <sonar.skip>true</sonar.skip>
     </properties>
 
     <repositories>
@@ -177,6 +179,23 @@
                     <!--                            </execution>-->
                     <!--                        </executions>-->
                     <!--                    </plugin>-->
+                </plugins>
+            </build>
+        </profile>
+        
+        <!-- Profil pour l'analyse SonarQube -->
+        <profile>
+            <id>sonar</id>
+            <properties>
+                <sonar.skip>false</sonar.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>5.1.0.4751</version>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
