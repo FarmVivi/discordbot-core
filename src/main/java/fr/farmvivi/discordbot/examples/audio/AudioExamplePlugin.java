@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.audio.CombinedAudio;
 import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,7 +73,9 @@ public class AudioExamplePlugin extends AbstractPlugin {
      * Gère l'événement lorsqu'un utilisateur rejoint un salon vocal.
      */
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
+    public void onGuildVoiceJoin(GuildVoiceUpdateEvent event) {
+        // Vérifie si l'utilisateur a rejoint un salon vocal (channelJoined != null && channelLeft == null)
+        if (event.getChannelJoined() == null) return;
         // Vérifie si le service audio est disponible
         if (!isAudioAvailable()) return;
 
@@ -93,7 +96,7 @@ public class AudioExamplePlugin extends AbstractPlugin {
             MyReceiveHandler receiveHandler = new MyReceiveHandler(new File(outputDir, "recording_" + guildId + ".wav"));
 
             // Connecte au salon vocal
-            VoiceChannel voiceChannel = (VoiceChannel) event.getChannelJoined();
+            VoiceChannel voiceChannel = event.getChannelJoined().asVoiceChannel();
             guild.getAudioManager().openAudioConnection(voiceChannel);
 
             // Enregistre les handlers avec le service audio
@@ -112,7 +115,9 @@ public class AudioExamplePlugin extends AbstractPlugin {
      * Gère l'événement lorsqu'un utilisateur quitte un salon vocal.
      */
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+    public void onGuildVoiceLeave(GuildVoiceUpdateEvent event) {
+        // Vérifie si l'utilisateur a quitté un salon vocal (channelLeft != null)
+        if (event.getChannelLeft() == null) return;
         // Vérifie si le service audio est disponible
         if (!isAudioAvailable()) return;
 
@@ -120,6 +125,7 @@ public class AudioExamplePlugin extends AbstractPlugin {
         String guildId = guild.getId();
 
         // Si tous les utilisateurs sont partis (sauf le bot), on ferme la connexion
+        // Vérifie si le salon vocal est maintenant vide (à part le bot)
         if (event.getChannelLeft().getMembers().size() <= 1) {
             // Désenregistre les handlers
             if (sendHandlers.containsKey(guildId)) {
