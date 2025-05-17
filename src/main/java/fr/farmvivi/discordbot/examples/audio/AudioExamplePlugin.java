@@ -82,11 +82,11 @@ public class AudioExamplePlugin extends AbstractPlugin {
         // Si on n'a pas déjà un handler pour cette guilde, on en crée un
         if (!sendHandlers.containsKey(guildId)) {
             // Crée le handler d'envoi audio
-            File audioFile = new File(getDataFolder(), "welcome.wav");
+            File audioFile = new File(getContext().getDataFolder(), "welcome.wav");
             MySendHandler sendHandler = new MySendHandler(audioFile);
 
             // Crée le handler de réception audio
-            File outputDir = new File(getDataFolder(), "recordings");
+            File outputDir = new File(getContext().getDataFolder(), "recordings");
             if (!outputDir.exists()) {
                 outputDir.mkdirs();
             }
