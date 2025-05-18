@@ -1,9 +1,9 @@
 package fr.farmvivi.discordbot.core.command.system;
 
-import fr.farmvivi.discordbot.core.Discobocor;
 import fr.farmvivi.discordbot.core.api.command.Command;
 import fr.farmvivi.discordbot.core.api.command.CommandContext;
 import fr.farmvivi.discordbot.core.api.command.CommandResult;
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.SimpleCommandBuilder;
 
 /**
@@ -11,13 +11,18 @@ import fr.farmvivi.discordbot.core.command.SimpleCommandBuilder;
  * This command is only available to administrators.
  */
 public class ShutdownCommand {
-    
+
     private final Command command;
-    
+    private final LanguageManager languageManager;
+
     /**
-     * Creates a new shutdown command.
+     * Creates a new shutdown command with a language manager.
+     *
+     * @param languageManager the language manager for translations
      */
-    public ShutdownCommand() {
+    public ShutdownCommand(LanguageManager languageManager) {
+        this.languageManager = languageManager;
+
         command = new SimpleCommandBuilder()
                 .name("shutdown")
                 .description("Shuts down the bot")
@@ -28,7 +33,7 @@ public class ShutdownCommand {
                 .executor(this::execute)
                 .build();
     }
-    
+
     /**
      * Gets the command instance.
      *
@@ -37,7 +42,7 @@ public class ShutdownCommand {
     public Command getCommand() {
         return command;
     }
-    
+
     /**
      * Executes the shutdown command.
      *
@@ -47,10 +52,13 @@ public class ShutdownCommand {
      */
     private CommandResult execute(CommandContext context, Command command) {
         boolean restart = context.getOption("restart", false);
-        
+
         if (restart) {
-            context.replyInfo("Bot is restarting...");
-            
+            // Get the restart message using the language manager if available
+            String restartMessage = languageManager.getString(context.getLocale(), "commands.shutdown.restarting");
+
+            context.replyInfo(restartMessage);
+
             // Schedule a delayed task to restart the bot
             Thread restartThread = new Thread(() -> {
                 try {
@@ -60,12 +68,15 @@ public class ShutdownCommand {
                     Thread.currentThread().interrupt();
                 }
             });
-            
+
             restartThread.setDaemon(true);
             restartThread.start();
         } else {
-            context.replyInfo("Bot is shutting down...");
-            
+            // Get the shutdown message using the language manager if available
+            String shutdownMessage = languageManager.getString(context.getLocale(), "commands.shutdown.shutting_down");
+
+            context.replyInfo(shutdownMessage);
+
             // Schedule a delayed task to shut down the bot
             Thread shutdownThread = new Thread(() -> {
                 try {
@@ -75,11 +86,11 @@ public class ShutdownCommand {
                     Thread.currentThread().interrupt();
                 }
             });
-            
+
             shutdownThread.setDaemon(true);
             shutdownThread.start();
         }
-        
+
         return CommandResult.success();
     }
 }

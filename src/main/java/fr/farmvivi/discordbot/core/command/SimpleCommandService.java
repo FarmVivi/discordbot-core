@@ -699,13 +699,13 @@ public class SimpleCommandService implements CommandService {
      */
     private void registerSystemCommands() {
         // Register help command
-        registerCommand(new HelpCommand(this).getCommand());
+        registerCommand(new HelpCommand(this, languageManager).getCommand());
 
         // Register version command
-        registerCommand(new VersionCommand().getCommand());
+        registerCommand(new VersionCommand(languageManager).getCommand());
 
         // Register shutdown command
-        registerCommand(new ShutdownCommand().getCommand());
+        registerCommand(new ShutdownCommand(languageManager).getCommand());
     }
 
     /**

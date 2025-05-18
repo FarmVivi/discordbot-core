@@ -69,7 +69,7 @@ public interface CommandService {
     /**
      * Creates and registers a command using a builder.
      *
-     * @param plugin         the plugin registering the command
+     * @param plugin          the plugin registering the command
      * @param builderConsumer consumer to configure the command builder
      * @return true if the command was registered
      */
@@ -164,7 +164,7 @@ public interface CommandService {
     /**
      * Checks if a user is on cooldown for a specific command.
      *
-     * @param userId    the user ID
+     * @param userId      the user ID
      * @param commandName the command name
      * @return true if the user is on cooldown
      */
@@ -173,7 +173,7 @@ public interface CommandService {
     /**
      * Gets the remaining cooldown time in seconds for a user and command.
      *
-     * @param userId    the user ID
+     * @param userId      the user ID
      * @param commandName the command name
      * @return the remaining cooldown time in seconds, or 0 if not on cooldown
      */
