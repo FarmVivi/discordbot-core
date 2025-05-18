@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -69,8 +70,8 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * @param components the components to set
      * @return this builder
      */
-    public CommandMessageBuilder setComponents(Collection<LayoutComponent> components) {
-        clearComponents();
+    public CommandMessageBuilder setComponents(Collection<? extends LayoutComponent> components) {
+        this.components.clear();
         if (components != null && !components.isEmpty()) {
             int count = Math.min(components.size(), Message.MAX_COMPONENT_COUNT);
             addComponents(components.stream().limit(count).toList());
@@ -85,8 +86,8 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * @param embeds the embeds to set
      * @return this builder
      */
-    public CommandMessageBuilder setEmbeds(Collection<MessageEmbed> embeds) {
-        clearEmbeds();
+    public CommandMessageBuilder setEmbeds(Collection<? extends MessageEmbed> embeds) {
+        this.embeds.clear();
         if (embeds != null && !embeds.isEmpty()) {
             int count = Math.min(embeds.size(), Message.MAX_EMBED_COUNT);
             addEmbeds(embeds.stream().limit(count).toList());

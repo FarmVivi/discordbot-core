@@ -14,13 +14,13 @@ public class CommandParseException extends CommandException {
      * @param message the error message
      */
     public CommandParseException(String message) {
-        this(message, null);
+        this(message, (String) null);
     }
 
     /**
      * Creates a new command parse exception with a specific parameter.
      *
-     * @param message the error message
+     * @param message   the error message
      * @param parameter the parameter that caused the error, or null if not applicable
      */
     public CommandParseException(String message, String parameter) {
@@ -32,7 +32,7 @@ public class CommandParseException extends CommandException {
      * Creates a new command parse exception with a cause.
      *
      * @param message the error message
-     * @param cause the cause of the exception
+     * @param cause   the cause of the exception
      */
     public CommandParseException(String message, Throwable cause) {
         this(message, null, cause);
@@ -41,9 +41,9 @@ public class CommandParseException extends CommandException {
     /**
      * Creates a new command parse exception with a specific parameter and cause.
      *
-     * @param message the error message
+     * @param message   the error message
      * @param parameter the parameter that caused the error, or null if not applicable
-     * @param cause the cause of the exception
+     * @param cause     the cause of the exception
      */
     public CommandParseException(String message, String parameter, Throwable cause) {
         super(message, cause);
