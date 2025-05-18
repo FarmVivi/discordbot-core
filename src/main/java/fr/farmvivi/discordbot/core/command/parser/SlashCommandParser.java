@@ -2,9 +2,10 @@ package fr.farmvivi.discordbot.core.command.parser;
 
 import fr.farmvivi.discordbot.core.api.command.Command;
 import fr.farmvivi.discordbot.core.api.command.CommandContext;
+import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
 import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
 import fr.farmvivi.discordbot.core.api.command.option.OptionType2;
-import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.SimpleCommandContext;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -26,8 +27,19 @@ import java.util.Map;
  * This parser extracts command information from SlashCommandInteractionEvents.
  */
 public class SlashCommandParser implements CommandParser {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(SlashCommandParser.class);
+
+    private final LanguageManager languageManager;
+
+    /**
+     * Creates a new SlashCommandParser.
+     *
+     * @param languageManager the language manager to use for localization
+     */
+    public SlashCommandParser(LanguageManager languageManager) {
+        this.languageManager = languageManager;
+    }
 
     @Override
     public boolean canParse(Event event) {
@@ -39,36 +51,36 @@ public class SlashCommandParser implements CommandParser {
         if (!(event instanceof SlashCommandInteractionEvent slashEvent)) {
             throw new CommandParseException("Event is not a slash command interaction event");
         }
-        
+
         // Get user, guild, and channel
         User user = slashEvent.getUser();
         Guild guild = slashEvent.getGuild();
-        
+
         // Get locale
         String localeTag = slashEvent.getUserLocale().toLocale().toLanguageTag();
         Locale locale = Locale.forLanguageTag(localeTag);
         if (locale.getLanguage().isEmpty()) {
             locale = Locale.US;
         }
-        
+
         // Parse options
         Map<String, Object> options = new HashMap<>();
         for (CommandOption<?> option : command.getOptions()) {
             String name = option.getName();
             OptionMapping mapping = slashEvent.getOption(name);
-            
+
             if (mapping != null) {
                 Object value = parseOptionValue(option.getType(), mapping);
                 options.put(name, value);
             }
         }
-        
+
         // Create and validate context
         SimpleCommandContext context = new SimpleCommandContext(
                 event, command, user, guild, slashEvent.getChannel(),
-                locale, options
+                locale, options, languageManager
         );
-        
+
         context.validateOptions();
         return context;
     }
@@ -78,7 +90,7 @@ public class SlashCommandParser implements CommandParser {
         if (!(event instanceof SlashCommandInteractionEvent slashEvent)) {
             throw new CommandParseException("Event is not a slash command interaction event");
         }
-        
+
         return slashEvent.getName();
     }
 
@@ -86,11 +98,11 @@ public class SlashCommandParser implements CommandParser {
     public boolean isCommandInvocation(Event event) {
         return event instanceof SlashCommandInteractionEvent;
     }
-    
+
     /**
      * Parses an option value from a slash command option mapping.
-     * 
-     * @param type the option type
+     *
+     * @param type    the option type
      * @param mapping the option mapping from JDA
      * @return the parsed value
      * @throws CommandParseException if parsing fails
@@ -109,22 +121,22 @@ public class SlashCommandParser implements CommandParser {
                     if (member != null) {
                         yield member;
                     }
-                    
+
                     Role role = mapping.getAsRole();
                     if (role != null) {
                         yield role;
                     }
-                    
+
                     User user = mapping.getAsUser();
                     if (user != null) {
                         yield user;
                     }
-                    
+
                     Channel channel = mapping.getAsChannel();
                     if (channel != null) {
                         yield channel;
                     }
-                    
+
                     yield mapping.getAsString();
                 }
                 case NUMBER -> mapping.getAsDouble();

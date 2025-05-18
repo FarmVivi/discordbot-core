@@ -1,5 +1,7 @@
 package fr.farmvivi.discordbot.core.command;
 
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,9 +17,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -27,27 +28,39 @@ import java.util.function.Predicate;
  * easily creating information, success, warning, and error messages.
  */
 public class CommandMessageBuilder extends MessageCreateBuilder {
-    
-    // Standard Discord colors
-    private static final Color COLOR_INFO = new Color(88, 101, 242); // Discord blurple
-    private static final Color COLOR_SUCCESS = new Color(87, 242, 135); // Discord green
-    private static final Color COLOR_WARNING = new Color(254, 231, 92); // Discord yellow
-    private static final Color COLOR_ERROR = new Color(237, 66, 69); // Discord red
-    
     private final Event event;
+    private final LanguageManager languageManager;
+    private final Locale locale;
     private boolean differ = false;
     private boolean ephemeral = false;
 
     /**
      * Creates a new command message builder.
      *
+     * @param event           the JDA event that triggered the command
+     * @param languageManager the language manager for translations
+     * @param locale          the locale to use for translations
+     */
+    public CommandMessageBuilder(Event event, LanguageManager languageManager, Locale locale) {
+        super();
+        this.event = event;
+        this.languageManager = languageManager;
+        this.locale = locale;
+    }
+
+    /**
+     * Creates a new command message builder.
+     * This constructor is for backward compatibility and does not use translations.
+     *
      * @param event the JDA event that triggered the command
      */
     public CommandMessageBuilder(Event event) {
         super();
         this.event = event;
+        this.languageManager = null;
+        this.locale = Locale.US;
     }
-    
+
     /**
      * Sets the content of the message.
      * This overrides any existing content.
@@ -62,7 +75,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         }
         return this;
     }
-    
+
     /**
      * Sets the components of the message.
      * This overrides any existing components.
@@ -78,7 +91,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         }
         return this;
     }
-    
+
     /**
      * Sets the embeds of the message.
      * This overrides any existing embeds.
@@ -138,22 +151,22 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     public void replyNow() {
         if (differ) {
             differ = false;
-            
+
             // Handle deferred slash commands
             if (event instanceof IReplyCallback callback && callback.isAcknowledged()) {
                 InteractionHook hook = callback.getHook();
-                
+
                 if (isEmpty()) {
                     hook.deleteOriginal().queue();
                 } else {
                     // Edit content
                     WebhookMessageEditAction<Message> messageWebhookMessageEditAction = hook.editOriginal(getContent());
-                    
+
                     // Edit embeds
                     if (!getEmbeds().isEmpty()) {
                         messageWebhookMessageEditAction.setEmbeds(getEmbeds());
                     }
-                    
+
                     // Edit components
                     if (!getComponents().isEmpty()) {
                         messageWebhookMessageEditAction.setComponents(getComponents());
@@ -169,23 +182,23 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                         messageWebhookMessageEditAction.queue();
                     }
                 }
-            } 
+            }
             // Handle deferred text commands
             else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
                 if (!isEmpty()) {
                     Message originalMessage = messageReceivedEvent.getMessage();
                     MessageCreateAction messageCreateAction = originalMessage.reply(build());
-                    
+
                     if (isEphemeral()) {
                         messageCreateAction
                                 .delay(1, TimeUnit.MINUTES)
                                 .flatMap(Message::delete)
                                 .queue();
-                        
+
                         // Delete original message after delay if we have permission
-                        if (messageReceivedEvent.isFromGuild() && 
+                        if (messageReceivedEvent.isFromGuild() &&
                                 messageReceivedEvent.getGuild().getSelfMember()
-                                        .hasPermission(messageReceivedEvent.getGuildChannel(), 
+                                        .hasPermission(messageReceivedEvent.getGuildChannel(),
                                                 net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
                             originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
                         }
@@ -194,11 +207,11 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                     }
                 } else if (isEphemeral()) {
                     Message originalMessage = messageReceivedEvent.getMessage();
-                    
+
                     // Delete original message after delay if we have permission
-                    if (messageReceivedEvent.isFromGuild() && 
+                    if (messageReceivedEvent.isFromGuild() &&
                             messageReceivedEvent.getGuild().getSelfMember()
-                                    .hasPermission(messageReceivedEvent.getGuildChannel(), 
+                                    .hasPermission(messageReceivedEvent.getGuildChannel(),
                                             net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
                         originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
                     }
@@ -234,7 +247,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * @return the embed builder
      */
     public EmbedBuilder createInfoEmbed() {
-        return createEmbed().setColor(COLOR_INFO);
+        return createEmbed().setColor(DiscordColor.DISCORD_BLURPLE.getColor());
     }
 
     /**
@@ -243,7 +256,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * @return the embed builder
      */
     public EmbedBuilder createSuccessEmbed() {
-        return createEmbed().setColor(COLOR_SUCCESS);
+        return createEmbed().setColor(DiscordColor.DISCORD_GREEN.getColor());
     }
 
     /**
@@ -252,7 +265,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * @return the embed builder
      */
     public EmbedBuilder createWarningEmbed() {
-        return createEmbed().setColor(COLOR_WARNING);
+        return createEmbed().setColor(DiscordColor.DISCORD_YELLOW.getColor());
     }
 
     /**
@@ -261,7 +274,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * @return the embed builder
      */
     public EmbedBuilder createErrorEmbed() {
-        return createEmbed().setColor(COLOR_ERROR);
+        return createEmbed().setColor(DiscordColor.DISCORD_RED.getColor());
     }
 
     /**
@@ -276,7 +289,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     /**
      * Adds an info message to the response.
      *
-     * @param title the message title
+     * @param title       the message title
      * @param description the message description
      */
     public void info(String title, String description) {
@@ -285,7 +298,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
 
         // Set title
         if (title == null || title.isEmpty()) {
-            embedBuilder.setTitle("Information");
+            embedBuilder.setTitle(languageManager.getString(locale, "commands.titles.info"));
         } else {
             embedBuilder.setTitle(title);
         }
@@ -311,7 +324,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     /**
      * Adds a success message to the response.
      *
-     * @param title the message title
+     * @param title       the message title
      * @param description the message description
      */
     public void success(String title, String description) {
@@ -320,7 +333,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
 
         // Set title
         if (title == null || title.isEmpty()) {
-            embedBuilder.setTitle("Command executed successfully");
+            embedBuilder.setTitle(languageManager.getString(locale, "commands.titles.success"));
         } else {
             embedBuilder.setTitle(title);
         }
@@ -346,7 +359,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     /**
      * Adds a warning message to the response.
      *
-     * @param title the message title
+     * @param title       the message title
      * @param description the message description
      */
     public void warning(String title, String description) {
@@ -355,7 +368,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
 
         // Set title
         if (title == null || title.isEmpty()) {
-            embedBuilder.setTitle("Warning");
+            embedBuilder.setTitle(languageManager.getString(locale, "commands.titles.warning"));
         } else {
             embedBuilder.setTitle(title);
         }
@@ -381,7 +394,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     /**
      * Adds an error message to the response.
      *
-     * @param title the message title
+     * @param title       the message title
      * @param description the message description
      */
     public void error(String title, String description) {
@@ -390,7 +403,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
 
         // Set title
         if (title == null || title.isEmpty()) {
-            embedBuilder.setTitle("An error occurred");
+            embedBuilder.setTitle(languageManager.getString(locale, "commands.titles.error"));
         } else {
             embedBuilder.setTitle(title);
         }
@@ -433,11 +446,11 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
 
         return super.addComponents(components);
     }
-    
+
     /**
      * Limits a string to a maximum length.
      *
-     * @param content the string to limit
+     * @param content   the string to limit
      * @param maxLength the maximum length
      * @return the limited string
      */
@@ -445,14 +458,14 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         if (content == null) {
             return "";
         }
-        
+
         if (content.length() > maxLength) {
             return content.substring(0, maxLength - 3) + "...";
         }
-        
+
         return content;
     }
-    
+
     /**
      * Builds the message and returns the data.
      * This is used for sending the message.

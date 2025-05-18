@@ -4,13 +4,13 @@ import fr.farmvivi.discordbot.core.api.command.Command;
 import fr.farmvivi.discordbot.core.api.command.CommandContext;
 import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
 import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 
 import java.util.*;
@@ -28,23 +28,26 @@ public class SimpleCommandContext implements CommandContext {
     private final MessageChannel channel;
     private final Locale locale;
     private final Map<String, Object> options;
+    private final LanguageManager languageManager;
     private boolean deferred = false;
     private boolean ephemeral = false;
 
     /**
      * Creates a new SimpleCommandContext with specified parameters.
      *
-     * @param originalEvent the original JDA event
-     * @param command       the command being executed
-     * @param user          the user executing the command
-     * @param guild         the guild where the command is executed (may be null)
-     * @param channel       the channel where the command is executed
-     * @param locale        the locale of the user or guild
-     * @param options       the options provided by the user
+     * @param originalEvent   the original JDA event
+     * @param command         the command being executed
+     * @param user            the user executing the command
+     * @param guild           the guild where the command is executed (may be null)
+     * @param channel         the channel where the command is executed
+     * @param locale          the locale of the user or guild
+     * @param options         the options provided by the user
+     * @param languageManager the language manager for translations
      */
     public SimpleCommandContext(Event originalEvent, Command command, User user,
                                 Guild guild, MessageChannel channel,
-                                Locale locale, Map<String, Object> options) {
+                                Locale locale, Map<String, Object> options,
+                                LanguageManager languageManager) {
         this.originalEvent = originalEvent;
         this.command = command;
         this.user = user;
@@ -52,6 +55,7 @@ public class SimpleCommandContext implements CommandContext {
         this.channel = channel;
         this.locale = locale;
         this.options = options != null ? new HashMap<>(options) : new HashMap<>();
+        this.languageManager = languageManager;
     }
 
     @Override
@@ -151,7 +155,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void reply(String message) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setContent(message);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
@@ -160,7 +164,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void reply(String message, Collection<LayoutComponent> components) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setContent(message);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
@@ -172,7 +176,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void replyEmbed(EmbedBuilder embed) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
         messageBuilder.addEmbeds(embed.build());
@@ -181,7 +185,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void replyEmbed(EmbedBuilder embed, Collection<LayoutComponent> components) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
         messageBuilder.addEmbeds(embed.build());
@@ -193,7 +197,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void replySuccess(String message) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
         messageBuilder.success(message);
@@ -202,7 +206,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void replyInfo(String message) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
         messageBuilder.info(message);
@@ -211,7 +215,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void replyWarning(String message) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
         messageBuilder.warning(message);
@@ -220,7 +224,7 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void replyError(String message) {
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
         messageBuilder.error(message);
@@ -237,7 +241,7 @@ public class SimpleCommandContext implements CommandContext {
         this.deferred = true;
         this.ephemeral = ephemeral;
 
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
+        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(true);
         messageBuilder.setEphemeral(ephemeral);
         messageBuilder.replyNow();
@@ -261,8 +265,8 @@ public class SimpleCommandContext implements CommandContext {
     @Override
     public JDA getJDA() {
         // Get JDA from the original event
-        if (originalEvent instanceof GenericEvent) {
-            return ((GenericEvent) originalEvent).getJDA();
+        if (originalEvent != null) {
+            return originalEvent.getJDA();
         }
         return null;
     }

@@ -199,6 +199,7 @@ public class Discobocor {
         // Create the command service
         commandService = new SimpleCommandService(
                 eventManager,
+                languageManager,
                 permissionManager,
                 coreConfig,
                 dataStorageManager
@@ -235,6 +236,11 @@ public class Discobocor {
                             "# Language settings\n" +
                             "language:\n" +
                             "  default: en-US\n\n" +
+                            "# Command system settings\n" +
+                            "commands:\n" +
+                            "  enabled: true  # Enable or disable the command system globally\n" +
+                            "  default-prefix: !  # Default prefix for text commands\n" +
+                            "  cooldown: 3  # Global default cooldown in seconds\n" +
                             "# Data storage settings\n" +
                             "data:\n" +
                             "  storage:\n" +

@@ -4,6 +4,7 @@ import fr.farmvivi.discordbot.core.api.command.Command;
 import fr.farmvivi.discordbot.core.api.command.CommandContext;
 import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
 import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.SimpleCommandContext;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -31,14 +32,17 @@ public class TextCommandParser implements CommandParser {
     private static final Pattern ROLE_MENTION_PATTERN = Pattern.compile("<@&(\\d+)>");
     private static final Pattern CHANNEL_MENTION_PATTERN = Pattern.compile("<#(\\d+)>");
 
+    private final LanguageManager languageManager;
     private final String prefix;
 
     /**
      * Creates a new text command parser.
      *
-     * @param prefix the command prefix
+     * @param languageManager the language manager to use for localization
+     * @param prefix          the command prefix
      */
-    public TextCommandParser(String prefix) {
+    public TextCommandParser(LanguageManager languageManager, String prefix) {
+        this.languageManager = languageManager;
         this.prefix = prefix;
     }
 
@@ -89,7 +93,7 @@ public class TextCommandParser implements CommandParser {
 
         // Create and validate context
         SimpleCommandContext context = new SimpleCommandContext(
-                event, command, user, guild, channel, locale, options
+                event, command, user, guild, channel, locale, options, languageManager
         );
 
         context.validateOptions();

@@ -8,6 +8,7 @@ import fr.farmvivi.discordbot.core.api.command.exception.CommandPermissionExcept
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.config.ConfigurationException;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
+import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
@@ -46,6 +47,7 @@ public class SimpleCommandService implements CommandService {
     private final CommandRegistry registry;
     private final List<CommandParser> parsers = new ArrayList<>();
     private final EventManager eventManager;
+    private final LanguageManager languageManager;
     private final PermissionManager permissionManager;
     private final Configuration configuration;
     private final DataStorageManager storageManager;
@@ -68,17 +70,20 @@ public class SimpleCommandService implements CommandService {
      * Creates a new SimpleCommandService.
      *
      * @param eventManager      the event manager
+     * @param languageManager   the language manager
      * @param permissionManager the permission manager
      * @param configuration     the configuration
      * @param storageManager    the storage manager
      */
     public SimpleCommandService(
             EventManager eventManager,
+            LanguageManager languageManager,
             PermissionManager permissionManager,
             Configuration configuration,
             DataStorageManager storageManager
     ) {
         this.eventManager = eventManager;
+        this.languageManager = languageManager;
         this.permissionManager = permissionManager;
         this.configuration = configuration;
         this.storageManager = storageManager;
@@ -98,8 +103,8 @@ public class SimpleCommandService implements CommandService {
         }
 
         // Register parsers
-        parsers.add(new SlashCommandParser());
-        parsers.add(new TextCommandParser(defaultPrefix));
+        parsers.add(new SlashCommandParser(languageManager));
+        parsers.add(new TextCommandParser(languageManager, defaultPrefix));
     }
 
     @Override
@@ -147,7 +152,7 @@ public class SimpleCommandService implements CommandService {
         for (CommandParser parser : parsers) {
             if (parser instanceof TextCommandParser textParser) {
                 parsers.remove(textParser);
-                parsers.add(new TextCommandParser(prefix));
+                parsers.add(new TextCommandParser(languageManager, prefix));
                 break;
             }
         }
@@ -448,18 +453,20 @@ public class SimpleCommandService implements CommandService {
      * @return the command result
      */
     public CommandResult executeCommand(Command command, CommandContext context) {
+        Locale locale = context.getLocale();
+
         if (!isEnabled()) {
-            return CommandResult.error("Command system is disabled");
+            return CommandResult.error(languageManager.getString(locale, "commands.messages.system_disabled"));
         }
 
         // Check if the command is enabled
         if (!command.isEnabled()) {
-            return CommandResult.error("This command is disabled");
+            return CommandResult.error(languageManager.getString(locale, "commands.messages.disabled"));
         }
 
         // Check guild-only
         if (command.isGuildOnly() && !context.isFromGuild()) {
-            return CommandResult.error("This command can only be used in a server");
+            return CommandResult.error(languageManager.getString(locale, "commands.messages.guild_only"));
         }
 
         // Check admin permission
@@ -473,7 +480,7 @@ public class SimpleCommandService implements CommandService {
                             "You don't have permission to use this command", command.getPermission());
                 }
             } catch (Exception e) {
-                return CommandResult.error("Permission error: " + e.getMessage());
+                return CommandResult.error(languageManager.getString(locale, "commands.messages.permission_error", e.getMessage()));
             }
         }
 
@@ -481,8 +488,7 @@ public class SimpleCommandService implements CommandService {
         String userId = context.getUser().getId();
         if (isOnCooldown(userId, command.getName())) {
             int seconds = getRemainingCooldown(userId, command.getName());
-            return CommandResult.error("This command is on cooldown. Please wait " + seconds +
-                    " second" + (seconds == 1 ? "" : "s") + " before using it again.");
+            return CommandResult.error(languageManager.getString(locale, "commands.messages.cooldown", seconds));
         }
 
         // Fire command execute event
@@ -491,7 +497,7 @@ public class SimpleCommandService implements CommandService {
 
         // Check if the event was cancelled
         if (executeEvent.isCancelled()) {
-            return CommandResult.error("Command execution was cancelled");
+            return CommandResult.error(languageManager.getString(locale, "commands.messages.execution_cancelled"));
         }
 
         // Execute the command
@@ -507,7 +513,7 @@ public class SimpleCommandService implements CommandService {
             }
         } catch (Exception e) {
             logger.error("Error executing command {}: {}", command.getName(), e.getMessage(), e);
-            result = CommandResult.error("An error occurred while executing the command: " + e.getMessage());
+            result = CommandResult.error(languageManager.getString(locale, "commands.messages.execution_error", e.getMessage()));
         }
 
         long endTime = System.nanoTime();
