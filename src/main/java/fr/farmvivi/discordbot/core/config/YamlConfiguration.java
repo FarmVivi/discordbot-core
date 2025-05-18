@@ -39,17 +39,28 @@ public class YamlConfiguration implements Configuration {
         // Empty constructor for subclasses
     }
 
+    /**
+     * Resolves a nested key (dot-separated) to its value.
+     */
+    private Object getValueForKey(String key) throws ConfigurationException {
+        String[] parts = key.split("\\.");
+        Object current = values;
+        for (String part : parts) {
+            if (!(current instanceof Map)) {
+                throw new ConfigurationException("Key not found: " + key);
+            }
+            Map<?, ?> map = (Map<?, ?>) current;
+            if (!map.containsKey(part) || map.get(part) == null) {
+                throw new ConfigurationException("Key not found: " + key);
+            }
+            current = map.get(part);
+        }
+        return current;
+    }
+
     @Override
     public String getString(String key) throws ConfigurationException {
-        if (!contains(key)) {
-            throw new ConfigurationException("Key not found: " + key);
-        }
-
-        Object value = values.get(key);
-        if (value == null) {
-            throw new ConfigurationException("Key not found: " + key);
-        }
-
+        Object value = getValueForKey(key);
         return value.toString();
     }
 
@@ -64,8 +75,8 @@ public class YamlConfiguration implements Configuration {
 
     @Override
     public int getInt(String key) throws ConfigurationException {
+        String value = getString(key);
         try {
-            String value = getString(key);
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             throw new ConfigurationException("Value is not an integer: " + key);
@@ -99,24 +110,15 @@ public class YamlConfiguration implements Configuration {
     @Override
     @SuppressWarnings("unchecked")
     public List<String> getStringList(String key) throws ConfigurationException {
-        if (!contains(key)) {
-            throw new ConfigurationException("Key not found: " + key);
-        }
-
-        Object value = values.get(key);
-        if (value == null) {
-            throw new ConfigurationException("Key not found: " + key);
-        }
-
-        if (value instanceof List) {
-            List<Object> list = (List<Object>) value;
+        Object raw = getValueForKey(key);
+        if (raw instanceof List) {
+            List<Object> list = (List<Object>) raw;
             List<String> stringList = new ArrayList<>();
             for (Object obj : list) {
                 stringList.add(obj.toString());
             }
             return stringList;
         }
-
         throw new ConfigurationException("Value is not a list: " + key);
     }
 
@@ -136,7 +138,12 @@ public class YamlConfiguration implements Configuration {
 
     @Override
     public boolean contains(String key) {
-        return values.containsKey(key);
+        try {
+            getValueForKey(key);
+            return true;
+        } catch (ConfigurationException e) {
+            return false;
+        }
     }
 
     @Override
