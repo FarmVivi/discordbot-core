@@ -2,20 +2,3 @@ permissions:
   error:
     denied: "Permission refusée : {0}"
     not_found: "Permission introuvable : {0}"
-  command:
-    set:
-      success: "Permission {0} définie à {1} pour l'utilisateur {2}"
-      success_guild: "Permission {0} définie à {1} pour l'utilisateur {2} dans la guilde {3}"
-    clear:
-      success: "Toutes les permissions supprimées pour l'utilisateur {0}"
-      success_guild: "Toutes les permissions supprimées pour l'utilisateur {0} dans la guilde {1}"
-    list:
-      header: "Permissions pour l'utilisateur {0} :"
-      header_guild: "Permissions pour l'utilisateur {0} dans la guilde {1} :"
-      entry: "- {0} : {1}"
-      none: "Aucune permission trouvée"
-  info:
-    registered: "Permissions enregistrées :"
-    entry: "- {0} : {1} (Défaut : {2})"
-    none: "Aucune permission enregistrée"
-    plugin_permissions: "Permissions pour le plugin {0} :"
