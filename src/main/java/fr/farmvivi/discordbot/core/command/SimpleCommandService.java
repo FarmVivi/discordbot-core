@@ -15,8 +15,8 @@ import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.GuildStorage;
-import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
-import fr.farmvivi.discordbot.core.api.command.exception.CommandPermissionException;
+import fr.farmvivi.discordbot.core.command.exception.CommandParseException;
+import fr.farmvivi.discordbot.core.command.exception.CommandPermissionException;
 import fr.farmvivi.discordbot.core.command.listener.CommandListener;
 import fr.farmvivi.discordbot.core.command.parser.CommandParser;
 import fr.farmvivi.discordbot.core.command.parser.SlashCommandParser;
@@ -58,7 +58,6 @@ public class SimpleCommandService implements CommandService {
     private final PermissionManager permissionManager;
     private final Configuration configuration;
     private final DataStorageManager storageManager;
-    private final Plugin corePlugin;
     
     private JDA jda;
     private boolean enabled;
@@ -81,20 +80,17 @@ public class SimpleCommandService implements CommandService {
      * @param permissionManager the permission manager
      * @param configuration the configuration
      * @param storageManager the storage manager
-     * @param corePlugin the core plugin
      */
     public SimpleCommandService(
             EventManager eventManager,
             PermissionManager permissionManager,
             Configuration configuration,
-            DataStorageManager storageManager,
-            Plugin corePlugin
+            DataStorageManager storageManager
     ) {
         this.eventManager = eventManager;
         this.permissionManager = permissionManager;
         this.configuration = configuration;
         this.storageManager = storageManager;
-        this.corePlugin = corePlugin;
         
         this.registry = new SimpleCommandRegistry();
         
@@ -201,6 +197,17 @@ public class SimpleCommandService implements CommandService {
         
         return result;
     }
+    
+    /**
+     * Registers a command without associating it with a plugin.
+     * This is used for system commands.
+     *
+     * @param command the command to register
+     * @return true if the command was registered
+     */
+    public boolean registerCommand(Command command) {
+        return registerCommand(command, null);
+    }
 
     @Override
     public boolean registerCommand(Plugin plugin, Consumer<CommandBuilder> builderConsumer) {
@@ -208,6 +215,20 @@ public class SimpleCommandService implements CommandService {
         builderConsumer.accept(builder);
         Command command = builder.build();
         return registerCommand(command, plugin);
+    }
+    
+    /**
+     * Registers a command without associating it with a plugin.
+     * This is used for system commands.
+     *
+     * @param builderConsumer consumer to configure the command builder
+     * @return true if the command was registered
+     */
+    public boolean registerCommand(Consumer<CommandBuilder> builderConsumer) {
+        SimpleCommandBuilder builder = new SimpleCommandBuilder();
+        builderConsumer.accept(builder);
+        Command command = builder.build();
+        return registerCommand(command);
     }
 
     @Override
@@ -681,13 +702,13 @@ public class SimpleCommandService implements CommandService {
      */
     private void registerSystemCommands() {
         // Register help command
-        registerCommand(new HelpCommand(this), corePlugin);
+        registerCommand(new HelpCommand(this).getCommand());
         
         // Register version command
-        registerCommand(new VersionCommand(), corePlugin);
+        registerCommand(new VersionCommand().getCommand());
         
         // Register shutdown command
-        registerCommand(new ShutdownCommand(), corePlugin);
+        registerCommand(new ShutdownCommand().getCommand());
     }
     
     /**

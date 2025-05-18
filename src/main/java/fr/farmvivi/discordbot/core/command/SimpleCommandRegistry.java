@@ -30,10 +30,13 @@ public class SimpleCommandRegistry implements CommandRegistry {
     // Maps command to its owning plugin
     private final Map<Command, Plugin> commandPluginMap = new ConcurrentHashMap<>();
     
+    // List of system commands (not associated with a plugin)
+    private final List<Command> systemCommands = new ArrayList<>();
+    
     @Override
     public boolean register(Command command, Plugin plugin) {
         Objects.requireNonNull(command, "Command cannot be null");
-        Objects.requireNonNull(plugin, "Plugin cannot be null");
+        // Plugin can be null for system commands
         
         String name = command.getName().toLowerCase();
         
@@ -46,9 +49,17 @@ public class SimpleCommandRegistry implements CommandRegistry {
         // Register the command
         commands.put(name, command);
         
-        // Associate the command with the plugin
-        pluginCommands.computeIfAbsent(plugin, k -> new ArrayList<>()).add(command);
-        commandPluginMap.put(command, plugin);
+        // If plugin is provided, associate the command with the plugin
+        if (plugin != null) {
+            pluginCommands.computeIfAbsent(plugin, k -> new ArrayList<>()).add(command);
+            commandPluginMap.put(command, plugin);
+            
+            logger.debug("Registered command '{}' from plugin '{}'", name, plugin.getName());
+        } else {
+            // This is a system command
+            systemCommands.add(command);
+            logger.debug("Registered system command '{}'", name);
+        }
         
         // Register aliases
         for (String alias : command.getAliases()) {
@@ -61,7 +72,6 @@ public class SimpleCommandRegistry implements CommandRegistry {
             aliasMap.put(lowerAlias, command);
         }
         
-        logger.debug("Registered command '{}' from plugin '{}'", name, plugin.getName());
         return true;
     }
 
@@ -73,6 +83,9 @@ public class SimpleCommandRegistry implements CommandRegistry {
         if (command == null) {
             return false;
         }
+        
+        // Remove from system commands if it's a system command
+        systemCommands.remove(command);
         
         // Remove the command from the plugin's command list
         Plugin plugin = commandPluginMap.remove(command);
@@ -97,7 +110,23 @@ public class SimpleCommandRegistry implements CommandRegistry {
 
     @Override
     public int unregisterAll(Plugin plugin) {
-        Objects.requireNonNull(plugin, "Plugin cannot be null");
+        if (plugin == null) {
+            // Unregister all system commands
+            int count = systemCommands.size();
+            
+            for (Command command : new ArrayList<>(systemCommands)) {
+                commands.remove(command.getName().toLowerCase());
+                
+                // Remove aliases
+                for (String alias : command.getAliases()) {
+                    aliasMap.remove(alias.toLowerCase());
+                }
+            }
+            
+            systemCommands.clear();
+            logger.debug("Unregistered {} system commands", count);
+            return count;
+        }
         
         List<Command> commands = pluginCommands.remove(plugin);
         if (commands == null || commands.isEmpty()) {
@@ -138,6 +167,10 @@ public class SimpleCommandRegistry implements CommandRegistry {
 
     @Override
     public List<Command> getCommands(Plugin plugin) {
+        if (plugin == null) {
+            // Return system commands
+            return Collections.unmodifiableList(systemCommands);
+        }
         return pluginCommands.getOrDefault(plugin, List.of()).stream()
                 .collect(Collectors.toUnmodifiableList());
     }
@@ -214,11 +247,9 @@ public class SimpleCommandRegistry implements CommandRegistry {
             
             // Replace the command in all maps
             Plugin plugin = commandPluginMap.get(command);
-            if (plugin != null) {
-                unregister(name);
-                register(newCommand, plugin);
-                return true;
-            }
+            unregister(name);
+            register(newCommand, plugin);
+            return true;
         }
         
         return false;
@@ -256,11 +287,9 @@ public class SimpleCommandRegistry implements CommandRegistry {
             
             // Replace the command in all maps
             Plugin plugin = commandPluginMap.get(command);
-            if (plugin != null) {
-                unregister(name);
-                register(newCommand, plugin);
-                return true;
-            }
+            unregister(name);
+            register(newCommand, plugin);
+            return true;
         }
         
         return false;
