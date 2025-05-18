@@ -90,7 +90,7 @@ public class SimpleCommandService implements CommandService {
             this.defaultPrefix = configuration.getString("commands.default-prefix", "!");
 
             logger.info("Command system " + (enabled ? "enabled" : "disabled") + " with default prefix: " + defaultPrefix);
-        } catch (ConfigurationException e) {
+        } catch (Exception e) {
             logger.warn("Failed to load command configuration, using defaults", e);
             this.enabled = true;
             this.defaultPrefix = "!";

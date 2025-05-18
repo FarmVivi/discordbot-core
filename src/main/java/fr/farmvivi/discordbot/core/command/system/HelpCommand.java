@@ -239,8 +239,8 @@ public class HelpCommand {
             embed.addField(category, value.toString(), false);
             
             // Check if we need to split the embed due to Discord's limits
-            if (embed.getFields().size() >= MessageEmbed.MAX_FIELD_COUNT ||
-                    embed.length() >= MessageEmbed.MAX_TOTAL_LENGTH - 100) {
+            if (embed.getFields().size() >= MessageEmbed.MAX_FIELD_AMOUNT ||
+                    embed.length() >= MessageEmbed.EMBED_MAX_LENGTH_BOT - 100) {
                 
                 // Send the current embed
                 context.replyEmbed(embed);

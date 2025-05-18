@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.core.api.command;
 
 import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -131,7 +132,7 @@ public interface CommandContext {
     /**
      * Replies to the command with an embed and components.
      *
-     * @param embed     the embed builder
+     * @param embed      the embed builder
      * @param components the message components
      */
     void replyEmbed(EmbedBuilder embed, Collection<LayoutComponent> components);
@@ -206,4 +207,11 @@ public interface CommandContext {
      * @param ephemeral true if the reply should be ephemeral
      */
     void setEphemeral(boolean ephemeral);
+
+    /**
+     * Gets the JDA instance associated with this command context.
+     *
+     * @return the JDA instance, or null if not available
+     */
+    JDA getJDA();
 }

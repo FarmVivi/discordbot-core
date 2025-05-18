@@ -2,23 +2,25 @@ package fr.farmvivi.discordbot.core.command;
 
 import fr.farmvivi.discordbot.core.api.command.Command;
 import fr.farmvivi.discordbot.core.api.command.CommandContext;
-import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
 import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
+import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 
 import java.util.*;
 
 /**
- * Implementation of CommandContext that provides all necessary functionality 
+ * Implementation of CommandContext that provides all necessary functionality
  * for command execution.
  */
 public class SimpleCommandContext implements CommandContext {
-    
+
     private final Event originalEvent;
     private final Command command;
     private final User user;
@@ -28,20 +30,20 @@ public class SimpleCommandContext implements CommandContext {
     private final Map<String, Object> options;
     private boolean deferred = false;
     private boolean ephemeral = false;
-    
+
     /**
      * Creates a new SimpleCommandContext with specified parameters.
-     * 
+     *
      * @param originalEvent the original JDA event
-     * @param command the command being executed
-     * @param user the user executing the command
-     * @param guild the guild where the command is executed (may be null)
-     * @param channel the channel where the command is executed
-     * @param locale the locale of the user or guild
-     * @param options the options provided by the user
+     * @param command       the command being executed
+     * @param user          the user executing the command
+     * @param guild         the guild where the command is executed (may be null)
+     * @param channel       the channel where the command is executed
+     * @param locale        the locale of the user or guild
+     * @param options       the options provided by the user
      */
-    public SimpleCommandContext(Event originalEvent, Command command, User user, 
-                                Guild guild, MessageChannel channel, 
+    public SimpleCommandContext(Event originalEvent, Command command, User user,
+                                Guild guild, MessageChannel channel,
                                 Locale locale, Map<String, Object> options) {
         this.originalEvent = originalEvent;
         this.command = command;
@@ -89,7 +91,7 @@ public class SimpleCommandContext implements CommandContext {
         if (value == null) {
             return Optional.empty();
         }
-        
+
         try {
             return Optional.of((T) value);
         } catch (ClassCastException e) {
@@ -104,7 +106,7 @@ public class SimpleCommandContext implements CommandContext {
         if (value == null) {
             return defaultValue;
         }
-        
+
         try {
             return (T) value;
         } catch (ClassCastException e) {
@@ -119,7 +121,7 @@ public class SimpleCommandContext implements CommandContext {
         if (value == null) {
             throw new IllegalArgumentException("Required option '" + name + "' is missing");
         }
-        
+
         try {
             return (T) value;
         } catch (ClassCastException e) {
@@ -234,7 +236,7 @@ public class SimpleCommandContext implements CommandContext {
     public void deferReply(boolean ephemeral) {
         this.deferred = true;
         this.ephemeral = ephemeral;
-        
+
         CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent);
         messageBuilder.setDiffer(true);
         messageBuilder.setEphemeral(ephemeral);
@@ -255,21 +257,30 @@ public class SimpleCommandContext implements CommandContext {
     public void setEphemeral(boolean ephemeral) {
         this.ephemeral = ephemeral;
     }
-    
+
+    @Override
+    public JDA getJDA() {
+        // Get JDA from the original event
+        if (originalEvent instanceof GenericEvent) {
+            return ((GenericEvent) originalEvent).getJDA();
+        }
+        return null;
+    }
+
     /**
      * Adds an option to the context.
      * This is used by parsers to populate the options.
      *
-     * @param name the option name
+     * @param name  the option name
      * @param value the option value
      */
     public void addOption(String name, Object value) {
         this.options.put(name, value);
     }
-    
+
     /**
      * Validates all options against their definitions.
-     * 
+     *
      * @throws CommandParseException if validation fails
      */
     public void validateOptions() throws CommandParseException {
@@ -278,7 +289,7 @@ public class SimpleCommandContext implements CommandContext {
             if (option.isRequired() && !options.containsKey(name)) {
                 throw new CommandParseException("Required option '" + name + "' is missing", name);
             }
-            
+
             if (options.containsKey(name)) {
                 Object value = options.get(name);
                 if (!isValidOptionType(option, value)) {
@@ -288,12 +299,12 @@ public class SimpleCommandContext implements CommandContext {
             }
         }
     }
-    
+
     /**
      * Checks if the value has the correct type for the option.
      *
      * @param option the option definition
-     * @param value the value to check
+     * @param value  the value to check
      * @return true if the value has the correct type
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -301,7 +312,7 @@ public class SimpleCommandContext implements CommandContext {
         if (value == null) {
             return !option.isRequired();
         }
-        
+
         try {
             return option.isValid(value);
         } catch (ClassCastException e) {
