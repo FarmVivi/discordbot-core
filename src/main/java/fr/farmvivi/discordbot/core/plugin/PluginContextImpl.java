@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.plugin;
 
 import fr.farmvivi.discordbot.core.api.audio.AudioService;
+import fr.farmvivi.discordbot.core.api.command.CommandService;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
@@ -27,6 +28,7 @@ public record PluginContextImpl(
         DataStorageManager getDataStorageManager,
         BinaryStorageManager getBinaryStorageManager,
         PermissionManager getPermissionManager,
-        AudioService getAudioService
+        AudioService getAudioService,
+        CommandService getCommandService
 ) implements PluginContext {
 }

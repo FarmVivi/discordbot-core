@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core;
 
 import fr.farmvivi.discordbot.core.api.audio.AudioService;
+import fr.farmvivi.discordbot.core.api.command.CommandService;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -8,6 +9,7 @@ import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
 import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import fr.farmvivi.discordbot.core.audio.AudioServiceImpl;
+import fr.farmvivi.discordbot.core.command.SimpleCommandService;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
@@ -48,6 +50,7 @@ public class Discobocor {
     private static BinaryStorageManager binaryStorageManager;
     private static SimplePermissionManager permissionManager;
     private static AudioService audioService;
+    private static CommandService commandService;
 
     static {
         Properties properties = new Properties();
@@ -193,6 +196,14 @@ public class Discobocor {
         // Create the audio service
         audioService = new AudioServiceImpl(eventManager);
 
+        // Create the command service
+        commandService = new SimpleCommandService(
+                eventManager,
+                permissionManager,
+                coreConfig,
+                dataStorageManager
+        );
+
         // Create the plugin manager
         pluginManager = new PluginManager(
                 pluginsFolder,
@@ -202,7 +213,8 @@ public class Discobocor {
                 dataStorageManager,
                 binaryStorageManager,
                 permissionManager,
-                audioService
+                audioService,
+                commandService
         );
 
         return true;
@@ -422,5 +434,14 @@ public class Discobocor {
      */
     public static AudioService getAudioService() {
         return audioService;
+    }
+
+    /**
+     * Gets the command service.
+     *
+     * @return the command service
+     */
+    public static CommandService getCommandService() {
+        return commandService;
     }
 }

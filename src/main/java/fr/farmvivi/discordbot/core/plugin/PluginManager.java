@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.plugin;
 
 import fr.farmvivi.discordbot.core.api.audio.AudioService;
+import fr.farmvivi.discordbot.core.api.command.CommandService;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -38,6 +39,7 @@ public class PluginManager implements PluginLoader, Closeable {
     private final BinaryStorageManager binaryStorageManager;
     private final PermissionManager permissionManager;
     private final AudioService audioService;
+    private final CommandService commandService;
 
     // Plugin tracking
     private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
@@ -65,7 +67,8 @@ public class PluginManager implements PluginLoader, Closeable {
             DataStorageManager dataStorageManager,
             BinaryStorageManager binaryStorageManager,
             PermissionManager permissionManager,
-            AudioService audioService) {
+            AudioService audioService,
+            CommandService commandService) {
         this.pluginsFolder = pluginsFolder;
         this.eventManager = eventManager;
         this.discordAPI = discordAPI;
@@ -74,6 +77,7 @@ public class PluginManager implements PluginLoader, Closeable {
         this.binaryStorageManager = binaryStorageManager;
         this.permissionManager = permissionManager;
         this.audioService = audioService;
+        this.commandService = commandService;
 
         if (!pluginsFolder.exists() && !pluginsFolder.mkdirs()) {
             logger.warn("Failed to create plugins folder: {}", pluginsFolder.getAbsolutePath());
@@ -133,7 +137,8 @@ public class PluginManager implements PluginLoader, Closeable {
                     dataStorageManager,
                     binaryStorageManager,
                     permissionManager,
-                    audioService
+                    audioService,
+                    commandService
             );
 
             // Initialize the plugin
@@ -236,6 +241,10 @@ public class PluginManager implements PluginLoader, Closeable {
             }
             if (audioService != null) {
                 audioService.closeAllConnectionsForPlugin(plugin);
+            }
+            if (commandService != null) {
+                // Unregister all commands from this plugin
+                commandService.getRegistry().unregisterAll(plugin);
             }
 
             // Set to disabled

@@ -1,6 +1,8 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
 import fr.farmvivi.discordbot.core.api.audio.AudioService;
+import fr.farmvivi.discordbot.core.api.command.CommandService;
+import fr.farmvivi.discordbot.core.api.command.PluginCommandAdapter;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
@@ -33,12 +35,14 @@ public abstract class AbstractPlugin implements Plugin {
     protected BinaryStorageManager binaryStorageManager;
     protected PermissionManager permissionManager;
     protected AudioService audioService;
+    protected CommandService commandService;
 
     // Plugin-specific managers
     protected PluginPermissionAdapter pluginPermissionAdapter;
     protected PluginLanguageAdapter pluginLanguageAdapter;
     protected PluginDataStorageAdapter pluginDataStorageAdapter;
     protected PluginBinaryStorageAdapter pluginBinaryStorageAdapter;
+    protected PluginCommandAdapter pluginCommandAdapter;
 
     // Plugin state
     private PluginLifecycle lifecycle = PluginLifecycle.DISCOVERED;
@@ -56,12 +60,14 @@ public abstract class AbstractPlugin implements Plugin {
         this.binaryStorageManager = context.getBinaryStorageManager();
         this.permissionManager = context.getPermissionManager();
         this.audioService = context.getAudioService();
+        this.commandService = context.getCommandService();
 
         // Initialize plugin-specific managers
         this.pluginLanguageAdapter = new PluginLanguageAdapter(this, languageManager);
         this.pluginPermissionAdapter = new PluginPermissionAdapter(this, permissionManager, languageManager);
         this.pluginDataStorageAdapter = new PluginDataStorageAdapter(this, dataStorageManager);
         this.pluginBinaryStorageAdapter = new PluginBinaryStorageAdapter(this, binaryStorageManager);
+        this.pluginCommandAdapter = new PluginCommandAdapter(this, commandService);
 
         // Create data directory if it doesn't exist
         File dataDir = new File(dataFolder);
@@ -168,6 +174,17 @@ public abstract class AbstractPlugin implements Plugin {
      */
     public PluginBinaryStorageAdapter getPluginBinaryStorage() {
         return pluginBinaryStorageAdapter;
+    }
+
+    /**
+     * Gets the plugin-specific command adapter.
+     * This provides convenient methods for registering and managing commands
+     * specifically for this plugin.
+     *
+     * @return the plugin command adapter
+     */
+    public PluginCommandAdapter getPluginCommandAdapter() {
+        return pluginCommandAdapter;
     }
 
     /**

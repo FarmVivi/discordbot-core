@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.api.plugin;
 
 import fr.farmvivi.discordbot.core.api.audio.AudioService;
+import fr.farmvivi.discordbot.core.api.command.CommandService;
 import fr.farmvivi.discordbot.core.api.config.Configuration;
 import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
 import fr.farmvivi.discordbot.core.api.event.EventManager;
@@ -90,4 +91,11 @@ public interface PluginContext {
      * @return the audio service, or null if audio is disabled
      */
     AudioService getAudioService();
+    
+    /**
+     * Gets the command service for registering and managing commands.
+     *
+     * @return the command service
+     */
+    CommandService getCommandService();
 }
