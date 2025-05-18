@@ -268,8 +268,9 @@ public class SimpleCommandBuilder implements CommandBuilder {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public CommandBuilder option(OptionType2 type, String name, String description, boolean required) {
-        return option(new SimpleCommandOption.Builder<>()
+        return option(new SimpleCommandOption.Builder<Object>()
                 .name(name)
                 .description(description)
                 .type(type)
@@ -304,6 +305,7 @@ public class SimpleCommandBuilder implements CommandBuilder {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Command build() {
         // Process subcommands first
         for (SimpleCommandBuilder subcommandBuilder : subcommandBuilders) {

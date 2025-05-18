@@ -38,6 +38,7 @@ import java.util.function.Consumer;
  * This service manages the lifecycle of commands, including registration,
  * execution, and synchronization with Discord.
  */
+@SuppressWarnings("deprecation")
 public class SimpleCommandService implements CommandService {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleCommandService.class);
