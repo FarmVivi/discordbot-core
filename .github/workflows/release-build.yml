@@ -45,6 +45,6 @@ jobs:
 
       # Upload du .jar sur la release GitHub
       - name: Upload JAR to release
-        uses: softprops/action-gh-release@v2.3.0
+        uses: softprops/action-gh-release@v2.3.2
         with:
           files: target/${{ steps.find_jar.outputs.jar_name }}
