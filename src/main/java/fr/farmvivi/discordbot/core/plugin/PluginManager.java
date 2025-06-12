@@ -543,18 +543,44 @@ public class PluginManager implements PluginLoader, Closeable {
         logger.info("Starting complete plugin reload...");
         long startTime = System.currentTimeMillis();
 
-        // Save plugin state if needed (e.g. configs)
+        savePluginState();
+        disableAllPlugins();
+        disconnectFromDiscord();
+        clearEventHandlers();
+        reloadAllPlugins();
+        preEnableAllPlugins();
+
+        boolean discordConnected = reconnectToDiscord();
+        boolean enabledOk = false;
+        if (discordConnected) {
+            enabledOk = enableAllPlugins();
+        } else {
+            logger.error("Skipping plugin enable phase due to Discord connection failure");
+        }
+
+        logReloadSummary(startTime, discordConnected);
+        return enabledOk && discordConnected;
+    }
+
+    /** Saves all plugin data prior to reload. */
+    private void savePluginState() {
         if (dataStorageManager != null) {
             dataStorageManager.saveAll();
         }
+    }
 
-        // Step 1: Disable plugins in proper sequence
+    /**
+     * Disables every loaded plugin following the proper sequence.
+     */
+    private void disableAllPlugins() {
         logger.info("Disabling plugins...");
         preDisablePlugins();
         disablePlugins();
         postDisablePlugins();
+    }
 
-        // Step 2: Disconnect from Discord
+    /** Disconnects the bot from Discord. */
+    private void disconnectFromDiscord() {
         logger.info("Disconnecting from Discord...");
         try {
             discordAPI.setShutdownPresence();
@@ -563,60 +589,80 @@ public class PluginManager implements PluginLoader, Closeable {
             logger.error("Failed to disconnect from Discord during reload", e);
             logger.warn("Continuing reload, but Discord reconnection may fail");
         }
+    }
 
-        // Step 3: Clear event handlers and clean up resources
+    /** Clears all event handlers before plugins are reloaded. */
+    private void clearEventHandlers() {
         logger.info("Cleaning up resources...");
         if (eventManager != null) {
             for (Plugin plugin : plugins.values()) {
                 eventManager.unregisterAll(plugin);
             }
         }
+    }
 
-        // Step 4: Reload plugins
+    /**
+     * Reloads plugins from disk by scanning the plugins folder and loading
+     * each plugin.
+     */
+    private void reloadAllPlugins() {
         logger.info("Reloading plugins...");
         try {
-            // Scan and load all plugins
             loadPlugins();
         } catch (Exception e) {
             logger.error("Error during plugin loading phase", e);
-            // Continue anyway, some plugins might have loaded successfully
         }
+    }
 
-        // Step 5: Pre-enable plugins (configure Discord)
+    /** Runs the pre-enable phase for all plugins. */
+    private void preEnableAllPlugins() {
         logger.info("Pre-enabling plugins...");
         preEnablePlugins();
+    }
 
-        // Step 6: Reconnect to Discord
+    /**
+     * Attempts to reconnect to Discord after plugins have been reloaded.
+     *
+     * @return true if the connection was successful
+     */
+    private boolean reconnectToDiscord() {
         logger.info("Reconnecting to Discord...");
-        boolean discordConnected = false;
         try {
             discordAPI.connect().join();
             discordAPI.setStartupPresence();
-            discordConnected = true;
+            return true;
         } catch (Exception e) {
             logger.error("Failed to reconnect to Discord after reload", e);
             logger.warn("Plugins requiring Discord features may not function properly");
-        }
-
-        // Step 7: Complete enabling plugins
-        if (discordConnected) {
-            logger.info("Enabling plugins...");
-            try {
-                enablePlugins();
-                postEnablePlugins();
-
-                // Set default presence
-                discordAPI.setDefaultPresence();
-            } catch (Exception e) {
-                logger.error("Error during plugin enabling phase", e);
-                return false;
-            }
-        } else {
-            logger.error("Skipping plugin enable phase due to Discord connection failure");
             return false;
         }
+    }
 
-        // Step 8: Calculate and log statistics
+    /**
+     * Enables all loaded plugins and sets the default presence.
+     *
+     * @return true if the enable phase completed without exception
+     */
+    private boolean enableAllPlugins() {
+        logger.info("Enabling plugins...");
+        try {
+            enablePlugins();
+            postEnablePlugins();
+            discordAPI.setDefaultPresence();
+            return true;
+        } catch (Exception e) {
+            logger.error("Error during plugin enabling phase", e);
+            return false;
+        }
+    }
+
+    /**
+     * Logs a summary of the reload process including timing statistics.
+     *
+     * @param startTime the time when the reload began
+     * @param discordConnected whether Discord reconnection succeeded
+     */
+    private void logReloadSummary(long startTime, boolean discordConnected) {
         int totalPlugins = plugins.size();
         int enabledPlugins = (int) plugins.values().stream()
                 .filter(p -> p.getLifecycle() == PluginLifecycle.ENABLED)
@@ -626,10 +672,9 @@ public class PluginManager implements PluginLoader, Closeable {
         long endTime = System.currentTimeMillis();
         double reloadTime = (endTime - startTime) / 1000.0;
 
-        logger.info("Plugin reload completed in {:.2f} seconds: {} total plugins, {} enabled, {} failed",
+        logger.info(
+                "Plugin reload completed in {:.2f} seconds: {} total plugins, {} enabled, {} failed",
                 reloadTime, totalPlugins, enabledPlugins, failedPlugins);
-
-        return enabledPlugins > 0 && discordConnected;
     }
 
     /**
