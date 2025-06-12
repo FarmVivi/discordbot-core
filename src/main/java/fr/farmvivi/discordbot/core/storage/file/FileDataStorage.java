@@ -174,7 +174,15 @@ public class FileDataStorage extends AbstractDataStorage {
     @Override
     public boolean close() {
         // Save all pending data
-        return save();
+        boolean result = save();
+
+        // Shutdown all debouncers
+        for (Debouncer debouncer : saveThrottlers.values()) {
+            debouncer.shutdown();
+        }
+        saveThrottlers.clear();
+
+        return result;
     }
 
     /**
