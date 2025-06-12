@@ -125,13 +125,8 @@ public class Discobocor {
      * @return true if initialization was successful, false otherwise
      */
     private static boolean initializeComponents() {
-        // Create the plugins folder if it doesn't exist
-        File pluginsFolder = new File("plugins");
-        if (!pluginsFolder.exists()) {
-            pluginsFolder.mkdirs();
-        }
+        File pluginsFolder = ensurePluginsFolder();
 
-        // Create the config file if it doesn't exist
         File configFile = new File("config.yml");
         if (!configFile.exists()) {
             if (!createDefaultConfig(configFile)) {
@@ -139,16 +134,10 @@ public class Discobocor {
             }
         }
 
-        // Load the configuration
-        try {
-            coreConfig = new EnvAwareYamlConfiguration(configFile);
-        } catch (Exception e) {
-            logger.error("Failed to load config.yml", e);
-            System.exit(1);
+        if (!loadCoreConfiguration(configFile)) {
             return false;
         }
 
-        // Check if the token is set
         String token;
         try {
             token = coreConfig.getString("discord.token");
@@ -163,7 +152,6 @@ public class Discobocor {
             return false;
         }
 
-        // Create the language manager with the default locale from config
         String defaultLanguage = coreConfig.getString("language.default", "en-US");
         Locale defaultLocale = Locale.forLanguageTag(defaultLanguage);
         if (defaultLocale.getLanguage().isEmpty()) {
@@ -171,32 +159,53 @@ public class Discobocor {
             defaultLocale = Locale.US;
         }
 
-        // Create the language manager
+        createLanguageServices(defaultLocale);
+        createEventAndDiscord(token);
+        createStorageManagers();
+        createCommandAndPluginManagers(pluginsFolder);
+
+        return true;
+    }
+
+    private static File ensurePluginsFolder() {
+        File pluginsFolder = new File("plugins");
+        if (!pluginsFolder.exists()) {
+            pluginsFolder.mkdirs();
+        }
+        return pluginsFolder;
+    }
+
+    private static boolean loadCoreConfiguration(File configFile) {
+        try {
+            coreConfig = new EnvAwareYamlConfiguration(configFile);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to load config.yml", e);
+            System.exit(1);
+            return false;
+        }
+    }
+
+    private static void createLanguageServices(Locale defaultLocale) {
         languageManager = new SimpleLanguageManager(defaultLocale);
 
-        // Create the language file manager
         LanguageFileLoader languageFileLoader = new LanguageFileLoader(languageManager, new File("lang"));
         languageFileLoader.loadLanguageFiles();
+    }
 
-        // Create the event manager
+    private static void createEventAndDiscord(String token) {
         eventManager = new SimpleEventManager();
-
-        // Create the Discord API
         discordAPI = new JDADiscordAPI(token);
+    }
 
-        // Create the data storage manager
+    private static void createStorageManagers() {
         dataStorageManager = StorageFactory.createStorageManager(coreConfig, eventManager);
-
-        // Create the binary storage manager
         binaryStorageManager = BinaryStorageFactory.createBinaryStorageManager(coreConfig, eventManager);
-
-        // Create the permission manager
         permissionManager = new SimplePermissionManager(eventManager, dataStorageManager);
-
-        // Create the audio service
         audioService = new AudioServiceImpl(eventManager);
+    }
 
-        // Create the command service
+    private static void createCommandAndPluginManagers(File pluginsFolder) {
         commandService = new SimpleCommandService(
                 eventManager,
                 languageManager,
@@ -205,7 +214,6 @@ public class Discobocor {
                 dataStorageManager
         );
 
-        // Create the plugin manager
         pluginManager = new PluginManager(
                 pluginsFolder,
                 eventManager,
@@ -217,8 +225,6 @@ public class Discobocor {
                 audioService,
                 commandService
         );
-
-        return true;
     }
 
     /**
