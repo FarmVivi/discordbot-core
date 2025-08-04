@@ -551,6 +551,113 @@ public class SimpleCommandService implements CommandService {
     }
 
     /**
+     * Builds JDA option data from a command option.
+     *
+     * @param option the command option
+     * @return the JDA option data
+     */
+    private OptionData buildOptionData(fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option) {
+        OptionData optionData = new OptionData(
+                convertOptionType(option.getType()),
+                option.getName(),
+                option.getDescription(),
+                option.isRequired()
+        );
+
+        // Add min/max values for number options
+        if (option.getMinValue() != null) {
+            if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.INTEGER) {
+                optionData.setMinValue(option.getMinValue().longValue());
+            } else if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.NUMBER) {
+                optionData.setMinValue(option.getMinValue().doubleValue());
+            }
+        }
+
+        if (option.getMaxValue() != null) {
+            if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.INTEGER) {
+                optionData.setMaxValue(option.getMaxValue().longValue());
+            } else if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.NUMBER) {
+                optionData.setMaxValue(option.getMaxValue().doubleValue());
+            }
+        }
+
+        // Add min/max length for string options
+        if (option.getMinLength() != null) {
+            optionData.setMinLength(option.getMinLength());
+        }
+
+        if (option.getMaxLength() != null) {
+            optionData.setMaxLength(option.getMaxLength());
+        }
+
+        // Add choices
+        if (!option.getChoices().isEmpty()) {
+            for (fr.farmvivi.discordbot.core.api.command.option.OptionChoice<?> choice : option.getChoices()) {
+                if (choice.value() instanceof String string) {
+                    optionData.addChoice(choice.name(), string);
+                } else if (choice.value() instanceof Integer integer) {
+                    optionData.addChoice(choice.name(), integer);
+                } else if (choice.value() instanceof Double doubleValue) {
+                    optionData.addChoice(choice.name(), doubleValue);
+                }
+            }
+        }
+
+        // Enable autocomplete
+        if (option.getAutocompleteProvider() != null) {
+            optionData.setAutoComplete(true);
+        }
+
+        return optionData;
+    }
+
+    /**
+     * Builds JDA subcommand data from a command.
+     *
+     * @param subcommand the subcommand
+     * @return the JDA subcommand data
+     */
+    private SubcommandData buildSubcommandData(Command subcommand) {
+        SubcommandData subcommandData = new SubcommandData(
+                subcommand.getName().toLowerCase(),
+                subcommand.getDescription()
+        );
+
+        // Add options to subcommand
+        for (fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option : subcommand.getOptions()) {
+            OptionData optionData = new OptionData(
+                    convertOptionType(option.getType()),
+                    option.getName(),
+                    option.getDescription(),
+                    option.isRequired()
+            );
+
+            subcommandData.addOptions(optionData);
+        }
+
+        return subcommandData;
+    }
+
+    /**
+     * Builds JDA subcommand group data from a command.
+     *
+     * @param command the command containing the subcommands
+     * @return the JDA subcommand group data
+     */
+    private SubcommandGroupData buildSubcommandGroupData(Command command) {
+        SubcommandGroupData groupData = new SubcommandGroupData(
+                command.getGroup().toLowerCase(),
+                command.getDescription()
+        );
+
+        for (Command subcommand : command.getSubcommands()) {
+            groupData.addSubcommands(buildSubcommandData(subcommand));
+        }
+
+        return groupData;
+    }
+
+    /**
      * Creates JDA command data from a command.
      *
      * @param command the command
@@ -561,112 +668,18 @@ public class SimpleCommandService implements CommandService {
 
         // Add options
         for (fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option : command.getOptions()) {
-            OptionData optionData = new OptionData(
-                    convertOptionType(option.getType()),
-                    option.getName(),
-                    option.getDescription(),
-                    option.isRequired()
-            );
-
-            // Add min/max values for number options
-            if (option.getMinValue() != null) {
-                if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.INTEGER) {
-                    optionData.setMinValue(option.getMinValue().longValue());
-                } else if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.NUMBER) {
-                    optionData.setMinValue(option.getMinValue().doubleValue());
-                }
-            }
-
-            if (option.getMaxValue() != null) {
-                if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.INTEGER) {
-                    optionData.setMaxValue(option.getMaxValue().longValue());
-                } else if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.NUMBER) {
-                    optionData.setMaxValue(option.getMaxValue().doubleValue());
-                }
-            }
-
-            // Add min/max length for string options
-            if (option.getMinLength() != null) {
-                optionData.setMinLength(option.getMinLength());
-            }
-
-            if (option.getMaxLength() != null) {
-                optionData.setMaxLength(option.getMaxLength());
-            }
-
-            // Add choices
-            if (!option.getChoices().isEmpty()) {
-                for (fr.farmvivi.discordbot.core.api.command.option.OptionChoice<?> choice : option.getChoices()) {
-                    if (choice.value() instanceof String string) {
-                        optionData.addChoice(choice.name(), string);
-                    } else if (choice.value() instanceof Integer integer) {
-                        optionData.addChoice(choice.name(), integer);
-                    } else if (choice.value() instanceof Double doubleValue) {
-                        optionData.addChoice(choice.name(), doubleValue);
-                    }
-                }
-            }
-
-            // Enable autocomplete
-            if (option.getAutocompleteProvider() != null) {
-                optionData.setAutoComplete(true);
-            }
-
-            data.addOptions(optionData);
+            data.addOptions(buildOptionData(option));
         }
 
         // Add subcommands
         if (!command.getSubcommands().isEmpty()) {
             // Group subcommands if a group is specified
             if (command.getGroup() != null) {
-                SubcommandGroupData groupData = new SubcommandGroupData(
-                        command.getGroup().toLowerCase(),
-                        command.getDescription()
-                );
-
-                for (Command subcommand : command.getSubcommands()) {
-                    SubcommandData subcommandData = new SubcommandData(
-                            subcommand.getName().toLowerCase(),
-                            subcommand.getDescription()
-                    );
-
-                    // Add options to subcommand
-                    for (fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option : subcommand.getOptions()) {
-                        OptionData optionData = new OptionData(
-                                convertOptionType(option.getType()),
-                                option.getName(),
-                                option.getDescription(),
-                                option.isRequired()
-                        );
-
-                        subcommandData.addOptions(optionData);
-                    }
-
-                    groupData.addSubcommands(subcommandData);
-                }
-
-                data.addSubcommandGroups(groupData);
+                data.addSubcommandGroups(buildSubcommandGroupData(command));
             } else {
                 // Add subcommands directly
                 for (Command subcommand : command.getSubcommands()) {
-                    SubcommandData subcommandData = new SubcommandData(
-                            subcommand.getName().toLowerCase(),
-                            subcommand.getDescription()
-                    );
-
-                    // Add options to subcommand
-                    for (fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option : subcommand.getOptions()) {
-                        OptionData optionData = new OptionData(
-                                convertOptionType(option.getType()),
-                                option.getName(),
-                                option.getDescription(),
-                                option.isRequired()
-                        );
-
-                        subcommandData.addOptions(optionData);
-                    }
-
-                    data.addSubcommands(subcommandData);
+                    data.addSubcommands(buildSubcommandData(subcommand));
                 }
             }
         }

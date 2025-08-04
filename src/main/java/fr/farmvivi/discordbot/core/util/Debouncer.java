@@ -1,12 +1,15 @@
 package fr.farmvivi.discordbot.core.util;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class Debouncer {
     private final long delayMillis;
     private final Runnable action;
-    private Timer timer;
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> future;
 
     /**
      * Crée un debouncer avec un délai spécifié et une action à exécuter.
@@ -24,15 +27,16 @@ public class Debouncer {
      * Si cette méthode est appelée plusieurs fois rapidement, l'action ne sera exécutée qu'une seule fois après le délai spécifié.
      */
     public synchronized void debounce() {
-        if (timer != null) {
-            timer.cancel();
+        if (future != null && !future.isDone()) {
+            future.cancel(false);
         }
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                action.run();
-            }
-        }, delayMillis);
+        future = executor.schedule(action, delayMillis, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Arrête l'exécuteur sous-jacent.
+     */
+    public void shutdown() {
+        executor.shutdownNow();
     }
 }
