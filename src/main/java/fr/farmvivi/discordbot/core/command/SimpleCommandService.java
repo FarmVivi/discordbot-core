@@ -20,6 +20,7 @@ import fr.farmvivi.discordbot.core.command.parser.TextCommandParser;
 import fr.farmvivi.discordbot.core.command.system.HelpCommand;
 import fr.farmvivi.discordbot.core.command.system.ShutdownCommand;
 import fr.farmvivi.discordbot.core.command.system.VersionCommand;
+import fr.farmvivi.discordbot.core.util.Debouncer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -32,10 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -61,6 +58,8 @@ public class SimpleCommandService implements CommandService {
     private boolean enabled;
     private String defaultPrefix;
     private CommandListener commandListener;
+    private boolean systemCommandsRegistered = false;
+    private boolean duringInitialization = false;
 
     // Statistics
     private final AtomicLong commandExecutionCount = new AtomicLong();
@@ -71,13 +70,8 @@ public class SimpleCommandService implements CommandService {
     // Cooldowns: userId -> (commandName -> expirationTime)
     private final Map<String, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
 
-    // Debounced synchronization
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r, "CommandSync");
-        t.setDaemon(true);
-        return t;
-    });
-    private ScheduledFuture<?> pendingSyncTask = null;
+    // Debounced synchronization using existing Debouncer utility
+    private Debouncer commandSyncDebouncer;
     private static final long SYNC_DELAY_MS = 1000; // 1 second delay
 
     /**
@@ -110,6 +104,9 @@ public class SimpleCommandService implements CommandService {
         // Register parsers
         parsers.add(new SlashCommandParser(languageManager));
         parsers.add(new TextCommandParser(languageManager, defaultPrefix));
+        
+        // Initialize command sync debouncer
+        this.commandSyncDebouncer = new Debouncer(SYNC_DELAY_MS, this::performSynchronization);
     }
 
     @Override
@@ -182,8 +179,9 @@ public class SimpleCommandService implements CommandService {
     public boolean registerCommand(Command command, Plugin plugin) {
         boolean result = registry.register(command, plugin);
 
-        // If the command was registered and the service is enabled, schedule a debounced synchronization
-        if (result && isEnabled() && jda != null && jda.getStatus() == JDA.Status.CONNECTED) {
+        // Only use debouncer as last resort - during runtime command registration
+        // Don't trigger debounced sync during initialization or if service is not fully ready
+        if (result && isEnabled() && jda != null && jda.getStatus() == JDA.Status.CONNECTED && !duringInitialization) {
             scheduleDebouncedSync();
         }
 
@@ -310,6 +308,8 @@ public class SimpleCommandService implements CommandService {
             return;
         }
 
+        // Mark that we're during initialization to avoid triggering debounced sync
+        duringInitialization = true;
         enabled = true;
 
         // Register the command listener
@@ -317,12 +317,21 @@ public class SimpleCommandService implements CommandService {
             commandListener = new CommandListener(this);
             jda.addEventListener(commandListener);
 
-            // Register system commands
-            registerSystemCommands();
+            // Register system commands only once
+            if (!systemCommandsRegistered) {
+                registerSystemCommands();
+                systemCommandsRegistered = true;
+            }
 
-            // Schedule debounced synchronization instead of immediate
-            scheduleDebouncedSync();
+            // Perform immediate synchronization instead of debounced during initialization
+            // This ensures all commands are synced once at startup
+            if (jda.getStatus() == JDA.Status.CONNECTED) {
+                synchronizeCommands();
+            }
         }
+
+        // End of initialization - now runtime command registrations can use debouncer
+        duringInitialization = false;
 
         logger.info("Command service enabled");
     }
@@ -335,10 +344,10 @@ public class SimpleCommandService implements CommandService {
 
         enabled = false;
 
-        // Cancel any pending sync task
-        if (pendingSyncTask != null && !pendingSyncTask.isDone()) {
-            pendingSyncTask.cancel(false);
-            pendingSyncTask = null;
+        // Shutdown the debouncer
+        if (commandSyncDebouncer != null) {
+            commandSyncDebouncer.shutdown();
+            commandSyncDebouncer = new Debouncer(SYNC_DELAY_MS, this::performSynchronization);
         }
 
         // Unregister the command listener
@@ -354,17 +363,8 @@ public class SimpleCommandService implements CommandService {
     public void setJDA(JDA jda) {
         this.jda = jda;
 
-        if (isEnabled() && jda != null) {
-            // Register the command listener
-            commandListener = new CommandListener(this);
-            jda.addEventListener(commandListener);
-
-            // Register system commands
-            registerSystemCommands();
-
-            // Schedule debounced synchronization instead of immediate
-            scheduleDebouncedSync();
-        }
+        // Don't register commands or listeners here - let enable() handle everything
+        // This avoids duplicate registrations and multiple sync calls
     }
 
     @Override
@@ -716,25 +716,25 @@ public class SimpleCommandService implements CommandService {
 
     /**
      * Schedules a debounced synchronization to avoid rapid API calls.
-     * If a sync is already scheduled, it cancels the previous one and schedules a new one.
+     * Uses the existing Debouncer utility class as requested.
      */
-    private synchronized void scheduleDebouncedSync() {
-        // Cancel any existing pending sync
-        if (pendingSyncTask != null && !pendingSyncTask.isDone()) {
-            pendingSyncTask.cancel(false);
+    private void scheduleDebouncedSync() {
+        if (commandSyncDebouncer != null) {
+            logger.debug("Scheduling debounced command synchronization in {}ms", SYNC_DELAY_MS);
+            commandSyncDebouncer.debounce();
         }
-
-        // Schedule a new sync with delay
-        pendingSyncTask = scheduler.schedule(() -> {
-            try {
-                logger.debug("Executing debounced command synchronization");
-                synchronizeCommands().join(); // Wait for completion
-            } catch (Exception e) {
-                logger.error("Error during debounced command synchronization", e);
-            }
-        }, SYNC_DELAY_MS, TimeUnit.MILLISECONDS);
-        
-        logger.debug("Scheduled debounced command synchronization in {}ms", SYNC_DELAY_MS);
+    }
+    
+    /**
+     * Performs the actual synchronization - used by the debouncer.
+     */
+    private void performSynchronization() {
+        try {
+            logger.debug("Executing debounced command synchronization");
+            synchronizeCommands().join(); // Wait for completion
+        } catch (Exception e) {
+            logger.error("Error during debounced command synchronization", e);
+        }
     }
 
     /**
