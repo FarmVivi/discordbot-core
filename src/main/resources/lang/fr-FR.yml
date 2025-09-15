@@ -10,6 +10,7 @@ commands:
     warning: "Avertissement"
     error: "Une erreur est survenue"
   messages:
+    success: "Commande exécutée avec succès"
     cooldown: "Cette commande est en cours de recharge. Veuillez attendre {0} seconde(s) avant de l'utiliser à nouveau."
     disabled: "Cette commande est désactivée"
     guild_only: "Cette commande ne peut être utilisée que dans un serveur"

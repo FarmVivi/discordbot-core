@@ -104,7 +104,7 @@ public class SimpleCommandService implements CommandService {
 
         // Register parsers
         parsers.add(new SlashCommandParser(languageManager));
-        parsers.add(new TextCommandParser(languageManager, defaultPrefix));
+        parsers.add(new TextCommandParser(languageManager, this));
         parsers.add(new ConsoleCommandParser(languageManager));
         
         // Initialize command sync debouncer
@@ -150,15 +150,6 @@ public class SimpleCommandService implements CommandService {
             configuration.save();
         } catch (ConfigurationException e) {
             logger.error("Failed to save command prefix to configuration", e);
-        }
-
-        // Update text command parser
-        for (CommandParser parser : parsers) {
-            if (parser instanceof TextCommandParser textParser) {
-                parsers.remove(textParser);
-                parsers.add(new TextCommandParser(languageManager, prefix));
-                break;
-            }
         }
     }
 
@@ -781,13 +772,32 @@ public class SimpleCommandService implements CommandService {
                         // Parse the command
                         CommandContext context = parser.parse(event, command);
 
+                        // For slash commands, defer the reply immediately to avoid timeout
+                        if (event instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
+                            context.deferReply();
+                            logger.debug("Deferred slash command interaction for command '{}'", command.getName());
+                        }
+
                         // Execute the command
                         CommandResult result = executeCommand(command, context);
 
-                        // If the execution failed and the result contains an error message,
-                        // reply with the error message
-                        if (!result.isSuccess() && result.getErrorMessage() != null) {
-                            context.replyError(result.getErrorMessage());
+                        // Handle replies based on command result and context
+                        if (event instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent) {
+                            if (slashEvent.isAcknowledged()) {
+                                // Command was deferred - check if we need to send a response
+                                if (!result.isSuccess() && result.getErrorMessage() != null) {
+                                    context.replyError(result.getErrorMessage());
+                                }
+                                // For successful commands, assume they handled their own reply through context
+                                // If they didn't, the deferred interaction will remain as "Bot is thinking..." 
+                                // which is acceptable for commands that don't need explicit confirmation
+                            }
+                            // If not acknowledged, the reply was sent directly by the command
+                        } else {
+                            // For text and console commands, only reply on error if no explicit reply was sent
+                            if (!result.isSuccess() && result.getErrorMessage() != null) {
+                                context.replyError(result.getErrorMessage());
+                            }
                         }
 
                         logger.debug("Command '{}' executed with success: {}", command.getName(), result.isSuccess());
