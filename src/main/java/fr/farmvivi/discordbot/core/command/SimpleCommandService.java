@@ -455,14 +455,18 @@ public class SimpleCommandService implements CommandService {
             return CommandResult.error(languageManager.getString(locale, "commands.messages.disabled"));
         }
 
-        // Check guild-only
-        if (command.isGuildOnly() && !context.isFromGuild()) {
+        // Determine if this is a console command (user is null)
+        boolean isConsoleCommand = context.getUser() == null;
+
+        // Check guild-only (skip for console commands - they are not bound to guilds)
+        if (command.isGuildOnly() && !context.isFromGuild() && !isConsoleCommand) {
             return CommandResult.error(languageManager.getString(locale, "commands.messages.guild_only"));
         }
 
-        // Check admin permission
-        if (command.getPermission() != null) {
-            String userId = context.getUser().getId();
+        String userId = isConsoleCommand ? "CONSOLE" : context.getUser().getId();
+
+        // Check admin permission (skip for console commands - they are trusted)
+        if (command.getPermission() != null && !isConsoleCommand) {
             String guildId = context.getGuild().map(Guild::getId).orElse(null);
 
             try {
@@ -475,9 +479,8 @@ public class SimpleCommandService implements CommandService {
             }
         }
 
-        // Check cooldown
-        String userId = context.getUser().getId();
-        if (isOnCooldown(userId, command.getName())) {
+        // Check cooldown (skip for console commands)
+        if (!isConsoleCommand && isOnCooldown(userId, command.getName())) {
             int seconds = getRemainingCooldown(userId, command.getName());
             return CommandResult.error(languageManager.getString(locale, "commands.messages.cooldown", seconds));
         }
@@ -498,8 +501,8 @@ public class SimpleCommandService implements CommandService {
         try {
             result = command.execute(context);
 
-            // Apply cooldown if specified
-            if (command.getCooldown() > 0) {
+            // Apply cooldown if specified (skip for console commands)
+            if (command.getCooldown() > 0 && !isConsoleCommand) {
                 applyCooldown(userId, command.getName(), command.getCooldown());
             }
         } catch (Exception e) {
@@ -752,42 +755,57 @@ public class SimpleCommandService implements CommandService {
 
         // Find a parser that can handle this event
         for (CommandParser parser : parsers) {
-            if (parser.canParse(event) && parser.isCommandInvocation(event)) {
-                try {
-                    // Extract the command name
-                    String commandName = parser.extractCommandName(event);
+            if (parser.canParse(event)) {
+                logger.debug("Parser {} can handle event type {}", parser.getClass().getSimpleName(), event.getClass().getSimpleName());
+                
+                if (parser.isCommandInvocation(event)) {
+                    logger.debug("Parser {} detected command invocation", parser.getClass().getSimpleName());
+                    
+                    try {
+                        // Extract the command name
+                        String commandName = parser.extractCommandName(event);
+                        logger.debug("Extracted command name: '{}'", commandName);
 
-                    // Find the command
-                    Command command = registry.getCommand(commandName)
-                            .orElseGet(() -> registry.getCommandByAlias(commandName).orElse(null));
+                        // Find the command
+                        Command command = registry.getCommand(commandName)
+                                .orElseGet(() -> registry.getCommandByAlias(commandName).orElse(null));
 
-                    if (command == null) {
-                        // Unknown command - log for debugging
-                        logger.debug("Unknown command '{}' attempted via {}", commandName, parser.getClass().getSimpleName());
-                        continue;
+                        if (command == null) {
+                            // Unknown command - log for debugging
+                            logger.debug("Unknown command '{}' attempted via {}", commandName, parser.getClass().getSimpleName());
+                            continue;
+                        }
+
+                        logger.debug("Found command '{}', executing...", command.getName());
+
+                        // Parse the command
+                        CommandContext context = parser.parse(event, command);
+
+                        // Execute the command
+                        CommandResult result = executeCommand(command, context);
+
+                        // If the execution failed and the result contains an error message,
+                        // reply with the error message
+                        if (!result.isSuccess() && result.getErrorMessage() != null) {
+                            context.replyError(result.getErrorMessage());
+                        }
+
+                        logger.debug("Command '{}' executed with success: {}", command.getName(), result.isSuccess());
+
+                        // We found and executed a command, so we're done
+                        return;
+                    } catch (CommandParseException e) {
+                        // Failed to parse the command - try the next parser
+                        logger.debug("Failed to parse command with {}: {}", parser.getClass().getSimpleName(), e.getMessage());
+                    } catch (Exception e) {
+                        // Something went wrong - log and continue
+                        logger.error("Error processing command with {}: {}", parser.getClass().getSimpleName(), e.getMessage(), e);
                     }
-
-                    // Parse the command
-                    CommandContext context = parser.parse(event, command);
-
-                    // Execute the command
-                    CommandResult result = executeCommand(command, context);
-
-                    // If the execution failed and the result contains an error message,
-                    // reply with the error message
-                    if (!result.isSuccess() && result.getErrorMessage() != null) {
-                        context.replyError(result.getErrorMessage());
-                    }
-
-                    // We found and executed a command, so we're done
-                    return;
-                } catch (CommandParseException e) {
-                    // Failed to parse the command - try the next parser
-                    logger.debug("Failed to parse command: {}", e.getMessage());
-                } catch (Exception e) {
-                    // Something went wrong - log and continue
-                    logger.error("Error processing command: {}", e.getMessage(), e);
+                } else {
+                    logger.debug("Parser {} did not detect command invocation", parser.getClass().getSimpleName());
                 }
+            } else {
+                logger.debug("Parser {} cannot handle event type {}", parser.getClass().getSimpleName(), event.getClass().getSimpleName());
             }
         }
     }
