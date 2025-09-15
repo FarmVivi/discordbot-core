@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -120,7 +120,7 @@ public interface CommandContext {
      * @param message    the message content
      * @param components the message components
      */
-    void reply(String message, Collection<LayoutComponent> components);
+    void reply(String message, Collection<MessageTopLevelComponent> components);
 
     /**
      * Replies to the command with an embed.
@@ -135,7 +135,7 @@ public interface CommandContext {
      * @param embed      the embed builder
      * @param components the message components
      */
-    void replyEmbed(EmbedBuilder embed, Collection<LayoutComponent> components);
+    void replyEmbed(EmbedBuilder embed, Collection<MessageTopLevelComponent> components);
 
     /**
      * Replies to the command with a success message.

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -83,7 +83,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * @param components the components to set
      * @return this builder
      */
-    public CommandMessageBuilder setComponents(Collection<? extends LayoutComponent> components) {
+    public CommandMessageBuilder setComponents(Collection<? extends MessageTopLevelComponent> components) {
         this.components.clear();
         if (components != null && !components.isEmpty()) {
             int count = Math.min(components.size(), Message.MAX_COMPONENT_COUNT);
@@ -438,7 +438,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
 
     @NotNull
     @Override
-    public MessageCreateBuilder addComponents(@NotNull Collection<? extends LayoutComponent> components) {
+    public MessageCreateBuilder addComponents(@NotNull Collection<? extends MessageTopLevelComponent> components) {
         // Limit components count
         if (components.size() > Message.MAX_COMPONENT_COUNT) {
             components = components.stream().limit(Message.MAX_COMPONENT_COUNT).toList();
