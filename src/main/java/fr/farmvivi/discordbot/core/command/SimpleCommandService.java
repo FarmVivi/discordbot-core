@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -670,8 +671,12 @@ public class SimpleCommandService implements CommandService {
             data.setDefaultPermissions(DefaultMemberPermissions.ENABLED);
         }
 
-        // Set guild-only
-        data.setGuildOnly(command.isGuildOnly());
+        // Set context types (replaces setGuildOnly)
+        if (command.isGuildOnly()) {
+            data.setContexts(InteractionContextType.GUILD);
+        } else {
+            data.setContexts(InteractionContextType.GUILD, InteractionContextType.BOT_DM, InteractionContextType.PRIVATE_CHANNEL);
+        }
 
         return data;
     }

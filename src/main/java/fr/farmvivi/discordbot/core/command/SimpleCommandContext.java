@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 
 import java.util.*;
 
@@ -163,7 +163,7 @@ public class SimpleCommandContext implements CommandContext {
     }
 
     @Override
-    public void reply(String message, Collection<LayoutComponent> components) {
+    public void reply(String message, Collection<MessageTopLevelComponent> components) {
         CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setContent(message);
         messageBuilder.setDiffer(deferred);
@@ -184,7 +184,7 @@ public class SimpleCommandContext implements CommandContext {
     }
 
     @Override
-    public void replyEmbed(EmbedBuilder embed, Collection<LayoutComponent> components) {
+    public void replyEmbed(EmbedBuilder embed, Collection<MessageTopLevelComponent> components) {
         CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
