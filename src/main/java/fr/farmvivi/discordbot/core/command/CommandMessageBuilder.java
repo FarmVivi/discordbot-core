@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.core.command;
 
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.core.command.parser.event.ConsoleCommandEvent;
 import fr.farmvivi.discordbot.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -230,6 +231,14 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                         .queue();
             }
         }
+        // Handle console command output
+        else if (event instanceof ConsoleCommandEvent) {
+            if (!isEmpty()) {
+                // Output to console
+                String output = formatForConsole();
+                System.out.println(output);
+            }
+        }
     }
 
     /**
@@ -275,6 +284,61 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      */
     public EmbedBuilder createErrorEmbed() {
         return createEmbed().setColor(DiscordColor.DISCORD_RED.getColor());
+    }
+
+    /**
+     * Formats the message for console output.
+     * Converts embeds and other Discord-specific elements to plain text.
+     *
+     * @return formatted console output
+     */
+    private String formatForConsole() {
+        StringBuilder output = new StringBuilder();
+        
+        // Add content if present
+        String content = getContent();
+        if (content != null && !content.trim().isEmpty()) {
+            output.append("[CONSOLE] ").append(content);
+        }
+        
+        // Format embeds for console
+        if (!getEmbeds().isEmpty()) {
+            for (MessageEmbed embed : getEmbeds()) {
+                if (output.length() > 0) {
+                    output.append("\n");
+                }
+                
+                output.append("[CONSOLE] ");
+                
+                // Add title
+                if (embed.getTitle() != null) {
+                    output.append("=== ").append(embed.getTitle()).append(" ===\n[CONSOLE] ");
+                }
+                
+                // Add description
+                if (embed.getDescription() != null) {
+                    output.append(embed.getDescription()).append("\n[CONSOLE] ");
+                }
+                
+                // Add fields
+                for (MessageEmbed.Field field : embed.getFields()) {
+                    if (field.getName() != null) {
+                        output.append(field.getName()).append(": ");
+                    }
+                    if (field.getValue() != null) {
+                        output.append(field.getValue());
+                    }
+                    output.append("\n[CONSOLE] ");
+                }
+                
+                // Remove trailing "[CONSOLE] "
+                if (output.toString().endsWith("[CONSOLE] ")) {
+                    output.setLength(output.length() - 10);
+                }
+            }
+        }
+        
+        return output.toString();
     }
 
     /**

@@ -130,7 +130,13 @@ public class TextCommandParser implements CommandParser {
 
         // Check if the message starts with the prefix
         String content = messageEvent.getMessage().getContentRaw();
-        return content.startsWith(prefix);
+        boolean isCommand = content.startsWith(prefix);
+        
+        if (isCommand) {
+            logger.debug("Text command detected: '{}' with prefix '{}'", content, prefix);
+        }
+        
+        return isCommand;
     }
 
     /**

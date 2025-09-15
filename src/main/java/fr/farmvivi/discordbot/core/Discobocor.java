@@ -11,6 +11,7 @@ import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
 import fr.farmvivi.discordbot.core.audio.AudioServiceImpl;
 import fr.farmvivi.discordbot.core.command.SimpleCommandService;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
+import fr.farmvivi.discordbot.core.console.ConsoleCommandService;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
 import fr.farmvivi.discordbot.core.language.LanguageFileLoader;
@@ -51,6 +52,7 @@ public class Discobocor {
     private static SimplePermissionManager permissionManager;
     private static AudioService audioService;
     private static CommandService commandService;
+    private static ConsoleCommandService consoleCommandService;
 
     static {
         Properties properties = new Properties();
@@ -217,6 +219,9 @@ public class Discobocor {
                 defaultPrefix
         );
 
+        // Create console command service
+        consoleCommandService = new ConsoleCommandService(commandService);
+
         pluginManager = new PluginManager(
                 pluginsFolder,
                 eventManager,
@@ -315,6 +320,9 @@ public class Discobocor {
             
             // Set JDA instance for command service
             commandService.setJDA(discordAPI.getJDA());
+            
+            // Set JDA instance for console command service
+            consoleCommandService.setJDA(discordAPI.getJDA());
         } catch (Exception e) {
             logger.error("Failed to connect to Discord", e);
             System.exit(1);
@@ -330,7 +338,10 @@ public class Discobocor {
         // 6. Post-enable plugins
         pluginManager.postEnablePlugins();
 
-        // 7. Set the default presence after all plugins are enabled
+        // 7. Start console command service
+        consoleCommandService.start();
+
+        // 8. Set the default presence after all plugins are enabled
         discordAPI.setDefaultPresence();
     }
 
@@ -350,6 +361,11 @@ public class Discobocor {
         // Disable command service
         if (commandService != null) {
             commandService.disable();
+        }
+
+        // Stop console command service
+        if (consoleCommandService != null) {
+            consoleCommandService.stop();
         }
 
         // Disconnect from Discord
@@ -463,5 +479,14 @@ public class Discobocor {
      */
     public static CommandService getCommandService() {
         return commandService;
+    }
+
+    /**
+     * Gets the console command service.
+     *
+     * @return the console command service
+     */
+    public static ConsoleCommandService getConsoleCommandService() {
+        return consoleCommandService;
     }
 }

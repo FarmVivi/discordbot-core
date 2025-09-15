@@ -15,6 +15,7 @@ import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.GuildStorage;
 import fr.farmvivi.discordbot.core.command.listener.CommandListener;
 import fr.farmvivi.discordbot.core.command.parser.CommandParser;
+import fr.farmvivi.discordbot.core.command.parser.ConsoleCommandParser;
 import fr.farmvivi.discordbot.core.command.parser.SlashCommandParser;
 import fr.farmvivi.discordbot.core.command.parser.TextCommandParser;
 import fr.farmvivi.discordbot.core.command.system.HelpCommand;
@@ -104,6 +105,7 @@ public class SimpleCommandService implements CommandService {
         // Register parsers
         parsers.add(new SlashCommandParser(languageManager));
         parsers.add(new TextCommandParser(languageManager, defaultPrefix));
+        parsers.add(new ConsoleCommandParser(languageManager));
         
         // Initialize command sync debouncer
         this.commandSyncDebouncer = new Debouncer(SYNC_DELAY_MS, this::performSynchronization);
@@ -760,7 +762,8 @@ public class SimpleCommandService implements CommandService {
                             .orElseGet(() -> registry.getCommandByAlias(commandName).orElse(null));
 
                     if (command == null) {
-                        // Unknown command
+                        // Unknown command - log for debugging
+                        logger.debug("Unknown command '{}' attempted via {}", commandName, parser.getClass().getSimpleName());
                         continue;
                     }
 
