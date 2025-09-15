@@ -313,50 +313,6 @@ public class SimpleCommandBuilder implements CommandBuilder {
             builder.subcommand(subcommand);
         }
 
-        SimpleCommand command = builder.build();
-        
-        // Set parent for all subcommands
-        for (Command subcommand : command.subcommands()) {
-            if (subcommand instanceof SimpleCommand) {
-                SimpleCommand simpleSubcommand = (SimpleCommand) subcommand;
-                SimpleCommand.Builder subcommandBuilder = new SimpleCommand.Builder()
-                        .name(simpleSubcommand.name())
-                        .description(simpleSubcommand.description())
-                        .category(simpleSubcommand.category());
-                
-                // Copy all fields
-                for (CommandOption<?> option : simpleSubcommand.options()) {
-                    subcommandBuilder.option(option);
-                }
-                for (Command nestedSubcommand : simpleSubcommand.subcommands()) {
-                    subcommandBuilder.subcommand(nestedSubcommand);
-                }
-                
-                subcommandBuilder
-                        .group(simpleSubcommand.group())
-                        .permission(simpleSubcommand.permission())
-                        .translationKey(simpleSubcommand.translationKey());
-                
-                for (String alias : simpleSubcommand.aliases()) {
-                    subcommandBuilder.alias(alias);
-                }
-                
-                subcommandBuilder
-                        .guildOnly(simpleSubcommand.isGuildOnly());
-                
-                for (String guildId : simpleSubcommand.guildIds()) {
-                    subcommandBuilder.guildId(guildId);
-                }
-                
-                subcommandBuilder
-                        .subcommand(true)
-                        .parent(command)
-                        .enabled(simpleSubcommand.isEnabled())
-                        .cooldown(simpleSubcommand.getCooldown())
-                        .executor(simpleSubcommand.executor());
-            }
-        }
-        
-        return command;
+        return builder.build();
     }
 }

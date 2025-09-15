@@ -728,7 +728,7 @@ public class SimpleCommandService implements CommandService {
                             .orElseGet(() -> registry.getCommandByAlias(commandName).orElse(null));
 
                     if (command == null) {
-                        // Unknown command
+                        // Unknown command - try next parser
                         continue;
                     }
 
@@ -741,7 +741,11 @@ public class SimpleCommandService implements CommandService {
                     // If the execution failed and the result contains an error message,
                     // reply with the error message
                     if (!result.isSuccess() && result.getErrorMessage() != null) {
-                        context.replyError(result.getErrorMessage());
+                        try {
+                            context.replyError(result.getErrorMessage());
+                        } catch (Exception replyException) {
+                            logger.error("Failed to send error message: {}", replyException.getMessage(), replyException);
+                        }
                     }
 
                     // We found and executed a command, so we're done
@@ -752,6 +756,17 @@ public class SimpleCommandService implements CommandService {
                 } catch (Exception e) {
                     // Something went wrong - log and continue
                     logger.error("Error processing command: {}", e.getMessage(), e);
+                    
+                    // Try to send a generic error message if possible
+                    try {
+                        if (event instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent) {
+                            slashEvent.reply("An error occurred while processing the command.").setEphemeral(true).queue();
+                        } else if (event instanceof net.dv8tion.jda.api.events.message.MessageReceivedEvent messageEvent) {
+                            messageEvent.getChannel().sendMessage("❌ An error occurred while processing the command.").queue();
+                        }
+                    } catch (Exception replyException) {
+                        logger.error("Failed to send error message: {}", replyException.getMessage(), replyException);
+                    }
                 }
             }
         }

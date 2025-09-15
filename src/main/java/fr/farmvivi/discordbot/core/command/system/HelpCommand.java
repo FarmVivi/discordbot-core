@@ -120,7 +120,7 @@ public class HelpCommand {
 
         if (context.getOriginalEvent() instanceof net.dv8tion.jda.api.events.message.MessageReceivedEvent) {
             usage.append("`").append(commandService.getPrefix());
-            if (context.isFromGuild()) {
+            if (context.getGuild().isPresent()) {
                 usage.append(commandService.getPrefix(context.getGuild().get().getId()));
             }
             usage.append(targetCommand.getName());

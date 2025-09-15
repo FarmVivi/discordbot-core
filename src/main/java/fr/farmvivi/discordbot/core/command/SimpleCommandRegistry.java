@@ -247,8 +247,38 @@ public class SimpleCommandRegistry implements CommandRegistry {
             
             // Replace the command in all maps
             Plugin plugin = commandPluginMap.get(command);
-            unregister(name);
-            register(newCommand, plugin);
+            String lowerName = name.toLowerCase();
+            
+            // Remove old command
+            commands.remove(lowerName);
+            systemCommands.remove(command);
+            if (plugin != null) {
+                List<Command> pluginCommandList = pluginCommands.get(plugin);
+                if (pluginCommandList != null) {
+                    pluginCommandList.remove(command);
+                }
+            }
+            commandPluginMap.remove(command);
+            
+            // Remove aliases
+            for (String alias : command.getAliases()) {
+                aliasMap.remove(alias.toLowerCase());
+            }
+            
+            // Add new command
+            commands.put(lowerName, newCommand);
+            if (plugin == null) {
+                systemCommands.add(newCommand);
+            } else {
+                pluginCommands.computeIfAbsent(plugin, k -> new ArrayList<>()).add(newCommand);
+                commandPluginMap.put(newCommand, plugin);
+            }
+            
+            // Add aliases
+            for (String alias : newCommand.getAliases()) {
+                aliasMap.put(alias.toLowerCase(), newCommand);
+            }
+            
             return true;
         }
         
@@ -287,8 +317,38 @@ public class SimpleCommandRegistry implements CommandRegistry {
             
             // Replace the command in all maps
             Plugin plugin = commandPluginMap.get(command);
-            unregister(name);
-            register(newCommand, plugin);
+            String lowerName = name.toLowerCase();
+            
+            // Remove old command
+            commands.remove(lowerName);
+            systemCommands.remove(command);
+            if (plugin != null) {
+                List<Command> pluginCommandList = pluginCommands.get(plugin);
+                if (pluginCommandList != null) {
+                    pluginCommandList.remove(command);
+                }
+            }
+            commandPluginMap.remove(command);
+            
+            // Remove aliases
+            for (String alias : command.getAliases()) {
+                aliasMap.remove(alias.toLowerCase());
+            }
+            
+            // Add new command
+            commands.put(lowerName, newCommand);
+            if (plugin == null) {
+                systemCommands.add(newCommand);
+            } else {
+                pluginCommands.computeIfAbsent(plugin, k -> new ArrayList<>()).add(newCommand);
+                commandPluginMap.put(newCommand, plugin);
+            }
+            
+            // Add aliases
+            for (String alias : newCommand.getAliases()) {
+                aliasMap.put(alias.toLowerCase(), newCommand);
+            }
+            
             return true;
         }
         

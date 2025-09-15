@@ -117,26 +117,39 @@ public class SlashCommandParser implements CommandParser {
                 case CHANNEL -> mapping.getAsChannel();
                 case ROLE -> mapping.getAsRole();
                 case MENTIONABLE -> {
-                    Member member = mapping.getAsMember();
-                    if (member != null) {
-                        yield member;
-                    }
+                    // Try to get as member first (most specific)
+                    try {
+                        Member member = mapping.getAsMember();
+                        if (member != null) {
+                            yield member;
+                        }
+                    } catch (Exception ignored) {}
+                    
+                    // Try to get as role
+                    try {
+                        Role role = mapping.getAsRole();
+                        if (role != null) {
+                            yield role;
+                        }
+                    } catch (Exception ignored) {}
+                    
+                    // Try to get as user
+                    try {
+                        User user = mapping.getAsUser();
+                        if (user != null) {
+                            yield user;
+                        }
+                    } catch (Exception ignored) {}
+                    
+                    // Try to get as channel
+                    try {
+                        Channel channel = mapping.getAsChannel();
+                        if (channel != null) {
+                            yield channel;
+                        }
+                    } catch (Exception ignored) {}
 
-                    Role role = mapping.getAsRole();
-                    if (role != null) {
-                        yield role;
-                    }
-
-                    User user = mapping.getAsUser();
-                    if (user != null) {
-                        yield user;
-                    }
-
-                    Channel channel = mapping.getAsChannel();
-                    if (channel != null) {
-                        yield channel;
-                    }
-
+                    // Fallback to string
                     yield mapping.getAsString();
                 }
                 case NUMBER -> mapping.getAsDouble();

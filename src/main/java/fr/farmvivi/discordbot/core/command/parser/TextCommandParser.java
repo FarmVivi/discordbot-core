@@ -374,7 +374,6 @@ public class TextCommandParser implements CommandParser {
         // Get all channels and convert to the right type
         var channels = event.getGuild().getChannels().stream()
                 .filter(c -> c.getName().equalsIgnoreCase(arg))
-                .map(c -> (Channel) c)
                 .toList();
 
         if (!channels.isEmpty()) {
