@@ -312,6 +312,9 @@ public class Discobocor {
 
             // Set the startup presence right after connecting
             discordAPI.setStartupPresence();
+            
+            // Set JDA instance for command service
+            commandService.setJDA(discordAPI.getJDA());
         } catch (Exception e) {
             logger.error("Failed to connect to Discord", e);
             System.exit(1);
@@ -320,11 +323,17 @@ public class Discobocor {
 
         // 4. Enable plugins
         pluginManager.enablePlugins();
+        
+        // 5. Enable command service after plugins are loaded
+        commandService.enable();
 
-        // 5. Post-enable plugins
+        // 5. Enable command service after plugins are loaded
+        commandService.enable();
+
+        // 6. Post-enable plugins
         pluginManager.postEnablePlugins();
 
-        // 6. Set the default presence after all plugins are enabled
+        // 7. Set the default presence after all plugins are enabled
         discordAPI.setDefaultPresence();
     }
 
@@ -339,6 +348,11 @@ public class Discobocor {
             } catch (Exception e) {
                 logger.error("Error during plugin shutdown", e);
             }
+        }
+
+        // Disable command service
+        if (commandService != null) {
+            commandService.disable();
         }
 
         // Disconnect from Discord
