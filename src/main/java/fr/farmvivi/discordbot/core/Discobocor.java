@@ -269,12 +269,7 @@ public class Discobocor {
                             "        access_key: your-access-key\n" +
                             "        secret_key: your-secret-key\n" +
                             "        endpoint: https://s3.amazonaws.com  # Optional, for S3-compatible services\n" +
-                            "        prefix: discordbot  # Optional, folder prefix in bucket\n" +
-                            "\n" +
-                            "# Audio settings\n" +
-                            "audio:\n" +
-                            "  # Default speaking mode (VOICE, SOUNDSHARE, PRIORITY_SPEAKER)\n" +
-                            "  speaking_mode: VOICE\n"
+                            "        prefix: discordbot  # Optional, folder prefix in bucket\n"
             );
             logger.info("Created default config.yml");
             logger.info("Please edit config.yml and restart the bot");

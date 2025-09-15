@@ -190,16 +190,6 @@ public void onAudioFrameMixed(AudioFrameMixedEvent event) {
 
 Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.discordbot.examples.audio` pour un exemple complet d'utilisation de l'API audio.
 
-## Configuration
-
-Dans le fichier `config.yml`, vous pouvez configurer le comportement audio :
-
-```yaml
-audio:
-  # Mode d'envoi par défaut (VOICE, SOUNDSHARE, PRIORITY_SPEAKER)
-  speaking_mode: VOICE
-```
-
 ## Performances et considérations techniques
 
 - Le système utilise un mode "bypass" efficace lorsqu'une seule source est active
