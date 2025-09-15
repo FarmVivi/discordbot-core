@@ -327,9 +327,6 @@ public class Discobocor {
         // 5. Enable command service after plugins are loaded
         commandService.enable();
 
-        // 5. Enable command service after plugins are loaded
-        commandService.enable();
-
         // 6. Post-enable plugins
         pluginManager.postEnablePlugins();
 

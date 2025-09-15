@@ -32,6 +32,10 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -66,6 +70,15 @@ public class SimpleCommandService implements CommandService {
 
     // Cooldowns: userId -> (commandName -> expirationTime)
     private final Map<String, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
+
+    // Debounced synchronization
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "CommandSync");
+        t.setDaemon(true);
+        return t;
+    });
+    private ScheduledFuture<?> pendingSyncTask = null;
+    private static final long SYNC_DELAY_MS = 1000; // 1 second delay
 
     /**
      * Creates a new SimpleCommandService.
@@ -169,18 +182,9 @@ public class SimpleCommandService implements CommandService {
     public boolean registerCommand(Command command, Plugin plugin) {
         boolean result = registry.register(command, plugin);
 
-        // If the command was registered and the service is enabled, synchronize commands
+        // If the command was registered and the service is enabled, schedule a debounced synchronization
         if (result && isEnabled() && jda != null && jda.getStatus() == JDA.Status.CONNECTED) {
-            if (command.getGuildIds().isEmpty()) {
-                synchronizeGlobalCommands();
-            } else {
-                for (String guildId : command.getGuildIds()) {
-                    Guild guild = jda.getGuildById(guildId);
-                    if (guild != null) {
-                        synchronizeGuildCommands(guild);
-                    }
-                }
-            }
+            scheduleDebouncedSync();
         }
 
         return result;
@@ -316,8 +320,8 @@ public class SimpleCommandService implements CommandService {
             // Register system commands
             registerSystemCommands();
 
-            // Synchronize commands
-            synchronizeCommands();
+            // Schedule debounced synchronization instead of immediate
+            scheduleDebouncedSync();
         }
 
         logger.info("Command service enabled");
@@ -330,6 +334,12 @@ public class SimpleCommandService implements CommandService {
         }
 
         enabled = false;
+
+        // Cancel any pending sync task
+        if (pendingSyncTask != null && !pendingSyncTask.isDone()) {
+            pendingSyncTask.cancel(false);
+            pendingSyncTask = null;
+        }
 
         // Unregister the command listener
         if (jda != null && commandListener != null) {
@@ -352,9 +362,8 @@ public class SimpleCommandService implements CommandService {
             // Register system commands
             registerSystemCommands();
 
-            // Synchronize commands
-            jda.getGuildCache().forEach(this::synchronizeGuildCommands);
-            synchronizeGlobalCommands();
+            // Schedule debounced synchronization instead of immediate
+            scheduleDebouncedSync();
         }
     }
 
@@ -703,6 +712,29 @@ public class SimpleCommandService implements CommandService {
 
         // Register shutdown command
         registerCommand(new ShutdownCommand(languageManager).getCommand());
+    }
+
+    /**
+     * Schedules a debounced synchronization to avoid rapid API calls.
+     * If a sync is already scheduled, it cancels the previous one and schedules a new one.
+     */
+    private synchronized void scheduleDebouncedSync() {
+        // Cancel any existing pending sync
+        if (pendingSyncTask != null && !pendingSyncTask.isDone()) {
+            pendingSyncTask.cancel(false);
+        }
+
+        // Schedule a new sync with delay
+        pendingSyncTask = scheduler.schedule(() -> {
+            try {
+                logger.debug("Executing debounced command synchronization");
+                synchronizeCommands().join(); // Wait for completion
+            } catch (Exception e) {
+                logger.error("Error during debounced command synchronization", e);
+            }
+        }, SYNC_DELAY_MS, TimeUnit.MILLISECONDS);
+        
+        logger.debug("Scheduled debounced command synchronization in {}ms", SYNC_DELAY_MS);
     }
 
     /**

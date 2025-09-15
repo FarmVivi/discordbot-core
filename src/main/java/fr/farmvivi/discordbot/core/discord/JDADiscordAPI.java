@@ -51,7 +51,8 @@ public class JDADiscordAPI implements DiscordAPI {
                         GatewayIntent.GUILD_PRESENCES,
                         GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                        GatewayIntent.GUILD_VOICE_STATES
+                        GatewayIntent.GUILD_VOICE_STATES,
+                        GatewayIntent.MESSAGE_CONTENT
                 )
                 .enableCache(
                         CacheFlag.MEMBER_OVERRIDES,
