@@ -159,10 +159,12 @@ public class Discobocor {
             defaultLocale = Locale.US;
         }
 
+        String defaultPrefix = coreConfig.getString("commands.default-prefix", "!");
+
         createLanguageServices(defaultLocale);
         createEventAndDiscord(token);
         createStorageManagers();
-        createCommandAndPluginManagers(pluginsFolder);
+        createCommandAndPluginManagers(pluginsFolder, defaultPrefix);
 
         return true;
     }
@@ -205,13 +207,14 @@ public class Discobocor {
         audioService = new AudioServiceImpl(eventManager);
     }
 
-    private static void createCommandAndPluginManagers(File pluginsFolder) {
+    private static void createCommandAndPluginManagers(File pluginsFolder, String defaultPrefix) {
         commandService = new SimpleCommandService(
                 eventManager,
                 languageManager,
                 permissionManager,
                 coreConfig,
-                dataStorageManager
+                dataStorageManager,
+                defaultPrefix
         );
 
         pluginManager = new PluginManager(
@@ -244,7 +247,6 @@ public class Discobocor {
                             "  default: en-US\n\n" +
                             "# Command system settings\n" +
                             "commands:\n" +
-                            "  enabled: true  # Enable or disable the command system globally\n" +
                             "  default-prefix: !  # Default prefix for text commands\n" +
                             "  cooldown: 3  # Global default cooldown in seconds\n" +
                             "# Data storage settings\n" +

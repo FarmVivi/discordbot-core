@@ -74,33 +74,24 @@ public class SimpleCommandService implements CommandService {
      * @param permissionManager the permission manager
      * @param configuration     the configuration
      * @param storageManager    the storage manager
+     * @param defaultPrefix     the default command prefix
      */
     public SimpleCommandService(
             EventManager eventManager,
             LanguageManager languageManager,
             PermissionManager permissionManager,
             Configuration configuration,
-            DataStorageManager storageManager
+            DataStorageManager storageManager,
+            String defaultPrefix
     ) {
         this.eventManager = eventManager;
         this.languageManager = languageManager;
         this.permissionManager = permissionManager;
         this.configuration = configuration;
         this.storageManager = storageManager;
+        this.defaultPrefix = defaultPrefix;
 
         this.registry = new SimpleCommandRegistry();
-
-        // Load configuration
-        try {
-            this.enabled = configuration.getBoolean("commands.enabled", true);
-            this.defaultPrefix = configuration.getString("commands.default-prefix", "!");
-
-            logger.info("Command system " + (enabled ? "enabled" : "disabled") + " with default prefix: " + defaultPrefix);
-        } catch (Exception e) {
-            logger.warn("Failed to load command configuration, using defaults", e);
-            this.enabled = true;
-            this.defaultPrefix = "!";
-        }
 
         // Register parsers
         parsers.add(new SlashCommandParser(languageManager));
@@ -315,12 +306,6 @@ public class SimpleCommandService implements CommandService {
         }
 
         enabled = true;
-        configuration.set("commands.enabled", true);
-        try {
-            configuration.save();
-        } catch (ConfigurationException e) {
-            logger.error("Failed to save command enabled state to configuration", e);
-        }
 
         // Register the command listener
         if (jda != null) {
@@ -344,12 +329,6 @@ public class SimpleCommandService implements CommandService {
         }
 
         enabled = false;
-        configuration.set("commands.enabled", false);
-        try {
-            configuration.save();
-        } catch (ConfigurationException e) {
-            logger.error("Failed to save command enabled state to configuration", e);
-        }
 
         // Unregister the command listener
         if (jda != null && commandListener != null) {
