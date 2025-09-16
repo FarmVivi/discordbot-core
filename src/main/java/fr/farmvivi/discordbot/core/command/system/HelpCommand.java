@@ -80,8 +80,13 @@ public class HelpCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
-        // Set response to ephemeral as help information is typically personal
-        context.setEphemeral(true);
+        // For slash commands, defer reply as ephemeral immediately to avoid timeout and ensure ephemeral responses
+        if (context.getOriginalEvent() instanceof SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
+            context.deferReply(true);
+        } else {
+            // For non-slash commands, set ephemeral for direct replies
+            context.setEphemeral(true);
+        }
         
         // Check if we're getting help for a specific command
         if (context.hasOption("command")) {
@@ -230,9 +235,27 @@ public class HelpCommand {
      * @return the command result
      */
     private CommandResult showGeneralHelp(CommandContext context) {
+        // Build dynamic description with correct prefix based on command type
+        String helpPrefix;
+        if (context.getOriginalEvent() instanceof SlashCommandInteractionEvent) {
+            helpPrefix = "/help";
+        } else if (context.getOriginalEvent() instanceof ConsoleCommandEvent) {
+            helpPrefix = "help";
+        } else if (context.getOriginalEvent() instanceof MessageReceivedEvent) {
+            String prefix = commandService.getPrefix();
+            if (context.isFromGuild()) {
+                prefix = commandService.getPrefix(context.getGuild().get().getId());
+            }
+            helpPrefix = prefix + "help";
+        } else {
+            helpPrefix = "help";
+        }
+        
+        String description = "Type `" + helpPrefix + " <command>` or `" + helpPrefix + " <category>` for more details.";
+        
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(languageManager.getString(context.getLocale(), "commands.help.general_title"))
-                .setDescription(languageManager.getString(context.getLocale(), "commands.help.general_description"));
+                .setDescription(description);
 
         // Group commands by category
         Map<String, List<Command>> commandsByCategory = commandService.getRegistry().getCommands().stream()

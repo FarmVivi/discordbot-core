@@ -8,6 +8,7 @@ import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.SimpleCommandBuilder;
 import fr.farmvivi.discordbot.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 /**
  * System command that displays version information about the bot.
@@ -51,8 +52,13 @@ public class VersionCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
-        // Set response to ephemeral as version information is typically personal
-        context.setEphemeral(true);
+        // For slash commands, defer reply as ephemeral immediately to avoid timeout and ensure ephemeral responses
+        if (context.getOriginalEvent() instanceof SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
+            context.deferReply(true);
+        } else {
+            // For non-slash commands, set ephemeral for direct replies
+            context.setEphemeral(true);
+        }
         
         EmbedBuilder embed = new EmbedBuilder().setColor(DiscordColor.DISCORD_BLURPLE.getColor());
 
