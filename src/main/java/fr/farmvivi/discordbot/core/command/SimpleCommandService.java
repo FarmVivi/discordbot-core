@@ -778,6 +778,14 @@ public class SimpleCommandService implements CommandService {
                         // Parse the command
                         CommandContext context = parser.parse(event, command);
 
+                        // For slash commands, acknowledge immediately to avoid timeout
+                        if (event instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
+                            // For system commands that should be ephemeral, defer with ephemeral=true
+                            boolean isSystemCommand = command.getCategory().equals("System");
+                            slashEvent.deferReply(isSystemCommand).queue();
+                            logger.debug("Deferred slash command interaction for command '{}' with ephemeral={}", command.getName(), isSystemCommand);
+                        }
+
                         // Execute the command
                         CommandResult result = executeCommand(command, context);
 

@@ -51,8 +51,8 @@ public class VersionCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
-        // Setup ephemeral response for this system command
-        SystemCommandUtils.setupEphemeralResponse(context);
+        // Set ephemeral for version responses as they are typically informational
+        context.setEphemeral(true);
         
         EmbedBuilder embed = new EmbedBuilder().setColor(DiscordColor.DISCORD_BLURPLE.getColor());
 

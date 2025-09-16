@@ -80,8 +80,8 @@ public class HelpCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
-        // Setup ephemeral response for this system command
-        SystemCommandUtils.setupEphemeralResponse(context);
+        // Set ephemeral for help responses as they are typically personal
+        context.setEphemeral(true);
         
         // Check if we're getting help for a specific command
         if (context.hasOption("command")) {

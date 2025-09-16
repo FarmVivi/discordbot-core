@@ -153,12 +153,6 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         if (differ) {
             differ = false;
 
-            // Handle initial deferral for slash commands
-            if (event instanceof SlashCommandInteractionEvent slashCommand && !slashCommand.isAcknowledged()) {
-                slashCommand.deferReply(isEphemeral()).queue();
-                return;
-            }
-
             // Handle deferred slash commands (editing the response)
             if (event instanceof IReplyCallback callback && callback.isAcknowledged()) {
                 InteractionHook hook = callback.getHook();
@@ -180,14 +174,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                     }
 
                     // Commit edit
-                    if (isEphemeral()) {
-                        messageWebhookMessageEditAction
-                                .delay(1, TimeUnit.MINUTES)
-                                .flatMap(Predicate.not(Message::isEphemeral), Message::delete)
-                                .queue();
-                    } else {
-                        messageWebhookMessageEditAction.queue();
-                    }
+                    messageWebhookMessageEditAction.queue();
                 }
             }
             // Handle deferred text commands

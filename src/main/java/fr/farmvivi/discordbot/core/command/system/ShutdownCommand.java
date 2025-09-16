@@ -53,8 +53,8 @@ public class ShutdownCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
-        // Setup ephemeral response for this system command
-        SystemCommandUtils.setupEphemeralResponse(context);
+        // Set ephemeral for shutdown responses as they are administrative
+        context.setEphemeral(true);
         
         boolean restart = context.getOption("restart", false);
 
