@@ -1,0 +1,28 @@
+# Example configuration file for DiscordBot Core
+# This shows how to configure system commands and other core features
+
+# Discord bot configuration
+discord:
+  token: "YOUR_BOT_TOKEN_HERE"
+
+# Commands configuration
+commands:
+  enabled: true  # Enable or disable the command system entirely
+  default-prefix: "!"  # Default prefix for text commands
+  system:  # System commands configuration
+    help:
+      enabled: true  # Enable/disable the help command
+    version:
+      enabled: true  # Enable/disable the version command  
+    shutdown:
+      enabled: true  # Enable/disable the shutdown command (admin only)
+
+# Database configuration (if needed)
+database:
+  url: "jdbc:sqlite:data/bot.db"
+  driver: "org.sqlite.JDBC"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  file: "logs/bot.log"
