@@ -4,8 +4,11 @@ import fr.farmvivi.discordbot.core.api.command.*;
 import fr.farmvivi.discordbot.core.api.command.option.OptionChoice;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.SimpleCommandBuilder;
+import fr.farmvivi.discordbot.core.command.parser.event.ConsoleCommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -77,6 +80,9 @@ public class HelpCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
+        // Set ephemeral for help responses as they are typically personal
+        context.setEphemeral(true);
+        
         // Check if we're getting help for a specific command
         if (context.hasOption("command")) {
             String commandName = context.getOption("command", "");
@@ -118,14 +124,23 @@ public class HelpCommand {
         StringBuilder usage = new StringBuilder();
         usage.append("**").append(languageManager.getString(context.getLocale(), "commands.help.usage")).append(":** ");
 
-        if (context.getOriginalEvent() instanceof net.dv8tion.jda.api.events.message.MessageReceivedEvent) {
-            usage.append("`").append(commandService.getPrefix());
-            if (context.isFromGuild()) {
-                usage.append(commandService.getPrefix(context.getGuild().get().getId()));
-            }
-            usage.append(targetCommand.getName());
-        } else {
+        // Detect command type and show appropriate prefix
+        if (context.getOriginalEvent() instanceof SlashCommandInteractionEvent) {
+            // Slash command
             usage.append("`/").append(targetCommand.getName());
+        } else if (context.getOriginalEvent() instanceof ConsoleCommandEvent) {
+            // Console command - no prefix
+            usage.append("`").append(targetCommand.getName());
+        } else if (context.getOriginalEvent() instanceof MessageReceivedEvent) {
+            // Text command - use prefix
+            String prefix = commandService.getPrefix();
+            if (context.isFromGuild()) {
+                prefix = commandService.getPrefix(context.getGuild().get().getId());
+            }
+            usage.append("`").append(prefix).append(targetCommand.getName());
+        } else {
+            // Fallback - just show command name
+            usage.append("`").append(targetCommand.getName());
         }
 
         if (!targetCommand.getOptions().isEmpty()) {
@@ -215,9 +230,27 @@ public class HelpCommand {
      * @return the command result
      */
     private CommandResult showGeneralHelp(CommandContext context) {
+        // Build dynamic description with correct prefix based on command type
+        String helpPrefix;
+        if (context.getOriginalEvent() instanceof SlashCommandInteractionEvent) {
+            helpPrefix = "/help";
+        } else if (context.getOriginalEvent() instanceof ConsoleCommandEvent) {
+            helpPrefix = "help";
+        } else if (context.getOriginalEvent() instanceof MessageReceivedEvent) {
+            String prefix = commandService.getPrefix();
+            if (context.isFromGuild()) {
+                prefix = commandService.getPrefix(context.getGuild().get().getId());
+            }
+            helpPrefix = prefix + "help";
+        } else {
+            helpPrefix = "help";
+        }
+        
+        String description = "Type `" + helpPrefix + " <command>` or `" + helpPrefix + " <category>` for more details.";
+        
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(languageManager.getString(context.getLocale(), "commands.help.general_title"))
-                .setDescription(languageManager.getString(context.getLocale(), "commands.help.general_description"));
+                .setDescription(description);
 
         // Group commands by category
         Map<String, List<Command>> commandsByCategory = commandService.getRegistry().getCommands().stream()
