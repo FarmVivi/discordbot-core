@@ -241,10 +241,10 @@ public class SimpleCommandContext implements CommandContext {
         this.deferred = true;
         this.ephemeral = ephemeral;
 
-        CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
-        messageBuilder.setDiffer(true);
-        messageBuilder.setEphemeral(ephemeral);
-        messageBuilder.replyNow();
+        // Directly perform deferral for interaction events
+        if (originalEvent instanceof net.dv8tion.jda.api.interactions.callbacks.IReplyCallback callback && !callback.isAcknowledged()) {
+            callback.deferReply(ephemeral).queue();
+        }
     }
 
     @Override
