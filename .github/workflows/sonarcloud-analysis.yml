@@ -43,12 +43,15 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Build project
-        run: mvn -B verify -DskipTests
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4.2.4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4.1.0
+      - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Nécessaire pour PR decoration
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar -DskipTests
