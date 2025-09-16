@@ -153,6 +153,12 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         if (differ) {
             differ = false;
 
+            // Handle initial deferral for slash commands that haven't been acknowledged yet
+            if (event instanceof SlashCommandInteractionEvent slashCommand && !slashCommand.isAcknowledged()) {
+                slashCommand.deferReply(isEphemeral()).queue();
+                return;
+            }
+
             // Handle deferred slash commands (editing the response)
             if (event instanceof IReplyCallback callback && callback.isAcknowledged()) {
                 InteractionHook hook = callback.getHook();
