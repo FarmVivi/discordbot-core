@@ -778,12 +778,6 @@ public class SimpleCommandService implements CommandService {
                         // Parse the command
                         CommandContext context = parser.parse(event, command);
 
-                        // For slash commands, defer the reply immediately to avoid timeout
-                        if (event instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
-                            context.deferReply();
-                            logger.debug("Deferred slash command interaction for command '{}'", command.getName());
-                        }
-
                         // Execute the command
                         CommandResult result = executeCommand(command, context);
 

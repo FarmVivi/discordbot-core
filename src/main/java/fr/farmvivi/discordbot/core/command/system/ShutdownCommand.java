@@ -53,13 +53,8 @@ public class ShutdownCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
-        // For slash commands, defer reply as ephemeral immediately to avoid timeout and ensure ephemeral responses
-        if (context.getOriginalEvent() instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
-            context.deferReply(true);
-        } else {
-            // For non-slash commands, set ephemeral for direct replies
-            context.setEphemeral(true);
-        }
+        // Setup ephemeral response for this system command
+        SystemCommandUtils.setupEphemeralResponse(context);
         
         boolean restart = context.getOption("restart", false);
 
