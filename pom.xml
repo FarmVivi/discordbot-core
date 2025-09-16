@@ -262,6 +262,8 @@
                         <!-- automatically creates the classpath using all project dependencies,
                              also adding the project build directory -->
                         <classpath/>
+                        <!-- Ensure WyLog runs at DEBUG when executing via mvn exec -->
+                        <argument>-Dnet.wytrem.wylog.defaultLogLevel=debug</argument>
                         <argument>${project.mainClass}</argument>
                     </arguments>
                     <workingDirectory>${project.basedir}/run</workingDirectory>
