@@ -176,11 +176,6 @@ public class SimpleCommandContext implements CommandContext {
 
     @Override
     public void replyEmbed(EmbedBuilder embed) {
-        // Auto-defer slash commands that haven't been acknowledged yet
-        if (originalEvent instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
-            this.deferred = true;
-        }
-        
         CommandMessageBuilder messageBuilder = new CommandMessageBuilder(originalEvent, languageManager, locale);
         messageBuilder.setDiffer(deferred);
         messageBuilder.setEphemeral(ephemeral);
