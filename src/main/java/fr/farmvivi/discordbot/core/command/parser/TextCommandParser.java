@@ -1,7 +1,6 @@
 package fr.farmvivi.discordbot.core.command.parser;
 
-import fr.farmvivi.discordbot.core.api.command.Command;
-import fr.farmvivi.discordbot.core.api.command.CommandContext;
+import fr.farmvivi.discordbot.core.api.command.*;
 import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
 import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
@@ -33,17 +32,17 @@ public class TextCommandParser implements CommandParser {
     private static final Pattern CHANNEL_MENTION_PATTERN = Pattern.compile("<#(\\d+)>");
 
     private final LanguageManager languageManager;
-    private final String prefix;
+    private final CommandService commandService;
 
     /**
      * Creates a new text command parser.
      *
      * @param languageManager the language manager to use for localization
-     * @param prefix          the command prefix
+     * @param commandService  the command service to get prefix information from
      */
-    public TextCommandParser(LanguageManager languageManager, String prefix) {
+    public TextCommandParser(LanguageManager languageManager, CommandService commandService) {
         this.languageManager = languageManager;
-        this.prefix = prefix;
+        this.commandService = commandService;
     }
 
     @Override
@@ -70,6 +69,10 @@ public class TextCommandParser implements CommandParser {
             locale = Locale.US;
         }
 
+        // Get the appropriate prefix for this guild
+        String guildId = messageEvent.isFromGuild() ? messageEvent.getGuild().getId() : null;
+        String prefix = commandService.getPrefix(guildId);
+        
         // Parse the message content
         String content = message.getContentRaw();
         if (!content.startsWith(prefix)) {
@@ -106,6 +109,10 @@ public class TextCommandParser implements CommandParser {
             throw new CommandParseException("Event is not a message received event");
         }
 
+        // Get the appropriate prefix for this guild
+        String guildId = messageEvent.isFromGuild() ? messageEvent.getGuild().getId() : null;
+        String prefix = commandService.getPrefix(guildId);
+        
         String content = messageEvent.getMessage().getContentRaw();
         if (!content.startsWith(prefix)) {
             throw new CommandParseException("Message does not start with the prefix: " + prefix);
@@ -128,9 +135,19 @@ public class TextCommandParser implements CommandParser {
             return false;
         }
 
+        // Get the appropriate prefix for this guild
+        String guildId = messageEvent.isFromGuild() ? messageEvent.getGuild().getId() : null;
+        String prefix = commandService.getPrefix(guildId);
+        
         // Check if the message starts with the prefix
         String content = messageEvent.getMessage().getContentRaw();
-        return content.startsWith(prefix);
+        boolean isCommand = content.startsWith(prefix);
+        
+        if (isCommand) {
+            logger.debug("Text command detected: '{}' with prefix '{}'", content, prefix);
+        }
+        
+        return isCommand;
     }
 
     /**

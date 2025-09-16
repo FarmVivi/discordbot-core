@@ -10,6 +10,7 @@ commands:
     warning: "Warning"
     error: "An error occurred"
   messages:
+    success: "Command executed successfully"
     cooldown: "This command is on cooldown. Please wait {0} second(s) before using it again."
     disabled: "This command is disabled"
     guild_only: "This command can only be used in a server"

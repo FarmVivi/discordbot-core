@@ -15,11 +15,13 @@ import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.api.storage.GuildStorage;
 import fr.farmvivi.discordbot.core.command.listener.CommandListener;
 import fr.farmvivi.discordbot.core.command.parser.CommandParser;
+import fr.farmvivi.discordbot.core.command.parser.ConsoleCommandParser;
 import fr.farmvivi.discordbot.core.command.parser.SlashCommandParser;
 import fr.farmvivi.discordbot.core.command.parser.TextCommandParser;
 import fr.farmvivi.discordbot.core.command.system.HelpCommand;
 import fr.farmvivi.discordbot.core.command.system.ShutdownCommand;
 import fr.farmvivi.discordbot.core.command.system.VersionCommand;
+import fr.farmvivi.discordbot.core.util.Debouncer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -57,6 +59,8 @@ public class SimpleCommandService implements CommandService {
     private boolean enabled;
     private String defaultPrefix;
     private CommandListener commandListener;
+    private boolean systemCommandsRegistered = false;
+    private boolean duringInitialization = false;
 
     // Statistics
     private final AtomicLong commandExecutionCount = new AtomicLong();
@@ -66,6 +70,10 @@ public class SimpleCommandService implements CommandService {
 
     // Cooldowns: userId -> (commandName -> expirationTime)
     private final Map<String, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
+
+    // Debounced synchronization using existing Debouncer utility
+    private Debouncer commandSyncDebouncer;
+    private static final long SYNC_DELAY_MS = 1000; // 1 second delay
 
     /**
      * Creates a new SimpleCommandService.
@@ -96,7 +104,11 @@ public class SimpleCommandService implements CommandService {
 
         // Register parsers
         parsers.add(new SlashCommandParser(languageManager));
-        parsers.add(new TextCommandParser(languageManager, defaultPrefix));
+        parsers.add(new TextCommandParser(languageManager, this));
+        parsers.add(new ConsoleCommandParser(languageManager));
+        
+        // Initialize command sync debouncer
+        this.commandSyncDebouncer = new Debouncer(SYNC_DELAY_MS, this::performSynchronization);
     }
 
     @Override
@@ -139,15 +151,6 @@ public class SimpleCommandService implements CommandService {
         } catch (ConfigurationException e) {
             logger.error("Failed to save command prefix to configuration", e);
         }
-
-        // Update text command parser
-        for (CommandParser parser : parsers) {
-            if (parser instanceof TextCommandParser textParser) {
-                parsers.remove(textParser);
-                parsers.add(new TextCommandParser(languageManager, prefix));
-                break;
-            }
-        }
     }
 
     @Override
@@ -169,18 +172,10 @@ public class SimpleCommandService implements CommandService {
     public boolean registerCommand(Command command, Plugin plugin) {
         boolean result = registry.register(command, plugin);
 
-        // If the command was registered and the service is enabled, synchronize commands
-        if (result && isEnabled() && jda != null && jda.getStatus() == JDA.Status.CONNECTED) {
-            if (command.getGuildIds().isEmpty()) {
-                synchronizeGlobalCommands();
-            } else {
-                for (String guildId : command.getGuildIds()) {
-                    Guild guild = jda.getGuildById(guildId);
-                    if (guild != null) {
-                        synchronizeGuildCommands(guild);
-                    }
-                }
-            }
+        // Only use debouncer as last resort - during runtime command registration
+        // Don't trigger debounced sync during initialization or if service is not fully ready
+        if (result && isEnabled() && jda != null && jda.getStatus() == JDA.Status.CONNECTED && !duringInitialization) {
+            scheduleDebouncedSync();
         }
 
         return result;
@@ -306,6 +301,8 @@ public class SimpleCommandService implements CommandService {
             return;
         }
 
+        // Mark that we're during initialization to avoid triggering debounced sync
+        duringInitialization = true;
         enabled = true;
 
         // Register the command listener
@@ -313,12 +310,21 @@ public class SimpleCommandService implements CommandService {
             commandListener = new CommandListener(this);
             jda.addEventListener(commandListener);
 
-            // Register system commands
-            registerSystemCommands();
+            // Register system commands only once
+            if (!systemCommandsRegistered) {
+                registerSystemCommands();
+                systemCommandsRegistered = true;
+            }
 
-            // Synchronize commands
-            synchronizeCommands();
+            // Perform immediate synchronization instead of debounced during initialization
+            // This ensures all commands are synced once at startup
+            if (jda.getStatus() == JDA.Status.CONNECTED) {
+                synchronizeCommands();
+            }
         }
+
+        // End of initialization - now runtime command registrations can use debouncer
+        duringInitialization = false;
 
         logger.info("Command service enabled");
     }
@@ -330,6 +336,12 @@ public class SimpleCommandService implements CommandService {
         }
 
         enabled = false;
+
+        // Shutdown the debouncer
+        if (commandSyncDebouncer != null) {
+            commandSyncDebouncer.shutdown();
+            commandSyncDebouncer = new Debouncer(SYNC_DELAY_MS, this::performSynchronization);
+        }
 
         // Unregister the command listener
         if (jda != null && commandListener != null) {
@@ -344,18 +356,8 @@ public class SimpleCommandService implements CommandService {
     public void setJDA(JDA jda) {
         this.jda = jda;
 
-        if (isEnabled() && jda != null) {
-            // Register the command listener
-            commandListener = new CommandListener(this);
-            jda.addEventListener(commandListener);
-
-            // Register system commands
-            registerSystemCommands();
-
-            // Synchronize commands
-            jda.getGuildCache().forEach(this::synchronizeGuildCommands);
-            synchronizeGlobalCommands();
-        }
+        // Don't register commands or listeners here - let enable() handle everything
+        // This avoids duplicate registrations and multiple sync calls
     }
 
     @Override
@@ -444,14 +446,18 @@ public class SimpleCommandService implements CommandService {
             return CommandResult.error(languageManager.getString(locale, "commands.messages.disabled"));
         }
 
-        // Check guild-only
-        if (command.isGuildOnly() && !context.isFromGuild()) {
+        // Determine if this is a console command (user is null)
+        boolean isConsoleCommand = context.getUser() == null;
+
+        // Check guild-only (skip for console commands - they are not bound to guilds)
+        if (command.isGuildOnly() && !context.isFromGuild() && !isConsoleCommand) {
             return CommandResult.error(languageManager.getString(locale, "commands.messages.guild_only"));
         }
 
-        // Check admin permission
-        if (command.getPermission() != null) {
-            String userId = context.getUser().getId();
+        String userId = isConsoleCommand ? "CONSOLE" : context.getUser().getId();
+
+        // Check admin permission (skip for console commands - they are trusted)
+        if (command.getPermission() != null && !isConsoleCommand) {
             String guildId = context.getGuild().map(Guild::getId).orElse(null);
 
             try {
@@ -464,9 +470,8 @@ public class SimpleCommandService implements CommandService {
             }
         }
 
-        // Check cooldown
-        String userId = context.getUser().getId();
-        if (isOnCooldown(userId, command.getName())) {
+        // Check cooldown (skip for console commands)
+        if (!isConsoleCommand && isOnCooldown(userId, command.getName())) {
             int seconds = getRemainingCooldown(userId, command.getName());
             return CommandResult.error(languageManager.getString(locale, "commands.messages.cooldown", seconds));
         }
@@ -487,8 +492,8 @@ public class SimpleCommandService implements CommandService {
         try {
             result = command.execute(context);
 
-            // Apply cooldown if specified
-            if (command.getCooldown() > 0) {
+            // Apply cooldown if specified (skip for console commands)
+            if (command.getCooldown() > 0 && !isConsoleCommand) {
                 applyCooldown(userId, command.getName(), command.getCooldown());
             }
         } catch (Exception e) {
@@ -706,6 +711,29 @@ public class SimpleCommandService implements CommandService {
     }
 
     /**
+     * Schedules a debounced synchronization to avoid rapid API calls.
+     * Uses the existing Debouncer utility class as requested.
+     */
+    private void scheduleDebouncedSync() {
+        if (commandSyncDebouncer != null) {
+            logger.debug("Scheduling debounced command synchronization in {}ms", SYNC_DELAY_MS);
+            commandSyncDebouncer.debounce();
+        }
+    }
+    
+    /**
+     * Performs the actual synchronization - used by the debouncer.
+     */
+    private void performSynchronization() {
+        try {
+            logger.debug("Executing debounced command synchronization");
+            synchronizeCommands().join(); // Wait for completion
+        } catch (Exception e) {
+            logger.error("Error during debounced command synchronization", e);
+        }
+    }
+
+    /**
      * Processes a command from a JDA event.
      * This method is called by the command listener.
      *
@@ -718,41 +746,76 @@ public class SimpleCommandService implements CommandService {
 
         // Find a parser that can handle this event
         for (CommandParser parser : parsers) {
-            if (parser.canParse(event) && parser.isCommandInvocation(event)) {
-                try {
-                    // Extract the command name
-                    String commandName = parser.extractCommandName(event);
+            if (parser.canParse(event)) {
+                logger.debug("Parser {} can handle event type {}", parser.getClass().getSimpleName(), event.getClass().getSimpleName());
+                
+                if (parser.isCommandInvocation(event)) {
+                    logger.debug("Parser {} detected command invocation", parser.getClass().getSimpleName());
+                    
+                    try {
+                        // Extract the command name
+                        String commandName = parser.extractCommandName(event);
+                        logger.debug("Extracted command name: '{}'", commandName);
 
-                    // Find the command
-                    Command command = registry.getCommand(commandName)
-                            .orElseGet(() -> registry.getCommandByAlias(commandName).orElse(null));
+                        // Find the command
+                        Command command = registry.getCommand(commandName)
+                                .orElseGet(() -> registry.getCommandByAlias(commandName).orElse(null));
 
-                    if (command == null) {
-                        // Unknown command
-                        continue;
+                        if (command == null) {
+                            // Unknown command - log for debugging
+                            logger.debug("Unknown command '{}' attempted via {}", commandName, parser.getClass().getSimpleName());
+                            continue;
+                        }
+
+                        logger.debug("Found command '{}', executing...", command.getName());
+
+                        // Parse the command
+                        CommandContext context = parser.parse(event, command);
+
+                        // For slash commands, defer the reply immediately to avoid timeout
+                        if (event instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent && !slashEvent.isAcknowledged()) {
+                            context.deferReply();
+                            logger.debug("Deferred slash command interaction for command '{}'", command.getName());
+                        }
+
+                        // Execute the command
+                        CommandResult result = executeCommand(command, context);
+
+                        // Handle replies based on command result and context
+                        if (event instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent slashEvent) {
+                            if (slashEvent.isAcknowledged()) {
+                                // Command was deferred - check if we need to send a response
+                                if (!result.isSuccess() && result.getErrorMessage() != null) {
+                                    context.replyError(result.getErrorMessage());
+                                }
+                                // For successful commands, assume they handled their own reply through context
+                                // If they didn't, the deferred interaction will remain as "Bot is thinking..." 
+                                // which is acceptable for commands that don't need explicit confirmation
+                            }
+                            // If not acknowledged, the reply was sent directly by the command
+                        } else {
+                            // For text and console commands, only reply on error if no explicit reply was sent
+                            if (!result.isSuccess() && result.getErrorMessage() != null) {
+                                context.replyError(result.getErrorMessage());
+                            }
+                        }
+
+                        logger.debug("Command '{}' executed with success: {}", command.getName(), result.isSuccess());
+
+                        // We found and executed a command, so we're done
+                        return;
+                    } catch (CommandParseException e) {
+                        // Failed to parse the command - try the next parser
+                        logger.debug("Failed to parse command with {}: {}", parser.getClass().getSimpleName(), e.getMessage());
+                    } catch (Exception e) {
+                        // Something went wrong - log and continue
+                        logger.error("Error processing command with {}: {}", parser.getClass().getSimpleName(), e.getMessage(), e);
                     }
-
-                    // Parse the command
-                    CommandContext context = parser.parse(event, command);
-
-                    // Execute the command
-                    CommandResult result = executeCommand(command, context);
-
-                    // If the execution failed and the result contains an error message,
-                    // reply with the error message
-                    if (!result.isSuccess() && result.getErrorMessage() != null) {
-                        context.replyError(result.getErrorMessage());
-                    }
-
-                    // We found and executed a command, so we're done
-                    return;
-                } catch (CommandParseException e) {
-                    // Failed to parse the command - try the next parser
-                    logger.debug("Failed to parse command: {}", e.getMessage());
-                } catch (Exception e) {
-                    // Something went wrong - log and continue
-                    logger.error("Error processing command: {}", e.getMessage(), e);
+                } else {
+                    logger.debug("Parser {} did not detect command invocation", parser.getClass().getSimpleName());
                 }
+            } else {
+                logger.debug("Parser {} cannot handle event type {}", parser.getClass().getSimpleName(), event.getClass().getSimpleName());
             }
         }
     }
