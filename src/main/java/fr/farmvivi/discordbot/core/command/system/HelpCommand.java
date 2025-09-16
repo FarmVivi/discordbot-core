@@ -77,6 +77,9 @@ public class HelpCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
+        // Set ephemeral response for help command
+        context.setEphemeral(true);
+        
         // Check if we're getting help for a specific command
         if (context.hasOption("command")) {
             String commandName = context.getOption("command", "");
@@ -119,13 +122,18 @@ public class HelpCommand {
         usage.append("**").append(languageManager.getString(context.getLocale(), "commands.help.usage")).append(":** ");
 
         if (context.getOriginalEvent() instanceof net.dv8tion.jda.api.events.message.MessageReceivedEvent) {
-            usage.append("`").append(commandService.getPrefix());
+            // Text command - show prefix
+            String prefix = commandService.getPrefix();
             if (context.isFromGuild()) {
-                usage.append(commandService.getPrefix(context.getGuild().get().getId()));
+                prefix = commandService.getPrefix(context.getGuild().get().getId());
             }
-            usage.append(targetCommand.getName());
-        } else {
+            usage.append("`").append(prefix).append(targetCommand.getName());
+        } else if (context.getOriginalEvent() instanceof net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent) {
+            // Slash command - show /
             usage.append("`/").append(targetCommand.getName());
+        } else {
+            // Console command or other - show plain command name
+            usage.append("`").append(targetCommand.getName());
         }
 
         if (!targetCommand.getOptions().isEmpty()) {

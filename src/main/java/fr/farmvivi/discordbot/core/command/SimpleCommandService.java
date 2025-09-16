@@ -700,14 +700,20 @@ public class SimpleCommandService implements CommandService {
      * Registers system commands.
      */
     private void registerSystemCommands() {
-        // Register help command
-        registerCommand(new HelpCommand(this, languageManager).getCommand());
+        // Register help command if enabled
+        if (configuration.getBoolean("commands.system.help.enabled", true)) {
+            registerCommand(new HelpCommand(this, languageManager).getCommand());
+        }
 
-        // Register version command
-        registerCommand(new VersionCommand(languageManager).getCommand());
+        // Register version command if enabled
+        if (configuration.getBoolean("commands.system.version.enabled", true)) {
+            registerCommand(new VersionCommand(languageManager).getCommand());
+        }
 
-        // Register shutdown command
-        registerCommand(new ShutdownCommand(languageManager).getCommand());
+        // Register shutdown command if enabled
+        if (configuration.getBoolean("commands.system.shutdown.enabled", true)) {
+            registerCommand(new ShutdownCommand(languageManager).getCommand());
+        }
     }
 
     /**

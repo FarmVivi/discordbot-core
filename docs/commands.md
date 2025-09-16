@@ -40,6 +40,13 @@ Le système de commandes est configuré dans le fichier `config.yml` :
 commands:
   enabled: true  # Active ou désactive le système de commandes
   default-prefix: "!"  # Préfixe par défaut pour les commandes textuelles
+  system:  # Configuration des commandes système
+    help:
+      enabled: true  # Active ou désactive la commande help
+    version:
+      enabled: true  # Active ou désactive la commande version
+    shutdown:
+      enabled: true  # Active ou désactive la commande shutdown
 ```
 
 Chaque guilde peut avoir son propre préfixe, qui est stocké dans la base de données.
@@ -293,6 +300,10 @@ Le système fournit plusieurs commandes système :
 - `help` : Affiche des informations sur les commandes disponibles
 - `version` : Affiche la version du bot
 - `shutdown` : Arrête le bot (réservé aux administrateurs)
+
+Ces commandes peuvent être activées ou désactivées individuellement dans la configuration via les paramètres `commands.system.help.enabled`, `commands.system.version.enabled` et `commands.system.shutdown.enabled` (tous activés par défaut).
+
+Les commandes système utilisent automatiquement des réponses éphémères pour une meilleure expérience utilisateur.
 
 ## Gestion des permissions
 

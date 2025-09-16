@@ -51,12 +51,14 @@ public class ShutdownCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
+        // Set ephemeral response for shutdown command - only the executor should see the confirmation
+        context.setEphemeral(true);
+        
         boolean restart = context.getOption("restart", false);
 
         if (restart) {
             // Get the restart message using the language manager if available
             String restartMessage = languageManager.getString(context.getLocale(), "commands.shutdown.restarting");
-
             context.replyInfo(restartMessage);
 
             // Schedule a delayed task to restart the bot
@@ -74,7 +76,6 @@ public class ShutdownCommand {
         } else {
             // Get the shutdown message using the language manager if available
             String shutdownMessage = languageManager.getString(context.getLocale(), "commands.shutdown.shutting_down");
-
             context.replyInfo(shutdownMessage);
 
             // Schedule a delayed task to shut down the bot

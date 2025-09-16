@@ -51,6 +51,9 @@ public class VersionCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
+        // Set ephemeral response for version command
+        context.setEphemeral(true);
+        
         EmbedBuilder embed = new EmbedBuilder().setColor(DiscordColor.DISCORD_BLURPLE.getColor());
 
         embed.setTitle(languageManager.getString(context.getLocale(), "commands.version.title"))
