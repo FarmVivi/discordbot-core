@@ -5,6 +5,8 @@ import fr.farmvivi.discordbot.core.api.command.CommandContext;
 import fr.farmvivi.discordbot.core.api.command.CommandResult;
 import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.SimpleCommandBuilder;
+import fr.farmvivi.discordbot.core.util.DiscordColor;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 /**
  * System command that shuts down the bot.
@@ -51,13 +53,22 @@ public class ShutdownCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
+        // Set response to ephemeral as shutdown commands are administrative
+        context.setEphemeral(true);
+        
         boolean restart = context.getOption("restart", false);
 
         if (restart) {
             // Get the restart message using the language manager if available
             String restartMessage = languageManager.getString(context.getLocale(), "commands.shutdown.restarting");
 
-            context.replyInfo(restartMessage);
+            // Create embed for restart message
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setColor(DiscordColor.DISCORD_BLURPLE.getColor())
+                    .setTitle(languageManager.getString(context.getLocale(), "commands.titles.info"))
+                    .setDescription(restartMessage);
+            
+            context.replyEmbed(embed);
 
             // Schedule a delayed task to restart the bot
             Thread restartThread = new Thread(() -> {
@@ -75,7 +86,13 @@ public class ShutdownCommand {
             // Get the shutdown message using the language manager if available
             String shutdownMessage = languageManager.getString(context.getLocale(), "commands.shutdown.shutting_down");
 
-            context.replyInfo(shutdownMessage);
+            // Create embed for shutdown message
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setColor(DiscordColor.DISCORD_BLURPLE.getColor())
+                    .setTitle(languageManager.getString(context.getLocale(), "commands.titles.info"))
+                    .setDescription(shutdownMessage);
+            
+            context.replyEmbed(embed);
 
             // Schedule a delayed task to shut down the bot
             Thread shutdownThread = new Thread(() -> {

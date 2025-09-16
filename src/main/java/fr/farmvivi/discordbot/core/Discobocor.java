@@ -254,6 +254,10 @@ public class Discobocor {
                             "commands:\n" +
                             "  default-prefix: !  # Default prefix for text commands\n" +
                             "  cooldown: 3  # Global default cooldown in seconds\n" +
+                            "  system:\n" +
+                            "    help: true      # Enable/disable help command\n" +
+                            "    version: true   # Enable/disable version command\n" +
+                            "    shutdown: true  # Enable/disable shutdown command\n" +
                             "# Data storage settings\n" +
                             "data:\n" +
                             "  storage:\n" +
