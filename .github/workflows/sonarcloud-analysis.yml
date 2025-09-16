@@ -1,4 +1,4 @@
-name: SonarCloud Analysis
+name: SonarQube Analysis
 
 permissions:
   contents: read            # pour checkout
@@ -19,8 +19,8 @@ on:
   workflow_dispatch:  # Permet de lancer manuellement le workflow
 
 jobs:
-  sonarcloud:
-    name: SonarCloud
+  sonarqube:
+    name: SonarQube
     runs-on: ubuntu-latest
     # Pour pull_request_target, n'exécuter que pour les PR provenant de forks internes
     if: |
@@ -43,36 +43,12 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4.2.4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+      - name: Build project
+        run: mvn -B verify -DskipTests
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4.2.4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-
-      - name: Build and analyze
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Nécessaire pour PR decoration
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          # Détermine s'il s'agit d'une pull request ou non
-          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "pull_request_target" ]]; then
-            # Pour les pull requests, ajoute les paramètres spécifiques pour l'analyse de PR
-            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar -DskipTests \
-              -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
-              -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }} \
-              -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }} \
-              -Dsonar.pullrequest.github.repository=${{ github.repository }} \
-              -Dsonar.scm.revision=${{ github.event.pull_request.head.sha }}
-          else
-            # Pour les pushes normaux et les workflow manuels
-            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar -DskipTests \
-              -Dsonar.branch.name=${{ github.ref_name }}
-          fi
+          SONAR_HOST_URL: https://sonarcloud.io
