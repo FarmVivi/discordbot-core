@@ -199,3 +199,6 @@ dev.txt
 
 # Ignore run directory containing configs
 run
+
+# Backup files from multi-module conversion
+pom-original.xml
