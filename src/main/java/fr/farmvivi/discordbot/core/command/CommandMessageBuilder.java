@@ -17,11 +17,12 @@ import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 /**
  * Builder for creating command response messages.
@@ -29,6 +30,8 @@ import java.util.function.Predicate;
  * easily creating information, success, warning, and error messages.
  */
 public class CommandMessageBuilder extends MessageCreateBuilder {
+    private static final Logger logger = LoggerFactory.getLogger(CommandMessageBuilder.class);
+
     private final Event event;
     private final LanguageManager languageManager;
     private final Locale locale;
@@ -150,26 +153,34 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * This method is called automatically when a command is executed.
      */
     public void replyNow() {
+        logger.debug("replyNow called with differ: {}", differ);
+
         if (differ) {
+            logger.debug("Handling deferred reply.");
             differ = false;
 
             // Handle deferred slash commands (editing already-deferred interactions)
             if (event instanceof IReplyCallback callback && callback.isAcknowledged()) {
+                logger.debug("Handling deferred slash command.");
                 InteractionHook hook = callback.getHook();
 
                 if (isEmpty()) {
+                    logger.debug("No content to send, deleting original message.");
                     hook.deleteOriginal().queue();
                 } else {
                     // Edit content
+                    logger.debug("Editing original message with new content.");
                     WebhookMessageEditAction<Message> messageWebhookMessageEditAction = hook.editOriginal(getContent());
 
                     // Edit embeds
                     if (!getEmbeds().isEmpty()) {
+                        logger.debug("Editing embeds.");
                         messageWebhookMessageEditAction.setEmbeds(getEmbeds());
                     }
 
                     // Edit components
                     if (!getComponents().isEmpty()) {
+                        logger.debug("Editing components.");
                         messageWebhookMessageEditAction.setComponents(getComponents());
                     }
 
@@ -179,11 +190,13 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
             }
             // Handle deferred text commands
             else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
+                logger.debug("Handling deferred text command.");
                 if (!isEmpty()) {
                     Message originalMessage = messageReceivedEvent.getMessage();
                     MessageCreateAction messageCreateAction = originalMessage.reply(build());
 
                     if (isEphemeral()) {
+                        logger.debug("Setting ephemeral message.");
                         messageCreateAction
                                 .delay(1, TimeUnit.MINUTES)
                                 .flatMap(Message::delete)
@@ -194,6 +207,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                                 messageReceivedEvent.getGuild().getSelfMember()
                                         .hasPermission(messageReceivedEvent.getGuildChannel(),
                                                 net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
+                            logger.debug("Deleting original message after delay.");
                             originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
                         }
                     } else {
@@ -207,6 +221,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                             messageReceivedEvent.getGuild().getSelfMember()
                                     .hasPermission(messageReceivedEvent.getGuildChannel(),
                                             net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
+                        logger.debug("Deleting original message after delay due to ephemeral response.");
                         originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
                     }
                 }
@@ -214,18 +229,21 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         }
         // Handle direct replies for non-deferred text commands
         else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
+            logger.debug("Handling direct reply for non-deferred text command.");
             if (!isEmpty()) {
                 Message originalMessage = messageReceivedEvent.getMessage();
                 // Reply directly to the original message (thread-safe queue)
                 MessageCreateAction messageCreateAction = originalMessage.reply(build());
 
                 if (isEphemeral()) {
+                    logger.debug("Setting ephemeral message for direct reply.");
                     messageCreateAction.queue(sent -> {
                         sent.delete().queueAfter(1, TimeUnit.MINUTES);
                         if (messageReceivedEvent.isFromGuild() &&
                                 messageReceivedEvent.getGuild().getSelfMember()
                                         .hasPermission(messageReceivedEvent.getGuildChannel(),
                                                 net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
+                            logger.debug("Deleting original message after delay for ephemeral response.");
                             originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
                         }
                     });
@@ -239,17 +257,21 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                                         net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
                     // If ephemeral with no content, optionally delete the triggering message after
                     // delay
+                    logger.debug("Deleting triggering message after delay due to ephemeral response with no content.");
                     messageReceivedEvent.getMessage().delete().queueAfter(1, TimeUnit.MINUTES);
                 }
             }
         }
         // Handle direct replies for slash commands
         else if (event instanceof SlashCommandInteractionEvent slashCommand && !slashCommand.isAcknowledged()) {
+            logger.debug("Handling direct reply for slash command.");
             if (isEmpty()) {
+                logger.debug("No content to send for slash command, replying with OK.");
                 slashCommand.reply("OK")
                         .flatMap(InteractionHook::deleteOriginal)
                         .queue();
             } else {
+                logger.debug("Replying to slash command with content.");
                 slashCommand.reply(build())
                         .setEphemeral(isEphemeral())
                         .queue();
@@ -257,6 +279,7 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
         }
         // Handle console command output
         else if (event instanceof ConsoleCommandEvent) {
+            logger.debug("Handling console command output.");
             if (!isEmpty()) {
                 // Output to console
                 String output = formatForConsole();

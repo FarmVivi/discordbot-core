@@ -15,11 +15,15 @@ import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of CommandContext that provides all necessary functionality
  * for command execution.
  */
 public class SimpleCommandContext implements CommandContext {
+    private static final Logger logger = LoggerFactory.getLogger(SimpleCommandContext.class);
 
     private final Event originalEvent;
     private final Command command;
@@ -243,6 +247,7 @@ public class SimpleCommandContext implements CommandContext {
 
         // Directly perform deferral for interaction events
         if (originalEvent instanceof net.dv8tion.jda.api.interactions.callbacks.IReplyCallback callback && !callback.isAcknowledged()) {
+            logger.debug("Deferring reply for interaction event.");
             callback.deferReply(ephemeral).queue();
         }
     }
