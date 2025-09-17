@@ -1,0 +1,34 @@
+# AudioExample Plugin Configuration
+
+# Audio settings
+audio:
+  # Default volume for audio playback (0-100)
+  default_volume: 50
+  
+  # Maximum recording duration in seconds
+  max_recording_duration: 300
+  
+  # Audio file format for recordings (wav, mp3, ogg)
+  recording_format: wav
+  
+  # Enable automatic audio enhancement
+  enable_enhancement: true
+
+# Voice channel settings
+voice:
+  # Auto join voice channel when user joins
+  auto_join: false
+  
+  # Auto leave when no users in channel
+  auto_leave: true
+  
+  # Auto leave timeout in seconds
+  auto_leave_timeout: 30
+
+# File paths
+paths:
+  # Directory for storing audio recordings
+  recordings_dir: "recordings/"
+  
+  # Directory for audio samples
+  samples_dir: "samples/"

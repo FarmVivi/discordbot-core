@@ -1,0 +1,7 @@
+name: AudioExample
+version: 1.0.0
+main: fr.farmvivi.discordbot.examples.audio.AudioExamplePlugin
+description: Example audio plugin demonstrating audio API capabilities
+author: FarmVivi
+website: https://github.com/FarmVivi/discordbot-core
+dependencies: []
