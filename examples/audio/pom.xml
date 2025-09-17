@@ -8,6 +8,7 @@
         <groupId>fr.farmvivi.discordbot</groupId>
         <artifactId>discordbot-parent</artifactId>
         <version>2.3.27-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>discordbot-example-audio</artifactId>

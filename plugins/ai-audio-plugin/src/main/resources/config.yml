@@ -1,0 +1,100 @@
+# AI Audio Plugin Configuration
+
+# API Configuration
+ai:
+  # OpenAI API key for GPT integration
+  openai_api_key: "${OPENAI_API_KEY:}"
+  
+  # Google Cloud credentials path
+  google_credentials_path: "${GOOGLE_CREDENTIALS_PATH:}"
+  
+  # Azure Cognitive Services key
+  azure_speech_key: "${AZURE_SPEECH_KEY:}"
+  azure_speech_region: "${AZURE_SPEECH_REGION:eastus}"
+
+# Speech Recognition Settings
+speech_recognition:
+  # Language for transcription (en-US, fr-FR, es-ES, etc.)
+  language: "en-US"
+  
+  # Confidence threshold for accepting transcriptions (0.0-1.0)
+  confidence_threshold: 0.8
+  
+  # Enable continuous recognition
+  continuous_recognition: true
+  
+  # Enable speaker identification
+  speaker_identification: true
+
+# Text-to-Speech Settings
+text_to_speech:
+  # Default voice for TTS
+  default_voice: "en-US-Standard-A"
+  
+  # Speech rate (0.25-4.0, 1.0 = normal)
+  speech_rate: 1.0
+  
+  # Pitch adjustment (-20.0 to 20.0, 0.0 = normal)
+  pitch: 0.0
+  
+  # Volume gain (-96.0 to 16.0 dB)
+  volume_gain: 0.0
+
+# Voice Commands
+voice_commands:
+  # Enable voice command recognition
+  enabled: true
+  
+  # Wake word to activate voice commands
+  wake_word: "hey bot"
+  
+  # Command timeout in milliseconds
+  timeout: 5000
+  
+  # Require wake word for every command
+  require_wake_word: true
+
+# Audio Processing
+audio_processing:
+  # Enable noise reduction
+  noise_reduction: true
+  
+  # Enable automatic gain control
+  auto_gain_control: true
+  
+  # Enable echo cancellation
+  echo_cancellation: true
+  
+  # Audio quality (low/medium/high)
+  quality: "medium"
+
+# Cost Management
+cost_management:
+  # Maximum monthly API requests
+  max_monthly_requests: 10000
+  
+  # Cache transcription results
+  cache_responses: true
+  
+  # Cache duration in seconds
+  cache_duration: 3600  # 1 hour
+  
+  # Enable usage warnings
+  usage_warnings: true
+  
+  # Warning threshold (percentage of monthly limit)
+  warning_threshold: 0.8
+
+# Privacy Settings
+privacy:
+  # Store audio recordings (for debugging)
+  store_recordings: false
+  
+  # Recording retention days
+  recording_retention_days: 7
+  
+  # Allow users to opt out
+  allow_opt_out: true
+  
+  # Data encryption
+  encrypt_data: true
