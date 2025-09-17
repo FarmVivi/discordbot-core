@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -114,6 +115,11 @@ public class JDADiscordAPI implements DiscordAPI {
 //            }
 
             jda.shutdown();
+            // Allow at most 10 seconds for remaining requests to finish
+            if (!jda.awaitShutdown(Duration.ofSeconds(10))) {
+                jda.shutdownNow(); // Cancel all remaining requests
+                jda.awaitShutdown(); // Wait until shutdown is complete (indefinitely)
+            }
             jda = null;
 
             // Reinitialize the builder for future connections

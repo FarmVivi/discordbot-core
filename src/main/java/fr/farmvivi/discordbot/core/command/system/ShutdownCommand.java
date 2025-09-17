@@ -31,7 +31,6 @@ public class ShutdownCommand {
                 .category("System")
                 .aliases("stop", "exit", "quit")
                 .permission("discobocor.admin.shutdown")
-                .booleanOption("restart", "Whether to restart the bot after shutdown", false)
                 .executor(this::execute)
                 .build();
     }
@@ -53,60 +52,22 @@ public class ShutdownCommand {
      * @return the command result
      */
     private CommandResult execute(CommandContext context, Command command) {
-        // Set ephemeral for shutdown responses as they are administrative
+        // Réponses administratives en éphémère
         context.setEphemeral(true);
-        
-        boolean restart = context.getOption("restart", false);
 
-        if (restart) {
-            // Get the restart message using the language manager if available
-            String restartMessage = languageManager.getString(context.getLocale(), "commands.shutdown.restarting");
+        String shutdownMessage = languageManager.getString(context.getLocale(), "commands.shutdown.shutting_down");
 
-            // Create embed for restart message
-            EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(DiscordColor.DISCORD_BLURPLE.getColor())
-                    .setTitle(languageManager.getString(context.getLocale(), "commands.titles.info"))
-                    .setDescription(restartMessage);
-            
-            context.replyEmbed(embed);
+        EmbedBuilder embed = new EmbedBuilder()
+                .setColor(DiscordColor.DISCORD_BLURPLE.getColor())
+                .setTitle(languageManager.getString(context.getLocale(), "commands.titles.info"))
+                .setDescription(shutdownMessage);
 
-            // Schedule a delayed task to restart the bot
-            Thread restartThread = new Thread(() -> {
-                try {
-                    Thread.sleep(2000); // Give time for the message to be sent
-                    System.exit(3); // Exit code 3 can be used by the wrapper script to restart
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            });
+        context.replyEmbed(embed);
 
-            restartThread.setDaemon(true);
-            restartThread.start();
-        } else {
-            // Get the shutdown message using the language manager if available
-            String shutdownMessage = languageManager.getString(context.getLocale(), "commands.shutdown.shutting_down");
+        Thread shutdownThread = new Thread(() -> System.exit(0));
 
-            // Create embed for shutdown message
-            EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(DiscordColor.DISCORD_BLURPLE.getColor())
-                    .setTitle(languageManager.getString(context.getLocale(), "commands.titles.info"))
-                    .setDescription(shutdownMessage);
-            
-            context.replyEmbed(embed);
-
-            // Schedule a delayed task to shut down the bot
-            Thread shutdownThread = new Thread(() -> {
-                try {
-                    Thread.sleep(2000); // Give time for the message to be sent
-                    System.exit(0);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            });
-
-            shutdownThread.setDaemon(true);
-            shutdownThread.start();
-        }
+        shutdownThread.setDaemon(true);
+        shutdownThread.start();
 
         return CommandResult.success();
     }
