@@ -120,22 +120,19 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>java</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <executable>java</executable>
-                    <arguments>
-                        <argument>-classpath</argument>
-                        <!-- automatically creates the classpath using all project dependencies,
-                             also adding the project build directory -->
-                        <classpath/>
-                        <!-- Ensure WyLog runs at DEBUG when executing via mvn exec -->
-                        <argument>-Dnet.wytrem.wylog.defaultLogLevel=debug</argument>
-                        <argument>${project.mainClass}</argument>
-                    </arguments>
-                    <workingDirectory>${project.basedir}/../run</workingDirectory>
+                    <mainClass>${project.mainClass}</mainClass>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>net.wytrem.wylog.defaultLogLevel</key>
+                            <value>debug</value>
+                        </systemProperty>
+                    </systemProperties>
+                    <workingDirectory>${project.basedir}/run</workingDirectory>
                 </configuration>
             </plugin>
 

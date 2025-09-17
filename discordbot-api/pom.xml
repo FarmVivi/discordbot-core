@@ -28,4 +28,8 @@
             <artifactId>wylog</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins/>
+    </build>
 </project>

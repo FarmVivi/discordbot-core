@@ -274,6 +274,9 @@
             </plugins>
         </pluginManagement>
 
+        <!-- Pas de configuration exec ici pour ne pas interférer avec les modules -->
+        <plugins/>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
