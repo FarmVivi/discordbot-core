@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.core.command.option;
 
-import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
-import fr.farmvivi.discordbot.core.api.command.option.OptionChoice;
-import fr.farmvivi.discordbot.core.api.command.option.OptionType2;
+import fr.farmvivi.discordbot.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.api.command.option.OptionChoice;
+import fr.farmvivi.discordbot.api.command.option.OptionType2;
 
 import java.util.ArrayList;
 import java.util.List;

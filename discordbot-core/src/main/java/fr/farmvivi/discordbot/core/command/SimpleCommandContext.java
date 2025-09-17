@@ -1,10 +1,10 @@
 package fr.farmvivi.discordbot.core.command;
 
-import fr.farmvivi.discordbot.core.api.command.Command;
-import fr.farmvivi.discordbot.core.api.command.CommandContext;
-import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
-import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
-import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.api.command.Command;
+import fr.farmvivi.discordbot.api.command.CommandContext;
+import fr.farmvivi.discordbot.api.command.exception.CommandParseException;
+import fr.farmvivi.discordbot.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.api.language.LanguageManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

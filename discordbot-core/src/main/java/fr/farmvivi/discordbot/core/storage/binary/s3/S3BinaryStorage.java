@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.core.storage.binary.s3;
 
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageKey;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.storage.binary.BinaryStorageKey;
 import fr.farmvivi.discordbot.core.storage.binary.AbstractBinaryStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

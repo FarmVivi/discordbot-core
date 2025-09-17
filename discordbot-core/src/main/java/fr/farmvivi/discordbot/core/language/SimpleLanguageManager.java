@@ -1,10 +1,10 @@
 package fr.farmvivi.discordbot.core.language;
 
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.language.LanguageManager;
-import fr.farmvivi.discordbot.core.api.language.events.LanguageLoadedEvent;
-import fr.farmvivi.discordbot.core.api.language.events.NamespaceRegisteredEvent;
-import fr.farmvivi.discordbot.core.api.language.events.StringRetrievalEvent;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.language.LanguageManager;
+import fr.farmvivi.discordbot.api.language.events.LanguageLoadedEvent;
+import fr.farmvivi.discordbot.api.language.events.NamespaceRegisteredEvent;
+import fr.farmvivi.discordbot.api.language.events.StringRetrievalEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;

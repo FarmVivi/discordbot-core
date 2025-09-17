@@ -1,11 +1,11 @@
 package fr.farmvivi.discordbot.core.storage;
 
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.storage.DataStorage;
-import fr.farmvivi.discordbot.core.api.storage.StorageKey;
-import fr.farmvivi.discordbot.core.api.storage.events.StorageGetEvent;
-import fr.farmvivi.discordbot.core.api.storage.events.StorageRemoveEvent;
-import fr.farmvivi.discordbot.core.api.storage.events.StorageSetEvent;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.storage.DataStorage;
+import fr.farmvivi.discordbot.api.storage.StorageKey;
+import fr.farmvivi.discordbot.api.storage.events.StorageGetEvent;
+import fr.farmvivi.discordbot.api.storage.events.StorageRemoveEvent;
+import fr.farmvivi.discordbot.api.storage.events.StorageSetEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

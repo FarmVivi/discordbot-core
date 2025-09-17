@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.core.permissions;
 
-import fr.farmvivi.discordbot.core.api.permissions.Permission;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionDefault;
+import fr.farmvivi.discordbot.api.permissions.Permission;
+import fr.farmvivi.discordbot.api.permissions.PermissionDefault;
 
 /**
  * Builder for creating Permission objects.

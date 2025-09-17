@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.core.permissions;
 
-import fr.farmvivi.discordbot.core.api.language.LanguageManager;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionDeniedException;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
+import fr.farmvivi.discordbot.api.language.LanguageManager;
+import fr.farmvivi.discordbot.api.permissions.PermissionDeniedException;
+import fr.farmvivi.discordbot.api.permissions.PermissionManager;
 
 /**
  * Utility class for checking permissions.

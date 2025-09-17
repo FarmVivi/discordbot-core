@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.core.plugin;
 
-import fr.farmvivi.discordbot.core.api.config.ConfigurationException;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;

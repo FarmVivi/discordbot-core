@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.core.language;
 
-import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.api.language.LanguageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;

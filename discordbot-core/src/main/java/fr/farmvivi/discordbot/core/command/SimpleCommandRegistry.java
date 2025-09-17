@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.core.command;
 
-import fr.farmvivi.discordbot.core.api.command.Command;
-import fr.farmvivi.discordbot.core.api.command.CommandRegistry;
-import fr.farmvivi.discordbot.core.api.plugin.Plugin;
+import fr.farmvivi.discordbot.api.command.Command;
+import fr.farmvivi.discordbot.api.command.CommandRegistry;
+import fr.farmvivi.discordbot.api.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

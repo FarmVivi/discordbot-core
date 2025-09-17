@@ -1,9 +1,9 @@
 package fr.farmvivi.discordbot.core.storage;
 
-import fr.farmvivi.discordbot.core.api.config.Configuration;
-import fr.farmvivi.discordbot.core.api.config.ConfigurationException;
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.core.storage.db.DatabaseDataStorage;
 import fr.farmvivi.discordbot.core.storage.file.FileDataStorage;
 import org.slf4j.Logger;

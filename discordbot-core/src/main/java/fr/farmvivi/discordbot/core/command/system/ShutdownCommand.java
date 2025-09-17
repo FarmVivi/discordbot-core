@@ -1,9 +1,9 @@
 package fr.farmvivi.discordbot.core.command.system;
 
-import fr.farmvivi.discordbot.core.api.command.Command;
-import fr.farmvivi.discordbot.core.api.command.CommandContext;
-import fr.farmvivi.discordbot.core.api.command.CommandResult;
-import fr.farmvivi.discordbot.core.api.language.LanguageManager;
+import fr.farmvivi.discordbot.api.command.Command;
+import fr.farmvivi.discordbot.api.command.CommandContext;
+import fr.farmvivi.discordbot.api.command.CommandResult;
+import fr.farmvivi.discordbot.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.SimpleCommandBuilder;
 import fr.farmvivi.discordbot.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;

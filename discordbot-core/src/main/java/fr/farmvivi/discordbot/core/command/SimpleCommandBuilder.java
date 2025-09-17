@@ -1,12 +1,12 @@
 package fr.farmvivi.discordbot.core.command;
 
-import fr.farmvivi.discordbot.core.api.command.Command;
-import fr.farmvivi.discordbot.core.api.command.CommandBuilder;
-import fr.farmvivi.discordbot.core.api.command.CommandContext;
-import fr.farmvivi.discordbot.core.api.command.CommandResult;
-import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
-import fr.farmvivi.discordbot.core.api.command.option.OptionChoice;
-import fr.farmvivi.discordbot.core.api.command.option.OptionType2;
+import fr.farmvivi.discordbot.api.command.Command;
+import fr.farmvivi.discordbot.api.command.CommandBuilder;
+import fr.farmvivi.discordbot.api.command.CommandContext;
+import fr.farmvivi.discordbot.api.command.CommandResult;
+import fr.farmvivi.discordbot.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.api.command.option.OptionChoice;
+import fr.farmvivi.discordbot.api.command.option.OptionType2;
 import fr.farmvivi.discordbot.core.command.option.SimpleCommandOption;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.core.event;
 
-import fr.farmvivi.discordbot.core.api.event.*;
-import fr.farmvivi.discordbot.core.api.plugin.Plugin;
+import fr.farmvivi.discordbot.api.event.*;
+import fr.farmvivi.discordbot.api.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.core.config;
 
-import fr.farmvivi.discordbot.core.api.config.Configuration;
-import fr.farmvivi.discordbot.core.api.config.ConfigurationException;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 

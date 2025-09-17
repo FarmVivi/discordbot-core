@@ -1,13 +1,13 @@
 package fr.farmvivi.discordbot.core;
 
-import fr.farmvivi.discordbot.core.api.audio.AudioService;
-import fr.farmvivi.discordbot.core.api.command.CommandService;
-import fr.farmvivi.discordbot.core.api.config.Configuration;
-import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
-import fr.farmvivi.discordbot.core.api.language.LanguageManager;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
-import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
-import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageManager;
+import fr.farmvivi.discordbot.api.audio.AudioService;
+import fr.farmvivi.discordbot.api.command.CommandService;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.discord.DiscordAPI;
+import fr.farmvivi.discordbot.api.language.LanguageManager;
+import fr.farmvivi.discordbot.api.permissions.PermissionManager;
+import fr.farmvivi.discordbot.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.api.storage.binary.BinaryStorageManager;
 import fr.farmvivi.discordbot.core.audio.AudioServiceImpl;
 import fr.farmvivi.discordbot.core.command.SimpleCommandService;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;

@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.core.discord;
 
 import fr.farmvivi.discordbot.core.Discobocor;
-import fr.farmvivi.discordbot.core.api.discord.DiscordAPI;
+import fr.farmvivi.discordbot.api.discord.DiscordAPI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;

@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.core.config;
 
-import fr.farmvivi.discordbot.core.api.config.ConfigurationException;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
 import fr.farmvivi.discordbot.core.util.EnvironmentUtils;
 
 import java.io.File;

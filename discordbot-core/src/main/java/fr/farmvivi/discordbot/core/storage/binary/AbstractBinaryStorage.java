@@ -1,11 +1,11 @@
 package fr.farmvivi.discordbot.core.storage.binary;
 
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorage;
-import fr.farmvivi.discordbot.core.api.storage.binary.BinaryStorageKey;
-import fr.farmvivi.discordbot.core.api.storage.binary.events.FileDeleteEvent;
-import fr.farmvivi.discordbot.core.api.storage.binary.events.FileDownloadEvent;
-import fr.farmvivi.discordbot.core.api.storage.binary.events.FileUploadEvent;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.storage.binary.BinaryStorage;
+import fr.farmvivi.discordbot.api.storage.binary.BinaryStorageKey;
+import fr.farmvivi.discordbot.api.storage.binary.events.FileDeleteEvent;
+import fr.farmvivi.discordbot.api.storage.binary.events.FileDownloadEvent;
+import fr.farmvivi.discordbot.api.storage.binary.events.FileUploadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

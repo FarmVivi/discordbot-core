@@ -1,13 +1,13 @@
 package fr.farmvivi.discordbot.core.permissions;
 
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.permissions.Permission;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionDefault;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
-import fr.farmvivi.discordbot.core.api.permissions.events.PermissionChangeEvent;
-import fr.farmvivi.discordbot.core.api.permissions.events.PermissionCheckEvent;
-import fr.farmvivi.discordbot.core.api.plugin.Plugin;
-import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.permissions.Permission;
+import fr.farmvivi.discordbot.api.permissions.PermissionDefault;
+import fr.farmvivi.discordbot.api.permissions.PermissionManager;
+import fr.farmvivi.discordbot.api.permissions.events.PermissionChangeEvent;
+import fr.farmvivi.discordbot.api.permissions.events.PermissionCheckEvent;
+import fr.farmvivi.discordbot.api.plugin.Plugin;
+import fr.farmvivi.discordbot.api.storage.DataStorageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

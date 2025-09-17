@@ -1,9 +1,9 @@
 package fr.farmvivi.discordbot.core.command;
 
-import fr.farmvivi.discordbot.core.api.command.Command;
-import fr.farmvivi.discordbot.core.api.command.CommandContext;
-import fr.farmvivi.discordbot.core.api.command.CommandResult;
-import fr.farmvivi.discordbot.core.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.api.command.Command;
+import fr.farmvivi.discordbot.api.command.CommandContext;
+import fr.farmvivi.discordbot.api.command.CommandResult;
+import fr.farmvivi.discordbot.api.command.option.CommandOption;
 
 import java.util.*;
 import java.util.function.BiFunction;

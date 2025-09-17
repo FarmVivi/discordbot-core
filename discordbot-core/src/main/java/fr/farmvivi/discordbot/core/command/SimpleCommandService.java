@@ -1,18 +1,21 @@
 package fr.farmvivi.discordbot.core.command;
 
-import fr.farmvivi.discordbot.core.api.command.*;
-import fr.farmvivi.discordbot.core.api.command.event.CommandExecuteEvent;
-import fr.farmvivi.discordbot.core.api.command.event.CommandExecutedEvent;
-import fr.farmvivi.discordbot.core.api.command.exception.CommandParseException;
-import fr.farmvivi.discordbot.core.api.command.exception.CommandPermissionException;
-import fr.farmvivi.discordbot.core.api.config.Configuration;
-import fr.farmvivi.discordbot.core.api.config.ConfigurationException;
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.language.LanguageManager;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionManager;
-import fr.farmvivi.discordbot.core.api.plugin.Plugin;
-import fr.farmvivi.discordbot.core.api.storage.DataStorageManager;
-import fr.farmvivi.discordbot.core.api.storage.GuildStorage;
+import fr.farmvivi.discordbot.api.command.*;
+import fr.farmvivi.discordbot.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.api.command.option.OptionChoice;
+import fr.farmvivi.discordbot.api.command.option.OptionType2;
+import fr.farmvivi.discordbot.api.command.event.CommandExecuteEvent;
+import fr.farmvivi.discordbot.api.command.event.CommandExecutedEvent;
+import fr.farmvivi.discordbot.api.command.exception.CommandParseException;
+import fr.farmvivi.discordbot.api.command.exception.CommandPermissionException;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.language.LanguageManager;
+import fr.farmvivi.discordbot.api.permissions.PermissionManager;
+import fr.farmvivi.discordbot.api.plugin.Plugin;
+import fr.farmvivi.discordbot.api.storage.DataStorageManager;
+import fr.farmvivi.discordbot.api.storage.GuildStorage;
 import fr.farmvivi.discordbot.core.command.listener.CommandListener;
 import fr.farmvivi.discordbot.core.command.parser.CommandParser;
 import fr.farmvivi.discordbot.core.command.parser.ConsoleCommandParser;
@@ -541,7 +544,7 @@ public class SimpleCommandService implements CommandService {
      * @param option the command option
      * @return the JDA option data
      */
-    private OptionData buildOptionData(fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option) {
+    private OptionData buildOptionData(CommandOption<?> option) {
         OptionData optionData = new OptionData(
                 convertOptionType(option.getType()),
                 option.getName(),
@@ -551,17 +554,17 @@ public class SimpleCommandService implements CommandService {
 
         // Add min/max values for number options
         if (option.getMinValue() != null) {
-            if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.INTEGER) {
+            if (option.getType() == OptionType2.INTEGER) {
                 optionData.setMinValue(option.getMinValue().longValue());
-            } else if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.NUMBER) {
+            } else if (option.getType() == OptionType2.NUMBER) {
                 optionData.setMinValue(option.getMinValue().doubleValue());
             }
         }
 
         if (option.getMaxValue() != null) {
-            if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.INTEGER) {
+            if (option.getType() == OptionType2.INTEGER) {
                 optionData.setMaxValue(option.getMaxValue().longValue());
-            } else if (option.getType() == fr.farmvivi.discordbot.core.api.command.option.OptionType2.NUMBER) {
+            } else if (option.getType() == OptionType2.NUMBER) {
                 optionData.setMaxValue(option.getMaxValue().doubleValue());
             }
         }
@@ -577,7 +580,7 @@ public class SimpleCommandService implements CommandService {
 
         // Add choices
         if (!option.getChoices().isEmpty()) {
-            for (fr.farmvivi.discordbot.core.api.command.option.OptionChoice<?> choice : option.getChoices()) {
+            for (OptionChoice<?> choice : option.getChoices()) {
                 if (choice.value() instanceof String string) {
                     optionData.addChoice(choice.name(), string);
                 } else if (choice.value() instanceof Integer integer) {
@@ -609,7 +612,7 @@ public class SimpleCommandService implements CommandService {
         );
 
         // Add options to subcommand
-        for (fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option : subcommand.getOptions()) {
+        for (CommandOption<?> option : subcommand.getOptions()) {
             OptionData optionData = new OptionData(
                     convertOptionType(option.getType()),
                     option.getName(),
@@ -652,7 +655,7 @@ public class SimpleCommandService implements CommandService {
         SlashCommandData data = Commands.slash(command.getName().toLowerCase(), command.getDescription());
 
         // Add options
-        for (fr.farmvivi.discordbot.core.api.command.option.CommandOption<?> option : command.getOptions()) {
+        for (CommandOption<?> option : command.getOptions()) {
             data.addOptions(buildOptionData(option));
         }
 
@@ -692,7 +695,7 @@ public class SimpleCommandService implements CommandService {
      * @param type the option type
      * @return the JDA option type
      */
-    private OptionType convertOptionType(fr.farmvivi.discordbot.core.api.command.option.OptionType2 type) {
+    private OptionType convertOptionType(OptionType2 type) {
         return type.getJdaType();
     }
 
