@@ -4,14 +4,13 @@ import fr.farmvivi.discordbot.core.api.language.LanguageManager;
 import fr.farmvivi.discordbot.core.command.parser.event.ConsoleCommandEvent;
 import fr.farmvivi.discordbot.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -153,138 +152,156 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
      * This method is called automatically when a command is executed.
      */
     public void replyNow() {
-        logger.debug("replyNow called with differ: {}", differ);
+        logger.debug("replyNow called with differ (deferred flag): {}", differ);
 
-        if (differ) {
-            logger.debug("Handling deferred reply.");
-            differ = false;
-
-            // Handle deferred slash commands (editing already-deferred interactions)
-            if (event instanceof IReplyCallback callback && callback.isAcknowledged()) {
-                logger.debug("Handling deferred slash command.");
-                InteractionHook hook = callback.getHook();
-
-                if (isEmpty()) {
-                    logger.debug("No content to send, deleting original message.");
-                    hook.deleteOriginal().queue();
-                } else {
-                    // Edit content
-                    logger.debug("Editing original message with new content.");
-                    WebhookMessageEditAction<Message> messageWebhookMessageEditAction = hook.editOriginal(getContent());
-
-                    // Edit embeds
-                    if (!getEmbeds().isEmpty()) {
-                        logger.debug("Editing embeds.");
-                        messageWebhookMessageEditAction.setEmbeds(getEmbeds());
-                    }
-
-                    // Edit components
-                    if (!getComponents().isEmpty()) {
-                        logger.debug("Editing components.");
-                        messageWebhookMessageEditAction.setComponents(getComponents());
-                    }
-
-                    // Commit edit (ephemeral flag was already set during deferral)
-                    messageWebhookMessageEditAction.queue();
-                }
-            }
-            // Handle deferred text commands
-            else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
-                logger.debug("Handling deferred text command.");
-                if (!isEmpty()) {
-                    Message originalMessage = messageReceivedEvent.getMessage();
-                    MessageCreateAction messageCreateAction = originalMessage.reply(build());
-
-                    if (isEphemeral()) {
-                        logger.debug("Setting ephemeral message.");
-                        messageCreateAction
-                                .delay(1, TimeUnit.MINUTES)
-                                .flatMap(Message::delete)
-                                .queue();
-
-                        // Delete original message after delay if we have permission
-                        if (messageReceivedEvent.isFromGuild() &&
-                                messageReceivedEvent.getGuild().getSelfMember()
-                                        .hasPermission(messageReceivedEvent.getGuildChannel(),
-                                                net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
-                            logger.debug("Deleting original message after delay.");
-                            originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
-                        }
-                    } else {
-                        messageCreateAction.queue();
-                    }
-                } else if (isEphemeral()) {
-                    Message originalMessage = messageReceivedEvent.getMessage();
-
-                    // Delete original message after delay if we have permission
-                    if (messageReceivedEvent.isFromGuild() &&
-                            messageReceivedEvent.getGuild().getSelfMember()
-                                    .hasPermission(messageReceivedEvent.getGuildChannel(),
-                                            net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
-                        logger.debug("Deleting original message after delay due to ephemeral response.");
-                        originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
-                    }
-                }
-            }
+        if (event instanceof IReplyCallback callback) {
+            handleInteractionCallback(callback);
+            return;
         }
-        // Handle direct replies for non-deferred text commands
-        else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
-            logger.debug("Handling direct reply for non-deferred text command.");
-            if (!isEmpty()) {
-                Message originalMessage = messageReceivedEvent.getMessage();
-                // Reply directly to the original message (thread-safe queue)
-                MessageCreateAction messageCreateAction = originalMessage.reply(build());
 
-                if (isEphemeral()) {
-                    logger.debug("Setting ephemeral message for direct reply.");
-                    messageCreateAction.queue(sent -> {
-                        sent.delete().queueAfter(1, TimeUnit.MINUTES);
-                        if (messageReceivedEvent.isFromGuild() &&
-                                messageReceivedEvent.getGuild().getSelfMember()
-                                        .hasPermission(messageReceivedEvent.getGuildChannel(),
-                                                net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
-                            logger.debug("Deleting original message after delay for ephemeral response.");
-                            originalMessage.delete().queueAfter(1, TimeUnit.MINUTES);
-                        }
-                    });
-                } else {
-                    messageCreateAction.queue();
-                }
-            } else {
-                if (isEphemeral() && messageReceivedEvent.isFromGuild() &&
-                        messageReceivedEvent.getGuild().getSelfMember()
-                                .hasPermission(messageReceivedEvent.getGuildChannel(),
-                                        net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
-                    // If ephemeral with no content, optionally delete the triggering message after
-                    // delay
-                    logger.debug("Deleting triggering message after delay due to ephemeral response with no content.");
-                    messageReceivedEvent.getMessage().delete().queueAfter(1, TimeUnit.MINUTES);
-                }
-            }
+        if (event instanceof MessageReceivedEvent messageReceivedEvent) {
+            handleTextMessage(messageReceivedEvent);
+            return;
         }
-        // Handle direct replies for slash commands
-        else if (event instanceof SlashCommandInteractionEvent slashCommand && !slashCommand.isAcknowledged()) {
-            logger.debug("Handling direct reply for slash command.");
+
+        if (event instanceof ConsoleCommandEvent) {
+            handleConsoleOutput();
+        }
+    }
+
+    /**
+     * Handles replies for interaction based events (slash commands, buttons, etc.).
+     */
+    private void handleInteractionCallback(IReplyCallback callback) {
+        boolean acknowledged = callback.isAcknowledged();
+        logger.debug("handleInteractionCallback: acknowledged={}, deferredFlag={}, ephemeralRequested={}", acknowledged, differ, ephemeral);
+
+        // If we expect to edit a deferred reply but it's not acknowledged yet, perform deferral now
+        if (differ && !acknowledged) {
+            logger.debug("Deferred flag set but interaction not yet acknowledged -> deferring now (ephemeral={}).", ephemeral);
+            callback.deferReply(ephemeral).queue();
+            return; // Actual content will be sent on a subsequent call when ready
+        }
+
+        // Editing an already deferred (acknowledged) interaction
+        if (acknowledged) {
+            InteractionHook hook = callback.getHook();
             if (isEmpty()) {
-                logger.debug("No content to send for slash command, replying with OK.");
-                slashCommand.reply("OK")
-                        .flatMap(InteractionHook::deleteOriginal)
-                        .queue();
+                logger.debug("No content provided after deferral -> deleting original.");
+                hook.deleteOriginal().queue();
             } else {
-                logger.debug("Replying to slash command with content.");
-                slashCommand.reply(build())
-                        .setEphemeral(isEphemeral())
-                        .queue();
+                logger.debug("Editing original deferred interaction message.");
+                String content = getContent();
+                if (content == null)
+                    content = ""; // JDA requires non-null string for content edit
+                WebhookMessageEditAction<Message> editAction = hook.editOriginal(content);
+                if (!getEmbeds().isEmpty()) {
+                    editAction.setEmbeds(getEmbeds());
+                } else {
+                    editAction.setEmbeds(); // clear embeds if none now
+                }
+                if (!getComponents().isEmpty()) {
+                    editAction.setComponents(getComponents());
+                } else {
+                    editAction.setComponents(); // clear components
+                }
+                editAction.queue();
             }
+            differ = false; // Reset internal flag
+            return;
         }
-        // Handle console command output
-        else if (event instanceof ConsoleCommandEvent) {
-            logger.debug("Handling console command output.");
-            if (!isEmpty()) {
-                // Output to console
-                String output = formatForConsole();
-                System.out.println(output);
+
+        // Direct initial reply (not deferred yet)
+        long start = System.currentTimeMillis();
+        if (isEmpty()) {
+            logger.debug("Empty content for initial interaction reply -> sending placeholder then deleting (ephemeral={}).", ephemeral);
+            callback.reply("\u200B") // zero-width to avoid visible 'OK'
+                    .setEphemeral(ephemeral)
+                    .flatMap(InteractionHook::deleteOriginal)
+                    .queue();
+            return;
+        }
+
+        // Build reply in a granular way to avoid any potential JDA bug with
+        // MessageCreateData + ephemeral
+        String rawContent = getContent();
+        if (rawContent == null)
+            rawContent = "";
+        final String content = rawContent;
+
+        var initialAction = callback.reply(content).setEphemeral(ephemeral);
+        if (!getEmbeds().isEmpty()) {
+            initialAction.addEmbeds(getEmbeds());
+        }
+        if (!getComponents().isEmpty()) {
+            initialAction.addComponents(getComponents());
+        }
+
+        long elapsed = System.currentTimeMillis() - start; // minimal now
+        if (elapsed > 2500) {
+            // Safety fallback: if building took unexpectedly long, defer instead (rare)
+            logger.warn("Building initial reply took {}ms (>2500). Falling back to defer+edit.", elapsed);
+            callback.deferReply(ephemeral).queue(h -> {
+                InteractionHook hook = callback.getHook();
+                WebhookMessageEditAction<Message> editAction = hook.editOriginal(content);
+                if (!getEmbeds().isEmpty())
+                    editAction.setEmbeds(getEmbeds());
+                else
+                    editAction.setEmbeds();
+                if (!getComponents().isEmpty())
+                    editAction.setComponents(getComponents());
+                else
+                    editAction.setComponents();
+                editAction.queue();
+            });
+            return;
+        }
+
+        logger.debug("Sending initial interaction reply (ephemeral={}) with {} embeds and {} components.", ephemeral, getEmbeds().size(), getComponents().size());
+        initialAction.queue();
+    }
+
+    /**
+     * Handles replies for classic text commands (MessageReceivedEvent).
+     */
+    private void handleTextMessage(MessageReceivedEvent messageReceivedEvent) {
+        boolean willDelete = ephemeral; // emulate ephemeral via deletion
+        if (differ) {
+            logger.debug("handleTextMessage: treating as deferred edit simulation (no actual edit possible).");
+            differ = false; // reset
+        }
+
+        if (!isEmpty()) {
+            Message originalMessage = messageReceivedEvent.getMessage();
+            MessageCreateAction action = originalMessage.reply(build());
+            if (willDelete) {
+                action.queue(sent -> {
+                    sent.delete().queueAfter(1, TimeUnit.MINUTES);
+                    deleteOriginalAfterDelay(messageReceivedEvent);
+                });
+            } else {
+                action.queue();
             }
+        } else if (willDelete) {
+            // No content but we still emulate ephemeral by deleting original
+            deleteOriginalAfterDelay(messageReceivedEvent);
+        }
+    }
+
+    private void deleteOriginalAfterDelay(MessageReceivedEvent event) {
+        if (event.isFromGuild() && event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), net.dv8tion.jda.api.Permission.MESSAGE_MANAGE)) {
+            logger.debug("Scheduling deletion of triggering message for ephemeral emulation.");
+            event.getMessage().delete().queueAfter(1, TimeUnit.MINUTES);
+        }
+    }
+
+    /**
+     * Outputs message content to console for console command events.
+     */
+    private void handleConsoleOutput() {
+        if (!isEmpty()) {
+            String output = formatForConsole();
+            System.out.println(output);
         }
     }
 

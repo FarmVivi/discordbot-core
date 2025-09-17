@@ -24,10 +24,10 @@ import fr.farmvivi.discordbot.core.command.system.VersionCommand;
 import fr.farmvivi.discordbot.core.util.Debouncer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
-import net.dv8tion.jda.api.interactions.InteractionContextType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public class SimpleCommandService implements CommandService {
         parsers.add(new SlashCommandParser(languageManager));
         parsers.add(new TextCommandParser(languageManager, this));
         parsers.add(new ConsoleCommandParser(languageManager));
-        
+
         // Initialize command sync debouncer
         this.commandSyncDebouncer = new Debouncer(SYNC_DELAY_MS, this::performSynchronization);
     }
@@ -726,7 +726,7 @@ public class SimpleCommandService implements CommandService {
             commandSyncDebouncer.debounce();
         }
     }
-    
+
     /**
      * Performs the actual synchronization - used by the debouncer.
      */
@@ -750,14 +750,16 @@ public class SimpleCommandService implements CommandService {
             return;
         }
 
+        logger.debug("Processing event of type {}", event.getClass().getSimpleName());
+
         // Find a parser that can handle this event
         for (CommandParser parser : parsers) {
             if (parser.canParse(event)) {
                 logger.debug("Parser {} can handle event type {}", parser.getClass().getSimpleName(), event.getClass().getSimpleName());
-                
+
                 if (parser.isCommandInvocation(event)) {
                     logger.debug("Parser {} detected command invocation", parser.getClass().getSimpleName());
-                    
+
                     try {
                         // Extract the command name
                         String commandName = parser.extractCommandName(event);
@@ -789,7 +791,7 @@ public class SimpleCommandService implements CommandService {
                                     context.replyError(result.getErrorMessage());
                                 }
                                 // For successful commands, assume they handled their own reply through context
-                                // If they didn't, the deferred interaction will remain as "Bot is thinking..." 
+                                // If they didn't, the deferred interaction will remain as "Bot is thinking..."
                                 // which is acceptable for commands that don't need explicit confirmation
                             }
                             // If not acknowledged, the reply was sent directly by the command
@@ -811,11 +813,7 @@ public class SimpleCommandService implements CommandService {
                         // Something went wrong - log and continue
                         logger.error("Error processing command with {}: {}", parser.getClass().getSimpleName(), e.getMessage(), e);
                     }
-                } else {
-                    logger.debug("Parser {} did not detect command invocation", parser.getClass().getSimpleName());
                 }
-            } else {
-                logger.debug("Parser {} cannot handle event type {}", parser.getClass().getSimpleName(), event.getClass().getSimpleName());
             }
         }
     }
