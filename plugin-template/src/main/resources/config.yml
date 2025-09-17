@@ -1,0 +1,44 @@
+# Template Plugin Configuration
+
+# Example settings
+example:
+  # Enable example feature
+  enabled: true
+  
+  # Example string setting
+  setting: "default_value"
+  
+  # Example number setting
+  number: 42
+  
+  # Example list setting
+  list:
+    - "item1"
+    - "item2"
+    - "item3"
+
+# Command settings
+commands:
+  # Enable template commands
+  enabled: true
+  
+  # Command prefix (if using text commands)
+  prefix: "!"
+
+# Permission settings
+permissions:
+  # Default permission level for users
+  default_permission: true
+  
+  # Admin permission nodes
+  admin_nodes:
+    - "templateplugin.admin"
+    - "templateplugin.config"
+
+# Storage settings
+storage:
+  # Enable data persistence
+  enabled: true
+  
+  # Data file format (json/yaml)
+  format: "json"

@@ -22,11 +22,13 @@ public class MusicPlugin extends AbstractPlugin {
 
     @Override
     public String getName() {
+        // Note: In future versions, this will be automatically loaded from plugin.yml
         return "MusicBot";
     }
 
     @Override
     public String getVersion() {
+        // Note: In future versions, this will be automatically loaded from plugin.yml
         return "1.0.0";
     }
 
