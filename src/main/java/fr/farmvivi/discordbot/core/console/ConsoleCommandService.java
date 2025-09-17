@@ -100,23 +100,8 @@ public class ConsoleCommandService {
                         continue;
                     }
                     
-                    // Handle special console commands
-                    if ("exit".equalsIgnoreCase(input) || "quit".equalsIgnoreCase(input)) {
-                        logger.info("Exit command received. Shutting down...");
-                        System.exit(0);
-                        break;
-                    }
-                    
-                    if ("clear".equalsIgnoreCase(input) || "cls".equalsIgnoreCase(input)) {
-                        // Clear console (ANSI escape codes)
-                        System.out.print("\033[2J\033[H");
-                        System.out.flush();
-                        continue;
-                    }
-                    
                     // Process as command
                     processConsoleCommand(input);
-                    
                 } catch (Exception e) {
                     logger.error("Error reading console input", e);
                     // Continue running even if there's an error
