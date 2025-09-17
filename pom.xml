@@ -15,7 +15,7 @@
     <modules>
         <module>discordbot-api</module>
         <module>discordbot-core</module>
-        <module>discordbot-example-audio</module>
+        <module>examples/audio</module>
     </modules>
 
     <properties>

@@ -1,0 +1,59 @@
+# Music Plugin Configuration
+
+# Audio settings
+music:
+  # Default volume for music playback (0-100)
+  default_volume: 50
+  
+  # Maximum queue size per server
+  max_queue_size: 100
+  
+  # Maximum track duration (milliseconds)
+  max_track_duration: 600000  # 10 minutes
+  
+  # Audio quality (low/medium/high)
+  audio_quality: "medium"
+
+# Platform support
+platforms:
+  # Enable Spotify integration
+  enable_spotify: true
+  
+  # Enable SoundCloud integration
+  enable_soundcloud: true
+  
+  # Enable YouTube integration (always enabled)
+  enable_youtube: true
+
+# Voice channel behavior
+voice:
+  # Auto-leave when no users in channel
+  auto_leave: true
+  
+  # Auto-leave timeout in seconds
+  auto_leave_timeout: 300  # 5 minutes
+  
+  # Auto-join user's voice channel when playing
+  auto_join: false
+
+# Playlist settings
+playlists:
+  # Maximum playlist size
+  max_playlist_size: 500
+  
+  # Allow public playlists
+  allow_public_playlists: true
+  
+  # Default playlist privacy (public/private)
+  default_privacy: "private"
+
+# Permission settings
+permissions:
+  # Allow users to skip their own tracks
+  allow_self_skip: true
+  
+  # Require vote to skip (percentage of users needed)
+  skip_vote_threshold: 0.5
+  
+  # DJ role permissions
+  dj_role_name: "DJ"

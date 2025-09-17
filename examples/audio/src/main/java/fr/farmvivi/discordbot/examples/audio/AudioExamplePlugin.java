@@ -28,6 +28,13 @@ public class AudioExamplePlugin extends AbstractPlugin {
     private final Map<String, MySendHandler> sendHandlers = new HashMap<>();
     private final Map<String, MyReceiveHandler> receiveHandlers = new HashMap<>();
 
+    private boolean autoJoinEnabled;
+    private boolean autoLeaveEnabled;
+    private int autoLeaveTimeout;
+    private int defaultVolume;
+    private String recordingFormat;
+    private int maxRecordingDuration;
+
     @Override
     public String getName() {
         return "AudioExample";
@@ -40,7 +47,14 @@ public class AudioExamplePlugin extends AbstractPlugin {
 
     @Override
     public void onEnable() {
-        logger.info("Plugin exemple audio activé !");
+        // Load configuration settings
+        loadConfiguration();
+        
+        // Log startup message
+        logger.info("Audio Example Plugin enabled!");
+        
+        // Create necessary directories
+        createDirectories();
     }
 
     @Override
@@ -60,7 +74,54 @@ public class AudioExamplePlugin extends AbstractPlugin {
         }
         receiveHandlers.clear();
 
-        logger.info("Plugin exemple audio désactivé !");
+        logger.info("Audio Example Plugin disabled!");
+    }
+
+    /**
+     * Load configuration values with defaults
+     */
+    private void loadConfiguration() {
+        // TODO: Use actual configuration API when available
+        // autoJoinEnabled = getConfiguration().getBoolean("audio.auto_join", false);
+        // autoLeaveEnabled = getConfiguration().getBoolean("voice.auto_leave", true);
+        // autoLeaveTimeout = getConfiguration().getInt("voice.auto_leave_timeout", 30);
+        // defaultVolume = getConfiguration().getInt("audio.default_volume", 50);
+        // recordingFormat = getConfiguration().getString("audio.recording_format", "wav");
+        // maxRecordingDuration = getConfiguration().getInt("audio.max_recording_duration", 300);
+        
+        // Use hardcoded defaults for now
+        autoJoinEnabled = false;
+        autoLeaveEnabled = true;
+        autoLeaveTimeout = 30;
+        defaultVolume = 50;
+        recordingFormat = "wav";
+        maxRecordingDuration = 300;
+        
+        logger.info("Loaded configuration - Auto Join: {}, Auto Leave: {}, Volume: {}", 
+                   autoJoinEnabled, autoLeaveEnabled, defaultVolume);
+    }
+
+    /**
+     * Create necessary directories from configuration
+     */
+    private void createDirectories() {
+        // TODO: Use actual data folder API when available
+        // String recordingsDir = getConfiguration().getString("paths.recordings_dir", "recordings/");
+        // String samplesDir = getConfiguration().getString("paths.samples_dir", "samples/");
+        // File recordings = new File(getDataFolder(), recordingsDir);
+        // File samples = new File(getDataFolder(), samplesDir);
+        
+        // Use hardcoded paths for now
+        File recordings = new File("recordings");
+        File samples = new File("samples");
+        
+        if (!recordings.exists() && !recordings.mkdirs()) {
+            logger.warn("Failed to create recordings directory: {}", recordings.getPath());
+        }
+        
+        if (!samples.exists() && !samples.mkdirs()) {
+            logger.warn("Failed to create samples directory: {}", samples.getPath());
+        }
     }
 
     /**
@@ -68,6 +129,9 @@ public class AudioExamplePlugin extends AbstractPlugin {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onGuildVoiceJoin(GuildVoiceUpdateEvent event) {
+        // Only auto-join if enabled in configuration
+        if (!autoJoinEnabled) return;
+        
         // Vérifie si l'utilisateur a rejoint un salon vocal (channelJoined != null && channelLeft == null)
         if (event.getChannelJoined() == null) return;
 
@@ -76,28 +140,36 @@ public class AudioExamplePlugin extends AbstractPlugin {
 
         // Si on n'a pas déjà un handler pour cette guilde, on en crée un
         if (!sendHandlers.containsKey(guildId)) {
+            // Use configured paths (hardcoded for now)
+            // TODO: String samplesDir = getConfiguration().getString("paths.samples_dir", "samples/");
+            // TODO: String recordingsDir = getConfiguration().getString("paths.recordings_dir", "recordings/");
+            
             // Crée le handler d'envoi audio
-            File audioFile = new File(getContext().getDataFolder(), "welcome.wav");
+            File audioFile = new File("samples/welcome.wav");
             MySendHandler sendHandler = new MySendHandler(audioFile);
 
-            // Crée le handler de réception audio
-            File outputDir = new File(getContext().getDataFolder(), "recordings");
+            // Crée le handler de réception audio with configured format
+            File outputDir = new File("recordings");
             if (!outputDir.exists()) {
                 outputDir.mkdirs();
             }
-            MyReceiveHandler receiveHandler = new MyReceiveHandler(new File(outputDir, "recording_" + guildId + ".wav"));
+            String filename = "recording_" + guildId + "." + recordingFormat;
+            MyReceiveHandler receiveHandler = new MyReceiveHandler(new File(outputDir, filename));
 
             // Connecte au salon vocal
             VoiceChannel voiceChannel = event.getChannelJoined().asVoiceChannel();
             guild.getAudioManager().openAudioConnection(voiceChannel);
 
-            // Enregistre les handlers avec le service audio
-            audioService.registerSendHandler(guild, this, sendHandler, 80, 60);
+            // Enregistre les handlers avec le service audio using configured volume
+            audioService.registerSendHandler(guild, this, sendHandler, defaultVolume, 60);
             audioService.registerReceiveHandler(guild, this, receiveHandler);
 
             // Stocke les handlers pour plus tard
             sendHandlers.put(guildId, sendHandler);
             receiveHandlers.put(guildId, receiveHandler);
+
+            // Log activity
+            logger.info("Started audio playback and recording in voice channel: " + voiceChannel.getName());
 
             logger.info("Connecté au salon vocal {} dans la guilde {}", voiceChannel.getName(), guild.getName());
         }

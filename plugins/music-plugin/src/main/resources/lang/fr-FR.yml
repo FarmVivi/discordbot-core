@@ -1,0 +1,46 @@
+music:
+  commands:
+    play: "Jouer de la musique depuis une URL ou une recherche"
+    pause: "Mettre en pause/reprendre la piste actuelle"
+    skip: "Passer la piste actuelle"
+    stop: "Arrêter la musique et vider la file d'attente"
+    queue: "Afficher la file d'attente musicale"
+    nowplaying: "Afficher la piste en cours"
+    volume: "Définir le volume de lecture"
+    shuffle: "Activer/désactiver le mode aléatoire"
+    loop: "Définir le mode de répétition (off/track/queue)"
+    playlist: "Gérer vos playlists"
+    search: "Rechercher des pistes musicales"
+    lyrics: "Afficher les paroles de la piste actuelle"
+    
+  messages:
+    plugin_enabled: "Plugin Musique activé !"
+    plugin_disabled: "Plugin Musique désactivé !"
+    track_added: "**{track}** ajouté à la file d'attente"
+    track_playing: "En cours de lecture : **{track}**"
+    track_paused: "Musique en pause"
+    track_resumed: "Musique reprise"
+    track_skipped: "**{track}** passé"
+    queue_cleared: "File d'attente vidée"
+    queue_empty: "La file d'attente est vide"
+    volume_set: "Volume défini à {volume}%"
+    shuffle_enabled: "Mode aléatoire activé"
+    shuffle_disabled: "Mode aléatoire désactivé"
+    loop_off: "Répétition désactivée"
+    loop_track: "Répétition de piste activée"
+    loop_queue: "Répétition de file activée"
+    
+  errors:
+    no_voice_channel: "Vous devez être dans un salon vocal !"
+    no_permission: "Vous n'avez pas la permission d'utiliser cette commande"
+    track_not_found: "Aucune piste trouvée pour : {query}"
+    queue_full: "File d'attente pleine (max {max} pistes)"
+    invalid_volume: "Le volume doit être entre 0 et 100"
+    playlist_not_found: "Playlist introuvable : {name}"
+    track_too_long: "Piste trop longue (max {max} minutes)"
+    
+  embed:
+    now_playing_title: "En cours de lecture"
+    queue_title: "File d'attente musicale"
+    search_results_title: "Résultats de recherche"
+    playlist_title: "Playlist : {name}"
