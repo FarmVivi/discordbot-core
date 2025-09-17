@@ -22,12 +22,6 @@
             <artifactId>discordbot-api</artifactId>
         </dependency>
 
-        <!-- Core module for AbstractPlugin -->
-        <dependency>
-            <groupId>fr.farmvivi.discordbot</groupId>
-            <artifactId>discordbot-core</artifactId>
-        </dependency>
-
         <!-- JDA for audio handling -->
         <dependency>
             <groupId>net.dv8tion</groupId>
