@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +30,8 @@ public class AudioExamplePlugin extends AbstractPlugin {
     private final Map<String, MySendHandler> sendHandlers = new HashMap<>();
     private final Map<String, MyReceiveHandler> receiveHandlers = new HashMap<>();
 
+    private ListenerAdapter jdaListener;
+
     private boolean autoJoinEnabled;
     private boolean autoLeaveEnabled;
     private int autoLeaveTimeout;
@@ -39,12 +43,28 @@ public class AudioExamplePlugin extends AbstractPlugin {
     public void onEnable() {
         // Load configuration settings
         loadConfiguration();
-        
+
         // Log startup message
         logger.info("Audio Example Plugin enabled!");
-        
+
         // Create necessary directories
         createDirectories();
+
+        // Register JDA listener for voice updates
+        jdaListener = new ListenerAdapter() {
+            @Override
+            public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
+                // Delegate to existing handlers
+                onGuildVoiceJoin(event);
+                onGuildVoiceLeave(event);
+            }
+        };
+        if (discordAPI != null && discordAPI.getJDA() != null) {
+            discordAPI.getJDA().addEventListener(jdaListener);
+            logger.debug("Registered JDA voice listener for AudioExamplePlugin");
+        } else {
+            logger.warn("JDA not available; voice auto-join will be inactive until connected");
+        }
     }
 
     @Override
@@ -64,6 +84,12 @@ public class AudioExamplePlugin extends AbstractPlugin {
         }
         receiveHandlers.clear();
 
+        // Unregister JDA listener
+        if (jdaListener != null && discordAPI != null && discordAPI.getJDA() != null) {
+            discordAPI.getJDA().removeEventListener(jdaListener);
+            jdaListener = null;
+        }
+
         logger.info("Audio Example Plugin disabled!");
     }
 
@@ -71,22 +97,26 @@ public class AudioExamplePlugin extends AbstractPlugin {
      * Load configuration values with defaults
      */
     private void loadConfiguration() {
-        autoJoinEnabled = getConfiguration().getBoolean("audio.auto_join", false);
+        // Read new key first, fallback to legacy key; default enabled
+        autoJoinEnabled = getConfiguration().getBoolean(
+                "voice.auto_join",
+                getConfiguration().getBoolean("audio.auto_join", true)
+        );
         autoLeaveEnabled = getConfiguration().getBoolean("voice.auto_leave", true);
         autoLeaveTimeout = getConfiguration().getInt("voice.auto_leave_timeout", 30);
         defaultVolume = getConfiguration().getInt("audio.default_volume", 50);
         recordingFormat = getConfiguration().getString("audio.recording_format", "wav");
         maxRecordingDuration = getConfiguration().getInt("audio.max_recording_duration", 300);
         // Persist defaults if not present
-        getConfiguration().set("audio.auto_join", autoJoinEnabled);
+        getConfiguration().set("voice.auto_join", autoJoinEnabled);
         getConfiguration().set("voice.auto_leave", autoLeaveEnabled);
         getConfiguration().set("voice.auto_leave_timeout", autoLeaveTimeout);
         getConfiguration().set("audio.default_volume", defaultVolume);
         getConfiguration().set("audio.recording_format", recordingFormat);
         getConfiguration().set("audio.max_recording_duration", maxRecordingDuration);
-        
-        logger.info("Loaded configuration - Auto Join: {}, Auto Leave: {}, Volume: {}", 
-                   autoJoinEnabled, autoLeaveEnabled, defaultVolume);
+
+        logger.info("Loaded configuration - Auto Join: {}, Auto Leave: {}, Volume: {}",
+                autoJoinEnabled, autoLeaveEnabled, defaultVolume);
     }
 
     /**
@@ -101,11 +131,11 @@ public class AudioExamplePlugin extends AbstractPlugin {
         // Persist paths
         getConfiguration().set("paths.recordings_dir", recordingsDir);
         getConfiguration().set("paths.samples_dir", samplesDir);
-        
+
         if (!recordings.exists() && !recordings.mkdirs()) {
             logger.warn("Failed to create recordings directory: {}", recordings.getPath());
         }
-        
+
         if (!samples.exists() && !samples.mkdirs()) {
             logger.warn("Failed to create samples directory: {}", samples.getPath());
         }
@@ -118,7 +148,7 @@ public class AudioExamplePlugin extends AbstractPlugin {
     public void onGuildVoiceJoin(GuildVoiceUpdateEvent event) {
         // Only auto-join if enabled in configuration
         if (!autoJoinEnabled) return;
-        
+
         // Vérifie si l'utilisateur a rejoint un salon vocal (channelJoined != null && channelLeft == null)
         if (event.getChannelJoined() == null) return;
 
@@ -130,7 +160,7 @@ public class AudioExamplePlugin extends AbstractPlugin {
             // Use configured paths (hardcoded for now)
             // TODO: String samplesDir = getConfiguration().getString("paths.samples_dir", "samples/");
             // TODO: String recordingsDir = getConfiguration().getString("paths.recordings_dir", "recordings/");
-            
+
             // Crée le handler d'envoi audio
             String samplesDir = getConfiguration().getString("paths.samples_dir", "samples/");
             File audioFile = new File(getDataFolder(), samplesDir + "/welcome.wav");

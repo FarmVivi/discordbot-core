@@ -18,7 +18,7 @@ audio:
 # Voice channel settings
 voice:
   # Auto join voice channel when user joins
-  auto_join: false
+  auto_join: true
   
   # Auto leave when no users in channel
   auto_leave: true
