@@ -1,6 +1,4 @@
 # AI Audio Plugin Configuration
-# Configuration version (automatically managed)
-config_version: 1
 
 # API Configuration
 ai:

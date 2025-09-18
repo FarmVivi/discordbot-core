@@ -1,6 +1,8 @@
 package fr.farmvivi.discordbot.core.plugin;
 
 import fr.farmvivi.discordbot.api.config.ConfigurationException;
+import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+import fr.farmvivi.discordbot.api.plugin.Plugin;
 import fr.farmvivi.discordbot.core.config.YamlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +15,15 @@ import java.nio.file.StandardCopyOption;
 
 /**
  * Plugin-specific configuration implementation.
- * Supports version management and automatic config file copying from plugin JAR.
+ * Supports automatic config file copying from plugin JAR and plugin-controlled migration.
  */
 public class PluginConfiguration extends YamlConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(PluginConfiguration.class);
     private static final String CONFIG_VERSION_KEY = "config_version";
-    private static final int CURRENT_CONFIG_VERSION = 1;
     
     private final String pluginName;
     private final PluginClassLoader classLoader;
+    private Plugin plugin;
 
     /**
      * Creates a new plugin configuration.
@@ -52,10 +54,22 @@ public class PluginConfiguration extends YamlConfiguration {
         // Try to load existing config or create a new one
         try {
             reload();
-            // Check and handle version migration
-            handleConfigVersioning();
         } catch (ConfigurationException e) {
             logger.debug("No existing config for plugin {}, will create new when saved", pluginName);
+        }
+    }
+    
+    /**
+     * Initializes migration handling after the plugin instance is created.
+     *
+     * @param plugin the plugin instance
+     */
+    public void initializeMigration(Plugin plugin) {
+        this.plugin = plugin;
+        
+        // Handle plugin-specific migration if plugin supports it
+        if (plugin instanceof ConfigurableMigrationPlugin migrationPlugin) {
+            handlePluginMigration(migrationPlugin);
         }
     }
 
@@ -100,73 +114,65 @@ public class PluginConfiguration extends YamlConfiguration {
     }
     
     /**
-     * Handles configuration versioning and migration.
+     * Handles plugin-specific configuration migration.
+     *
+     * @param migrationPlugin the plugin that handles migration
      */
-    private void handleConfigVersioning() {
+    private void handlePluginMigration(ConfigurableMigrationPlugin migrationPlugin) {
         int currentVersion = getInt(CONFIG_VERSION_KEY, 0);
+        int expectedVersion = migrationPlugin.getExpectedConfigVersion();
         
-        if (currentVersion == 0) {
-            // First time loading or old config without version
-            logger.info("Adding version {} to plugin {} configuration", CURRENT_CONFIG_VERSION, pluginName);
-            set(CONFIG_VERSION_KEY, CURRENT_CONFIG_VERSION);
-            try {
-                save();
-            } catch (ConfigurationException e) {
-                logger.warn("Failed to save version to plugin {} configuration: {}", pluginName, e.getMessage());
-            }
-        } else if (currentVersion < CURRENT_CONFIG_VERSION) {
+        if (currentVersion < expectedVersion) {
             // Configuration needs migration
             logger.info("Migrating plugin {} configuration from version {} to {}", 
-                       pluginName, currentVersion, CURRENT_CONFIG_VERSION);
-            migrateConfiguration(currentVersion, CURRENT_CONFIG_VERSION);
-        } else if (currentVersion > CURRENT_CONFIG_VERSION) {
+                       pluginName, currentVersion, expectedVersion);
+            
+            // Create backup before migration
+            createBackup();
+            
+            try {
+                // Let the plugin handle its own migration
+                migrationPlugin.migrateConfiguration(this, currentVersion, expectedVersion);
+                
+                // Update version after successful migration
+                set(CONFIG_VERSION_KEY, expectedVersion);
+                save();
+                
+                logger.info("Successfully migrated plugin {} configuration to version {}", pluginName, expectedVersion);
+            } catch (Exception e) {
+                logger.error("Failed to migrate plugin {} configuration: {}", pluginName, e.getMessage(), e);
+            }
+        } else if (currentVersion > expectedVersion) {
             // Configuration is from a newer version
             logger.warn("Plugin {} configuration version {} is newer than expected {}. " +
                        "This may cause compatibility issues.", 
-                       pluginName, currentVersion, CURRENT_CONFIG_VERSION);
-        }
-    }
-    
-    /**
-     * Migrates configuration from one version to another.
-     *
-     * @param fromVersion the current version
-     * @param toVersion the target version
-     */
-    private void migrateConfiguration(int fromVersion, int toVersion) {
-        // Apply migrations step by step
-        for (int version = fromVersion; version < toVersion; version++) {
-            try {
-                applyMigration(version, version + 1);
-                logger.debug("Applied migration {} -> {} for plugin {}", version, version + 1, pluginName);
-            } catch (Exception e) {
-                logger.error("Failed to apply migration {} -> {} for plugin {}: {}", 
-                           version, version + 1, pluginName, e.getMessage());
-                return; // Stop migration on error
-            }
+                       pluginName, currentVersion, expectedVersion);
         }
         
-        // Update version and save
-        set(CONFIG_VERSION_KEY, toVersion);
+        // Validate configuration after loading/migration
         try {
-            save();
-            logger.info("Successfully migrated plugin {} configuration to version {}", pluginName, toVersion);
+            migrationPlugin.validateConfiguration(this);
         } catch (ConfigurationException e) {
-            logger.error("Failed to save migrated configuration for plugin {}: {}", pluginName, e.getMessage());
+            logger.error("Plugin {} configuration validation failed: {}", pluginName, e.getMessage());
         }
     }
     
     /**
-     * Applies a specific migration step.
-     *
-     * @param fromVersion the version to migrate from
-     * @param toVersion the version to migrate to
+     * Creates a backup of the current configuration.
      */
-    private void applyMigration(int fromVersion, int toVersion) {
-        // Future plugin-specific migrations can be added here
-        // For now, this is a placeholder for when migrations are needed
-        logger.debug("No specific migration needed for plugin {} from version {} to {}", 
-                    pluginName, fromVersion, toVersion);
+    private void createBackup() {
+        if (getConfigFile() == null || !getConfigFile().exists()) {
+            return;
+        }
+        
+        try {
+            File backupFile = new File(getConfigFile().getParent(), 
+                                     "config.yml.backup." + System.currentTimeMillis());
+            Files.copy(getConfigFile().toPath(), backupFile.toPath());
+            logger.info("Created configuration backup for plugin {} at {}", pluginName, backupFile.getAbsolutePath());
+        } catch (IOException e) {
+            logger.warn("Failed to create configuration backup for plugin {}: {}", pluginName, e.getMessage());
+        }
     }
     
     /**

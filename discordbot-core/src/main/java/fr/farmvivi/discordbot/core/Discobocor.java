@@ -134,9 +134,6 @@ public class Discobocor {
 
         String token;
         try {
-            // Validate configuration before proceeding
-            ((CoreConfiguration) coreConfig).validateConfiguration();
-            
             token = coreConfig.getString("discord.token");
             if (token == null || token.equals("YOUR_BOT_TOKEN")) {
                 logger.error("Please set your bot token in config.yml");
@@ -144,7 +141,7 @@ public class Discobocor {
                 return false;
             }
         } catch (Exception e) {
-            logger.error("Configuration validation failed: {}", e.getMessage());
+            logger.error("Failed to get discord.token from config.yml", e);
             System.exit(1);
             return false;
         }

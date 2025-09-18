@@ -1,6 +1,4 @@
 # Music Plugin Configuration
-# Configuration version (automatically managed)
-config_version: 1
 
 # Audio settings
 music:
