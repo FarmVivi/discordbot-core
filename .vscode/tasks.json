@@ -1,29 +1,107 @@
 {
   "version": "2.0.0",
   "tasks": [
+    /* ===================== BUILD / PACKAGE ===================== */
     {
-      "label": "compile",
+      "label": "package:all",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am compile package",
-      "group": "build"
+      "command": "mvn clean package",
+      "group": { "kind": "build", "isDefault": true },
+      "detail": "Build & test all modules (full lifecycle)"
     },
     {
-      "label": "run",
+      "label": "package:all:skipTests",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java",
-      "group": "test"
+      "command": "mvn clean package -DskipTests",
+      "group": "build",
+      "detail": "Fast build of all modules without tests"
     },
     {
-      "label": "clean compile",
+      "label": "install:all:fast",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am clean compile package",
-      "group": "build"
+      "command": "mvn -T1C install -DskipTests",
+      "group": "build",
+      "detail": "Parallel install (1 thread per core) skipping tests"
     },
     {
-      "label": "clean run",
+      "label": "core:compile+shade",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am clean install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java",
-      "group": "test"
+      "command": "mvn -pl discordbot-core -am compile package -DskipTests",
+      "group": "build",
+      "detail": "Compile+package core (and deps) quickly"
+    },
+    {
+      "label": "clean:all",
+      "type": "shell",
+      "command": "mvn clean",
+      "group": "build",
+      "detail": "Clean all module targets"
+    },
+    /* ===================== MODULE-SPECIFIC BUILDS ===================== */
+    {
+      "label": "build:core",
+      "type": "shell",
+      "command": "mvn -pl discordbot-core -am install -DskipTests",
+      "group": "build",
+      "detail": "Incremental build of core only"
+    },
+    {
+      "label": "build:plugins",
+      "type": "shell",
+      "command": "mvn -pl plugins/ai-audio-plugin,plugins/music-plugin -am package -DskipTests",
+      "group": "build",
+      "detail": "Build bundled plugins"
+    },
+    {
+      "label": "build:examples",
+      "type": "shell",
+      "command": "mvn -pl examples/audio -am package -DskipTests",
+      "group": "build",
+      "detail": "Build example audio plugin"
+    },
+    {
+      "label": "build:template",
+      "type": "shell",
+      "command": "mvn -pl plugin-template -am package -DskipTests",
+      "group": "build",
+      "detail": "Build plugin template"
+    },
+    /* ===================== RUN / EXECUTION ===================== */
+    {
+      "label": "run:core",
+      "type": "shell",
+      "command": "mvn -pl discordbot-core -am install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java -DskipTests",
+      "group": { "kind": "test", "isDefault": true },
+      "detail": "Install (skip tests) then start core from run dir"
+    },
+    {
+      "label": "run:core:clean",
+      "type": "shell",
+      "command": "mvn -pl discordbot-core -am clean install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java -DskipTests",
+      "group": "test",
+      "detail": "Clean build then run core"
+    },
+    {
+      "label": "run:core:debug",
+      "type": "shell",
+      "command": "mvn -pl discordbot-core -am install -DskipTests -DforkCount=0; cd discordbot-core/run; $env:MAVEN_OPTS='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'; mvn -f ../pom.xml exec:java -DskipTests",
+      "group": "test",
+      "detail": "Run core with JDWP debug on port 5005"
+    },
+    /* ===================== QUALITY / UTIL ===================== */
+    {
+      "label": "verify:all",
+      "type": "shell",
+      "command": "mvn verify",
+      "group": "build",
+      "detail": "Run full verify lifecycle (tests + integration if configured)"
+    },
+    {
+      "label": "test:all",
+      "type": "shell",
+      "command": "mvn test",
+      "group": "test",
+      "detail": "Execute unit tests across all modules"
     }
   ]
 }

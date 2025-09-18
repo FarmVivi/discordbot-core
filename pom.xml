@@ -52,6 +52,18 @@
             <name>github-farmvivi</name>
             <url>https://public:&#103;hp_HlKJ3MHXAJoo8n7nOdWzumL6dGMQCF2fpd7L@maven.pkg.github.com/FarmVivi/*</url>
         </repository>
+
+        <!-- Repository nécessaire pour certaines dépendances communautaires (ex: lavaplayer forks) -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
+        <!-- Repository officiel lavalink (héberge lavaplayer fork dev.arbjerg) -->
+        <repository>
+            <id>lavalink-maven</id>
+            <url>https://maven.lavalink.dev/releases</url>
+        </repository>
     </repositories>
 
     <dependencyManagement>

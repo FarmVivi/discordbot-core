@@ -35,18 +35,11 @@
             <artifactId>wylog</artifactId>
         </dependency>
 
-        <!-- LavaPlayer for audio playback -->
+        <!-- LavaPlayer fork maintenu (ex: walkyst ou sedmelluq legacy). Choisir une version publiée -->
         <dependency>
-            <groupId>dev.arbjerg</groupId>
-            <artifactId>lavaplayer</artifactId>
-            <version>2.3.4</version>
-        </dependency>
-
-        <!-- YouTube source for LavaPlayer -->
-        <dependency>
-            <groupId>dev.arbjerg</groupId>
-            <artifactId>lavaplayer-ext-youtube-rotator</artifactId>
-            <version>2.3.4</version>
+            <groupId>com.github.walkyst</groupId>
+            <artifactId>lavaplayer-fork</artifactId>
+            <version>1.4.3</version>
         </dependency>
     </dependencies>
 
