@@ -2,6 +2,7 @@ package com.example.plugin;
 
 import fr.farmvivi.discordbot.api.event.EventHandler;
 import fr.farmvivi.discordbot.api.event.EventPriority;
+import fr.farmvivi.discordbot.api.permissions.Permission;
 import fr.farmvivi.discordbot.api.permissions.PermissionDefault;
 import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -47,9 +48,6 @@ public class TemplatePlugin extends AbstractPlugin {
      */
     @Override
     public void onEnable() {
-        // Register language namespace (example)
-        getPluginLanguageManager().registerNamespace("template");
-
         // Register permissions
         registerPermissions();
 
@@ -122,9 +120,15 @@ public class TemplatePlugin extends AbstractPlugin {
      * to control access to plugin features.
      */
     private void registerPermissions() {
-        getPluginPermissionManager().registerPermission("template.use", PermissionDefault.TRUE);
-        getPluginPermissionManager().registerPermission("template.admin", PermissionDefault.OPERATOR);
-        logger.debug("Permissions registered");
+        getPluginPermissionManager().registerPermission(new SimplePermission(
+                pluginPrefix("use"),
+                "Allows usage of base template features",
+                PermissionDefault.TRUE));
+        getPluginPermissionManager().registerPermission(new SimplePermission(
+                pluginPrefix("admin"),
+                "Allows administrative template actions",
+                PermissionDefault.OP));
+        logger.debug("Permissions registered: {}", getPluginPermissionManager().getRegisteredPermissions());
     }
 
     /**
@@ -132,8 +136,9 @@ public class TemplatePlugin extends AbstractPlugin {
      * This demonstrates how to use the storage API for data persistence.
      */
     private void savePluginData() {
-        getPluginDataStorage().set("plugin.lastShutdown", System.currentTimeMillis());
-        logger.debug("Plugin data saved");
+        getPluginDataStorage().getGlobalStorage().set("lastShutdown", System.currentTimeMillis());
+        getPluginDataStorage().saveAll();
+        logger.debug("Plugin data saved (global.lastShutdown)");
     }
 
     /**
@@ -143,7 +148,7 @@ public class TemplatePlugin extends AbstractPlugin {
      * @param data     the data to save
      */
     private void savePlayerData(String playerId, String data) {
-        getPluginDataStorage().set("players." + playerId + ".data", data);
+        getPluginDataStorage().getUserStorage(playerId).set("data", data);
         logger.trace("Saved data for player {}", playerId);
     }
 
@@ -154,7 +159,9 @@ public class TemplatePlugin extends AbstractPlugin {
      * @return the player's data, or null if not found
      */
     private String getPlayerData(String playerId) {
-        return getPluginDataStorage().getString("players." + playerId + ".data", null);
+        return getPluginDataStorage().getUserStorage(playerId)
+                .get("data", String.class)
+                .orElse(null);
     }
 
     /**
@@ -165,8 +172,9 @@ public class TemplatePlugin extends AbstractPlugin {
      * @return true if the user has the permission
      */
     private boolean hasPermission(String userId, String permission) {
-        // Placeholder: adapt when user objects are accessible here.
-        return getPluginPermissionManager().hasPermission(userId, permission);
+        // Placeholder: utilisation d'un système externe requis pour résolution utilisateur.
+        // Ici on vérifie seulement si la permission est enregistrée.
+        return getPluginPermissionManager().getRegisteredPermissions().contains(permission);
     }
 
     /**
@@ -178,6 +186,25 @@ public class TemplatePlugin extends AbstractPlugin {
      * @return the localized message
      */
     private String getLocalizedMessage(String guildId, String key, String defaultValue) {
-        return getPluginLanguageManager().getString(guildId, key, defaultValue);
+        // PluginLanguageAdapter gère déjà le préfixe namespace. Ici uniquement clé simple.
+        return getPluginLanguageManager().getString(key);
+    }
+
+    private String pluginPrefix(String node) {
+        return getName().toLowerCase() + "." + node;
+    }
+
+    // Simple internal Permission implementation for template usage
+    private record SimplePermission(String name, String description,
+                                    PermissionDefault getDefault) implements Permission {
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
     }
 }
