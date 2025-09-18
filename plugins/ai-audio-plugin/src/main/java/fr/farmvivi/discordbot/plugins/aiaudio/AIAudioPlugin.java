@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.plugins.aiaudio;
 
-import fr.farmvivi.discordbot.core.api.event.EventHandler;
-import fr.farmvivi.discordbot.core.api.permissions.PermissionDefault;
-import fr.farmvivi.discordbot.core.api.plugin.AbstractPlugin;
+import fr.farmvivi.discordbot.api.event.EventHandler;
+import fr.farmvivi.discordbot.api.permissions.PermissionDefault;
+import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 /**
