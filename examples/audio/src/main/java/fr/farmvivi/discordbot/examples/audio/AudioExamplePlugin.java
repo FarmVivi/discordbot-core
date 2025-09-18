@@ -4,6 +4,9 @@ import fr.farmvivi.discordbot.api.audio.events.AudioFrameMixedEvent;
 import fr.farmvivi.discordbot.api.event.EventHandler;
 import fr.farmvivi.discordbot.api.event.EventPriority;
 import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.discordbot.core.config.ConfigurationMigrationManager;
+import fr.farmvivi.discordbot.core.plugin.VersionedPluginConfiguration;
+import fr.farmvivi.discordbot.examples.audio.config.AudioPluginMigration_1_0_0_to_1_1_0;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.audio.CombinedAudio;
@@ -23,8 +26,12 @@ import java.util.Map;
  * Exemple de plugin audio qui montre comment utiliser le système audio.
  * Ce plugin joue un fichier audio quand un utilisateur rejoint un salon vocal
  * et enregistre l'audio reçu dans un fichier.
+ * 
+ * Démontre l'utilisation du nouveau système de configuration avec versioning.
  */
 public class AudioExamplePlugin extends AbstractPlugin {
+    private static final String CONFIG_VERSION = "1.1.0";
+    
     private final Map<String, MySendHandler> sendHandlers = new HashMap<>();
     private final Map<String, MyReceiveHandler> receiveHandlers = new HashMap<>();
 
@@ -34,14 +41,20 @@ public class AudioExamplePlugin extends AbstractPlugin {
     private int defaultVolume;
     private String recordingFormat;
     private int maxRecordingDuration;
+    private boolean enhancementEnabled;
+    private String enhancementLevel;
 
     @Override
     public void onEnable() {
+        // Setup configuration migrations
+        setupConfigurationMigrations();
+        
         // Load configuration settings
         loadConfiguration();
         
         // Log startup message
-        logger.info("Audio Example Plugin enabled!");
+        logger.info("Audio Example Plugin enabled with configuration version {}!", 
+                   getConfiguration().getString("config_version", "unknown"));
         
         // Create necessary directories
         createDirectories();
@@ -68,6 +81,21 @@ public class AudioExamplePlugin extends AbstractPlugin {
     }
 
     /**
+     * Sets up configuration migrations for this plugin.
+     */
+    private void setupConfigurationMigrations() {
+        // Get the migration manager from the plugin loader (PluginManager)
+        if (getPluginLoader() instanceof fr.farmvivi.discordbot.core.plugin.PluginManager pluginManager) {
+            ConfigurationMigrationManager migrationManager = pluginManager.getMigrationManager();
+            
+            // Register our migration from 1.0.0 to 1.1.0
+            migrationManager.registerMigrator(new AudioPluginMigration_1_0_0_to_1_1_0());
+            
+            logger.debug("Registered configuration migrations for AudioExamplePlugin");
+        }
+    }
+
+    /**
      * Load configuration values with defaults
      */
     private void loadConfiguration() {
@@ -77,6 +105,9 @@ public class AudioExamplePlugin extends AbstractPlugin {
         defaultVolume = getConfiguration().getInt("audio.default_volume", 50);
         recordingFormat = getConfiguration().getString("audio.recording_format", "wav");
         maxRecordingDuration = getConfiguration().getInt("audio.max_recording_duration", 300);
+        enhancementEnabled = getConfiguration().getBoolean("audio.enable_enhancement", true);
+        enhancementLevel = getConfiguration().getString("audio.enhancement_level", "medium");
+        
         // Persist defaults if not present
         getConfiguration().set("audio.auto_join", autoJoinEnabled);
         getConfiguration().set("voice.auto_leave", autoLeaveEnabled);
@@ -84,9 +115,11 @@ public class AudioExamplePlugin extends AbstractPlugin {
         getConfiguration().set("audio.default_volume", defaultVolume);
         getConfiguration().set("audio.recording_format", recordingFormat);
         getConfiguration().set("audio.max_recording_duration", maxRecordingDuration);
+        getConfiguration().set("audio.enable_enhancement", enhancementEnabled);
+        getConfiguration().set("audio.enhancement_level", enhancementLevel);
         
-        logger.info("Loaded configuration - Auto Join: {}, Auto Leave: {}, Volume: {}", 
-                   autoJoinEnabled, autoLeaveEnabled, defaultVolume);
+        logger.info("Loaded configuration - Auto Join: {}, Auto Leave: {}, Volume: {}, Enhancement: {} ({})", 
+                   autoJoinEnabled, autoLeaveEnabled, defaultVolume, enhancementEnabled, enhancementLevel);
     }
 
     /**

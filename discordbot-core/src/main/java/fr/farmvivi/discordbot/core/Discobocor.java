@@ -10,7 +10,10 @@ import fr.farmvivi.discordbot.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.api.storage.binary.BinaryStorageManager;
 import fr.farmvivi.discordbot.core.audio.AudioServiceImpl;
 import fr.farmvivi.discordbot.core.command.SimpleCommandService;
+import fr.farmvivi.discordbot.core.config.CoreConfiguration;
+import fr.farmvivi.discordbot.core.config.ConfigurationMigrationManager;
 import fr.farmvivi.discordbot.core.config.EnvAwareYamlConfiguration;
+import fr.farmvivi.discordbot.core.config.migrations.CoreMigration_2_3_0_to_2_3_27;
 import fr.farmvivi.discordbot.core.console.ConsoleCommandService;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
@@ -236,56 +239,35 @@ public class Discobocor {
     }
 
     /**
-     * Creates the default configuration file.
+     * Creates the default configuration using the new versioned configuration system.
      *
      * @param configFile the configuration file
      * @return true if creation was successful, false otherwise
      */
     private static boolean createDefaultConfig(File configFile) {
         try {
-            Files.writeString(Path.of(configFile.getAbsolutePath()),
-                    "# Discord Bot Configuration\n" +
-                            "discord:\n" +
-                            "  token: YOUR_BOT_TOKEN\n\n" +
-                            "# Language settings\n" +
-                            "language:\n" +
-                            "  default: en-US\n\n" +
-                            "# Command system settings\n" +
-                            "commands:\n" +
-                            "  default-prefix: !  # Default prefix for text commands\n" +
-                            "  cooldown: 3  # Global default cooldown in seconds\n" +
-                            "  system:\n" +
-                            "    help: true      # Enable/disable help command\n" +
-                            "    version: true   # Enable/disable version command\n" +
-                            "    shutdown: true  # Enable/disable shutdown command\n" +
-                            "# Data storage settings\n" +
-                            "data:\n" +
-                            "  storage:\n" +
-                            "    type: FILE  # Options: FILE, DB\n" +
-                            "    db:\n" +
-                            "      url: jdbc:mysql://localhost:3306/discordbot\n" +
-                            "      username: username\n" +
-                            "      password: password\n\n" +
-                            "  # Binary storage settings for large files\n" +
-                            "  binary:\n" +
-                            "    storage:\n" +
-                            "      type: FILE  # Options: FILE, S3\n" +
-                            "      file:\n" +
-                            "        folder: binary\n" +
-                            "      s3:\n" +
-                            "        bucket: your-bucket-name\n" +
-                            "        region: eu-west-3\n" +
-                            "        access_key: your-access-key\n" +
-                            "        secret_key: your-secret-key\n" +
-                            "        endpoint: https://s3.amazonaws.com  # Optional, for S3-compatible services\n" +
-                            "        prefix: discordbot  # Optional, folder prefix in bucket\n"
-            );
-            logger.info("Created default config.yml");
-            logger.info("Please edit config.yml and restart the bot");
+            // Create migration manager and register core migrations
+            ConfigurationMigrationManager migrationManager = new ConfigurationMigrationManager();
+            migrationManager.registerMigrator(new CoreMigration_2_3_0_to_2_3_27());
+            
+            // Create core configuration - this will automatically copy default config and handle migrations
+            CoreConfiguration coreConfig = new CoreConfiguration(configFile, migrationManager);
+            
+            // Validate the configuration
+            if (!coreConfig.validateConfiguration()) {
+                logger.warn("Default configuration was created but validation failed");
+                logger.info("Please review and edit config.yml, then restart the bot");
+                System.exit(0);
+                return false;
+            }
+            
+            logger.info("Created versioned core configuration (version: {})", coreConfig.getConfigurationVersion());
+            logger.info("Please edit config.yml with your bot token and restart the bot");
             System.exit(0);
             return false;
-        } catch (IOException e) {
-            logger.error("Failed to create config.yml", e);
+            
+        } catch (Exception e) {
+            logger.error("Failed to create versioned configuration", e);
             System.exit(1);
             return false;
         }

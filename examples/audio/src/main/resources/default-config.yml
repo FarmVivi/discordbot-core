@@ -1,0 +1,35 @@
+# Default configuration for Audio Example Plugin
+# This file is automatically copied when the plugin loads for the first time
+
+config_version: "1.1.0"
+
+# Plugin information
+plugin:
+  name: "AudioExample"
+  enabled: true
+
+# Audio settings
+audio:
+  auto_join: false              # Auto join voice channel when user joins
+  default_volume: 50            # Default volume for audio playback (0-100)
+  max_recording_duration: 300   # Maximum recording duration in seconds
+  recording_format: wav         # Audio file format for recordings
+  enable_enhancement: true      # Enable automatic audio enhancement
+  enhancement_level: medium     # Enhancement level: low, medium, high
+
+# Voice channel settings
+voice:
+  auto_leave: true              # Auto leave when no users in channel
+  auto_leave_timeout: 30        # Auto leave timeout in seconds
+
+# File paths (relative to plugin data folder)
+paths:
+  recordings_dir: "recordings/" # Directory for storing audio recordings
+  samples_dir: "samples/"       # Directory for audio samples
+
+# Advanced settings
+advanced:
+  buffer_size: 4096            # Audio buffer size
+  sample_rate: 48000           # Audio sample rate (Hz)
+  bit_depth: 16                # Audio bit depth
+  enable_debug_logging: false  # Enable detailed audio debug logging

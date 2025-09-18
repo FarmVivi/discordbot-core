@@ -1,0 +1,151 @@
+# Discord Bot Core Configuration
+# This file is automatically created with default values
+config_version: "2.3.27"
+
+# Discord Bot Configuration
+discord:
+  # Bot token from Discord Developer Portal
+  token: "YOUR_BOT_TOKEN"
+  
+  # Bot activity settings
+  activity:
+    type: "PLAYING"  # PLAYING, LISTENING, WATCHING, COMPETING
+    text: "with plugins!"
+  
+  # Default command prefix for text commands
+  prefix: "!"
+  
+  # Enable slash commands
+  enable_slash_commands: true
+
+# Language settings
+language:
+  default: "en-US"
+
+# Command system settings
+commands:
+  default-prefix: "!"  # Default prefix for text commands
+  cooldown: 3  # Global default cooldown in seconds
+  system:
+    enabled: true
+    admin-only: true
+
+# Database Configuration
+database:
+  # Database type: file, mysql, postgresql
+  type: "file"
+  
+  # File database settings
+  file:
+    path: "data/database.db"
+  
+  # MySQL settings (when type: mysql)
+  mysql:
+    host: "${DB_HOST:localhost}"
+    port: "${DB_PORT:3306}"
+    database: "${DB_NAME:discordbot}"
+    username: "${DB_USER:root}"
+    password: "${DB_PASSWORD:}"
+
+# Storage Configuration
+storage:
+  # Binary storage backend: file, s3
+  binary_storage: "file"
+  
+  # File storage settings
+  file:
+    base_path: "data/files/"
+  
+  # S3 storage settings (when binary_storage: s3)
+  s3:
+    bucket: "${S3_BUCKET}"
+    region: "${S3_REGION:us-east-1}"
+    access_key: "${S3_ACCESS_KEY}"
+    secret_key: "${S3_SECRET_KEY}"
+
+# Binary storage settings for large files
+binary:
+  storage:
+    type: "FILE"  # Options: FILE, S3
+    file:
+      folder: "binary"
+    s3:
+      bucket: "your-bucket-name"
+      region: "eu-west-3"
+      access_key: "your-access-key"
+      secret_key: "your-secret-key"
+      endpoint: "https://s3.amazonaws.com"  # Optional, for S3-compatible services
+      prefix: "discordbot"  # Optional, folder prefix in bucket
+
+# Language and Localization
+language_extended:
+  # Available languages
+  supported:
+    - "en-US"
+    - "fr-FR"
+    - "es-ES"
+    - "de-DE"
+
+# Logging Configuration
+logging:
+  # Log level: trace, debug, info, warn, error
+  level: "info"
+  
+  # Log to file
+  file:
+    enabled: true
+    path: "logs/bot.log"
+    max_size: "10MB"
+    max_files: 10
+  
+  # Log to console
+  console:
+    enabled: true
+    pattern: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Plugin system configuration
+plugins:
+  # Plugin folder
+  folder: "plugins"
+  
+  # Auto-enable new plugins
+  auto_enable: true
+  
+  # Configuration migration settings
+  config:
+    auto_migrate: true
+    backup_before_migration: true
+    max_backup_files: 5
+
+# Security settings
+security:
+  # Enable command rate limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+  
+  # Bot administrator settings
+  admins:
+    # Discord user IDs with admin access
+    user_ids: []
+    
+    # Discord role IDs with admin access
+    role_ids: []
+
+# Performance settings
+performance:
+  # Thread pool settings
+  thread_pool:
+    core_size: 4
+    max_size: 16
+    queue_size: 1000
+  
+  # Cache settings
+  cache:
+    max_size: 10000
+    expire_after_write: "1h"
+  
+  # Audio settings
+  audio:
+    buffer_size: 4096
+    sample_rate: 48000

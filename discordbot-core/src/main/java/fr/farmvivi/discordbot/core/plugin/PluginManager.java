@@ -12,6 +12,7 @@ import fr.farmvivi.discordbot.api.plugin.PluginLoader;
 import fr.farmvivi.discordbot.api.plugin.events.*;
 import fr.farmvivi.discordbot.api.storage.DataStorageManager;
 import fr.farmvivi.discordbot.api.storage.binary.BinaryStorageManager;
+import fr.farmvivi.discordbot.core.config.ConfigurationMigrationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,9 @@ public class PluginManager implements PluginLoader, Closeable {
     private final PermissionManager permissionManager;
     private final AudioService audioService;
     private final CommandService commandService;
+    
+    // Configuration management
+    private final ConfigurationMigrationManager migrationManager;
 
     // Plugin tracking
     private final Map<String, Plugin> plugins = new ConcurrentHashMap<>();
@@ -58,6 +62,8 @@ public class PluginManager implements PluginLoader, Closeable {
      * @param dataStorageManager   the data storage manager
      * @param binaryStorageManager the binary storage manager
      * @param permissionManager    the permission manager
+     * @param audioService         the audio service
+     * @param commandService       the command service
      */
     public PluginManager(
             File pluginsFolder,
@@ -78,6 +84,7 @@ public class PluginManager implements PluginLoader, Closeable {
         this.permissionManager = permissionManager;
         this.audioService = audioService;
         this.commandService = commandService;
+        this.migrationManager = new ConfigurationMigrationManager();
 
         if (!pluginsFolder.exists() && !pluginsFolder.mkdirs()) {
             logger.warn("Failed to create plugins folder: {}", pluginsFolder.getAbsolutePath());
@@ -124,14 +131,16 @@ public class PluginManager implements PluginLoader, Closeable {
                 eventManager.fireEvent(loadingEvent);
             }
 
-            // Create the plugin context
+            // Create the plugin context with enhanced configuration
+            PluginConfiguration pluginConfig = createPluginConfiguration(descriptor, classLoader);
+            
             PluginContextImpl context = new PluginContextImpl(
                     descriptor.name(),
                     descriptor.version(),
                     LoggerFactory.getLogger(descriptor.name()),
                     eventManager,
                     discordAPI,
-                    new PluginConfiguration(descriptor.name()),
+                    pluginConfig,
                     new File(pluginsFolder, descriptor.name()).getAbsolutePath(),
                     this,
                     classLoader,
@@ -821,6 +830,31 @@ public class PluginManager implements PluginLoader, Closeable {
         preDisablePlugins();
         disablePlugins();
         postDisablePlugins();
+    }
+    
+    /**
+     * Gets the configuration migration manager.
+     *
+     * @return the migration manager
+     */
+    public ConfigurationMigrationManager getMigrationManager() {
+        return migrationManager;
+    }
+    
+    /**
+     * Creates an appropriate plugin configuration based on the plugin descriptor.
+     *
+     * @param descriptor the plugin descriptor
+     * @param classLoader the plugin class loader
+     * @return the plugin configuration
+     */
+    private PluginConfiguration createPluginConfiguration(PluginDescriptor descriptor, ClassLoader classLoader) {
+        // Check if the plugin has a version specified that suggests it supports versioned configs
+        String pluginVersion = descriptor.version();
+        
+        // For now, use the enhanced configuration with automatic default copying
+        // In the future, plugins can opt into versioned configurations via descriptor metadata
+        return new PluginConfiguration(descriptor.name(), classLoader);
     }
 
     /**
