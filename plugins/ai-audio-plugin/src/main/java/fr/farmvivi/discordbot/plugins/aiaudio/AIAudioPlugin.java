@@ -1,6 +1,7 @@
 package fr.farmvivi.discordbot.plugins.aiaudio;
 
 import fr.farmvivi.discordbot.api.event.EventHandler;
+import fr.farmvivi.discordbot.api.permissions.Permission;
 import fr.farmvivi.discordbot.api.permissions.PermissionDefault;
 import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -57,11 +58,20 @@ public class AIAudioPlugin extends AbstractPlugin {
     }
 
     private void registerPermissions() {
-        getPluginPermissionManager().registerPermission("aiaudio.transcribe", PermissionDefault.TRUE);
-        getPluginPermissionManager().registerPermission("aiaudio.tts", PermissionDefault.TRUE);
-        getPluginPermissionManager().registerPermission("aiaudio.analyze", PermissionDefault.OPERATOR);
-        getPluginPermissionManager().registerPermission("aiaudio.voicecommands", PermissionDefault.TRUE);
-        getPluginPermissionManager().registerPermission("aiaudio.admin", PermissionDefault.OPERATOR);
+        perm("transcribe", "Allows transcription of voice channels", PermissionDefault.TRUE);
+        perm("tts", "Allows text-to-speech usage", PermissionDefault.TRUE);
+        perm("analyze", "Allows advanced audio analysis", PermissionDefault.OP);
+        perm("voicecommands", "Allows voice command features", PermissionDefault.TRUE);
+        perm("admin", "Allows administrative AI audio actions", PermissionDefault.OP);
+        logger.debug("AI Audio permissions registered: {}", getPluginPermissionManager().getRegisteredPermissions());
+    }
+
+    private void perm(String node, String desc, PermissionDefault def) {
+        getPluginPermissionManager().registerPermission(new AIPermission(permissionKey(node), desc, def));
+    }
+
+    private String permissionKey(String node) {
+        return getName().toLowerCase() + "." + node;
     }
 
     private void initializeServices() {
@@ -71,13 +81,20 @@ public class AIAudioPlugin extends AbstractPlugin {
     }
 
     private void loadConfiguration() {
-        // Set default configuration values
-        getConfiguration().set("ai.openai_api_key", "");
-        getConfiguration().set("ai.google_credentials_path", "");
-        getConfiguration().set("ai.transcription_language", "en-US");
-        getConfiguration().set("ai.tts_voice", "en-US-Standard-A");
-        getConfiguration().set("ai.enable_voice_commands", true);
-        getConfiguration().set("ai.confidence_threshold", 0.8);
+        String openAiKey = getConfiguration().getString("ai.openai_api_key", "");
+        String googleCreds = getConfiguration().getString("ai.google_credentials_path", "");
+        String language = getConfiguration().getString("ai.transcription_language", "en-US");
+        String voice = getConfiguration().getString("ai.tts_voice", "en-US-Standard-A");
+        boolean voiceCmd = getConfiguration().getBoolean("ai.enable_voice_commands", true);
+        double threshold;
+        String thresholdRaw = getConfiguration().getString("ai.confidence_threshold", "0.8");
+        try {
+            threshold = Double.parseDouble(thresholdRaw);
+        } catch (NumberFormatException e) {
+            threshold = 0.8;
+        }
+        logger.info("AI Audio config: lang={}, voice={}, voiceCmd={}, threshold={}, openAIKeySet={}, googleCredsSet={}",
+                language, voice, voiceCmd, threshold, !openAiKey.isEmpty(), !googleCreds.isEmpty());
     }
 
     // TODO: Implement commands when command API is available
@@ -110,4 +127,25 @@ public class AIAudioPlugin extends AbstractPlugin {
     public AudioAnalysisService getAudioAnalysis() {
         return audioAnalysis;
     }
+}
+// Internal permission implementation
+class AIPermission implements Permission {
+    private final String name;
+    private final String description;
+    private final PermissionDefault def;
+
+    AIPermission(String name, String description, PermissionDefault def) {
+        this.name = name;
+        this.description = description;
+        this.def = def;
+    }
+
+    @Override
+    public String getName() { return name; }
+
+    @Override
+    public String getDescription() { return description; }
+
+    @Override
+    public PermissionDefault getDefault() { return def; }
 }
