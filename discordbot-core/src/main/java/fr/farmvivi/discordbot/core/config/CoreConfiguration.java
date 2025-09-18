@@ -30,10 +30,9 @@ public class CoreConfiguration extends EnvAwareYamlConfiguration {
         // Create default config if it doesn't exist
         if (!configFile.exists()) {
             createDefaultConfig(configFile);
-            // Exit after creating default config to let user edit it
+            // Inform the user but do not exit here (tests and callers decide)
             logger.info("Created default config.yml");
             logger.info("Please edit config.yml and restart the bot");
-            System.exit(0);
         }
         
         // Handle versioning and migration
@@ -72,14 +71,9 @@ public class CoreConfiguration extends EnvAwareYamlConfiguration {
         int currentVersion = getInt(CONFIG_VERSION_KEY, 0);
         
         if (currentVersion == 0) {
-            // Old configuration without version
-            logger.info("Adding version {} to core configuration", CURRENT_CONFIG_VERSION);
-            set(CONFIG_VERSION_KEY, CURRENT_CONFIG_VERSION);
-            try {
-                save();
-            } catch (ConfigurationException e) {
-                logger.warn("Failed to save version to core configuration: {}", e.getMessage());
-            }
+            // Legacy configuration without version: treat as migration 0 -> CURRENT
+            logger.info("Migrating legacy core configuration to version {}", CURRENT_CONFIG_VERSION);
+            migrateConfiguration(0, CURRENT_CONFIG_VERSION);
         } else if (currentVersion < CURRENT_CONFIG_VERSION) {
             // Configuration needs migration
             logger.info("Migrating core configuration from version {} to {}", 

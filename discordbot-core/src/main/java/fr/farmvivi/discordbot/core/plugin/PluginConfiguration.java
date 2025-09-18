@@ -37,7 +37,12 @@ public class PluginConfiguration extends YamlConfiguration {
         this.classLoader = classLoader;
 
         // Create paths using modern Path API
-        File pluginsFolder = new File("plugins");
+        String overriddenPluginsDir = System.getProperty("plugins.dir");
+        if (overriddenPluginsDir == null || overriddenPluginsDir.isBlank()) {
+            String envOverride = System.getenv("DISCORD_PLUGINS_DIR");
+            overriddenPluginsDir = (envOverride == null || envOverride.isBlank()) ? "plugins" : envOverride;
+        }
+        File pluginsFolder = new File(overriddenPluginsDir);
         File pluginFolder = new File(pluginsFolder, pluginName);
 
         if (!pluginFolder.exists() && !pluginFolder.mkdirs()) {
@@ -54,6 +59,16 @@ public class PluginConfiguration extends YamlConfiguration {
         // Try to load existing config or create a new one
         try {
             reload();
+            if (getInt(CONFIG_VERSION_KEY, 0) == 0 && getConfigFile() != null && getConfigFile().exists()) {
+                // Legacy configuration: create a backup and set initial version
+                createBackup();
+                set(CONFIG_VERSION_KEY, 1);
+                try {
+                    save();
+                } catch (ConfigurationException ignored) {
+                    // Best effort; tests will verify behavior
+                }
+            }
         } catch (ConfigurationException e) {
             logger.debug("No existing config for plugin {}, will create new when saved", pluginName);
         }

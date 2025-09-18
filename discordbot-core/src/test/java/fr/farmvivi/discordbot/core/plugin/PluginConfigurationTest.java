@@ -2,6 +2,7 @@ package fr.farmvivi.discordbot.core.plugin;
 
 import fr.farmvivi.discordbot.api.config.ConfigurationException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
@@ -37,8 +38,14 @@ class PluginConfigurationTest {
         MockitoAnnotations.openMocks(this);
         
         // Set up temporary plugin structure
+        System.setProperty("plugins.dir", tempDir.resolve("plugins").toString());
         pluginFolder = tempDir.resolve("plugins").resolve(pluginName).toFile();
         configFile = new File(pluginFolder, "config.yml");
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.clearProperty("plugins.dir");
     }
 
     @Test

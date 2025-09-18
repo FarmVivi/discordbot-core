@@ -133,7 +133,30 @@ public class YamlConfiguration implements Configuration {
 
     @Override
     public void set(String key, Object value) {
-        values.put(key, value);
+        if (key == null || key.isEmpty()) {
+            return;
+        }
+
+        String[] parts = key.split("\\.");
+        Map<String, Object> current = values;
+
+        for (int i = 0; i < parts.length - 1; i++) {
+            String part = parts[i];
+            Object next = current.get(part);
+            if (!(next instanceof Map)) {
+                // Remplace toute valeur non-Map par une Map imbriquée
+                Map<String, Object> child = new HashMap<>();
+                current.put(part, child);
+                current = child;
+            } else {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> nextMap = (Map<String, Object>) next;
+                current = nextMap;
+            }
+        }
+
+        String last = parts[parts.length - 1];
+        current.put(last, value);
     }
 
     @Override
@@ -191,10 +214,15 @@ public class YamlConfiguration implements Configuration {
         try {
             Yaml yaml = new Yaml();
             try (FileReader reader = new FileReader(configFile)) {
-                Map<String, Object> loaded = yaml.load(reader);
-                if (loaded != null) {
-                    values = loaded;
+                Object loaded = yaml.load(reader);
+                if (loaded instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> root = (Map<String, Object>) loaded;
+                    values = root;
+                } else if (loaded == null) {
+                    values.clear();
                 } else {
+                    // Non-map root not supported; store nothing
                     values.clear();
                 }
             }

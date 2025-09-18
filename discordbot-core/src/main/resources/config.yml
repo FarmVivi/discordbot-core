@@ -10,7 +10,7 @@ language:
 
 # Command system settings
 commands:
-  default-prefix: !  # Default prefix for text commands
+  default-prefix: "!"  # Default prefix for text commands
   cooldown: 3  # Global default cooldown in seconds
   system:
     help: true      # Enable/disable help command
