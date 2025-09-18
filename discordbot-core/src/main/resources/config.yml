@@ -1,4 +1,6 @@
 # Discord Bot Configuration
+config_version: 1
+
 discord:
   token: YOUR_BOT_TOKEN
 

@@ -226,7 +226,113 @@ messages:
 
 #### Migration Support
 
-To implement configuration migration in your plugin, implement the `ConfigurableMigrationPlugin` interface:
+DiscordBot Core provides two ways to implement configuration migration in your plugin:
+
+1. **Separate Migration Class (Recommended)** - Keeps your main plugin class clean
+2. **Direct Implementation** - Implement migration logic directly in your plugin class
+
+##### Option 1: Separate Migration Class (Recommended)
+
+Create a separate class for handling migration logic and specify it in your `plugin.yml`:
+
+```yaml
+# plugin.yml
+name: MyPlugin
+main: com.example.myplugin.MyPlugin
+version: 1.0.0
+description: Example plugin with separate migration class
+authors:
+  - YourName
+migration-class: com.example.myplugin.MyPluginMigrator
+```
+
+Then create the migration class:
+
+```java
+package com.example.myplugin;
+
+import fr.farmvivi.discordbot.api.plugin.PluginConfigurationMigrator;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
+
+public class MyPluginMigrator implements PluginConfigurationMigrator {
+    
+    private static final int CURRENT_CONFIG_VERSION = 2;
+    
+    @Override
+    public int getExpectedConfigVersion() {
+        return CURRENT_CONFIG_VERSION;
+    }
+    
+    @Override
+    public void migrateConfiguration(Configuration config, int fromVersion, int toVersion) 
+            throws ConfigurationException {
+        // Migrate step by step
+        for (int version = fromVersion; version < toVersion; version++) {
+            switch (version) {
+                case 0 -> migrateFrom0To1(config);
+                case 1 -> migrateFrom1To2(config);
+                // Add more migration cases as needed
+                default -> throw new ConfigurationException("No migration available from version " + version);
+            }
+        }
+    }
+    
+    @Override
+    public void validateConfiguration(Configuration config) throws ConfigurationException {
+        // Validate required settings
+        if (!config.contains("api.endpoint")) {
+            throw new ConfigurationException("Missing required setting: api.endpoint");
+        }
+        
+        // Validate value ranges
+        int maxLevel = config.getInt("gameplay.max_level", 100);
+        if (maxLevel < 1 || maxLevel > 1000) {
+            throw new ConfigurationException("max_level must be between 1 and 1000, got: " + maxLevel);
+        }
+    }
+    
+    private void migrateFrom0To1(Configuration config) throws ConfigurationException {
+        // Example: Add new default settings
+        if (!config.contains("new_feature")) {
+            config.set("new_feature.enabled", true);
+            config.set("new_feature.timeout", 30);
+        }
+    }
+    
+    private void migrateFrom1To2(Configuration config) throws ConfigurationException {
+        // Example: Restructure configuration
+        if (config.contains("permissions")) {
+            // Move flat permissions to hierarchical structure
+            boolean adminPerm = config.getBoolean("permissions.admin", false);
+            config.set("permissions.roles.admin.enabled", adminPerm);
+        }
+    }
+}
+```
+
+Your main plugin class remains clean:
+
+```java
+package com.example.myplugin;
+
+import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+
+public class MyPlugin extends AbstractPlugin {
+    
+    @Override
+    public void onEnable() {
+        // Your plugin logic here
+        // Configuration migration is handled automatically by the separate migrator class
+        logger.info("Plugin enabled with configuration version: {}", 
+                   getPluginConfig().getConfigVersion());
+    }
+}
+```
+
+##### Option 2: Direct Implementation
+
+Alternatively, you can implement migration logic directly in your plugin class:
 
 ```java
 package com.example.myplugin;

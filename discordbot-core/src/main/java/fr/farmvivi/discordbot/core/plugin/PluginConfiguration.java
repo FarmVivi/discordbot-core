@@ -3,6 +3,7 @@ package fr.farmvivi.discordbot.core.plugin;
 import fr.farmvivi.discordbot.api.config.ConfigurationException;
 import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
 import fr.farmvivi.discordbot.api.plugin.Plugin;
+import fr.farmvivi.discordbot.api.plugin.PluginConfigurationMigrator;
 import fr.farmvivi.discordbot.core.config.YamlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +64,31 @@ public class PluginConfiguration extends YamlConfiguration {
      * Initializes migration handling after the plugin instance is created.
      *
      * @param plugin the plugin instance
+     * @param descriptor the plugin descriptor
      */
-    public void initializeMigration(Plugin plugin) {
+    public void initializeMigration(Plugin plugin, PluginDescriptor descriptor) {
         this.plugin = plugin;
         
-        // Handle plugin-specific migration if plugin supports it
+        // First try to load a separate migration class if specified
+        if (descriptor.migrationClass() != null && !descriptor.migrationClass().isEmpty()) {
+            try {
+                Class<?> migrationClass = classLoader.loadClass(descriptor.migrationClass());
+                Object migrationInstance = migrationClass.getDeclaredConstructor().newInstance();
+                
+                if (migrationInstance instanceof PluginConfigurationMigrator migrator) {
+                    handlePluginMigrationWithMigrator(migrator);
+                    return;
+                } else {
+                    logger.warn("Migration class {} for plugin {} does not implement PluginConfigurationMigrator interface", 
+                               descriptor.migrationClass(), pluginName);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to load migration class {} for plugin {}: {}", 
+                           descriptor.migrationClass(), pluginName, e.getMessage());
+            }
+        }
+        
+        // Fall back to the plugin implementing ConfigurableMigrationPlugin directly
         if (plugin instanceof ConfigurableMigrationPlugin migrationPlugin) {
             handlePluginMigration(migrationPlugin);
         }
@@ -154,6 +175,53 @@ public class PluginConfiguration extends YamlConfiguration {
             migrationPlugin.validateConfiguration(this);
         } catch (ConfigurationException e) {
             logger.error("Plugin {} configuration validation failed: {}", pluginName, e.getMessage());
+        }
+    }
+    
+    /**
+     * Handles plugin-specific configuration migration using a separate migrator class.
+     *
+     * @param migrator the separate migration class instance
+     */
+    private void handlePluginMigrationWithMigrator(PluginConfigurationMigrator migrator) {
+        int currentVersion = getInt(CONFIG_VERSION_KEY, 0);
+        int expectedVersion = migrator.getExpectedConfigVersion();
+        
+        if (currentVersion < expectedVersion) {
+            // Configuration needs migration
+            logger.info("Migrating plugin {} configuration from version {} to {} using migration class", 
+                       pluginName, currentVersion, expectedVersion);
+            
+            // Create backup before migration
+            createBackup();
+            
+            try {
+                // Let the migrator handle the migration
+                migrator.migrateConfiguration(this, currentVersion, expectedVersion);
+                
+                // Update version after successful migration
+                set(CONFIG_VERSION_KEY, expectedVersion);
+                save();
+                
+                logger.info("Successfully migrated plugin {} configuration to version {} using migration class", 
+                           pluginName, expectedVersion);
+            } catch (Exception e) {
+                logger.error("Failed to migrate plugin {} configuration using migration class: {}", 
+                           pluginName, e.getMessage(), e);
+            }
+        } else if (currentVersion > expectedVersion) {
+            // Configuration is from a newer version
+            logger.warn("Plugin {} configuration version {} is newer than expected {}. " +
+                       "This may cause compatibility issues.", 
+                       pluginName, currentVersion, expectedVersion);
+        }
+        
+        // Validate configuration after loading/migration
+        try {
+            migrator.validateConfiguration(this);
+        } catch (ConfigurationException e) {
+            logger.error("Plugin {} configuration validation failed using migration class: {}", 
+                        pluginName, e.getMessage());
         }
     }
     
