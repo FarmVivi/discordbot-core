@@ -185,6 +185,53 @@ public void onPlayerLevelUp(PlayerLevelUpEvent event) {
 
 ## Configuration
 
+### Automatic Configuration Management
+
+**DiscordBot Core now provides automatic configuration management for plugins:**
+
+#### Default Configuration Files
+
+When your plugin is loaded, the system automatically:
+
+1. **Copies default config**: If no `config.yml` exists in the plugin folder, it copies from your JAR's resources
+2. **Creates directories**: Automatically creates the plugin's data folder structure
+3. **Handles versioning**: Manages configuration versions and migrations automatically
+
+**Best Practice**: Always include a `config.yml` file in your plugin's `src/main/resources/` directory.
+
+#### Configuration Versioning
+
+Include version tracking in your default configuration:
+
+```yaml
+# config.yml in your plugin's resources
+# Configuration version (automatically managed)
+config_version: 1
+
+# Your plugin settings
+gameplay:
+  max_level: 100
+  enable_pvp: false
+  respawn_time: 30
+
+economy:
+  currency: "coins"
+  starting_balance: 1000
+  daily_bonus: 100
+
+messages:
+  welcome: "Welcome to the server!"
+  goodbye: "Thanks for playing!"
+```
+
+#### Migration Support
+
+When you need to change your configuration structure:
+
+1. **Increment version**: Update `config_version` in your default config
+2. **Handle migration**: Override migration logic if needed (advanced)
+3. **Test thoroughly**: Ensure existing configs migrate properly
+
 ### Reading Configuration
 
 ```java
@@ -204,27 +251,115 @@ public void onEnable() {
 ```java
 public void updateSettings(int newMaxLevel) {
     getPluginConfig().set("gameplay.max_level", newMaxLevel);
-    // Configuration is automatically saved
+    // Configuration is automatically saved with version tracking
+}
+```
+
+### Configuration Best Practices
+
+#### For New Plugins
+
+1. **Include Default Config**: Always provide a comprehensive `config.yml` in your JAR
+2. **Start with Version 1**: Use `config_version: 1` in your initial configuration
+3. **Document Settings**: Include comments explaining each configuration option
+4. **Use Sensible Defaults**: Provide working defaults that require minimal changes
+5. **Validate Settings**: Check required settings during plugin initialization
+
+#### Configuration Migration (Advanced)
+
+When updating your plugin's configuration structure:
+
+```java
+// In your plugin class (advanced usage)
+@Override
+public void onLoad(PluginContext context) {
+    super.onLoad(context);
+    
+    // Check if custom migration is needed
+    int currentVersion = getPluginConfig().getConfigVersion();
+    if (currentVersion < EXPECTED_VERSION) {
+        // Custom migration logic if automatic migration isn't sufficient
+        performCustomMigration(currentVersion);
+    }
+}
+
+private void performCustomMigration(int fromVersion) {
+    switch (fromVersion) {
+        case 1 -> {
+            // Migrate from version 1 to 2
+            // Example: rename keys, restructure data, etc.
+            if (getPluginConfig().contains("old_setting")) {
+                String value = getPluginConfig().getString("old_setting", "default");
+                getPluginConfig().set("new_settings.migrated_value", value);
+                // Note: old keys are automatically removed after migration
+            }
+        }
+        // Add more migration cases as needed
+    }
+}
+```
+
+#### Configuration Validation
+
+```java
+@Override
+public void onEnable() {
+    // Validate critical settings
+    try {
+        validateConfiguration();
+        loadConfiguration();
+    } catch (Exception e) {
+        logger.error("Configuration validation failed", e);
+        setEnabled(false);
+        return;
+    }
+}
+
+private void validateConfiguration() throws IllegalStateException {
+    // Check required settings
+    if (!getPluginConfig().contains("api.endpoint")) {
+        throw new IllegalStateException("Missing required setting: api.endpoint");
+    }
+    
+    // Validate ranges
+    int maxLevel = getPluginConfig().getInt("gameplay.max_level", 100);
+    if (maxLevel < 1 || maxLevel > 1000) {
+        throw new IllegalStateException("max_level must be between 1 and 1000");
+    }
 }
 ```
 
 ### Configuration File Structure
 
+Now handled automatically by the versioning system. Your `config.yml` should include the version and be well-documented:
+
 ```yaml
-# config.yml
+# MyPlugin Configuration 
+# Configuration version (automatically managed)
+config_version: 1
+
+# Gameplay settings
 gameplay:
-  max_level: 100
-  enable_pvp: false
-  respawn_time: 30
+  max_level: 100          # Maximum player level (1-1000)
+  enable_pvp: false       # Allow player vs player combat
+  respawn_time: 30        # Respawn delay in seconds
 
+# Economy settings  
 economy:
-  currency: "coins"
-  starting_balance: 1000
-  daily_bonus: 100
+  currency: "coins"       # Name of the currency
+  starting_balance: 1000  # Starting money for new players
+  daily_bonus: 100        # Daily login bonus
 
+# User interface messages
 messages:
   welcome: "Welcome to the server!"
   goodbye: "Thanks for playing!"
+
+# Advanced settings
+advanced:
+  debug_mode: false       # Enable debug logging
+  cache_size: 1000        # Cache size for performance
+  api_timeout: 30         # API timeout in seconds
 ```
 
 ## Data Storage
