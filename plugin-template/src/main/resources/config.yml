@@ -1,4 +1,5 @@
 # Template Plugin Configuration
+config_version: 1
 
 # Example settings
 example:

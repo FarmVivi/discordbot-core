@@ -226,11 +226,123 @@ messages:
 
 #### Migration Support
 
-When you need to change your configuration structure:
+To implement configuration migration in your plugin, implement the `ConfigurableMigrationPlugin` interface:
 
-1. **Increment version**: Update `config_version` in your default config
-2. **Handle migration**: Override migration logic if needed (advanced)
-3. **Test thoroughly**: Ensure existing configs migrate properly
+```java
+package com.example.myplugin;
+
+import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
+
+public class MyPlugin extends AbstractPlugin implements ConfigurableMigrationPlugin {
+    
+    private static final int CURRENT_CONFIG_VERSION = 2;
+    
+    @Override
+    public int getExpectedConfigVersion() {
+        return CURRENT_CONFIG_VERSION;
+    }
+    
+    @Override
+    public void migrateConfiguration(Configuration config, int fromVersion, int toVersion) 
+            throws ConfigurationException {
+        logger.info("Migrating {} configuration from version {} to {}", getName(), fromVersion, toVersion);
+        
+        // Migrate step by step
+        for (int version = fromVersion; version < toVersion; version++) {
+            switch (version) {
+                case 0 -> migrateFrom0To1(config);
+                case 1 -> migrateFrom1To2(config);
+                // Add more migration cases as needed
+                default -> logger.warn("No migration available from version {}", version);
+            }
+        }
+    }
+    
+    @Override
+    public void validateConfiguration(Configuration config) throws ConfigurationException {
+        // Validate required settings
+        if (!config.contains("api.endpoint")) {
+            throw new ConfigurationException("Missing required setting: api.endpoint");
+        }
+        
+        // Validate value ranges
+        int maxLevel = config.getInt("gameplay.max_level", 100);
+        if (maxLevel < 1 || maxLevel > 1000) {
+            throw new ConfigurationException("max_level must be between 1 and 1000, got: " + maxLevel);
+        }
+        
+        logger.info("Configuration validation passed for plugin {}", getName());
+    }
+    
+    private void migrateFrom0To1(Configuration config) throws ConfigurationException {
+        // Example: Add new default settings
+        if (!config.contains("new_feature")) {
+            config.set("new_feature.enabled", true);
+            config.set("new_feature.timeout", 30);
+        }
+        
+        // Example: Rename old settings
+        if (config.contains("old_setting_name")) {
+            Object value = config.getString("old_setting_name", "default");
+            config.set("new_setting_name", value);
+            // Note: Don't remove old keys here, the system handles cleanup
+        }
+    }
+    
+    private void migrateFrom1To2(Configuration config) throws ConfigurationException {
+        // Example: Restructure configuration
+        if (config.contains("permissions")) {
+            // Move flat permissions to hierarchical structure
+            boolean adminPerm = config.getBoolean("permissions.admin", false);
+            boolean moderatorPerm = config.getBoolean("permissions.moderator", false);
+            
+            config.set("permissions.roles.admin.enabled", adminPerm);
+            config.set("permissions.roles.moderator.enabled", moderatorPerm);
+        }
+    }
+}
+```
+
+#### Migration Best Practices
+
+1. **Always increment versions**: When changing config structure, increment `CURRENT_CONFIG_VERSION`
+2. **Step-by-step migration**: Migrate one version at a time (v0→v1→v2) to ensure data integrity
+3. **Preserve user data**: Never delete user settings without migration
+4. **Test thoroughly**: Test migration with real configuration files
+5. **Log changes**: Provide clear logging during migration process
+6. **Handle errors**: Use try-catch blocks and meaningful error messages
+
+#### Migration Example
+
+```yaml
+# Version 0 (original)
+permissions:
+  admin: true
+  moderator: false
+
+# Version 1 (after migrateFrom0To1)
+permissions:
+  admin: true
+  moderator: false
+new_feature:
+  enabled: true
+  timeout: 30
+
+# Version 2 (after migrateFrom1To2)  
+permissions:
+  roles:
+    admin:
+      enabled: true
+    moderator:
+      enabled: false
+new_feature:
+  enabled: true
+  timeout: 30
+config_version: 2
+```
 
 ### Reading Configuration
 
@@ -259,74 +371,12 @@ public void updateSettings(int newMaxLevel) {
 
 #### For New Plugins
 
-1. **Include Default Config**: Always provide a comprehensive `config.yml` in your JAR
-2. **Start with Version 1**: Use `config_version: 1` in your initial configuration
+1. **Include Default Config**: Always provide a comprehensive `config.yml` in your JAR's resources
+2. **Start with Version 1**: Use `config_version: 1` in your initial configuration  
 3. **Document Settings**: Include comments explaining each configuration option
 4. **Use Sensible Defaults**: Provide working defaults that require minimal changes
-5. **Validate Settings**: Check required settings during plugin initialization
-
-#### Configuration Migration (Advanced)
-
-When updating your plugin's configuration structure:
-
-```java
-// In your plugin class (advanced usage)
-@Override
-public void onLoad(PluginContext context) {
-    super.onLoad(context);
-    
-    // Check if custom migration is needed
-    int currentVersion = getPluginConfig().getConfigVersion();
-    if (currentVersion < EXPECTED_VERSION) {
-        // Custom migration logic if automatic migration isn't sufficient
-        performCustomMigration(currentVersion);
-    }
-}
-
-private void performCustomMigration(int fromVersion) {
-    switch (fromVersion) {
-        case 1 -> {
-            // Migrate from version 1 to 2
-            // Example: rename keys, restructure data, etc.
-            if (getPluginConfig().contains("old_setting")) {
-                String value = getPluginConfig().getString("old_setting", "default");
-                getPluginConfig().set("new_settings.migrated_value", value);
-                // Note: old keys are automatically removed after migration
-            }
-        }
-        // Add more migration cases as needed
-    }
-}
-```
-
-#### Configuration Validation
-
-```java
-@Override
-public void onEnable() {
-    // Validate critical settings
-    try {
-        validateConfiguration();
-        loadConfiguration();
-    } catch (Exception e) {
-        logger.error("Configuration validation failed", e);
-        setEnabled(false);
-        return;
-    }
-}
-
-private void validateConfiguration() throws IllegalStateException {
-    // Check required settings
-    if (!getPluginConfig().contains("api.endpoint")) {
-        throw new IllegalStateException("Missing required setting: api.endpoint");
-    }
-    
-    // Validate ranges
-    int maxLevel = getPluginConfig().getInt("gameplay.max_level", 100);
-    if (maxLevel < 1 || maxLevel > 1000) {
-        throw new IllegalStateException("max_level must be between 1 and 1000");
-    }
-}
+5. **Implement Migration**: If your plugin needs configuration migration, implement `ConfigurableMigrationPlugin`
+6. **Validate Settings**: Use `validateConfiguration()` to check required settings during plugin initialization
 ```
 
 ### Configuration File Structure
