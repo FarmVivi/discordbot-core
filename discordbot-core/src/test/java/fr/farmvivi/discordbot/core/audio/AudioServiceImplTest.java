@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.core.audio;
 
-import fr.farmvivi.discordbot.core.api.audio.events.AudioSendHandlerRegisteredEvent;
-import fr.farmvivi.discordbot.core.api.event.EventManager;
-import fr.farmvivi.discordbot.core.api.plugin.Plugin;
+import fr.farmvivi.discordbot.api.audio.events.AudioSendHandlerRegisteredEvent;
+import fr.farmvivi.discordbot.api.event.EventManager;
+import fr.farmvivi.discordbot.api.plugin.Plugin;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.AudioManager;
