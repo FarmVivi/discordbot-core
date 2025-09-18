@@ -126,6 +126,8 @@ public class PluginManager implements PluginLoader, Closeable {
 
             // Create the plugin context
             PluginContextImpl context = new PluginContextImpl(
+                    descriptor.name(),
+                    descriptor.version(),
                     LoggerFactory.getLogger(descriptor.name()),
                     eventManager,
                     discordAPI,
@@ -307,7 +309,7 @@ public class PluginManager implements PluginLoader, Closeable {
                 Plugin plugin = loadPlugin(jarPath);
                 if (plugin != null) {
                     plugins.put(pluginName, plugin);
-                    logger.info("Loaded plugin: {} v{}", pluginName, plugin.getVersion());
+                    logger.info("Loaded plugin: {} v{}", pluginName, pluginDescriptors.get(pluginName).version());
                 } else {
                     failedPlugins.add(pluginName);
                     logger.error("Failed to load plugin: {}", pluginName);

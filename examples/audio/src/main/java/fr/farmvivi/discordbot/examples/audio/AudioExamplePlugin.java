@@ -36,18 +36,6 @@ public class AudioExamplePlugin extends AbstractPlugin {
     private int maxRecordingDuration;
 
     @Override
-    public String getName() {
-        // Note: In future versions, this will be automatically loaded from plugin.yml
-        return "AudioExample";
-    }
-
-    @Override
-    public String getVersion() {
-        // Note: In future versions, this will be automatically loaded from plugin.yml
-        return "1.0.0";
-    }
-
-    @Override
     public void onEnable() {
         // Load configuration settings
         loadConfiguration();

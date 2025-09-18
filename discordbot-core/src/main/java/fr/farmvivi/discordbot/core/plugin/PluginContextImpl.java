@@ -17,6 +17,8 @@ import org.slf4j.Logger;
  * Implementation of PluginContext that provides access to core services.
  */
 public record PluginContextImpl(
+        String getPluginName,
+        String getPluginVersion,
         Logger getLogger,
         EventManager getEventManager,
         DiscordAPI getDiscordAPI,

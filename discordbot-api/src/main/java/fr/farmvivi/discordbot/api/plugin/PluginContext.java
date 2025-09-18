@@ -16,6 +16,20 @@ import org.slf4j.Logger;
  */
 public interface PluginContext {
     /**
+     * Gets the plugin name as declared in plugin.yml.
+     *
+     * @return the plugin name
+     */
+    String getPluginName();
+
+    /**
+     * Gets the plugin version as declared in plugin.yml.
+     *
+     * @return the plugin version
+     */
+    String getPluginVersion();
+
+    /**
      * Gets the logger for the plugin.
      *
      * @return the logger instance
