@@ -71,21 +71,19 @@ public class AudioExamplePlugin extends AbstractPlugin {
      * Load configuration values with defaults
      */
     private void loadConfiguration() {
-        // TODO: Use actual configuration API when available
-        // autoJoinEnabled = getConfiguration().getBoolean("audio.auto_join", false);
-        // autoLeaveEnabled = getConfiguration().getBoolean("voice.auto_leave", true);
-        // autoLeaveTimeout = getConfiguration().getInt("voice.auto_leave_timeout", 30);
-        // defaultVolume = getConfiguration().getInt("audio.default_volume", 50);
-        // recordingFormat = getConfiguration().getString("audio.recording_format", "wav");
-        // maxRecordingDuration = getConfiguration().getInt("audio.max_recording_duration", 300);
-        
-        // Use hardcoded defaults for now
-        autoJoinEnabled = false;
-        autoLeaveEnabled = true;
-        autoLeaveTimeout = 30;
-        defaultVolume = 50;
-        recordingFormat = "wav";
-        maxRecordingDuration = 300;
+        autoJoinEnabled = getConfiguration().getBoolean("audio.auto_join", false);
+        autoLeaveEnabled = getConfiguration().getBoolean("voice.auto_leave", true);
+        autoLeaveTimeout = getConfiguration().getInt("voice.auto_leave_timeout", 30);
+        defaultVolume = getConfiguration().getInt("audio.default_volume", 50);
+        recordingFormat = getConfiguration().getString("audio.recording_format", "wav");
+        maxRecordingDuration = getConfiguration().getInt("audio.max_recording_duration", 300);
+        // Persist defaults if not present
+        getConfiguration().set("audio.auto_join", autoJoinEnabled);
+        getConfiguration().set("voice.auto_leave", autoLeaveEnabled);
+        getConfiguration().set("voice.auto_leave_timeout", autoLeaveTimeout);
+        getConfiguration().set("audio.default_volume", defaultVolume);
+        getConfiguration().set("audio.recording_format", recordingFormat);
+        getConfiguration().set("audio.max_recording_duration", maxRecordingDuration);
         
         logger.info("Loaded configuration - Auto Join: {}, Auto Leave: {}, Volume: {}", 
                    autoJoinEnabled, autoLeaveEnabled, defaultVolume);
@@ -95,15 +93,14 @@ public class AudioExamplePlugin extends AbstractPlugin {
      * Create necessary directories from configuration
      */
     private void createDirectories() {
-        // TODO: Use actual data folder API when available
-        // String recordingsDir = getConfiguration().getString("paths.recordings_dir", "recordings/");
-        // String samplesDir = getConfiguration().getString("paths.samples_dir", "samples/");
-        // File recordings = new File(getDataFolder(), recordingsDir);
-        // File samples = new File(getDataFolder(), samplesDir);
-        
-        // Use hardcoded paths for now
-        File recordings = new File("recordings");
-        File samples = new File("samples");
+        String recordingsDir = getConfiguration().getString("paths.recordings_dir", "recordings/");
+        String samplesDir = getConfiguration().getString("paths.samples_dir", "samples/");
+        File recordings = new File(getDataFolder(), recordingsDir);
+        File samples = new File(getDataFolder(), samplesDir);
+
+        // Persist paths
+        getConfiguration().set("paths.recordings_dir", recordingsDir);
+        getConfiguration().set("paths.samples_dir", samplesDir);
         
         if (!recordings.exists() && !recordings.mkdirs()) {
             logger.warn("Failed to create recordings directory: {}", recordings.getPath());
@@ -135,11 +132,13 @@ public class AudioExamplePlugin extends AbstractPlugin {
             // TODO: String recordingsDir = getConfiguration().getString("paths.recordings_dir", "recordings/");
             
             // Crée le handler d'envoi audio
-            File audioFile = new File("samples/welcome.wav");
+            String samplesDir = getConfiguration().getString("paths.samples_dir", "samples/");
+            File audioFile = new File(getDataFolder(), samplesDir + "/welcome.wav");
             MySendHandler sendHandler = new MySendHandler(audioFile);
 
             // Crée le handler de réception audio with configured format
-            File outputDir = new File("recordings");
+            String recordingsDir = getConfiguration().getString("paths.recordings_dir", "recordings/");
+            File outputDir = new File(getDataFolder(), recordingsDir);
             if (!outputDir.exists()) {
                 outputDir.mkdirs();
             }
