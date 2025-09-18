@@ -1,0 +1,20 @@
+template:
+  messages:
+    plugin_enabled: "Template Plugin enabled!"
+    plugin_disabled: "Template Plugin disabled!"
+    example_message: "Hello from Template Plugin!"
+    welcome_user: "Welcome, {user}!"
+    
+  commands:
+    help: "Show template plugin help"
+    info: "Show plugin information"
+    example: "Example command"
+    
+  errors:
+    no_permission: "You don't have permission to use this command"
+    invalid_usage: "Invalid command usage"
+    config_error: "Configuration error: {error}"
+    
+  config:
+    reloaded: "Configuration reloaded successfully"
+    saved: "Configuration saved successfully"

@@ -4,25 +4,25 @@
     {
       "label": "compile",
       "type": "shell",
-      "command": "mvn compile package",
+      "command": "mvn -pl discordbot-core -am compile package",
       "group": "build"
     },
     {
       "label": "run",
       "type": "shell",
-      "command": "mvn compile exec:exec",
+      "command": "mvn -pl discordbot-core -am install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java",
       "group": "test"
     },
     {
       "label": "clean compile",
       "type": "shell",
-      "command": "mvn clean compile package",
+      "command": "mvn -pl discordbot-core -am clean compile package",
       "group": "build"
     },
     {
       "label": "clean run",
       "type": "shell",
-      "command": "mvn clean compile exec:exec",
+      "command": "mvn -pl discordbot-core -am clean install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java",
       "group": "test"
     }
   ]

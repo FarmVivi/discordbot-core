@@ -1,0 +1,7 @@
+name: MusicBot
+version: 1.0.0
+main: fr.farmvivi.discordbot.plugins.music.MusicPlugin
+description: Advanced music bot plugin with playlist management and audio effects
+author: FarmVivi
+website: https://github.com/FarmVivi/discordbot-core
+dependencies: []

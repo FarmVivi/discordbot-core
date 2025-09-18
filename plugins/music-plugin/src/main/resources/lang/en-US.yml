@@ -1,0 +1,46 @@
+music:
+  commands:
+    play: "Play music from URL or search query"
+    pause: "Pause/resume the current track"
+    skip: "Skip the current track"
+    stop: "Stop music and clear the queue"
+    queue: "Show the current music queue"
+    nowplaying: "Show currently playing track"
+    volume: "Set the playback volume"
+    shuffle: "Toggle queue shuffle mode"
+    loop: "Set loop mode (off/track/queue)"
+    playlist: "Manage your playlists"
+    search: "Search for music tracks"
+    lyrics: "Show lyrics for current track"
+    
+  messages:
+    plugin_enabled: "Music Plugin enabled!"
+    plugin_disabled: "Music Plugin disabled!"
+    track_added: "Added **{track}** to the queue"
+    track_playing: "Now playing: **{track}**"
+    track_paused: "Music paused"
+    track_resumed: "Music resumed"
+    track_skipped: "Skipped **{track}**"
+    queue_cleared: "Queue cleared"
+    queue_empty: "The queue is empty"
+    volume_set: "Volume set to {volume}%"
+    shuffle_enabled: "Shuffle enabled"
+    shuffle_disabled: "Shuffle disabled"
+    loop_off: "Loop disabled"
+    loop_track: "Loop track enabled"
+    loop_queue: "Loop queue enabled"
+    
+  errors:
+    no_voice_channel: "You must be in a voice channel!"
+    no_permission: "You don't have permission to use this command"
+    track_not_found: "No tracks found for: {query}"
+    queue_full: "Queue is full (max {max} tracks)"
+    invalid_volume: "Volume must be between 0 and 100"
+    playlist_not_found: "Playlist not found: {name}"
+    track_too_long: "Track is too long (max {max} minutes)"
+    
+  embed:
+    now_playing_title: "Now Playing"
+    queue_title: "Music Queue"
+    search_results_title: "Search Results"
+    playlist_title: "Playlist: {name}"

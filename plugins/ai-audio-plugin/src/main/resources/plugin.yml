@@ -1,0 +1,7 @@
+name: AIAudio
+version: 1.0.0
+main: fr.farmvivi.discordbot.plugins.aiaudio.AIAudioPlugin
+description: AI-powered voice processing and interaction plugin
+author: FarmVivi
+website: https://github.com/FarmVivi/discordbot-core
+dependencies: []

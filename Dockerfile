@@ -27,8 +27,8 @@ FROM gcr.io/distroless/java17-debian12:latest as production
 # Create project directory
 WORKDIR /app
 
-# Copy only the built jar file
-COPY --from=build /app/target/discordbot-core.jar ./discordbot-core.jar
+# Copy only the built jar file from the core module
+COPY --from=build /app/discordbot-core/target/discordbot-core.jar ./discordbot-core.jar
 
 # Set the entry point
 ENTRYPOINT ["java", "-jar", "discordbot-core.jar"]

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>fr.farmvivi.discordbot</groupId>
+        <artifactId>discordbot-parent</artifactId>
+        <version>2.3.27-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>discordbot-example-audio</artifactId>
+
+    <name>DiscordBot Example Audio Plugin</name>
+    <description>Example audio plugin for Discord Bot showing audio handling capabilities</description>
+
+    <dependencies>
+        <!-- API module -->
+        <dependency>
+            <groupId>fr.farmvivi.discordbot</groupId>
+            <artifactId>discordbot-api</artifactId>
+        </dependency>
+
+        <!-- JDA for audio handling -->
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+        </dependency>
+
+        <!-- WyLog for logging -->
+        <dependency>
+            <groupId>net.wytrem</groupId>
+            <artifactId>wylog</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

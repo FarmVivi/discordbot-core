@@ -7,7 +7,10 @@ services:
       dockerfile: Dockerfile
     volumes:
       # Mount for local development (uncomment when developing)
-      #- ./src:/app/src
+      # Multi-module structure: mount individual modules
+      #- ./discordbot-api/src:/app/discordbot-api/src
+      #- ./discordbot-core/src:/app/discordbot-core/src  
+      #- ./discordbot-example-audio/src:/app/discordbot-example-audio/src
       # Mount for application data persistence
       - ./data:/app/data
       - ./plugins:/app/plugins
