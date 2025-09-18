@@ -144,6 +144,22 @@ public abstract class AbstractPlugin implements Plugin {
     }
 
     /**
+     * Convenience accessor for the plugin configuration.
+     * @return configuration instance
+     */
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    /**
+     * Convenience accessor for the plugin data folder path.
+     * @return absolute path to plugin data folder
+     */
+    public String getDataFolder() {
+        return dataFolder;
+    }
+
+    /**
      * Gets the plugin-specific permission manager.
      * This provides convenient methods for registering and checking permissions
      * specifically for this plugin.
