@@ -131,7 +131,7 @@ public class PluginManager implements PluginLoader, Closeable {
                     LoggerFactory.getLogger(descriptor.name()),
                     eventManager,
                     discordAPI,
-                    new PluginConfiguration(descriptor.name()),
+                    new PluginConfiguration(descriptor.name(), classLoader),
                     new File(pluginsFolder, descriptor.name()).getAbsolutePath(),
                     this,
                     classLoader,

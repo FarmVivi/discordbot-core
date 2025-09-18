@@ -1,8 +1,10 @@
 # AudioExample Plugin Configuration
+# Configuration version (automatically managed)
+config_version: 1
 
 # Audio settings
 audio:
-  # Default volume for audio playback (0-100)
+  # Default volume for audio playbook (0-100)
   default_volume: 50
   
   # Maximum recording duration in seconds
