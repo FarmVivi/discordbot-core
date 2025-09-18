@@ -110,4 +110,47 @@ public class PluginClassLoader extends URLClassLoader {
         super.close();
         seenPackages.clear();
     }
+
+    /*
+     * Resources: prefer plugin JAR over parent (child-first) to avoid
+     * accidentally picking core resources like "/config.yml".
+     */
+    @Override
+    public URL getResource(String name) {
+        // Try to find in this classloader first
+        URL url = findResource(name);
+        if (url != null) {
+            return url;
+        }
+        // Then delegate to parent
+        ClassLoader parent = getParent();
+        return parent != null ? parent.getResource(name) : super.getResource(name);
+    }
+
+    @Override
+    public java.util.Enumeration<URL> getResources(String name) throws IOException {
+        // Collect child resources first
+        java.util.LinkedHashSet<URL> all = new java.util.LinkedHashSet<>();
+        java.util.Enumeration<URL> child = findResources(name);
+        while (child.hasMoreElements()) {
+            all.add(child.nextElement());
+        }
+        // Then parent resources
+        ClassLoader parent = getParent();
+        java.util.Enumeration<URL> parentEnum = parent != null ? parent.getResources(name) : super.getResources(name);
+        while (parentEnum.hasMoreElements()) {
+            all.add(parentEnum.nextElement());
+        }
+        return java.util.Collections.enumeration(all);
+    }
+
+    @Override
+    public java.io.InputStream getResourceAsStream(String name) {
+        URL url = getResource(name);
+        try {
+            return url != null ? url.openStream() : null;
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }

@@ -126,7 +126,11 @@ public class PluginConfiguration extends YamlConfiguration {
         }
         
         // Try to find config.yml in the plugin JAR
-        try (InputStream defaultConfigStream = classLoader.getResourceAsStream("config.yml")) {
+        String resourceName = "config.yml";
+        if (resourceName.startsWith("/")) {
+            resourceName = resourceName.substring(1);
+        }
+        try (InputStream defaultConfigStream = classLoader.getResourceAsStream(resourceName)) {
             if (defaultConfigStream == null) {
                 logger.debug("No default config.yml found in plugin {} JAR", pluginName);
                 return;
