@@ -233,17 +233,28 @@ DiscordBot Core provides two ways to implement configuration migration in your p
 
 ##### Option 1: Separate Migration Class (Recommended)
 
-Create a separate class for handling migration logic and specify it in your `plugin.yml`:
+Create a separate class for handling migration logic and specify it in your main plugin class:
 
-```yaml
-# plugin.yml
-name: MyPlugin
-main: com.example.myplugin.MyPlugin
-version: 1.0.0
-description: Example plugin with separate migration class
-authors:
-  - YourName
-migration-class: com.example.myplugin.MyPluginMigrator
+```java
+package com.example.myplugin;
+
+import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+
+public class MyPlugin extends AbstractPlugin {
+    
+    @Override
+    public Class<? extends ConfigurableMigrationPlugin> getMigrationClass() {
+        return MyPluginMigrator.class;
+    }
+    
+    @Override
+    public void onEnable() {
+        // Your plugin logic here - migration is handled automatically
+        logger.info("Plugin enabled with configuration version: {}", 
+                   getPluginConfig().getConfigVersion());
+    }
+}
 ```
 
 Then create the migration class:
@@ -251,11 +262,11 @@ Then create the migration class:
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.api.plugin.PluginConfigurationMigrator;
+import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
 import fr.farmvivi.discordbot.api.config.Configuration;
 import fr.farmvivi.discordbot.api.config.ConfigurationException;
 
-public class MyPluginMigrator implements PluginConfigurationMigrator {
+public class MyPluginMigrator implements ConfigurableMigrationPlugin {
     
     private static final int CURRENT_CONFIG_VERSION = 2;
     
@@ -307,25 +318,6 @@ public class MyPluginMigrator implements PluginConfigurationMigrator {
             boolean adminPerm = config.getBoolean("permissions.admin", false);
             config.set("permissions.roles.admin.enabled", adminPerm);
         }
-    }
-}
-```
-
-Your main plugin class remains clean:
-
-```java
-package com.example.myplugin;
-
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
-
-public class MyPlugin extends AbstractPlugin {
-    
-    @Override
-    public void onEnable() {
-        // Your plugin logic here
-        // Configuration migration is handled automatically by the separate migrator class
-        logger.info("Plugin enabled with configuration version: {}", 
-                   getPluginConfig().getConfigVersion());
     }
 }
 ```

@@ -151,7 +151,7 @@ public class PluginManager implements PluginLoader, Closeable {
             plugin.onLoad(context);
             
             // Initialize configuration migration after plugin is loaded
-            pluginConfig.initializeMigration(plugin, descriptor);
+            pluginConfig.initializeMigration(plugin);
 
             // Store the classloader
             classLoaders.put(descriptor.name(), classLoader);

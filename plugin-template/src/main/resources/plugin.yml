@@ -5,5 +5,3 @@ description: Template plugin for DiscordBot Core development
 author: YourName
 website: https://github.com/your-username/your-plugin-repo
 dependencies: []
-# Optional: Specify a separate migration class to keep your main plugin class clean
-# migration-class: com.example.plugin.TemplatePluginMigrator

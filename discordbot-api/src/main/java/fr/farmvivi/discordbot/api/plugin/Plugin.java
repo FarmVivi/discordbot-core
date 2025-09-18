@@ -89,4 +89,15 @@ public interface Plugin {
      * @param lifecycle the new lifecycle state
      */
     void setLifecycle(PluginLifecycle lifecycle);
+
+    /**
+     * Gets the migration class for this plugin's configuration.
+     * Plugins can override this method to provide a separate class
+     * that handles configuration migration logic.
+     *
+     * @return the migration class, or null if no separate migration class is used
+     */
+    default Class<? extends ConfigurableMigrationPlugin> getMigrationClass() {
+        return null;
+    }
 }

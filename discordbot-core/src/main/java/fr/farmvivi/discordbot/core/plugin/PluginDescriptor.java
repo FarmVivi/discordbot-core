@@ -19,8 +19,7 @@ public record PluginDescriptor(
         String description,
         List<String> authors,
         List<String> dependencies,
-        List<String> softDependencies,
-        String migrationClass
+        List<String> softDependencies
 ) {
     /**
      * Creates a new plugin descriptor from plugin.yml input stream.
@@ -44,14 +43,12 @@ public record PluginDescriptor(
             List<String> authors = getStringList(values, "authors");
             List<String> dependencies = getStringList(values, "dependencies");
             List<String> softDependencies = getStringList(values, "soft-dependencies");
-            String migrationClass = getString(values, "migration-class", null);
 
             return new PluginDescriptor(
                     name, main, version, description,
                     Collections.unmodifiableList(authors),
                     Collections.unmodifiableList(dependencies),
-                    Collections.unmodifiableList(softDependencies),
-                    migrationClass
+                    Collections.unmodifiableList(softDependencies)
             );
         } catch (Exception e) {
             throw new ConfigurationException("Failed to parse plugin.yml: " + e.getMessage(), e);
