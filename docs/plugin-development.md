@@ -185,6 +185,263 @@ public void onPlayerLevelUp(PlayerLevelUpEvent event) {
 
 ## Configuration
 
+### Automatic Configuration Management
+
+**DiscordBot Core now provides automatic configuration management for plugins:**
+
+#### Default Configuration Files
+
+When your plugin is loaded, the system automatically:
+
+1. **Copies default config**: If no `config.yml` exists in the plugin folder, it copies from your JAR's resources
+2. **Creates directories**: Automatically creates the plugin's data folder structure
+3. **Handles versioning**: Manages configuration versions and migrations automatically
+
+**Best Practice**: Always include a `config.yml` file in your plugin's `src/main/resources/` directory.
+
+#### Configuration Versioning
+
+Include version tracking in your default configuration:
+
+```yaml
+# config.yml in your plugin's resources
+# Configuration version (automatically managed)
+config_version: 1
+
+# Your plugin settings
+gameplay:
+  max_level: 100
+  enable_pvp: false
+  respawn_time: 30
+
+economy:
+  currency: "coins"
+  starting_balance: 1000
+  daily_bonus: 100
+
+messages:
+  welcome: "Welcome to the server!"
+  goodbye: "Thanks for playing!"
+```
+
+#### Migration Support
+
+DiscordBot Core provides two ways to implement configuration migration in your plugin:
+
+1. **Separate Migration Class (Recommended)** - Keeps your main plugin class clean
+2. **Direct Implementation** - Implement migration logic directly in your plugin class
+
+##### Option 1: Separate Migration Class (Recommended)
+
+Create a separate class for handling migration logic and specify it in your main plugin class:
+
+```java
+package com.example.myplugin;
+
+import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+
+public class MyPlugin extends AbstractPlugin {
+    
+    @Override
+    public Class<? extends ConfigurableMigrationPlugin> getMigrationClass() {
+        return MyPluginMigrator.class;
+    }
+    
+    @Override
+    public void onEnable() {
+        // Your plugin logic here - migration is handled automatically
+        logger.info("Plugin enabled with configuration version: {}", 
+                   getPluginConfig().getConfigVersion());
+    }
+}
+```
+
+Then create the migration class:
+
+```java
+package com.example.myplugin;
+
+import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
+
+public class MyPluginMigrator implements ConfigurableMigrationPlugin {
+    
+    private static final int CURRENT_CONFIG_VERSION = 2;
+    
+    @Override
+    public int getExpectedConfigVersion() {
+        return CURRENT_CONFIG_VERSION;
+    }
+    
+    @Override
+    public void migrateConfiguration(Configuration config, int fromVersion, int toVersion) 
+            throws ConfigurationException {
+        // Migrate step by step
+        for (int version = fromVersion; version < toVersion; version++) {
+            switch (version) {
+                case 0 -> migrateFrom0To1(config);
+                case 1 -> migrateFrom1To2(config);
+                // Add more migration cases as needed
+                default -> throw new ConfigurationException("No migration available from version " + version);
+            }
+        }
+    }
+    
+    @Override
+    public void validateConfiguration(Configuration config) throws ConfigurationException {
+        // Validate required settings
+        if (!config.contains("api.endpoint")) {
+            throw new ConfigurationException("Missing required setting: api.endpoint");
+        }
+        
+        // Validate value ranges
+        int maxLevel = config.getInt("gameplay.max_level", 100);
+        if (maxLevel < 1 || maxLevel > 1000) {
+            throw new ConfigurationException("max_level must be between 1 and 1000, got: " + maxLevel);
+        }
+    }
+    
+    private void migrateFrom0To1(Configuration config) throws ConfigurationException {
+        // Example: Add new default settings
+        if (!config.contains("new_feature")) {
+            config.set("new_feature.enabled", true);
+            config.set("new_feature.timeout", 30);
+        }
+    }
+    
+    private void migrateFrom1To2(Configuration config) throws ConfigurationException {
+        // Example: Restructure configuration
+        if (config.contains("permissions")) {
+            // Move flat permissions to hierarchical structure
+            boolean adminPerm = config.getBoolean("permissions.admin", false);
+            config.set("permissions.roles.admin.enabled", adminPerm);
+        }
+    }
+}
+```
+
+##### Option 2: Direct Implementation
+
+Alternatively, you can implement migration logic directly in your plugin class:
+
+```java
+package com.example.myplugin;
+
+import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+import fr.farmvivi.discordbot.api.config.Configuration;
+import fr.farmvivi.discordbot.api.config.ConfigurationException;
+
+public class MyPlugin extends AbstractPlugin implements ConfigurableMigrationPlugin {
+    
+    private static final int CURRENT_CONFIG_VERSION = 2;
+    
+    @Override
+    public int getExpectedConfigVersion() {
+        return CURRENT_CONFIG_VERSION;
+    }
+    
+    @Override
+    public void migrateConfiguration(Configuration config, int fromVersion, int toVersion) 
+            throws ConfigurationException {
+        logger.info("Migrating {} configuration from version {} to {}", getName(), fromVersion, toVersion);
+        
+        // Migrate step by step
+        for (int version = fromVersion; version < toVersion; version++) {
+            switch (version) {
+                case 0 -> migrateFrom0To1(config);
+                case 1 -> migrateFrom1To2(config);
+                // Add more migration cases as needed
+                default -> logger.warn("No migration available from version {}", version);
+            }
+        }
+    }
+    
+    @Override
+    public void validateConfiguration(Configuration config) throws ConfigurationException {
+        // Validate required settings
+        if (!config.contains("api.endpoint")) {
+            throw new ConfigurationException("Missing required setting: api.endpoint");
+        }
+        
+        // Validate value ranges
+        int maxLevel = config.getInt("gameplay.max_level", 100);
+        if (maxLevel < 1 || maxLevel > 1000) {
+            throw new ConfigurationException("max_level must be between 1 and 1000, got: " + maxLevel);
+        }
+        
+        logger.info("Configuration validation passed for plugin {}", getName());
+    }
+    
+    private void migrateFrom0To1(Configuration config) throws ConfigurationException {
+        // Example: Add new default settings
+        if (!config.contains("new_feature")) {
+            config.set("new_feature.enabled", true);
+            config.set("new_feature.timeout", 30);
+        }
+        
+        // Example: Rename old settings
+        if (config.contains("old_setting_name")) {
+            Object value = config.getString("old_setting_name", "default");
+            config.set("new_setting_name", value);
+            // Note: Don't remove old keys here, the system handles cleanup
+        }
+    }
+    
+    private void migrateFrom1To2(Configuration config) throws ConfigurationException {
+        // Example: Restructure configuration
+        if (config.contains("permissions")) {
+            // Move flat permissions to hierarchical structure
+            boolean adminPerm = config.getBoolean("permissions.admin", false);
+            boolean moderatorPerm = config.getBoolean("permissions.moderator", false);
+            
+            config.set("permissions.roles.admin.enabled", adminPerm);
+            config.set("permissions.roles.moderator.enabled", moderatorPerm);
+        }
+    }
+}
+```
+
+#### Migration Best Practices
+
+1. **Always increment versions**: When changing config structure, increment `CURRENT_CONFIG_VERSION`
+2. **Step-by-step migration**: Migrate one version at a time (v0→v1→v2) to ensure data integrity
+3. **Preserve user data**: Never delete user settings without migration
+4. **Test thoroughly**: Test migration with real configuration files
+5. **Log changes**: Provide clear logging during migration process
+6. **Handle errors**: Use try-catch blocks and meaningful error messages
+
+#### Migration Example
+
+```yaml
+# Version 0 (original)
+permissions:
+  admin: true
+  moderator: false
+
+# Version 1 (after migrateFrom0To1)
+permissions:
+  admin: true
+  moderator: false
+new_feature:
+  enabled: true
+  timeout: 30
+
+# Version 2 (after migrateFrom1To2)  
+permissions:
+  roles:
+    admin:
+      enabled: true
+    moderator:
+      enabled: false
+new_feature:
+  enabled: true
+  timeout: 30
+config_version: 2
+```
+
 ### Reading Configuration
 
 ```java
@@ -204,27 +461,53 @@ public void onEnable() {
 ```java
 public void updateSettings(int newMaxLevel) {
     getPluginConfig().set("gameplay.max_level", newMaxLevel);
-    // Configuration is automatically saved
+    // Configuration is automatically saved with version tracking
 }
+```
+
+### Configuration Best Practices
+
+#### For New Plugins
+
+1. **Include Default Config**: Always provide a comprehensive `config.yml` in your JAR's resources
+2. **Start with Version 1**: Use `config_version: 1` in your initial configuration  
+3. **Document Settings**: Include comments explaining each configuration option
+4. **Use Sensible Defaults**: Provide working defaults that require minimal changes
+5. **Implement Migration**: If your plugin needs configuration migration, implement `ConfigurableMigrationPlugin`
+6. **Validate Settings**: Use `validateConfiguration()` to check required settings during plugin initialization
 ```
 
 ### Configuration File Structure
 
+Now handled automatically by the versioning system. Your `config.yml` should include the version and be well-documented:
+
 ```yaml
-# config.yml
+# MyPlugin Configuration 
+# Configuration version (automatically managed)
+config_version: 1
+
+# Gameplay settings
 gameplay:
-  max_level: 100
-  enable_pvp: false
-  respawn_time: 30
+  max_level: 100          # Maximum player level (1-1000)
+  enable_pvp: false       # Allow player vs player combat
+  respawn_time: 30        # Respawn delay in seconds
 
+# Economy settings  
 economy:
-  currency: "coins"
-  starting_balance: 1000
-  daily_bonus: 100
+  currency: "coins"       # Name of the currency
+  starting_balance: 1000  # Starting money for new players
+  daily_bonus: 100        # Daily login bonus
 
+# User interface messages
 messages:
   welcome: "Welcome to the server!"
   goodbye: "Thanks for playing!"
+
+# Advanced settings
+advanced:
+  debug_mode: false       # Enable debug logging
+  cache_size: 1000        # Cache size for performance
+  api_timeout: 30         # API timeout in seconds
 ```
 
 ## Data Storage

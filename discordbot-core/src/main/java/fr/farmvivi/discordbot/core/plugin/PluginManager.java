@@ -124,6 +124,9 @@ public class PluginManager implements PluginLoader, Closeable {
                 eventManager.fireEvent(loadingEvent);
             }
 
+            // Create the plugin configuration
+            PluginConfiguration pluginConfig = new PluginConfiguration(descriptor.name(), classLoader);
+            
             // Create the plugin context
             PluginContextImpl context = new PluginContextImpl(
                     descriptor.name(),
@@ -131,7 +134,7 @@ public class PluginManager implements PluginLoader, Closeable {
                     LoggerFactory.getLogger(descriptor.name()),
                     eventManager,
                     discordAPI,
-                    new PluginConfiguration(descriptor.name()),
+                    pluginConfig,
                     new File(pluginsFolder, descriptor.name()).getAbsolutePath(),
                     this,
                     classLoader,
@@ -146,6 +149,9 @@ public class PluginManager implements PluginLoader, Closeable {
             // Initialize the plugin
             plugin.setLifecycle(PluginLifecycle.LOADED);
             plugin.onLoad(context);
+            
+            // Initialize configuration migration after plugin is loaded
+            pluginConfig.initializeMigration(plugin);
 
             // Store the classloader
             classLoaders.put(descriptor.name(), classLoader);

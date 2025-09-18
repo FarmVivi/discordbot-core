@@ -1,4 +1,5 @@
 # AI Audio Plugin Configuration
+config_version: 1
 
 # API Configuration
 ai:

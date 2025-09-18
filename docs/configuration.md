@@ -1,16 +1,44 @@
 # Configuration Guide
 
-DiscordBot Core uses a flexible YAML-based configuration system with environment variable support and plugin-specific settings.
+DiscordBot Core uses a flexible YAML-based configuration system with **automatic versioning**, **migration support**, environment variable support, and plugin-specific settings.
+
+## Configuration Versioning
+
+### Automatic Version Management
+
+All configuration files (both core and plugins) now include automatic version tracking:
+
+```yaml
+# Configuration version (automatically managed)
+config_version: 1
+```
+
+**Key Features:**
+- **Automatic Migration**: When the bot detects an older configuration version, it automatically migrates to the newer format
+- **Backup Creation**: Before any migration, a timestamped backup is created
+- **Plugin Config Copying**: Plugin configs are automatically copied from JAR files when missing
+- **Validation**: Configuration validation ensures required settings are present
+
+### Version History
+
+- **Version 0**: Legacy configurations without version tracking
+- **Version 1**: Current version with structured YAML and versioning support
 
 ## Core Configuration
 
 ### Main Configuration File (`config.yml`)
 
+The core configuration is automatically created with comprehensive defaults if missing:
+
 ```yaml
+# Discord Bot Core Configuration
+# Configuration version (automatically managed)
+config_version: 1
+
 # Discord Bot Configuration
 discord:
   # Bot token from Discord Developer Portal
-  token: "${DISCORD_TOKEN}"
+  token: "YOUR_BOT_TOKEN"
   
   # Bot activity settings
   activity:
@@ -171,7 +199,42 @@ port: "${DB_PORT:3306}"
 database_url: "jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:discordbot}"
 ```
 
-## Plugin Configuration
+### Automatic Plugin Configuration Management
+
+**DiscordBot Core now automatically manages plugin configurations:**
+
+#### Default Config File Copying
+
+When a plugin is loaded, the system automatically:
+
+1. **Checks for existing config**: If `plugins/{PluginName}/config.yml` exists, it uses that
+2. **Copies from JAR**: If no config exists, it copies the default `config.yml` from the plugin's JAR file
+3. **Creates plugin folder**: Automatically creates the plugin's data folder if needed
+4. **Logs the process**: Provides clear logging about configuration management
+
+#### Plugin Configuration Versioning
+
+Each plugin configuration includes version tracking:
+
+```yaml
+# Example Plugin Configuration
+# Configuration version (automatically managed)  
+config_version: 1
+
+# Plugin-specific settings
+plugin_settings:
+  feature_enabled: true
+  max_items: 100
+```
+
+#### Migration Process
+
+When a plugin's configuration version is outdated:
+
+1. **Backup Creation**: A timestamped backup is created (e.g., `config.yml.backup.1640995200000`)
+2. **Step-by-step Migration**: Configurations are migrated incrementally (v1→v2→v3)
+3. **Error Handling**: Migration stops on errors to prevent data corruption
+4. **Logging**: Detailed logs show the migration progress
 
 ### Plugin-Specific Settings
 
@@ -507,13 +570,76 @@ java -jar discordbot-core.jar --migrate-config
 java -jar discordbot-core.jar --validate-config
 ```
 
+### Automatic Configuration Migration
+
+**DiscordBot Core now provides automatic configuration migration with the following features:**
+
+#### Migration Process
+
+1. **Version Detection**: The system automatically detects configuration versions
+2. **Backup Creation**: Before any migration, backups are created with timestamps
+3. **Step-by-step Migration**: Configurations are migrated incrementally to prevent data loss
+4. **Validation**: Post-migration validation ensures configurations are valid
+5. **Rollback Support**: Backups allow manual rollback if needed
+
+#### Migration Commands
+
+While migration is automatic, you can also trigger manual operations:
+
+```bash
+# Force configuration validation
+java -jar discordbot-core.jar --validate-config
+
+# Show current configuration versions
+java -jar discordbot-core.jar --show-config-versions
+
+# Create manual backup (optional)
+cp config.yml config.yml.manual.backup
+```
+
+#### Migration Logging
+
+The system provides detailed logging during migrations:
+
+```
+[INFO] Core configuration version 0 detected, migrating to version 1
+[INFO] Created configuration backup at config.yml.backup.1640995200000
+[INFO] Applied migration 0 -> 1 for core configuration
+[INFO] Successfully migrated core configuration to version 1
+[INFO] Plugin MusicBot configuration version 0 detected, migrating to version 1  
+[INFO] Applied migration 0 -> 1 for plugin MusicBot
+[INFO] Successfully migrated plugin MusicBot configuration to version 1
+```
+
 ### Version Compatibility
 
 Each version of DiscordBot Core supports specific configuration schema versions:
 
 ```yaml
 # Configuration version (automatically managed)
-config_version: "2.3.0"
+config_version: 1
 
 # Compatibility warnings will be shown for older versions
 ```
+
+**Migration Path:**
+- **Version 0** (Legacy): Configurations without version tracking
+- **Version 1** (Current): Structured configurations with full versioning support
+
+### Best Practices for Configuration Management
+
+#### For Plugin Developers
+
+1. **Include Default Config**: Always include a `config.yml` in your plugin JAR's resources
+2. **Version Your Config**: Start with `config_version: 1` in your default configuration
+3. **Plan Migrations**: When changing config structure, increment the version and plan migration logic
+4. **Validate Settings**: Use the configuration API to validate required settings
+5. **Document Changes**: Clearly document configuration changes in your plugin's README
+
+#### For Bot Administrators
+
+1. **Backup Regularly**: While automatic backups are created, maintain regular manual backups
+2. **Test Migrations**: Test configuration migrations in a development environment first
+3. **Monitor Logs**: Watch for migration warnings and errors in bot logs
+4. **Environment Variables**: Use environment variables for sensitive settings like tokens
+5. **Version Control**: Consider using version control for your configuration files
