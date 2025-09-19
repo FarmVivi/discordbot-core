@@ -11,20 +11,20 @@ commands:
     enabled: true
     description: "Simple ping-pong command"
     cooldown: 3  # seconds
-    
+
   # Echo command with arguments
   echo:
     enabled: true
     description: "Echo back user input"
     max_length: 200
     cooldown: 5
-    
+
   # Info command with embeds
   info:
     enabled: true
     description: "Show bot and plugin information"
     show_detailed: false
-    
+
   # Admin-only command
   admin:
     enabled: true

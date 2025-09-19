@@ -223,4 +223,13 @@ public abstract class AbstractPlugin implements Plugin {
     public boolean isEnabled() {
         return lifecycle == PluginLifecycle.ENABLED;
     }
+
+    /**
+     * Gets the SLF4J logger for this plugin.
+     *
+     * @return the logger instance
+     */
+    public Logger getLogger() {
+        return logger;
+    }
 }

@@ -9,13 +9,13 @@ import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
  * This command can be enabled/disabled via configuration.
  */
 public class ExampleCommand {
-    
+
     private final AbstractPlugin plugin;
-    
+
     public ExampleCommand(AbstractPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     /**
      * Execute the example command.
      * Demonstrates basic command handling with i18n support.
@@ -25,7 +25,7 @@ public class ExampleCommand {
         if (!plugin.getConfiguration().getBoolean("commands.enabled", true)) {
             return CommandResult.error("Commands are disabled");
         }
-        
+
         // Check permissions (example)
         if (!plugin.getPluginPermissionManager().hasPermission(
                 context.getUser().getId(), "template.use")) {
@@ -34,15 +34,15 @@ public class ExampleCommand {
             context.reply(message);
             return CommandResult.error("No permission");
         }
-        
+
         // Get localized message
         String response = plugin.getPluginLanguageManager()
                 .getString("messages.example_message");
-        
+
         context.reply(response);
-        plugin.logger.info("Example command executed by user: {}", 
-                          context.getUser().getAsTag());
-        
+        plugin.getLogger().info("Example command executed by user: {}",
+                context.getUser().getAsTag());
+
         return CommandResult.success();
     }
 }

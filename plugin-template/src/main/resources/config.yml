@@ -90,7 +90,7 @@ example:
   advanced_mode: false
   
   # Example list setting
-  allowed_channels: []
+  allowed_channels: [ ]
   
   # Example object setting
   limits:

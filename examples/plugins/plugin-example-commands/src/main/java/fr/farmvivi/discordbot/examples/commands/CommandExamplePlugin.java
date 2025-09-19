@@ -1,6 +1,6 @@
 package fr.farmvivi.discordbot.examples.commands;
 
-import fr.farmvivi.discordbot.api.command.CommandBuilder;
+import fr.farmvivi.discordbot.api.command.Command;
 import fr.farmvivi.discordbot.api.command.CommandContext;
 import fr.farmvivi.discordbot.api.command.CommandResult;
 import fr.farmvivi.discordbot.api.permissions.Permission;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Example plugin demonstrating comprehensive command system features.
- * 
+ * <p>
  * This plugin showcases:
  * - Slash command registration and handling
  * - Command permissions and cooldowns
@@ -57,8 +57,8 @@ public class CommandExamplePlugin extends AbstractPlugin {
     @Override
     public void onDisable() {
         super.onDisable();
-        logger.info("Command Example Plugin disabled. Total commands executed: {}", 
-                   commandExecutionCount.get());
+        logger.info("Command Example Plugin disabled. Total commands executed: {}",
+                commandExecutionCount.get());
     }
 
     /**
@@ -125,8 +125,8 @@ public class CommandExamplePlugin extends AbstractPlugin {
     private void registerPingCommand() {
         commandService.registerCommand(this, builder -> {
             builder.name("ping")
-                   .description(getPluginLanguageManager().getString("ping.description"))
-                   .executor(this::executePingCommand);
+                    .description(getPluginLanguageManager().getString("ping.description"))
+                    .executor(this::executePingCommand);
         });
     }
 
@@ -136,12 +136,9 @@ public class CommandExamplePlugin extends AbstractPlugin {
     private void registerEchoCommand() {
         commandService.registerCommand(this, builder -> {
             builder.name("echo")
-                   .description(getPluginLanguageManager().getString("echo.description"))
-                   .addStringOption(option -> 
-                       option.name("message")
-                             .description("Message to echo back")
-                             .required(true))
-                   .executor(this::executeEchoCommand);
+                    .description(getPluginLanguageManager().getString("echo.description"))
+                    .stringOption("message", "Message to echo back", true)
+                    .executor(this::executeEchoCommand);
         });
     }
 
@@ -151,8 +148,8 @@ public class CommandExamplePlugin extends AbstractPlugin {
     private void registerInfoCommand() {
         commandService.registerCommand(this, builder -> {
             builder.name("info")
-                   .description(getPluginLanguageManager().getString("info.description"))
-                   .executor(this::executeInfoCommand);
+                    .description(getPluginLanguageManager().getString("info.description"))
+                    .executor(this::executeInfoCommand);
         });
     }
 
@@ -162,15 +159,15 @@ public class CommandExamplePlugin extends AbstractPlugin {
     private void registerAdminCommand() {
         commandService.registerCommand(this, builder -> {
             builder.name("admin")
-                   .description(getPluginLanguageManager().getString("admin.description"))
-                   .executor(this::executeAdminCommand);
+                    .description(getPluginLanguageManager().getString("admin.description"))
+                    .executor(this::executeAdminCommand);
         });
     }
 
     /**
      * Executes the ping command.
      */
-    private CommandResult executePingCommand(CommandContext context, Object command) {
+    private CommandResult executePingCommand(CommandContext context, Command command) {
         // Check cooldown
         if (isOnCooldown(context, "ping")) {
             return CommandResult.error("On cooldown");
@@ -185,7 +182,7 @@ public class CommandExamplePlugin extends AbstractPlugin {
         // Send response
         if (getConfiguration().getBoolean("responses.use_embeds", true)) {
             MessageEmbed embed = createSimpleEmbed("🏓 Ping", response, Color.GREEN);
-            context.replyEmbeds(embed);
+            context.replyEmbed(new EmbedBuilder(embed));
         } else {
             context.reply(response);
         }
@@ -201,15 +198,15 @@ public class CommandExamplePlugin extends AbstractPlugin {
     /**
      * Executes the echo command.
      */
-    private CommandResult executeEchoCommand(CommandContext context, Object command) {
+    private CommandResult executeEchoCommand(CommandContext context, Command command) {
         // Check cooldown
         if (isOnCooldown(context, "echo")) {
             return CommandResult.error("On cooldown");
         }
 
         // Get message argument
-        String message = context.getOption("message", String.class, "");
-        
+        String message = context.getOption("message", "");
+
         if (message.isEmpty()) {
             String errorMsg = getPluginLanguageManager().getString("echo.no_message");
             context.reply(errorMsg);
@@ -233,7 +230,7 @@ public class CommandExamplePlugin extends AbstractPlugin {
         // Send response
         if (getConfiguration().getBoolean("responses.use_embeds", true)) {
             MessageEmbed embed = createSimpleEmbed("📢 Echo", response, Color.BLUE);
-            context.replyEmbeds(embed);
+            context.replyEmbed(new EmbedBuilder(embed));
         } else {
             context.reply(response);
         }
@@ -244,7 +241,7 @@ public class CommandExamplePlugin extends AbstractPlugin {
     /**
      * Executes the info command.
      */
-    private CommandResult executeInfoCommand(CommandContext context, Object command) {
+    private CommandResult executeInfoCommand(CommandContext context, Command command) {
         // Increment statistics
         commandExecutionCount.incrementAndGet();
 
@@ -260,28 +257,28 @@ public class CommandExamplePlugin extends AbstractPlugin {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle(getPluginLanguageManager().getString("info.title"));
         embed.setColor(getEmbedColor());
-        
+
         embed.addField("📌 " + getPluginLanguageManager().getString("info.version", getVersion()), "", false);
         embed.addField("⏰ " + getPluginLanguageManager().getString("info.uptime", uptime), "", false);
         embed.addField("📊 " + getPluginLanguageManager().getString("info.commands_executed", commandExecutionCount.get()), "", false);
         embed.addField("💾 " + getPluginLanguageManager().getString("info.memory_usage", memoryUsed), "", false);
 
         if (getConfiguration().getBoolean("commands.info.show_detailed", false)) {
-            embed.addField("🔧 Configuration", "Enabled: " + getConfiguration().getBoolean("enabled"), false);
-            embed.addField("🌐 Language", getPluginLanguageManager().getDefaultLocale().toString(), false);
+            embed.addField("🔧 Configuration", "Enabled: " + getConfiguration().getBoolean("enabled", false), false);
+            embed.addField("🌐 Language", languageManager.getDefaultLocale().toString(), false);
         }
 
         embed.setFooter("Command Example Plugin", null);
         embed.setTimestamp(java.time.Instant.now());
 
-        context.replyEmbeds(embed.build());
+        context.replyEmbed(embed);
         return CommandResult.success();
     }
 
     /**
      * Executes the admin command.
      */
-    private CommandResult executeAdminCommand(CommandContext context, Object command) {
+    private CommandResult executeAdminCommand(CommandContext context, Command command) {
         // Check permissions
         if (!getPluginPermissionManager().hasPermission(context.getUser().getId(), "commandexample.admin")) {
             String errorMsg = getPluginLanguageManager().getString("admin.no_permission");
@@ -297,7 +294,7 @@ public class CommandExamplePlugin extends AbstractPlugin {
 
         // Send response
         MessageEmbed embed = createSimpleEmbed("🔧 Admin", response, Color.ORANGE);
-        context.replyEmbeds(embed);
+        context.replyEmbed(new EmbedBuilder(embed));
 
         // Log admin command usage
         logger.info("Admin command executed by: {}", context.getUser().getAsTag());
@@ -373,7 +370,8 @@ public class CommandExamplePlugin extends AbstractPlugin {
     /**
      * Simple permission implementation.
      */
-    private record SimplePermission(String name, String description, PermissionDefault defaultValue) implements Permission {
+    private record SimplePermission(String name, String description,
+                                    PermissionDefault defaultValue) implements Permission {
         @Override
         public String getName() {
             return name;

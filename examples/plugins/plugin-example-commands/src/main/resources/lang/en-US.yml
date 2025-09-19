@@ -3,13 +3,13 @@ commands:
   ping:
     description: "Check if the bot is responsive"
     response: "🏓 Pong! Bot is online and responsive."
-    
+
   echo:
     description: "Echo back your message"
     response: "📢 You said: {0}"
     no_message: "Please provide a message to echo!"
     too_long: "Message too long! Maximum {0} characters allowed."
-    
+
   info:
     description: "Display bot and plugin information"
     title: "Command Example Plugin"
@@ -17,7 +17,7 @@ commands:
     uptime: "Uptime: {0}"
     commands_executed: "Commands executed: {0}"
     memory_usage: "Memory usage: {0}MB"
-    
+
   admin:
     description: "Administrative command (admin only)"
     response: "🔧 Admin command executed successfully!"
@@ -30,7 +30,7 @@ commands:
     disabled: "🚫 This command is currently disabled."
     loading: "⌛ Processing your command..."
     success: "✅ Command executed successfully!"
-    
+
   # Help messages
   help:
     title: "Command Example Plugin - Help"
@@ -38,7 +38,7 @@ commands:
     available_commands: "Available Commands:"
     command_format: "`/{0}` - {1}"
     footer: "Use /{0} <command> for detailed information about a specific command."
-    
+
   # Error messages
   errors:
     not_found: "❌ Command not found."
@@ -46,7 +46,7 @@ commands:
     invalid_arguments: "❌ Invalid arguments provided."
     execution_failed: "❌ Command execution failed: {0}"
     cooldown_active: "⏳ Command is on cooldown. Try again in {0} seconds."
-    
+
   # Status messages  
   status:
     enabled: "✅ Plugin is enabled and ready!"

@@ -68,7 +68,7 @@ public class TemplatePlugin extends AbstractPlugin {
     public void onLoad(fr.farmvivi.discordbot.api.plugin.PluginContext context) {
         super.onLoad(context);
         logger.info("Loading {} v{}", getName(), getVersion());
-        
+
         // Early initialization - minimal setup only
         loadFeatureFlags();
     }
@@ -81,7 +81,7 @@ public class TemplatePlugin extends AbstractPlugin {
     public void onPreEnable() {
         super.onPreEnable();
         logger.info("Pre-enabling {} v{}", getName(), getVersion());
-        
+
         // Register permissions
         registerPermissions();
     }
@@ -199,14 +199,14 @@ public class TemplatePlugin extends AbstractPlugin {
 
         // Example: React to messages containing the plugin name (if configured)
         if (getConfiguration().getBoolean("features.respond_to_mentions", false) &&
-            event.getMessage().getContentRaw().toLowerCase().contains("template")) {
-            
+                event.getMessage().getContentRaw().toLowerCase().contains("template")) {
+
             // React with an emoji
             event.getMessage().addReaction(Emoji.fromUnicode("👋")).queue();
-            
+
             // Log the interaction
-            logger.debug("Reacted to message mentioning template from user: {}", 
-                        event.getAuthor().getAsTag());
+            logger.debug("Reacted to message mentioning template from user: {}",
+                    event.getAuthor().getAsTag());
         }
     }
 
@@ -220,7 +220,7 @@ public class TemplatePlugin extends AbstractPlugin {
             exampleStorageEnabled = getConfiguration().getBoolean("features.example_storage", false);
 
             logger.debug("Feature flags loaded - Commands: {}, Events: {}, Storage: {}",
-                        exampleCommandsEnabled, exampleEventsEnabled, exampleStorageEnabled);
+                    exampleCommandsEnabled, exampleEventsEnabled, exampleStorageEnabled);
         } catch (Exception e) {
             logger.warn("Failed to load feature flags, using defaults", e);
             exampleCommandsEnabled = false;
@@ -291,8 +291,8 @@ public class TemplatePlugin extends AbstractPlugin {
         // Register example command using CommandService
         commandService.registerCommand(this, builder -> {
             builder.name("template-example")
-                   .description(getPluginLanguageManager().getString("commands.example"))
-                   .executor((context, cmd) -> exampleCommand.execute(context));
+                    .description(getPluginLanguageManager().getString("commands.example"))
+                    .executor((context, cmd) -> exampleCommand.execute(context));
         });
 
         logger.info("Example commands registered");
@@ -349,7 +349,7 @@ public class TemplatePlugin extends AbstractPlugin {
         try {
             // Example: Check configuration version for migrations
             int configVersion = getConfiguration().getInt("config_version", 1);
-            
+
             if (configVersion < 1) {
                 logger.info("Performing data migration to version 1");
                 // Perform migration logic here
