@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -267,6 +268,8 @@ public class AudioExamplePlugin extends AbstractPlugin {
                 AudioInputStream source = AudioSystem.getAudioInputStream(audioFile);
                 AudioFormat target = new AudioFormat(48000f, 16, 2, true, false);
                 this.pcmStream = AudioSystem.getAudioInputStream(target, source);
+                LOG.info("Opened '{}' -> converted to {} Hz, {}-bit, {} channels, little-endian",
+                        audioFile.getName(), (int) target.getSampleRate(), target.getSampleSizeInBits(), target.getChannels());
             } catch (UnsupportedAudioFileException | IOException e) {
                 LOG.error("Failed to open audio file for playback: {}", audioFile.getAbsolutePath(), e);
                 done = true;
@@ -296,8 +299,8 @@ public class AudioExamplePlugin extends AbstractPlugin {
                     for (int i = read; i < FRAME_SIZE; i++) frameBuffer[i] = 0;
                     done = true;
                 }
-                // clone since we reuse the array
-                lastBuffer = ByteBuffer.wrap(frameBuffer.clone());
+                // clone since we reuse the array, and ensure little-endian order
+                lastBuffer = ByteBuffer.wrap(frameBuffer.clone()).order(ByteOrder.LITTLE_ENDIAN);
                 return true;
             } catch (IOException e) {
                 LOG.error("I/O error while reading audio data", e);
@@ -416,9 +419,15 @@ public class AudioExamplePlugin extends AbstractPlugin {
         public void handleCombinedAudio(CombinedAudio combinedAudio) {
             if (raf == null) return;
             try {
-                byte[] audio = combinedAudio.getAudioData(1.0); // Volume normal
-                raf.write(audio);
-                dataSize += audio.length;
+                byte[] be = combinedAudio.getAudioData(1.0); // BigEndian PCM per JDA docs
+                // Convertit en little-endian pour WAV
+                for (int i = 0; i + 1 < be.length; i += 2) {
+                    byte hi = be[i];
+                    be[i] = be[i + 1];
+                    be[i + 1] = hi;
+                }
+                raf.write(be);
+                dataSize += be.length;
             } catch (IOException e) {
                 LOG.error("Erreur d'écriture des données audio dans {}", outputFile.getAbsolutePath(), e);
             }

@@ -193,14 +193,15 @@ Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.disco
 
 ## Performances et considérations techniques
 
-- Le système utilise un mode "bypass" efficace lorsqu'une seule source est active
-- Le mixage PCM est optimisé pour les performances
-- Les fondus sont calculés de manière progressive pour des transitions douces
-- Le système est thread-safe et adapté aux environnements multi-threads
-- Le décodage/encodage Opus est géré automatiquement
+- Convention de format interne: fournissez du PCM Little-Endian 48 kHz, 16-bit, stéréo, par trames de 20 ms (3840 octets). Le pipeline convertit en Big-Endian uniquement à la frontière JDA.
+- Le système utilise un mode "bypass" efficace lorsqu'une seule source est active.
+- Le mixage PCM est optimisé (somme en int, clipping dur) et évite les copies inutiles.
+- Les fondus sont calculés de manière progressive pour des transitions douces.
+- Le système est thread-safe et adapté aux environnements multi-threads.
+- Le décodage/encodage Opus est géré automatiquement par JDA côté envoi si `isOpus()==false`.
 
 ## Restrictions
 
 - Le système utilise uniquement les fonctionnalités audio de JDA, sans dépendances externes
-- Chaque frame audio a une durée fixe de 20ms (standard pour Discord)
-- Format audio : PCM 48kHz 16-bit stéréo (ou Opus encodé)
+- Chaque frame audio a une durée fixe de 20ms (standard pour Discord).
+- Format attendu côté handlers: PCM 48kHz 16-bit stéréo, Little-Endian (ou Opus encodé si `isOpus()==true`).

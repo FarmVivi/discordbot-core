@@ -24,6 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
     private static final Logger logger = LoggerFactory.getLogger(AudioPipeline.class);
+    private static final int FRAME_SIZE_BYTES = 3840; // 20ms @ 48kHz, 2ch, 16-bit
 
     // Constantes pour le fondu audio
     private static final int FADE_DURATION_MS = 200;
@@ -38,11 +39,17 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
     // Mixeur et état
     private final AudioMixer mixer;
     private final ReentrantLock strategyLock = new ReentrantLock();
+    // Cache par frame
+    private final Map<String, Boolean> frameCanProvide = new ConcurrentHashMap<>();
+    // Buffer BE réutilisable unique pour 20ms (simplifié)
+    private final byte[] beFrameBuffer = new byte[FRAME_SIZE_BYTES];
     private Strategy currentStrategy = Strategy.DIRECT_BYPASS;
     private int priorityThreshold = AudioService.DEFAULT_PRIORITY_THRESHOLD;
     // État cache
     private String lastActivePluginName = null;
-    private boolean providedAudioLastFrame = false;
+    private String selectedBypassPluginName = null;
+    private boolean bypassModeComputed = true;
+
     /**
      * Crée un nouveau pipeline audio pour une guilde.
      *
@@ -60,6 +67,52 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         guild.getAudioManager().setReceivingHandler(this);
 
         logger.debug("Created audio pipeline for guild {}", guild.getName());
+    }
+
+    /**
+     * Convertit une trame PCM little-endian en BigEndian 20ms (3840 octets) dans un buffer réutilisable.
+     * - Swap par échantillon 16-bit (LE -> BE)
+     * - Tronque/Pad pour assurer exactement 3840 octets
+     * - Retourne un ByteBuffer array-backed pointant sur le buffer interne réutilisé
+     */
+    private ByteBuffer ensureBigEndianFrame(ByteBuffer le) {
+        // Lecture: s'assurer d'un tableau source
+        byte[] src;
+        int srcOff;
+        int len = le.remaining();
+        if (le.hasArray()) {
+            src = le.array();
+            srcOff = le.arrayOffset() + le.position();
+        } else {
+            // Copier minimalement vers un tampon temporaire local
+            src = new byte[len];
+            int pos = le.position();
+            le.get(src);
+            le.position(pos);
+            srcOff = 0;
+        }
+
+        // Utilise le buffer BE réutilisable unique
+        byte[] dst = beFrameBuffer;
+
+        int copy = Math.min(len, FRAME_SIZE_BYTES);
+        int i = 0;
+        // Conversion LE->BE pour la partie à copier
+        for (; i + 1 < copy; i += 2) {
+            byte lo = src[srcOff + i];
+            byte hi = src[srcOff + i + 1];
+            dst[i] = hi;
+            dst[i + 1] = lo;
+        }
+        // Si nombre impair (ne devrait pas arriver), compléter le dernier octet par 0
+        if ((copy & 1) == 1) {
+            dst[copy - 1] = 0;
+        }
+        // Padding si nécessaire
+        for (; i < FRAME_SIZE_BYTES; i++) {
+            dst[i] = 0;
+        }
+        return ByteBuffer.wrap(dst);
     }
 
     /**
@@ -221,6 +274,10 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         logger.debug("Closed audio pipeline for guild {}", guild.getName());
     }
 
+    //
+    // Implémentation de AudioSendHandler
+    //
+
     /**
      * Met à jour la stratégie de traitement audio en fonction du nombre de sources.
      */
@@ -243,68 +300,75 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
     public boolean canProvide() {
         strategyLock.lock();
         try {
-            // Détermine si une source fournit de l'audio
-            if (currentStrategy == Strategy.DIRECT_BYPASS) {
-                // Mode bypass : une seule source
-                if (sendHandlers.isEmpty()) {
-                    return false;
+            // Réinitialise le cache du frame
+            frameCanProvide.clear();
+            selectedBypassPluginName = null;
+
+            bypassModeComputed = true;
+
+            if (sendHandlers.isEmpty()) return false;
+
+            // Évalue chaque source pour ce frame (un seul appel canProvide par frame et par source)
+            int pcmActive = 0;
+            String singlePcmPlugin = null;
+
+
+            boolean highPriorityActive = false;
+            String highPriorityPluginName = null;
+
+            for (Map.Entry<String, SourceHandler> entry : sendHandlers.entrySet()) {
+                String pluginName = entry.getKey();
+                SourceHandler sourceHandler = entry.getValue();
+                AudioSendHandler handler = sourceHandler.getHandler();
+
+                boolean can = handler.canProvide();
+                frameCanProvide.put(pluginName, can);
+                if (!can) continue;
+
+                if (!handler.isOpus()) {
+                    pcmActive++;
+                    singlePcmPlugin = pluginName; // si 1 seul, ce sera celui-ci
                 }
 
-                // La seule source existante
-                SourceHandler sourceHandler = sendHandlers.values().iterator().next();
-                return sourceHandler.getHandler().canProvide();
+                // Détection haute priorité (sur toute source, utile pour fade)
+                int priority = sourceHandler.getPriority();
+                if (priority >= priorityThreshold) {
+                    highPriorityActive = true;
+                    highPriorityPluginName = pluginName;
+                }
+            }
+
+            // Choix de stratégie dynamique
+            if (pcmActive >= 2) {
+                // Mixage PCM
+                bypassModeComputed = false;
+            } else if (pcmActive == 1) {
+                // Bypass d'une unique source PCM
+                selectedBypassPluginName = singlePcmPlugin;
+                bypassModeComputed = true;
             } else {
-                // Mode mixage : plusieurs sources
-                boolean canProvide = false;
+                // Rien à fournir
+                return false;
+            }
 
-                // Préparation pour la détection de sources prioritaires
-                boolean highPriorityActive = false;
-                String highPriorityPluginName = null;
-
-                // Vérifie chaque source
-                for (Map.Entry<String, SourceHandler> entry : sendHandlers.entrySet()) {
-                    String pluginName = entry.getKey();
-                    SourceHandler sourceHandler = entry.getValue();
-                    AudioSendHandler handler = sourceHandler.getHandler();
-
-                    // Vérifie si ce handler peut fournir de l'audio
-                    if (handler.canProvide()) {
-                        canProvide = true;
-
-                        // Détecte les sources de haute priorité
-                        int priority = sourceHandler.getPriority();
-                        if (priority >= priorityThreshold) {
-                            highPriorityActive = true;
-                            highPriorityPluginName = pluginName;
-
-                            // Si un plugin de haute priorité devient actif, démarre le fade out des autres
-                            if (lastActivePluginName == null || !lastActivePluginName.equals(pluginName)) {
-                                startFade(pluginName);
-                            }
-                            break;
-                        }
-                    }
+            // Gestion des fades selon la haute priorité détectée
+            if (highPriorityActive) {
+                if (lastActivePluginName == null || !lastActivePluginName.equals(highPriorityPluginName)) {
+                    startFade(highPriorityPluginName);
                 }
-
-                // Si aucune source de haute priorité n'est active et qu'il y en avait une avant,
-                // démarre le fade in pour toutes les sources
-                if (!highPriorityActive && lastActivePluginName != null) {
+                lastActivePluginName = highPriorityPluginName;
+            } else {
+                if (lastActivePluginName != null) {
                     startFadeIn();
                 }
-
-                // Met à jour l'état du dernier plugin actif
-                lastActivePluginName = highPriorityActive ? highPriorityPluginName : null;
-
-                return canProvide;
+                lastActivePluginName = null;
             }
+
+            return true;
         } finally {
             strategyLock.unlock();
         }
     }
-
-    //
-    // Implémentation de AudioSendHandler
-    //
 
     @Override
     public ByteBuffer provide20MsAudio() {
@@ -312,51 +376,51 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         try {
             ByteBuffer audio;
             int activeSourceCount = 0;
-            boolean bypassMode = currentStrategy == Strategy.DIRECT_BYPASS;
+            boolean bypassMode = bypassModeComputed;
 
             if (bypassMode) {
-                // Mode bypass : transmet directement l'audio d'une seule source
-                if (sendHandlers.isEmpty()) {
+                // Mode bypass dynamique: plugin sélectionné dans canProvide()
+                if (selectedBypassPluginName == null) {
                     audio = null;
                 } else {
-                    SourceHandler sourceHandler = sendHandlers.values().iterator().next();
-                    AudioSendHandler handler = sourceHandler.getHandler();
-
-                    if (handler.canProvide()) {
+                    SourceHandler sourceHandler = sendHandlers.get(selectedBypassPluginName);
+                    AudioSendHandler handler = sourceHandler != null ? sourceHandler.getHandler() : null;
+                    if (handler != null && Boolean.TRUE.equals(frameCanProvide.get(selectedBypassPluginName))) {
                         audio = handler.provide20MsAudio();
-                        activeSourceCount = 1;
+                        activeSourceCount = (audio != null ? 1 : 0);
                     } else {
                         audio = null;
                     }
                 }
             } else {
-                // Mode mixage : mixe plusieurs sources
+                // Mode mixage PCM
                 mixer.reset();
 
-                // Traite chaque source
                 for (Map.Entry<String, SourceHandler> entry : sendHandlers.entrySet()) {
                     String pluginName = entry.getKey();
                     SourceHandler sourceHandler = entry.getValue();
                     AudioSendHandler handler = sourceHandler.getHandler();
 
-                    // Ajoute l'audio de cette source si disponible
-                    if (handler.canProvide()) {
-                        ByteBuffer sourceAudio = handler.provide20MsAudio();
-                        if (sourceAudio != null) {
-                            // Calcule le volume effectif en tenant compte des fades
-                            float effectiveVolume = calculateEffectiveVolume(pluginName, sourceHandler);
-
-                            // Ajoute au mixeur
-                            mixer.addSource(sourceAudio, effectiveVolume);
-                            activeSourceCount++;
-                        }
+                    // Uniquement les sources PCM actives selon le cache
+                    if (handler.isOpus()) {
+                        priorityManager.updateFade(pluginName);
+                        continue;
+                    }
+                    if (!Boolean.TRUE.equals(frameCanProvide.get(pluginName))) {
+                        priorityManager.updateFade(pluginName);
+                        continue;
                     }
 
-                    // Mets à jour l'état des fades
+                    ByteBuffer sourceAudio = handler.provide20MsAudio();
+                    if (sourceAudio != null) {
+                        float effectiveVolume = calculateEffectiveVolume(pluginName, sourceHandler);
+                        mixer.addSource(sourceAudio, effectiveVolume);
+                        activeSourceCount++;
+                    }
+
                     priorityManager.updateFade(pluginName);
                 }
 
-                // Obtient l'audio mixé
                 audio = mixer.mix();
             }
 
@@ -365,9 +429,12 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             AudioFrameMixedEvent event = new AudioFrameMixedEvent(guild, activeSourceCount, bypassMode, containsAudio);
             eventManager.fireEvent(event);
 
-            // Met à jour l'état
-            providedAudioLastFrame = containsAudio;
+            // Met à jour l'état (aucun autre état persistant requis ici)
 
+            // JDA attend du PCM BigEndian si isOpus() == false
+            if (audio != null) {
+                return ensureBigEndianFrame(audio);
+            }
             return audio;
         } finally {
             strategyLock.unlock();
@@ -376,13 +443,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
 
     @Override
     public boolean isOpus() {
-        // En mode bypass, utilise le format d'origine
-        if (currentStrategy == Strategy.DIRECT_BYPASS && !sendHandlers.isEmpty()) {
-            SourceHandler sourceHandler = sendHandlers.values().iterator().next();
-            return sourceHandler.getHandler().isOpus();
-        }
-
-        // En mode mixage, utilise toujours PCM (JDA se chargera de l'encodage)
+        // Le pipeline fournit toujours du PCM; JDA gère l'encodage Opus
         return false;
     }
 

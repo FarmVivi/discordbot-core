@@ -23,7 +23,7 @@ public class AudioMixer {
 
     // Buffer de sortie
     private final short[] mixBuffer = new short[FRAME_SIZE / BYTES_PER_SAMPLE];
-    private final ByteBuffer outputBuffer = ByteBuffer.allocate(FRAME_SIZE).order(ByteOrder.BIG_ENDIAN);
+    private final ByteBuffer outputBuffer = ByteBuffer.allocate(FRAME_SIZE).order(ByteOrder.LITTLE_ENDIAN);
 
     // Liste des sources pour ce frame
     private final List<SourceFrame> sources = new ArrayList<>();
@@ -77,8 +77,8 @@ public class AudioMixer {
                 if (buffer.remaining() >= BYTES_PER_SAMPLE) {
                     short sample = buffer.getShort();
                     // Applique le volume
-                    sample = (short) (sample * source.getVolume());
-                    sum += sample;
+                    float scaled = sample * source.getVolume();
+                    sum += (int) scaled;
                 }
             }
 
@@ -93,13 +93,15 @@ public class AudioMixer {
         // Remplit le buffer de sortie
         outputBuffer.clear();
         for (short sample : mixBuffer) {
-            outputBuffer.putShort(sample);
+            // Écrit explicitement en little-endian
+            outputBuffer.put((byte) (sample & 0xFF));
+            outputBuffer.put((byte) ((sample >> 8) & 0xFF));
         }
 
         // Prépare le buffer pour la lecture
         outputBuffer.flip();
-
-        return outputBuffer;
+        // Retourne une vue en lecture seule pour éviter toute mutation externe
+        return outputBuffer.asReadOnlyBuffer();
     }
 
     /**
@@ -117,7 +119,8 @@ public class AudioMixer {
          */
         public SourceFrame(ByteBuffer buffer, float volume) {
             // Crée une copie du buffer pour pouvoir le modifier sans affecter l'original
-            this.buffer = buffer.duplicate().order(ByteOrder.BIG_ENDIAN);
+            // Standardise en PCM little-endian (conforme attentes JDA)
+            this.buffer = buffer.duplicate().order(ByteOrder.LITTLE_ENDIAN);
             this.volume = volume;
         }
 
