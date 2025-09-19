@@ -13,10 +13,16 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -250,45 +256,53 @@ public class AudioExamplePlugin extends AbstractPlugin {
      * Exemple d'un handler d'envoi audio qui lit un fichier audio.
      */
     private static class MySendHandler implements AudioSendHandler {
-        private final File audioFile;
-        private FileInputStream stream;
-        private byte[] buffer;
-        private int bufferIndex = 0;
+        private static final Logger LOG = LoggerFactory.getLogger(MySendHandler.class);
+        private static final int FRAME_SIZE = 3840; // 20ms @ 48kHz, 2 canaux, 16 bits
+
+        private AudioInputStream pcmStream;
+        private final byte[] frameBuffer = new byte[FRAME_SIZE];
+        private ByteBuffer lastBuffer;
         private boolean done = false;
 
         public MySendHandler(File audioFile) {
-            this.audioFile = audioFile;
-
             try {
-                this.stream = new FileInputStream(audioFile);
-                this.buffer = new byte[stream.available()];
-                stream.read(buffer);
-                stream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                AudioInputStream source = AudioSystem.getAudioInputStream(audioFile);
+                AudioFormat target = new AudioFormat(48000f, 16, 2, true, false);
+                this.pcmStream = AudioSystem.getAudioInputStream(target, source);
+            } catch (UnsupportedAudioFileException | IOException e) {
+                LOG.error("Failed to open audio file for playback: {}", audioFile.getAbsolutePath(), e);
                 done = true;
             }
         }
 
         @Override
         public boolean canProvide() {
-            return !done && bufferIndex < buffer.length;
+            if (done || pcmStream == null) return false;
+            try {
+                int read = readFully(pcmStream, frameBuffer, 0, FRAME_SIZE);
+                if (read < 0) {
+                    done = true;
+                    return false;
+                }
+                if (read < FRAME_SIZE) {
+                    for (int i = read; i < FRAME_SIZE; i++) frameBuffer[i] = 0;
+                    done = true;
+                }
+                // clone since we reuse the array
+                lastBuffer = ByteBuffer.wrap(frameBuffer.clone());
+                return true;
+            } catch (IOException e) {
+                LOG.error("I/O error while reading audio data", e);
+                done = true;
+                return false;
+            }
         }
 
         @Override
         public ByteBuffer provide20MsAudio() {
-            // Copie 20ms d'audio (960 échantillons * 2 octets * 2 canaux = 3840 octets)
-            int bytesToRead = Math.min(3840, buffer.length - bufferIndex);
-            byte[] audio = new byte[bytesToRead];
-            System.arraycopy(buffer, bufferIndex, audio, 0, bytesToRead);
-            bufferIndex += bytesToRead;
-
-            // Si on a atteint la fin du fichier
-            if (bufferIndex >= buffer.length) {
-                done = true;
-            }
-
-            return ByteBuffer.wrap(audio);
+            ByteBuffer buf = lastBuffer;
+            lastBuffer = null;
+            return buf;
         }
 
         @Override
@@ -299,12 +313,22 @@ public class AudioExamplePlugin extends AbstractPlugin {
 
         public void cleanup() {
             try {
-                if (stream != null) {
-                    stream.close();
+                if (pcmStream != null) {
+                    pcmStream.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Error while closing audio stream", e);
             }
+        }
+
+        private static int readFully(java.io.InputStream in, byte[] b, int off, int len) throws IOException {
+            int total = 0;
+            while (total < len) {
+                int r = in.read(b, off + total, len - total);
+                if (r < 0) break;
+                total += r;
+            }
+            return total == 0 ? -1 : total;
         }
     }
 
@@ -312,52 +336,105 @@ public class AudioExamplePlugin extends AbstractPlugin {
      * Exemple d'un handler de réception audio qui enregistre l'audio dans un fichier.
      */
     private static class MyReceiveHandler implements AudioReceiveHandler {
+        private static final Logger LOG = LoggerFactory.getLogger(MyReceiveHandler.class);
+        private static final int SAMPLE_RATE = 48000;
+        private static final int CHANNELS = 2;
+        private static final int BITS_PER_SAMPLE = 16;
+
         private final File outputFile;
+        private RandomAccessFile raf;
+        private long dataSize = 0;
 
         public MyReceiveHandler(File outputFile) {
             this.outputFile = outputFile;
-
-            // Initialisation de l'enregistrement (dans un cas réel, on ouvrirait un flux de sortie)
-            System.out.println("Démarrage de l'enregistrement dans " + outputFile.getAbsolutePath());
+            try {
+                File parent = outputFile.getParentFile();
+                if (parent != null && !parent.exists()) {
+                    parent.mkdirs();
+                }
+                this.raf = new RandomAccessFile(outputFile, "rw");
+                this.raf.setLength(0);
+                writeWavHeader(raf, 0, SAMPLE_RATE, CHANNELS, BITS_PER_SAMPLE);
+                LOG.info("Démarrage de l'enregistrement dans {}", outputFile.getAbsolutePath());
+            } catch (IOException e) {
+                LOG.error("Impossible de démarrer l'enregistrement dans {}", outputFile.getAbsolutePath(), e);
+                this.raf = null;
+            }
         }
 
         @Override
         public boolean canReceiveCombined() {
-            return true;
+            return raf != null;
         }
 
         @Override
         public boolean canReceiveUser() {
-            return true;
+            return false;
         }
 
         @Override
         public void handleCombinedAudio(CombinedAudio combinedAudio) {
-            // Traitement de l'audio combiné
-            // Dans un cas réel, on écrirait les données dans un fichier
-
-            // Récupère les données audio
-            byte[] audio = combinedAudio.getAudioData(1.0); // Volume normal
-
-            // Traitement des données (dans un cas réel, on écrirait dans un fichier)
-            // System.out.println("Données audio reçues : " + audio.length + " octets");
-        }
-
-        @Override
-        public void handleUserAudio(UserAudio userAudio) {
-            // Traitement de l'audio par utilisateur
-            // Utile pour savoir qui parle et enregistrer séparément par utilisateur
-
-            String userId = userAudio.getUser().getId();
-            byte[] audio = userAudio.getAudioData(1.0);
-
-            // Traitement des données (dans un cas réel, on écrirait dans un fichier par utilisateur)
-            // System.out.println("Données audio de l'utilisateur " + userId + " : " + audio.length + " octets");
+            if (raf == null) return;
+            try {
+                byte[] audio = combinedAudio.getAudioData(1.0); // Volume normal
+                raf.write(audio);
+                dataSize += audio.length;
+            } catch (IOException e) {
+                LOG.error("Erreur d'écriture des données audio dans {}", outputFile.getAbsolutePath(), e);
+            }
         }
 
         public void cleanup() {
-            // Fermeture des ressources d'enregistrement
-            System.out.println("Arrêt de l'enregistrement dans " + outputFile.getAbsolutePath());
+            if (raf == null) return;
+            try {
+                finalizeWavHeader(raf, dataSize);
+                raf.close();
+                LOG.info("Arrêt de l'enregistrement dans {}", outputFile.getAbsolutePath());
+            } catch (IOException e) {
+                LOG.warn("Erreur lors de la fermeture de l'enregistrement {}", outputFile.getAbsolutePath(), e);
+            }
+        }
+
+        private static void writeWavHeader(RandomAccessFile raf, long dataSize, int sampleRate, int channels, int bitsPerSample) throws IOException {
+            int byteRate = sampleRate * channels * bitsPerSample / 8;
+            int blockAlign = channels * bitsPerSample / 8;
+
+            raf.seek(0);
+            // RIFF header
+            raf.writeBytes("RIFF");
+            writeLEInt(raf, (int) (36 + dataSize));
+            raf.writeBytes("WAVE");
+            // fmt chunk
+            raf.writeBytes("fmt ");
+            writeLEInt(raf, 16); // PCM
+            writeLEShort(raf, (short) 1); // Audio format = PCM
+            writeLEShort(raf, (short) channels);
+            writeLEInt(raf, sampleRate);
+            writeLEInt(raf, byteRate);
+            writeLEShort(raf, (short) blockAlign);
+            writeLEShort(raf, (short) bitsPerSample);
+            // data chunk
+            raf.writeBytes("data");
+            writeLEInt(raf, (int) dataSize);
+        }
+
+        private static void finalizeWavHeader(RandomAccessFile raf, long dataSize) throws IOException {
+            raf.seek(4);
+            writeLEInt(raf, (int) (36 + dataSize));
+            raf.seek(40);
+            writeLEInt(raf, (int) dataSize);
+        }
+
+        private static void writeLEInt(RandomAccessFile raf, int value) throws IOException {
+            raf.writeByte(value & 0xFF);
+            raf.writeByte((value >> 8) & 0xFF);
+            raf.writeByte((value >> 16) & 0xFF);
+            raf.writeByte((value >> 24) & 0xFF);
+        }
+
+        private static void writeLEShort(RandomAccessFile raf, short value) throws IOException {
+            raf.writeByte(value & 0xFF);
+            raf.writeByte((value >> 8) & 0xFF);
         }
     }
 }
