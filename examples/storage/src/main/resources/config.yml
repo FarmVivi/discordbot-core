@@ -1,0 +1,67 @@
+# Storage Example Plugin Configuration
+config_version: 1
+
+# Storage settings
+storage:
+  # Enable automatic data backups
+  auto_backup: true
+  
+  # Backup interval in minutes
+  backup_interval: 5
+  
+  # Enable data compression
+  compress_data: false
+  
+  # Enable binary storage features
+  binary_storage: true
+
+# User experience settings
+experience:
+  # XP per message
+  xp_per_message: 1
+  
+  # XP required per level
+  xp_per_level: 100
+  
+  # Enable level up notifications
+  level_up_notifications: true
+
+# Statistics settings
+statistics:
+  # Enable global statistics
+  global_stats: true
+  
+  # Enable guild statistics
+  guild_stats: true
+  
+  # Enable user statistics
+  user_stats: true
+  
+  # Leaderboard size
+  leaderboard_size: 10
+
+# Activity tracking
+activity:
+  # Track activity streaks
+  track_streaks: true
+  
+  # Maximum streak history
+  max_streak_history: 365
+  
+  # Activity timeout in hours
+  activity_timeout: 24
+
+# File storage
+files:
+  # Maximum file size in bytes
+  max_file_size: 1048576  # 1MB
+  
+  # Allowed file extensions
+  allowed_extensions:
+    - "txt"
+    - "json"
+    - "yml"
+    - "md"
+  
+  # File retention period in days
+  retention_days: 30

@@ -1,0 +1,61 @@
+# Event Example Plugin Configuration
+config_version: 1
+
+# Feature toggles
+features:
+  welcome_messages: true
+  event_logging: true
+  auto_roles: false
+  reaction_roles: true
+  activity_monitoring: true
+
+# Welcome/Leave messages
+messages:
+  welcome: "Welcome {user} to {server}! 🎉"
+  leave: "{user} has left {server}. 👋"
+
+# Auto role assignment
+auto_role:
+  # Default role ID to assign to new members
+  default_role_id: null
+  
+  # VIP role assignment threshold (message count)
+  vip_threshold: 100
+  vip_role_id: null
+
+# Reaction role system
+reaction_roles:
+  # Message ID for reaction roles
+  message_id: null
+  
+  # Emoji to role mappings
+  roles:
+    "🎮": null  # Gaming role
+    "🎵": null  # Music role
+    "💻": null  # Tech role
+    "🎨": null  # Art role
+
+# Activity monitoring
+activity:
+  # Inactive threshold in minutes
+  inactive_threshold: 30
+  
+  # Message count reset interval in minutes
+  reset_interval: 60
+  
+  # Spam detection threshold
+  spam_threshold: 10
+
+# Logging settings
+logging:
+  # Log member events
+  member_events: true
+  
+  # Log voice events
+  voice_events: true
+  
+  # Log status changes
+  status_changes: false
+  
+  # Log server management events
+  server_events: true

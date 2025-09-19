@@ -1,0 +1,7 @@
+name: StorageExamplePlugin
+version: 1.0.0
+main: fr.farmvivi.discordbot.examples.storage.StorageExamplePlugin
+description: Example plugin demonstrating comprehensive storage system features
+author: DiscordBot Core Team
+website: https://github.com/FarmVivi/discordbot-core
+dependencies: [ ]

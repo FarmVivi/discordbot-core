@@ -6,15 +6,77 @@ template:
     welcome_user: "Bienvenue, {user} !"
 
   commands:
-    help: "Afficher l'aide du plugin template"
-    info: "Afficher les informations du plugin"
-    example: "Commande d'exemple"
+    # Commandes de base
+    info:
+      description: "Afficher les informations du plugin"
+      status: "Statut : Actif"
+    
+    config:
+      description: "Gérer la configuration du plugin"
+      reloaded: "✅ Configuration rechargée !"
+      set:
+        description: "Définir une valeur de configuration"
+    
+    # Commandes de démonstration
+    demo:
+      description: "Démontrer différents types d'options"
+    
+    category:
+      description: "Sélectionner une catégorie avec autocomplétion"
+    
+    # Commandes de données
+    profile:
+      description: "Gérer votre profil"
+      view: "Voir votre profil"
+      nickname: "Définir votre pseudonyme"
+    
+    file:
+      description: "Opérations de stockage de fichiers"
+      save: "Sauvegarder du texte dans un fichier"
+      list: "Lister vos fichiers sauvegardés"
+    
+    # Commandes audio
+    audio:
+      description: "Démonstration du système audio"
+
+  # Descriptions des permissions
+  permissions:
+    use:
+      description: "Permet l'utilisation des fonctionnalités de base du template"
+    admin:
+      description: "Permet les actions administratives du template"
+    advanced:
+      description: "Permet l'accès aux fonctionnalités avancées"
+
+  # Messages de statut des fonctionnalités
+  features:
+    welcome_enabled: "✅ Messages de bienvenue activés"
+    welcome_disabled: "❌ Messages de bienvenue désactivés"
+    data_storage_enabled: "✅ Stockage de données activé"
+    data_storage_disabled: "❌ Stockage de données désactivé"
+    audio_enabled: "✅ Fonctionnalités audio activées"
+    audio_disabled: "❌ Fonctionnalités audio désactivées"
+
+  # Messages d'interface utilisateur
+  ui:
+    profile_title: "👤 **Profil de {user}**"
+    statistics_title: "📊 **Statistiques**"
+    file_saved: "💾 Fichier sauvegardé : **{filename}**"
+    file_list_title: "📁 **Vos fichiers :**"
+    no_files: "📁 Aucun fichier trouvé."
+    
+  # Messages système
+  system:
+    data_cleanup: "🧹 Nettoyage des données terminé"
+    statistics_updated: "📊 Statistiques mises à jour"
+    backup_completed: "💾 Sauvegarde terminée"
 
   errors:
-    no_permission: "Vous n'avez pas la permission d'utiliser cette commande"
-    invalid_usage: "Utilisation de commande invalide"
-    config_error: "Erreur de configuration : {error}"
-
-  config:
-    reloaded: "Configuration rechargée avec succès"
-    saved: "Configuration sauvegardée avec succès"
+    no_permission: "❌ Vous n'avez pas la permission d'utiliser cette commande"
+    invalid_usage: "❌ Utilisation de commande invalide"
+    config_error: "❌ Erreur de configuration : {error}"
+    file_save_error: "❌ Échec de la sauvegarde du fichier : {error}"
+    file_list_error: "❌ Échec de la liste des fichiers : {error}"
+    guild_only: "❌ Cette commande ne peut être utilisée que dans un serveur"
+    feature_disabled: "❌ Cette fonctionnalité est désactivée"
+    rate_limited: "⏰ Veuillez attendre avant d'utiliser cette commande à nouveau"

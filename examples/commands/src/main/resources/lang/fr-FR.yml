@@ -1,0 +1,38 @@
+commandexample:
+  messages:
+    plugin_enabled: "Plugin d'Exemple de Commandes activé !"
+    plugin_disabled: "Plugin d'Exemple de Commandes désactivé !"
+    
+  commands:
+    hello:
+      description: "Dire bonjour à quelqu'un"
+      usage: "/hello"
+    options:
+      description: "Commande de démo avec différents types d'options"
+      usage: "/options <texte> [nombre] [drapeau] [utilisateur] [canal] [rôle] [fichier]"
+    admin:
+      description: "Commande réservée aux administrateurs"
+      usage: "/admin"
+    cooldown:
+      description: "Commande avec délai d'attente"
+      usage: "/cooldown"
+    manage:
+      description: "Commandes de gestion"
+      usage: "/manage <user|server> <options>"
+    code:
+      description: "Obtenir des infos sur un langage de programmation"
+      usage: "/code <langage>"
+    guildinfo:
+      description: "Obtenir les informations du serveur"
+      usage: "/guildinfo"
+    secret:
+      description: "Envoyer un message secret"
+      usage: "/secret <message>"
+      
+  errors:
+    no_permission: "❌ Vous n'avez pas la permission d'utiliser cette commande"
+    invalid_usage: "❌ Utilisation invalide de la commande : {usage}"
+    cooldown_active: "⏰ Commande en délai d'attente. Réessayez dans {seconds} secondes"
+    guild_only: "❌ Cette commande ne peut être utilisée que dans un serveur"
+    user_not_found: "❌ Utilisateur introuvable"
+    error_occurred: "❌ Une erreur s'est produite lors de l'exécution de la commande"

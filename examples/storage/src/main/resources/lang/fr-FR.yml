@@ -1,0 +1,47 @@
+storageexample:
+  messages:
+    plugin_enabled: "Plugin d'Exemple de Stockage activé !"
+    plugin_disabled: "Plugin d'Exemple de Stockage désactivé !"
+    
+  commands:
+    profile:
+      updated: "✅ Profil mis à jour avec succès !"
+      not_found: "❌ Profil introuvable"
+    
+    file:
+      saved: "💾 Fichier **{filename}** sauvegardé avec succès !"
+      save_failed: "❌ Échec de la sauvegarde du fichier : {error}"
+      not_found: "❌ Fichier introuvable : {filename}"
+      list_empty: "📁 Aucun fichier trouvé dans le stockage"
+      
+    stats:
+      server_title: "📊 **Statistiques de {server}**"
+      global_title: "🌐 **Statistiques Globales**"
+      no_data: "📈 Aucune donnée statistique disponible"
+      
+    leaderboard:
+      title: "🏆 **Classement des Messages**"
+      no_data: "📈 Aucune donnée de classement disponible !"
+      entry: "👤 {user} : {count} messages"
+      
+  storage:
+    backup_started: "🔄 Sauvegarde des données démarrée"
+    backup_completed: "✅ Sauvegarde des données terminée"
+    backup_failed: "❌ Échec de la sauvegarde : {error}"
+    save_all_completed: "💾 Toutes les données sauvegardées avec succès"
+    
+  experience:
+    level_up: "🎉 Montée de niveau ! Vous êtes maintenant niveau {level} !"
+    xp_gained: "⭐ +{xp} XP gagnés !"
+    
+  activity:
+    streak_started: "🔥 Série d'activité commencée !"
+    streak_continued: "🔥 Série d'activité : {days} jours !"
+    streak_broken: "💔 Série d'activité interrompue"
+    
+  errors:
+    storage_error: "❌ Erreur de stockage : {error}"
+    data_corrupted: "⚠️ Corruption de données détectée"
+    backup_failed: "❌ Échec de l'opération de sauvegarde"
+    file_too_large: "❌ Fichier trop volumineux (max {max_size} octets)"
+    invalid_extension: "❌ Extension de fichier invalide : {extension}"

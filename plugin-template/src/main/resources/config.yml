@@ -1,30 +1,60 @@
 # Template Plugin Configuration
 config_version: 1
 
-# Example settings
-example:
-  # Enable example feature
+# Core features
+features:
+  # Enable main plugin features
   enabled: true
   
-  # Example string setting
-  setting: "default_value"
+  # Enable welcome messages for new members
+  welcome_messages: true
   
-  # Example number setting
-  number: 42
+  # Enable data storage and persistence
+  data_storage: true
   
-  # Example list setting
-  list:
-    - "item1"
-    - "item2"
-    - "item3"
+  # Enable advanced features (requires permission)
+  advanced_features: false
+
+# Messages and text
+messages:
+  # Welcome message template (supports {user} and {server} placeholders)
+  welcome: "Welcome {user} to {server}! 🎉"
+  
+  # Custom response message
+  response: "Hello from Template Plugin!"
+
+# User limits and restrictions
+limits:
+  # Maximum number of tracked users
+  max_users: 100
+  
+  # Maximum file size for uploads (bytes)
+  max_file_size: 1048576  # 1MB
+  
+  # Rate limiting per user (commands per minute)
+  rate_limit: 10
+
+# Channel configuration
+channels:
+  # List of allowed channel IDs (empty = all channels)
+  allowed: []
+  
+  # List of ignored channel IDs
+  ignored: []
+  
+  # Log channel ID for events
+  log_channel: null
 
 # Command settings
 commands:
   # Enable template commands
   enabled: true
   
-  # Command prefix (if using text commands)
+  # Command prefix for text commands
   prefix: "!"
+  
+  # Default permission for commands
+  default_permission: true
 
 # Permission settings
 permissions:
@@ -35,11 +65,56 @@ permissions:
   admin_nodes:
     - "templateplugin.admin"
     - "templateplugin.config"
+    - "templateplugin.advanced"
 
-# Storage settings
+# Storage and data settings
 storage:
   # Enable data persistence
   enabled: true
   
-  # Data file format (json/yaml)
+  # Auto-save interval in minutes
+  auto_save_interval: 5
+  
+  # Data cleanup interval in hours
+  cleanup_interval: 24
+  
+  # Data format (json/yaml)
   format: "json"
+
+# Audio features (demonstration)
+audio:
+  # Enable audio features
+  enabled: false
+  
+  # Default volume (0-100)
+  default_volume: 50
+  
+  # Audio priority (0-100)
+  priority: 60
+
+# Statistics and analytics
+statistics:
+  # Enable statistics collection
+  enabled: true
+  
+  # Track user activity
+  track_users: true
+  
+  # Track guild activity
+  track_guilds: true
+  
+  # Statistics retention period (days)
+  retention_days: 90
+
+# Internationalization
+language:
+  # Default language
+  default: "en-US"
+  
+  # Supported languages
+  supported:
+    - "en-US"
+    - "fr-FR"
+  
+  # Auto-detect user language
+  auto_detect: true

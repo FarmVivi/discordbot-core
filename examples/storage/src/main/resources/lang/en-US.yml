@@ -1,0 +1,47 @@
+storageexample:
+  messages:
+    plugin_enabled: "Storage Example Plugin enabled!"
+    plugin_disabled: "Storage Example Plugin disabled!"
+    
+  commands:
+    profile:
+      updated: "✅ Profile updated successfully!"
+      not_found: "❌ Profile not found"
+    
+    file:
+      saved: "💾 File **{filename}** saved successfully!"
+      save_failed: "❌ Failed to save file: {error}"
+      not_found: "❌ File not found: {filename}"
+      list_empty: "📁 No files found in storage"
+      
+    stats:
+      server_title: "📊 **{server} Statistics**"
+      global_title: "🌐 **Global Statistics**"
+      no_data: "📈 No statistics data available yet"
+      
+    leaderboard:
+      title: "🏆 **Message Leaderboard**"
+      no_data: "📈 No leaderboard data available yet!"
+      entry: "👤 {user}: {count} messages"
+      
+  storage:
+    backup_started: "🔄 Data backup started"
+    backup_completed: "✅ Data backup completed"
+    backup_failed: "❌ Data backup failed: {error}"
+    save_all_completed: "💾 All data saved successfully"
+    
+  experience:
+    level_up: "🎉 Level up! You are now level {level}!"
+    xp_gained: "⭐ +{xp} XP earned!"
+    
+  activity:
+    streak_started: "🔥 Activity streak started!"
+    streak_continued: "🔥 Activity streak: {days} days!"
+    streak_broken: "💔 Activity streak broken"
+    
+  errors:
+    storage_error: "❌ Storage error: {error}"
+    data_corrupted: "⚠️ Data corruption detected"
+    backup_failed: "❌ Backup operation failed"
+    file_too_large: "❌ File too large (max {max_size} bytes)"
+    invalid_extension: "❌ Invalid file extension: {extension}"

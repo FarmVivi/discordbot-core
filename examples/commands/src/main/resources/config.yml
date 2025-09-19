@@ -1,0 +1,27 @@
+# Command Example Plugin Configuration
+config_version: 1
+
+# Command settings
+commands:
+  # Enable commands
+  enabled: true
+  
+  # Command cooldown settings
+  cooldowns:
+    # Default cooldown in seconds
+    default: 5
+    
+    # Per-command cooldowns
+    cooldown_command: 10
+
+# Permission settings
+permissions:
+  # Admin permission nodes
+  admin_nodes:
+    - "commandexample.admin"
+    - "commandexample.manage"
+    
+  # Default permissions
+  defaults:
+    use_commands: true
+    use_admin_commands: false

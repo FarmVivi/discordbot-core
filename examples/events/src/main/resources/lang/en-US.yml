@@ -1,0 +1,31 @@
+eventexample:
+  messages:
+    plugin_enabled: "Event Example Plugin enabled!"
+    plugin_disabled: "Event Example Plugin disabled!"
+    
+  events:
+    member_join: "👋 Welcome {user} to {server}!"
+    member_leave: "😢 {user} has left {server}"
+    role_assigned: "🎭 Role {role} assigned to {user}"
+    role_removed: "🎭 Role {role} removed from {user}"
+    spam_detected: "⚠️ Potential spam detected from {user}"
+    voice_join: "🔊 {user} joined voice channel: {channel}"
+    voice_leave: "🔇 {user} left voice channel: {channel}"
+    
+  features:
+    welcome_enabled: "✅ Welcome messages enabled"
+    welcome_disabled: "❌ Welcome messages disabled"
+    logging_enabled: "✅ Event logging enabled"
+    logging_disabled: "❌ Event logging disabled"
+    auto_roles_enabled: "✅ Auto roles enabled"
+    auto_roles_disabled: "❌ Auto roles disabled"
+    
+  monitoring:
+    activity_reset: "🔄 Activity data reset"
+    inactive_cleanup: "🧹 Cleaned up {count} inactive users"
+    
+  errors:
+    config_error: "❌ Configuration error: {error}"
+    role_not_found: "❌ Role not found: {role}"
+    channel_not_found: "❌ Channel not found: {channel}"
+    permission_denied: "❌ Insufficient permissions for action"

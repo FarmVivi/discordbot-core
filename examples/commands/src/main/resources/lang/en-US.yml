@@ -1,0 +1,38 @@
+commandexample:
+  messages:
+    plugin_enabled: "Command Example Plugin enabled!"
+    plugin_disabled: "Command Example Plugin disabled!"
+    
+  commands:
+    hello:
+      description: "Say hello to someone"
+      usage: "/hello"
+    options:
+      description: "Demo command with various option types"
+      usage: "/options <text> [number] [flag] [user] [channel] [role] [file]"
+    admin:
+      description: "Admin-only command"
+      usage: "/admin"
+    cooldown:
+      description: "Command with cooldown"
+      usage: "/cooldown"
+    manage:
+      description: "Management commands"
+      usage: "/manage <user|server> <options>"
+    code:
+      description: "Get programming language info"
+      usage: "/code <language>"
+    guildinfo:
+      description: "Get server information"
+      usage: "/guildinfo"
+    secret:
+      description: "Send secret message"
+      usage: "/secret <message>"
+      
+  errors:
+    no_permission: "❌ You don't have permission to use this command"
+    invalid_usage: "❌ Invalid command usage: {usage}"
+    cooldown_active: "⏰ Command on cooldown. Try again in {seconds} seconds"
+    guild_only: "❌ This command can only be used in a server"
+    user_not_found: "❌ User not found"
+    error_occurred: "❌ An error occurred while executing the command"

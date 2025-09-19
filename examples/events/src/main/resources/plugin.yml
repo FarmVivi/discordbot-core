@@ -1,0 +1,7 @@
+name: EventExamplePlugin
+version: 1.0.0
+main: fr.farmvivi.discordbot.examples.events.EventExamplePlugin
+description: Example plugin demonstrating comprehensive event system features
+author: DiscordBot Core Team
+website: https://github.com/FarmVivi/discordbot-core
+dependencies: [ ]

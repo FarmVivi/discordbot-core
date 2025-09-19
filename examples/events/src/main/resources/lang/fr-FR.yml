@@ -1,0 +1,31 @@
+eventexample:
+  messages:
+    plugin_enabled: "Plugin d'Exemple d'Événements activé !"
+    plugin_disabled: "Plugin d'Exemple d'Événements désactivé !"
+    
+  events:
+    member_join: "👋 Bienvenue {user} sur {server} !"
+    member_leave: "😢 {user} a quitté {server}"
+    role_assigned: "🎭 Rôle {role} assigné à {user}"
+    role_removed: "🎭 Rôle {role} retiré de {user}"
+    spam_detected: "⚠️ Spam potentiel détecté de {user}"
+    voice_join: "🔊 {user} a rejoint le canal vocal : {channel}"
+    voice_leave: "🔇 {user} a quitté le canal vocal : {channel}"
+    
+  features:
+    welcome_enabled: "✅ Messages de bienvenue activés"
+    welcome_disabled: "❌ Messages de bienvenue désactivés"
+    logging_enabled: "✅ Journalisation des événements activée"
+    logging_disabled: "❌ Journalisation des événements désactivée"
+    auto_roles_enabled: "✅ Attribution automatique de rôles activée"
+    auto_roles_disabled: "❌ Attribution automatique de rôles désactivée"
+    
+  monitoring:
+    activity_reset: "🔄 Données d'activité réinitialisées"
+    inactive_cleanup: "🧹 Nettoyage de {count} utilisateurs inactifs"
+    
+  errors:
+    config_error: "❌ Erreur de configuration : {error}"
+    role_not_found: "❌ Rôle introuvable : {role}"
+    channel_not_found: "❌ Canal introuvable : {channel}"
+    permission_denied: "❌ Permissions insuffisantes pour cette action"
