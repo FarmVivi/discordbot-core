@@ -41,7 +41,7 @@ public class ExampleEventListener {
         }
         
         // Example: Respond to mentions (if enabled)
-        if (event.getMessage().isMentioned(event.getJDA().getSelfUser()) &&
+        if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser()) &&
             plugin.getConfiguration().getBoolean("features.respond_to_mentions", false)) {
             
             String response = plugin.getPluginLanguageManager()
