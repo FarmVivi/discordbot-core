@@ -1,0 +1,2032 @@
+{
+  "repository": "FarmVivi/discordbot-core",
+  "total_files": 225,
+  "generated_date": "2025-09-19T19:16:39+00:00",
+  "files": [
+    {
+      "path": ".dockerignore",
+      "name": ".dockerignore",
+      "extension": "",
+      "type": "project_meta",
+      "module": "root",
+      "size_bytes": 147,
+      "directory": ""
+    },
+    {
+      "path": ".gitattributes",
+      "name": ".gitattributes",
+      "extension": "",
+      "type": "project_meta",
+      "module": "root",
+      "size_bytes": 49,
+      "directory": ""
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "name": "dependabot.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "github",
+      "size_bytes": 468,
+      "directory": ".github"
+    },
+    {
+      "path": ".github/workflows/bump-major-version.yml",
+      "name": "bump-major-version.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "github",
+      "size_bytes": 1905,
+      "directory": ".github/workflows"
+    },
+    {
+      "path": ".github/workflows/bump-minor-version.yml",
+      "name": "bump-minor-version.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "github",
+      "size_bytes": 1873,
+      "directory": ".github/workflows"
+    },
+    {
+      "path": ".github/workflows/bump-patch-version.yml",
+      "name": "bump-patch-version.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "github",
+      "size_bytes": 1825,
+      "directory": ".github/workflows"
+    },
+    {
+      "path": ".github/workflows/docker-image-ci.yml",
+      "name": "docker-image-ci.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "github",
+      "size_bytes": 2366,
+      "directory": ".github/workflows"
+    },
+    {
+      "path": ".github/workflows/release-build.yml",
+      "name": "release-build.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "github",
+      "size_bytes": 1467,
+      "directory": ".github/workflows"
+    },
+    {
+      "path": ".github/workflows/sonarcloud-analysis.yml",
+      "name": "sonarcloud-analysis.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "github",
+      "size_bytes": 3321,
+      "directory": ".github/workflows"
+    },
+    {
+      "path": ".gitignore",
+      "name": ".gitignore",
+      "extension": "",
+      "type": "project_meta",
+      "module": "root",
+      "size_bytes": 3444,
+      "directory": ""
+    },
+    {
+      "path": ".idea/copilot.data.migration.agent.xml",
+      "name": "copilot.data.migration.agent.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 190,
+      "directory": ".idea"
+    },
+    {
+      "path": ".idea/copilot.data.migration.edit.xml",
+      "name": "copilot.data.migration.edit.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 189,
+      "directory": ".idea"
+    },
+    {
+      "path": ".idea/discord.xml",
+      "name": "discord.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 222,
+      "directory": ".idea"
+    },
+    {
+      "path": ".idea/encodings.xml",
+      "name": "encodings.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 1540,
+      "directory": ".idea"
+    },
+    {
+      "path": ".idea/misc.xml",
+      "name": "misc.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 467,
+      "directory": ".idea"
+    },
+    {
+      "path": ".idea/sonarlint.xml",
+      "name": "sonarlint.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 296,
+      "directory": ".idea"
+    },
+    {
+      "path": ".idea/sqldialects.xml",
+      "name": "sqldialects.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 171,
+      "directory": ".idea"
+    },
+    {
+      "path": ".idea/vcs.xml",
+      "name": "vcs.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "ide",
+      "size_bytes": 167,
+      "directory": ".idea"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "name": "settings.json",
+      "extension": ".json",
+      "type": "json_config",
+      "module": "ide",
+      "size_bytes": 185,
+      "directory": ".vscode"
+    },
+    {
+      "path": ".vscode/tasks.json",
+      "name": "tasks.json",
+      "extension": ".json",
+      "type": "json_config",
+      "module": "ide",
+      "size_bytes": 3592,
+      "directory": ".vscode"
+    },
+    {
+      "path": "Dockerfile",
+      "name": "Dockerfile",
+      "extension": "",
+      "type": "docker_config",
+      "module": "root",
+      "size_bytes": 1016,
+      "directory": ""
+    },
+    {
+      "path": "LICENSE",
+      "name": "LICENSE",
+      "extension": "",
+      "type": "project_meta",
+      "module": "root",
+      "size_bytes": 35149,
+      "directory": ""
+    },
+    {
+      "path": "README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "root",
+      "size_bytes": 6884,
+      "directory": ""
+    },
+    {
+      "path": "build.sh",
+      "name": "build.sh",
+      "extension": ".sh",
+      "type": "script",
+      "module": "root",
+      "size_bytes": 1058,
+      "directory": ""
+    },
+    {
+      "path": "discordbot-api/pom.xml",
+      "name": "pom.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "discordbot-api",
+      "size_bytes": 1079,
+      "directory": "discordbot-api"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/AudioService.java",
+      "name": "AudioService.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 4337,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioEvent.java",
+      "name": "AudioEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 651,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioFrameMixedEvent.java",
+      "name": "AudioFrameMixedEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1704,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioHandlerEvent.java",
+      "name": "AudioHandlerEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1044,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioReceiveHandlerRegisteredEvent.java",
+      "name": "AudioReceiveHandlerRegisteredEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 972,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioReceiveHandlerRemovedEvent.java",
+      "name": "AudioReceiveHandlerRemovedEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 975,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioSendHandlerRegisteredEvent.java",
+      "name": "AudioSendHandlerRegisteredEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1479,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioSendHandlerRemovedEvent.java",
+      "name": "AudioSendHandlerRemovedEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 927,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events/AudioVolumeChangedEvent.java",
+      "name": "AudioVolumeChangedEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1686,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/audio/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/Command.java",
+      "name": "Command.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 3439,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/CommandBuilder.java",
+      "name": "CommandBuilder.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 10960,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/CommandContext.java",
+      "name": "CommandContext.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 5488,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/CommandRegistry.java",
+      "name": "CommandRegistry.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 3372,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/CommandResult.java",
+      "name": "CommandResult.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1652,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/CommandService.java",
+      "name": "CommandService.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 4917,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/PluginCommandAdapter.java",
+      "name": "PluginCommandAdapter.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 4544,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/event/CommandEvent.java",
+      "name": "CommandEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 602,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/event/CommandExecuteEvent.java",
+      "name": "CommandExecuteEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1132,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/event/CommandExecutedEvent.java",
+      "name": "CommandExecutedEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1525,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception/CommandException.java",
+      "name": "CommandException.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 915,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception/CommandExecutionException.java",
+      "name": "CommandExecutionException.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 979,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception/CommandParseException.java",
+      "name": "CommandParseException.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1787,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception/CommandPermissionException.java",
+      "name": "CommandPermissionException.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 769,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/exception"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/option/CommandOption.java",
+      "name": "CommandOption.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 3880,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/option"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/option/OptionChoice.java",
+      "name": "OptionChoice.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1195,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/option"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/option/OptionType2.java",
+      "name": "OptionType2.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1867,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/command/option"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/config/Configuration.java",
+      "name": "Configuration.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 3466,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/config"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/config/ConfigurationException.java",
+      "name": "ConfigurationException.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 360,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/config"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/discord/DiscordAPI.java",
+      "name": "DiscordAPI.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 3842,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/discord"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event/Cancellable.java",
+      "name": "Cancellable.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 418,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event/Event.java",
+      "name": "Event.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 111,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event/EventHandler.java",
+      "name": "EventHandler.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 725,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event/EventManager.java",
+      "name": "EventManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2168,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event/EventPriority.java",
+      "name": "EventPriority.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 167,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event/EventRegistry.java",
+      "name": "EventRegistry.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2570,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event/EventTypeInfo.java",
+      "name": "EventTypeInfo.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2264,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/event"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/LanguageManager.java",
+      "name": "LanguageManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2425,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/PluginLanguageAdapter.java",
+      "name": "PluginLanguageAdapter.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2722,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events/LanguageEvent.java",
+      "name": "LanguageEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 598,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events/LanguageLoadedEvent.java",
+      "name": "LanguageLoadedEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1460,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events/NamespaceRegisteredEvent.java",
+      "name": "NamespaceRegisteredEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 399,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events/StringRetrievalEvent.java",
+      "name": "StringRetrievalEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2000,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/language/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/Permission.java",
+      "name": "Permission.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 924,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/PermissionDefault.java",
+      "name": "PermissionDefault.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 524,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/PermissionDeniedException.java",
+      "name": "PermissionDeniedException.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2617,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/PermissionManager.java",
+      "name": "PermissionManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 3560,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/PluginPermissionAdapter.java",
+      "name": "PluginPermissionAdapter.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1627,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/events/PermissionChangeEvent.java",
+      "name": "PermissionChangeEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1956,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/events/PermissionCheckEvent.java",
+      "name": "PermissionCheckEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2177,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/permissions/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/AbstractPlugin.java",
+      "name": "AbstractPlugin.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 7550,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/ConfigurableMigrationPlugin.java",
+      "name": "ConfigurableMigrationPlugin.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1314,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/Plugin.java",
+      "name": "Plugin.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2776,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/PluginContext.java",
+      "name": "PluginContext.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2949,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/PluginLifecycle.java",
+      "name": "PluginLifecycle.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1634,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/PluginLoader.java",
+      "name": "PluginLoader.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1306,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginDisableEvent.java",
+      "name": "PluginDisableEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 857,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginDisabledEvent.java",
+      "name": "PluginDisabledEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 485,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginEnableEvent.java",
+      "name": "PluginEnableEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 850,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginEnabledEvent.java",
+      "name": "PluginEnabledEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 479,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginEvent.java",
+      "name": "PluginEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 801,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginLifecycleChangeEvent.java",
+      "name": "PluginLifecycleChangeEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1167,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginLoadedEvent.java",
+      "name": "PluginLoadedEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 476,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events/PluginLoadingEvent.java",
+      "name": "PluginLoadingEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 461,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/plugin/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/DataStorage.java",
+      "name": "DataStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2035,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/DataStorageManager.java",
+      "name": "DataStorageManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2056,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/GlobalStorage.java",
+      "name": "GlobalStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2029,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/GuildStorage.java",
+      "name": "GuildStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2339,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/PluginDataStorageAdapter.java",
+      "name": "PluginDataStorageAdapter.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2513,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/PluginGlobalStorage.java",
+      "name": "PluginGlobalStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2791,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/PluginGuildStorage.java",
+      "name": "PluginGuildStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2933,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/PluginUserGuildStorage.java",
+      "name": "PluginUserGuildStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 3139,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/PluginUserStorage.java",
+      "name": "PluginUserStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2917,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/StorageKey.java",
+      "name": "StorageKey.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2014,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/UserGuildStorage.java",
+      "name": "UserGuildStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2749,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/UserStorage.java",
+      "name": "UserStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2305,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/BinaryStorage.java",
+      "name": "BinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 4177,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/BinaryStorageKey.java",
+      "name": "BinaryStorageKey.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2660,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/BinaryStorageManager.java",
+      "name": "BinaryStorageManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1932,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/GlobalBinaryStorage.java",
+      "name": "GlobalBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 5302,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/GuildBinaryStorage.java",
+      "name": "GuildBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 5656,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/PluginBinaryStorageAdapter.java",
+      "name": "PluginBinaryStorageAdapter.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 2454,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/PluginGlobalBinaryStorage.java",
+      "name": "PluginGlobalBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 5930,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/PluginGuildBinaryStorage.java",
+      "name": "PluginGuildBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 6067,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/PluginUserBinaryStorage.java",
+      "name": "PluginUserBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 6046,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/PluginUserGuildBinaryStorage.java",
+      "name": "PluginUserGuildBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 6298,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/UserBinaryStorage.java",
+      "name": "UserBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 5603,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/UserGuildBinaryStorage.java",
+      "name": "UserGuildBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 6152,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events/BinaryStorageEvent.java",
+      "name": "BinaryStorageEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 661,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events/FileDeleteEvent.java",
+      "name": "FileDeleteEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 733,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events/FileDownloadEvent.java",
+      "name": "FileDownloadEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1076,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events/FileUploadEvent.java",
+      "name": "FileUploadEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1426,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/binary/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events/StorageEvent.java",
+      "name": "StorageEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 998,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events/StorageGetEvent.java",
+      "name": "StorageGetEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 1036,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events/StorageRemoveEvent.java",
+      "name": "StorageRemoveEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 707,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events"
+    },
+    {
+      "path": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events/StorageSetEvent.java",
+      "name": "StorageSetEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-api",
+      "size_bytes": 748,
+      "directory": "discordbot-api/src/main/java/fr/farmvivi/discordbot/api/storage/events"
+    },
+    {
+      "path": "discordbot-core/.gitignore",
+      "name": ".gitignore",
+      "extension": "",
+      "type": "project_meta",
+      "module": "discordbot-core",
+      "size_bytes": 47,
+      "directory": "discordbot-core"
+    },
+    {
+      "path": "discordbot-core/pom.xml",
+      "name": "pom.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "discordbot-core",
+      "size_bytes": 5208,
+      "directory": "discordbot-core"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/Discobocor.java",
+      "name": "Discobocor.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 13817,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio/AudioMixer.java",
+      "name": "AudioMixer.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 4792,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio/AudioPipeline.java",
+      "name": "AudioPipeline.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 20016,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio/AudioServiceImpl.java",
+      "name": "AudioServiceImpl.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 10367,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio/PriorityManager.java",
+      "name": "PriorityManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 3599,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio/SourceHandler.java",
+      "name": "SourceHandler.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 1462,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/CommandMessageBuilder.java",
+      "name": "CommandMessageBuilder.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 19881,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/SimpleCommand.java",
+      "name": "SimpleCommand.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 10893,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/SimpleCommandBuilder.java",
+      "name": "SimpleCommandBuilder.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 12335,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/SimpleCommandContext.java",
+      "name": "SimpleCommandContext.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 10844,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/SimpleCommandRegistry.java",
+      "name": "SimpleCommandRegistry.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 10140,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/SimpleCommandService.java",
+      "name": "SimpleCommandService.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 30785,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/listener/CommandListener.java",
+      "name": "CommandListener.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 1484,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/listener"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/option/SimpleCommandOption.java",
+      "name": "SimpleCommandOption.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 7429,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/option"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser/CommandParser.java",
+      "name": "CommandParser.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 1672,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser/ConsoleCommandParser.java",
+      "name": "ConsoleCommandParser.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 8310,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser/SlashCommandParser.java",
+      "name": "SlashCommandParser.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5446,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser/TextCommandParser.java",
+      "name": "TextCommandParser.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 17433,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser/event/ConsoleCommandEvent.java",
+      "name": "ConsoleCommandEvent.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 755,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/parser/event"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/system/HelpCommand.java",
+      "name": "HelpCommand.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 12235,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/system"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/system/ShutdownCommand.java",
+      "name": "ShutdownCommand.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 2365,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/system"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/system/VersionCommand.java",
+      "name": "VersionCommand.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 3823,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/command/system"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/config/CoreConfiguration.java",
+      "name": "CoreConfiguration.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 8074,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/config"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/config/EnvAwareYamlConfiguration.java",
+      "name": "EnvAwareYamlConfiguration.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 3430,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/config"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/config/YamlConfiguration.java",
+      "name": "YamlConfiguration.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 7272,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/config"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/console/ConsoleCommandService.java",
+      "name": "ConsoleCommandService.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 4482,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/console"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/discord/JDADiscordAPI.java",
+      "name": "JDADiscordAPI.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 8601,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/discord"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/event/EventRegistryImpl.java",
+      "name": "EventRegistryImpl.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 3798,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/event"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/event/SimpleEventManager.java",
+      "name": "SimpleEventManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 21480,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/event"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/language/LanguageFileLoader.java",
+      "name": "LanguageFileLoader.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 4225,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/language"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/language/SimpleLanguageManager.java",
+      "name": "SimpleLanguageManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 17290,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/language"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions/PermissionBuilder.java",
+      "name": "PermissionBuilder.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 1540,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions/PermissionChecker.java",
+      "name": "PermissionChecker.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 3099,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions/PermissionImpl.java",
+      "name": "PermissionImpl.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 1731,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions/SimplePermissionManager.java",
+      "name": "SimplePermissionManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 14797,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/permissions"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin/DependencyResolver.java",
+      "name": "DependencyResolver.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5476,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin/PluginClassLoader.java",
+      "name": "PluginClassLoader.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5061,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin/PluginConfiguration.java",
+      "name": "PluginConfiguration.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 8572,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin/PluginContextImpl.java",
+      "name": "PluginContextImpl.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 1441,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin/PluginDescriptor.java",
+      "name": "PluginDescriptor.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 3245,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin/PluginManager.java",
+      "name": "PluginManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 30769,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/plugin"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/AbstractDataStorage.java",
+      "name": "AbstractDataStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 7781,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/StorageFactory.java",
+      "name": "StorageFactory.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 4387,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary/AbstractBinaryStorage.java",
+      "name": "AbstractBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 11136,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary/BinaryStorageFactory.java",
+      "name": "BinaryStorageFactory.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5304,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary/file/FileBinaryStorage.java",
+      "name": "FileBinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 7270,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary/file"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary/s3/S3BinaryStorage.java",
+      "name": "S3BinaryStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 17502,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/binary/s3"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/db/DatabaseDataStorage.java",
+      "name": "DatabaseDataStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 10151,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/db"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/file/FileDataStorage.java",
+      "name": "FileDataStorage.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 8739,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/storage/file"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/util/Debouncer.java",
+      "name": "Debouncer.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 1356,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/util"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/util/DiscordColor.java",
+      "name": "DiscordColor.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 735,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/util"
+    },
+    {
+      "path": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/util/EnvironmentUtils.java",
+      "name": "EnvironmentUtils.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 847,
+      "directory": "discordbot-core/src/main/java/fr/farmvivi/discordbot/core/util"
+    },
+    {
+      "path": "discordbot-core/src/main/resources/config.yml",
+      "name": "config.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "discordbot-core",
+      "size_bytes": 1056,
+      "directory": "discordbot-core/src/main/resources"
+    },
+    {
+      "path": "discordbot-core/src/main/resources/lang/en-US.yml",
+      "name": "en-US.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "discordbot-core",
+      "size_bytes": 1721,
+      "directory": "discordbot-core/src/main/resources/lang"
+    },
+    {
+      "path": "discordbot-core/src/main/resources/lang/fr-FR.yml",
+      "name": "fr-FR.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "discordbot-core",
+      "size_bytes": 1921,
+      "directory": "discordbot-core/src/main/resources/lang"
+    },
+    {
+      "path": "discordbot-core/src/main/resources/project.properties",
+      "name": "project.properties",
+      "extension": ".properties",
+      "type": "properties_config",
+      "module": "discordbot-core",
+      "size_bytes": 47,
+      "directory": "discordbot-core/src/main/resources"
+    },
+    {
+      "path": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/audio/AudioMixerTest.java",
+      "name": "AudioMixerTest.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5513,
+      "directory": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/audio/AudioServiceImplTest.java",
+      "name": "AudioServiceImplTest.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5699,
+      "directory": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/audio/PriorityManagerTest.java",
+      "name": "PriorityManagerTest.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5708,
+      "directory": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/audio"
+    },
+    {
+      "path": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/config/CoreConfigurationTest.java",
+      "name": "CoreConfigurationTest.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 5262,
+      "directory": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/config"
+    },
+    {
+      "path": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/plugin/PluginConfigurationTest.java",
+      "name": "PluginConfigurationTest.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "discordbot-core",
+      "size_bytes": 8394,
+      "directory": "discordbot-core/src/test/java/fr/farmvivi/discordbot/core/plugin"
+    },
+    {
+      "path": "docker-compose.yml",
+      "name": "docker-compose.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "root",
+      "size_bytes": 675,
+      "directory": ""
+    },
+    {
+      "path": "docs/audio-api.md",
+      "name": "audio-api.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "docs",
+      "size_bytes": 6776,
+      "directory": "docs"
+    },
+    {
+      "path": "docs/commands.md",
+      "name": "commands.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "docs",
+      "size_bytes": 9734,
+      "directory": "docs"
+    },
+    {
+      "path": "docs/configuration.md",
+      "name": "configuration.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "docs",
+      "size_bytes": 15302,
+      "directory": "docs"
+    },
+    {
+      "path": "docs/plugin-development.md",
+      "name": "plugin-development.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "docs",
+      "size_bytes": 24012,
+      "directory": "docs"
+    },
+    {
+      "path": "examples/audio/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "examples",
+      "size_bytes": 3235,
+      "directory": "examples/audio"
+    },
+    {
+      "path": "examples/audio/pom.xml",
+      "name": "pom.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "examples",
+      "size_bytes": 1767,
+      "directory": "examples/audio"
+    },
+    {
+      "path": "examples/audio/src/main/java/fr/farmvivi/discordbot/examples/audio/AudioExamplePlugin.java",
+      "name": "AudioExamplePlugin.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "examples",
+      "size_bytes": 18490,
+      "directory": "examples/audio/src/main/java/fr/farmvivi/discordbot/examples/audio"
+    },
+    {
+      "path": "examples/audio/src/main/resources/config.yml",
+      "name": "config.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "examples",
+      "size_bytes": 745,
+      "directory": "examples/audio/src/main/resources"
+    },
+    {
+      "path": "examples/audio/src/main/resources/lang/en-US.yml",
+      "name": "en-US.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "examples",
+      "size_bytes": 789,
+      "directory": "examples/audio/src/main/resources/lang"
+    },
+    {
+      "path": "examples/audio/src/main/resources/lang/fr-FR.yml",
+      "name": "fr-FR.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "examples",
+      "size_bytes": 869,
+      "directory": "examples/audio/src/main/resources/lang"
+    },
+    {
+      "path": "examples/audio/src/main/resources/plugin.yml",
+      "name": "plugin.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "examples",
+      "size_bytes": 255,
+      "directory": "examples/audio/src/main/resources"
+    },
+    {
+      "path": "gource-nvenc.bat",
+      "name": "gource-nvenc.bat",
+      "extension": ".bat",
+      "type": "script",
+      "module": "root",
+      "size_bytes": 1799,
+      "directory": ""
+    },
+    {
+      "path": "gource-nvenc.sh",
+      "name": "gource-nvenc.sh",
+      "extension": ".sh",
+      "type": "script",
+      "module": "root",
+      "size_bytes": 1696,
+      "directory": ""
+    },
+    {
+      "path": "plugin-template/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "plugin-template",
+      "size_bytes": 3190,
+      "directory": "plugin-template"
+    },
+    {
+      "path": "plugin-template/pom.xml",
+      "name": "pom.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "plugin-template",
+      "size_bytes": 1692,
+      "directory": "plugin-template"
+    },
+    {
+      "path": "plugin-template/src/main/java/com/example/plugin/TemplatePlugin.java",
+      "name": "TemplatePlugin.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugin-template",
+      "size_bytes": 7675,
+      "directory": "plugin-template/src/main/java/com/example/plugin"
+    },
+    {
+      "path": "plugin-template/src/main/resources/config.yml",
+      "name": "config.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugin-template",
+      "size_bytes": 767,
+      "directory": "plugin-template/src/main/resources"
+    },
+    {
+      "path": "plugin-template/src/main/resources/lang/en-US.yml",
+      "name": "en-US.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugin-template",
+      "size_bytes": 602,
+      "directory": "plugin-template/src/main/resources/lang"
+    },
+    {
+      "path": "plugin-template/src/main/resources/lang/fr-FR.yml",
+      "name": "fr-FR.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugin-template",
+      "size_bytes": 677,
+      "directory": "plugin-template/src/main/resources/lang"
+    },
+    {
+      "path": "plugin-template/src/main/resources/plugin.yml",
+      "name": "plugin.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugin-template",
+      "size_bytes": 230,
+      "directory": "plugin-template/src/main/resources"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "plugins",
+      "size_bytes": 6171,
+      "directory": "plugins/ai-audio-plugin"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/pom.xml",
+      "name": "pom.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "plugins",
+      "size_bytes": 2133,
+      "directory": "plugins/ai-audio-plugin"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio/AIAudioPlugin.java",
+      "name": "AIAudioPlugin.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugins",
+      "size_bytes": 5349,
+      "directory": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio/AudioAnalysisService.java",
+      "name": "AudioAnalysisService.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugins",
+      "size_bytes": 474,
+      "directory": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio/SpeechRecognitionService.java",
+      "name": "SpeechRecognitionService.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugins",
+      "size_bytes": 729,
+      "directory": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio/TextToSpeechService.java",
+      "name": "TextToSpeechService.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugins",
+      "size_bytes": 449,
+      "directory": "plugins/ai-audio-plugin/src/main/java/fr/farmvivi/discordbot/plugins/aiaudio"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/resources/config.yml",
+      "name": "config.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 2192,
+      "directory": "plugins/ai-audio-plugin/src/main/resources"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/resources/lang/en-US.yml",
+      "name": "en-US.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 2097,
+      "directory": "plugins/ai-audio-plugin/src/main/resources/lang"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/resources/lang/fr-FR.yml",
+      "name": "fr-FR.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 2319,
+      "directory": "plugins/ai-audio-plugin/src/main/resources/lang"
+    },
+    {
+      "path": "plugins/ai-audio-plugin/src/main/resources/plugin.yml",
+      "name": "plugin.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 239,
+      "directory": "plugins/ai-audio-plugin/src/main/resources"
+    },
+    {
+      "path": "plugins/music-plugin/README.md",
+      "name": "README.md",
+      "extension": ".md",
+      "type": "markdown_doc",
+      "module": "plugins",
+      "size_bytes": 4523,
+      "directory": "plugins/music-plugin"
+    },
+    {
+      "path": "plugins/music-plugin/pom.xml",
+      "name": "pom.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "plugins",
+      "size_bytes": 2030,
+      "directory": "plugins/music-plugin"
+    },
+    {
+      "path": "plugins/music-plugin/src/main/java/fr/farmvivi/discordbot/plugins/music/MusicManager.java",
+      "name": "MusicManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugins",
+      "size_bytes": 692,
+      "directory": "plugins/music-plugin/src/main/java/fr/farmvivi/discordbot/plugins/music"
+    },
+    {
+      "path": "plugins/music-plugin/src/main/java/fr/farmvivi/discordbot/plugins/music/MusicPlugin.java",
+      "name": "MusicPlugin.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugins",
+      "size_bytes": 4916,
+      "directory": "plugins/music-plugin/src/main/java/fr/farmvivi/discordbot/plugins/music"
+    },
+    {
+      "path": "plugins/music-plugin/src/main/java/fr/farmvivi/discordbot/plugins/music/PlaylistManager.java",
+      "name": "PlaylistManager.java",
+      "extension": ".java",
+      "type": "java_source",
+      "module": "plugins",
+      "size_bytes": 429,
+      "directory": "plugins/music-plugin/src/main/java/fr/farmvivi/discordbot/plugins/music"
+    },
+    {
+      "path": "plugins/music-plugin/src/main/resources/config.yml",
+      "name": "config.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 1265,
+      "directory": "plugins/music-plugin/src/main/resources"
+    },
+    {
+      "path": "plugins/music-plugin/src/main/resources/lang/en-US.yml",
+      "name": "en-US.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 1692,
+      "directory": "plugins/music-plugin/src/main/resources/lang"
+    },
+    {
+      "path": "plugins/music-plugin/src/main/resources/lang/fr-FR.yml",
+      "name": "fr-FR.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 1977,
+      "directory": "plugins/music-plugin/src/main/resources/lang"
+    },
+    {
+      "path": "plugins/music-plugin/src/main/resources/plugin.yml",
+      "name": "plugin.yml",
+      "extension": ".yml",
+      "type": "yaml_config",
+      "module": "plugins",
+      "size_bytes": 254,
+      "directory": "plugins/music-plugin/src/main/resources"
+    },
+    {
+      "path": "pom.xml",
+      "name": "pom.xml",
+      "extension": ".xml",
+      "type": "xml_config",
+      "module": "root",
+      "size_bytes": 11725,
+      "directory": ""
+    },
+    {
+      "path": "sonar-project.properties",
+      "name": "sonar-project.properties",
+      "extension": ".properties",
+      "type": "properties_config",
+      "module": "root",
+      "size_bytes": 715,
+      "directory": ""
+    }
+  ]
+}
