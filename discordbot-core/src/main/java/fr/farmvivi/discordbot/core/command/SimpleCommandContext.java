@@ -7,16 +7,15 @@ import fr.farmvivi.discordbot.api.command.option.CommandOption;
 import fr.farmvivi.discordbot.api.language.LanguageManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.components.MessageTopLevelComponent;
-
-import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Implementation of CommandContext that provides all necessary functionality

@@ -5,30 +5,35 @@ Advanced music bot functionality for DiscordBot Core with comprehensive playlist
 ## Features
 
 ### 🎵 Music Playback
+
 - **Multi-platform Support**: Play music from YouTube, Spotify, SoundCloud
 - **High-quality Audio**: Lossless audio streaming with configurable bitrates
 - **Smart Search**: Intelligent search across multiple platforms
 - **URL Support**: Direct links and playlist imports
 
 ### 📜 Queue Management
+
 - **Dynamic Queue**: Add, remove, and reorder tracks
 - **Queue Persistence**: Save and restore queues across restarts
 - **Shuffle & Loop**: Advanced playback modes
 - **Skip Voting**: Democratic skip system for shared listening
 
 ### 📋 Playlist System
+
 - **Personal Playlists**: Create and manage custom playlists
 - **Shared Playlists**: Collaborative playlists for servers
 - **Import/Export**: Backup and transfer playlists
 - **Favorites**: Quick access to favorite tracks
 
 ### 🎛️ Audio Control
+
 - **Volume Control**: Per-server volume settings
 - **Audio Effects**: Equalizer, bass boost, nightcore, and more
 - **Audio Filters**: Real-time audio processing
 - **Quality Settings**: Adaptive bitrate based on connection
 
 ### 📊 Rich Interface
+
 - **Now Playing**: Beautiful embeds with track information
 - **Progress Bars**: Visual playback progress
 - **Album Art**: Display track artwork and metadata
@@ -36,20 +41,20 @@ Advanced music bot functionality for DiscordBot Core with comprehensive playlist
 
 ## Commands
 
-| Command | Description | Permission |
-|---------|-------------|------------|
-| `/play <query>` | Play music from search or URL | `music.play` |
-| `/pause` | Pause/resume playback | `music.play` |
-| `/skip` | Skip current track | `music.skip` |
-| `/queue` | Show current queue | `music.queue` |
-| `/volume <0-100>` | Set playback volume | `music.volume` |
-| `/nowplaying` | Show current track info | `music.queue` |
-| `/playlist <action>` | Manage playlists | `music.playlist` |
-| `/search <query>` | Search for tracks | `music.play` |
-| `/shuffle` | Toggle queue shuffle | `music.queue` |
-| `/loop <mode>` | Set loop mode (off/track/queue) | `music.queue` |
-| `/clear` | Clear the queue | `music.admin` |
-| `/remove <index>` | Remove track from queue | `music.queue` |
+| Command              | Description                     | Permission       |
+|----------------------|---------------------------------|------------------|
+| `/play <query>`      | Play music from search or URL   | `music.play`     |
+| `/pause`             | Pause/resume playback           | `music.play`     |
+| `/skip`              | Skip current track              | `music.skip`     |
+| `/queue`             | Show current queue              | `music.queue`    |
+| `/volume <0-100>`    | Set playback volume             | `music.volume`   |
+| `/nowplaying`        | Show current track info         | `music.queue`    |
+| `/playlist <action>` | Manage playlists                | `music.playlist` |
+| `/search <query>`    | Search for tracks               | `music.play`     |
+| `/shuffle`           | Toggle queue shuffle            | `music.queue`    |
+| `/loop <mode>`       | Set loop mode (off/track/queue) | `music.queue`    |
+| `/clear`             | Clear the queue                 | `music.admin`    |
+| `/remove <index>`    | Remove track from queue         | `music.queue`    |
 
 ## Installation
 
@@ -66,9 +71,9 @@ Advanced music bot functionality for DiscordBot Core with comprehensive playlist
    ```
 
 3. **Configure the plugin**
-   - Edit server configuration to set up API keys (optional)
-   - Configure default volume and queue settings
-   - Set up custom prefixes and permissions
+    - Edit server configuration to set up API keys (optional)
+    - Configure default volume and queue settings
+    - Set up custom prefixes and permissions
 
 4. **Restart the bot** to load the music plugin
 
@@ -110,6 +115,7 @@ music:
 🚧 **Under Development** - This plugin is currently being implemented.
 
 Core features planned:
+
 - [x] Basic plugin structure and commands
 - [ ] LavaPlayer integration for audio playback
 - [ ] Queue management system

@@ -5,6 +5,7 @@ A modular, generic Discord bot engine designed for flexibility and extensibility
 ## 🚀 Features
 
 ### Core Engine Features
+
 - **Multi-Module Architecture**: Clean separation between API contracts and implementations
 - **Plugin System**: Dynamic plugin loading with dependency resolution and lifecycle management
 - **Command Framework**: Unified slash commands and text commands with permissions, cooldowns, and categories
@@ -17,8 +18,9 @@ A modular, generic Discord bot engine designed for flexibility and extensibility
 - **Discord Integration**: Full Discord API coverage through JDA with abstractions
 
 ### Built-in Commands
+
 - `help` - Interactive help system with command discovery
-- `version` - Display bot and plugin version information  
+- `version` - Display bot and plugin version information
 - `shutdown` - Graceful bot shutdown with plugin cleanup
 
 ## 🎵 Available Plugins
@@ -26,22 +28,28 @@ A modular, generic Discord bot engine designed for flexibility and extensibility
 The DiscordBot Core ecosystem includes several ready-to-use plugins:
 
 ### 🎵 Music Plugin
+
 Advanced music bot functionality with playlist management, queue controls, and audio effects.
+
 - Play music from YouTube, Spotify, SoundCloud
 - Playlist creation and management
 - Queue controls (skip, shuffle, loop)
 - Volume control and audio filters
 - Now playing displays with rich embeds
 
-### 🤖 AI Audio Plugin  
+### 🤖 AI Audio Plugin
+
 AI-powered voice processing capabilities for enhanced user interaction.
+
 - Voice recognition and transcription
 - Text-to-speech with multiple voices
 - Audio analysis and processing
 - Integration with popular AI services
 
 ### 🔊 Audio Example Plugin
+
 Demonstration plugin showing audio API capabilities.
+
 - Basic audio playback and recording
 - Voice channel event handling
 - Audio stream processing examples
@@ -65,6 +73,7 @@ discordbot-core/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - **Java 17** or newer
 - **Maven 3.6+** for building
 - **Discord Bot Token** (obtain from Discord Developer Portal)
@@ -72,23 +81,27 @@ discordbot-core/
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/FarmVivi/discordbot-core.git
 cd discordbot-core
 ```
 
 2. **Build the project**
+
 ```bash
 mvn clean package
 ```
 
 3. **Configure the bot**
+
 ```bash
 cp config.example.yml config.yml
 # Edit config.yml with your bot token and settings
 ```
 
 4. **Run the bot**
+
 ```bash
 java -jar target/discordbot-core.jar
 ```
@@ -110,17 +123,20 @@ Creating plugins for DiscordBot Core is straightforward thanks to the provided t
 ### Using the Plugin Template
 
 1. **Copy the template**
+
 ```bash
 cp -r plugin-template my-awesome-plugin
 cd my-awesome-plugin
 ```
 
 2. **Customize the plugin**
+
 - Edit `pom.xml` to change artifact ID and details
 - Implement your plugin logic in the main class
 - Add commands, event handlers, and features
 
 3. **Build and install**
+
 ```bash
 mvn clean package
 cp target/my-awesome-plugin-*.jar ../plugins/
@@ -154,7 +170,7 @@ public class MyAwesomePlugin extends AbstractPlugin {
 ### Available APIs
 
 - **Command API**: Create slash commands and text commands
-- **Event API**: Handle Discord and plugin events  
+- **Event API**: Handle Discord and plugin events
 - **Audio API**: Process audio streams and voice channels
 - **Permission API**: Manage user permissions and roles
 - **Storage API**: Persist data across restarts

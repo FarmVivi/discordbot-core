@@ -12,7 +12,7 @@ music:
     playlist: "Manage your playlists"
     search: "Search for music tracks"
     lyrics: "Show lyrics for current track"
-    
+
   messages:
     plugin_enabled: "Music Plugin enabled!"
     plugin_disabled: "Music Plugin disabled!"
@@ -29,7 +29,7 @@ music:
     loop_off: "Loop disabled"
     loop_track: "Loop track enabled"
     loop_queue: "Loop queue enabled"
-    
+
   errors:
     no_voice_channel: "You must be in a voice channel!"
     no_permission: "You don't have permission to use this command"
@@ -38,7 +38,7 @@ music:
     invalid_volume: "Volume must be between 0 and 100"
     playlist_not_found: "Playlist not found: {name}"
     track_too_long: "Track is too long (max {max} minutes)"
-    
+
   embed:
     now_playing_title: "Now Playing"
     queue_title: "Music Queue"

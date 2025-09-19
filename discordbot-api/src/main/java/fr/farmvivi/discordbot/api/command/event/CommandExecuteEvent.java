@@ -1,8 +1,8 @@
 package fr.farmvivi.discordbot.api.command.event;
 
-import fr.farmvivi.discordbot.api.event.Cancellable;
 import fr.farmvivi.discordbot.api.command.Command;
 import fr.farmvivi.discordbot.api.command.CommandContext;
+import fr.farmvivi.discordbot.api.event.Cancellable;
 
 /**
  * Event fired before a command is executed.
@@ -12,7 +12,7 @@ public class CommandExecuteEvent extends CommandEvent implements Cancellable {
 
     private final CommandContext context;
     private boolean cancelled = false;
-    
+
     /**
      * Creates a new command execute event.
      *
@@ -23,7 +23,7 @@ public class CommandExecuteEvent extends CommandEvent implements Cancellable {
         super(command);
         this.context = context;
     }
-    
+
     /**
      * Gets the command context.
      *
@@ -32,12 +32,12 @@ public class CommandExecuteEvent extends CommandEvent implements Cancellable {
     public CommandContext getContext() {
         return context;
     }
-    
+
     @Override
     public boolean isCancelled() {
         return cancelled;
     }
-    
+
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;

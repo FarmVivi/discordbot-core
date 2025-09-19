@@ -82,7 +82,7 @@ public class HelpCommand {
     private CommandResult execute(CommandContext context, Command command) {
         // Set ephemeral for help responses as they are typically personal
         context.setEphemeral(true);
-        
+
         // Check if we're getting help for a specific command
         if (context.hasOption("command")) {
             String commandName = context.getOption("command", "");
@@ -245,9 +245,9 @@ public class HelpCommand {
         } else {
             helpPrefix = "help";
         }
-        
+
         String description = "Type `" + helpPrefix + " <command>` or `" + helpPrefix + " <category>` for more details.";
-        
+
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(languageManager.getString(context.getLocale(), "commands.help.general_title"))
                 .setDescription(description);

@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.audio.AudioSendHandler;
  */
 public class SourceHandler {
     private final AudioSendHandler handler;
-    private int baseVolume;
     private final int priority;
+    private int baseVolume;
 
     /**
      * Crée un nouveau wrapper de handler d'envoi audio.

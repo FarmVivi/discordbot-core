@@ -1,13 +1,13 @@
 package fr.farmvivi.discordbot.core.command;
 
 import fr.farmvivi.discordbot.api.command.*;
-import fr.farmvivi.discordbot.api.command.option.CommandOption;
-import fr.farmvivi.discordbot.api.command.option.OptionChoice;
-import fr.farmvivi.discordbot.api.command.option.OptionType2;
 import fr.farmvivi.discordbot.api.command.event.CommandExecuteEvent;
 import fr.farmvivi.discordbot.api.command.event.CommandExecutedEvent;
 import fr.farmvivi.discordbot.api.command.exception.CommandParseException;
 import fr.farmvivi.discordbot.api.command.exception.CommandPermissionException;
+import fr.farmvivi.discordbot.api.command.option.CommandOption;
+import fr.farmvivi.discordbot.api.command.option.OptionChoice;
+import fr.farmvivi.discordbot.api.command.option.OptionType2;
 import fr.farmvivi.discordbot.api.config.Configuration;
 import fr.farmvivi.discordbot.api.config.ConfigurationException;
 import fr.farmvivi.discordbot.api.event.EventManager;
@@ -49,7 +49,7 @@ import java.util.function.Consumer;
 public class SimpleCommandService implements CommandService {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleCommandService.class);
-
+    private static final long SYNC_DELAY_MS = 1000; // 1 second delay
     private final CommandRegistry registry;
     private final List<CommandParser> parsers = new ArrayList<>();
     private final EventManager eventManager;
@@ -57,26 +57,21 @@ public class SimpleCommandService implements CommandService {
     private final PermissionManager permissionManager;
     private final Configuration configuration;
     private final DataStorageManager storageManager;
-
+    // Statistics
+    private final AtomicLong commandExecutionCount = new AtomicLong();
+    private final AtomicLong successfulCommandExecutionCount = new AtomicLong();
+    private final AtomicLong failedCommandExecutionCount = new AtomicLong();
+    private final AtomicLong totalExecutionTimeNs = new AtomicLong();
+    // Cooldowns: userId -> (commandName -> expirationTime)
+    private final Map<String, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
     private JDA jda;
     private boolean enabled;
     private String defaultPrefix;
     private CommandListener commandListener;
     private boolean systemCommandsRegistered = false;
     private boolean duringInitialization = false;
-
-    // Statistics
-    private final AtomicLong commandExecutionCount = new AtomicLong();
-    private final AtomicLong successfulCommandExecutionCount = new AtomicLong();
-    private final AtomicLong failedCommandExecutionCount = new AtomicLong();
-    private final AtomicLong totalExecutionTimeNs = new AtomicLong();
-
-    // Cooldowns: userId -> (commandName -> expirationTime)
-    private final Map<String, Map<String, Long>> cooldowns = new ConcurrentHashMap<>();
-
     // Debounced synchronization using existing Debouncer utility
     private Debouncer commandSyncDebouncer;
-    private static final long SYNC_DELAY_MS = 1000; // 1 second delay
 
     /**
      * Creates a new SimpleCommandService.
@@ -130,16 +125,6 @@ public class SimpleCommandService implements CommandService {
     }
 
     @Override
-    public String getPrefix(String guildId) {
-        if (guildId == null) {
-            return defaultPrefix;
-        }
-
-        GuildStorage guildStorage = storageManager.getGuildStorage(guildId);
-        return guildStorage.get("commands.prefix", String.class).orElse(defaultPrefix);
-    }
-
-    @Override
     public void setPrefix(String prefix) {
         if (prefix == null || prefix.isEmpty()) {
             throw new IllegalArgumentException("Prefix cannot be null or empty");
@@ -154,6 +139,16 @@ public class SimpleCommandService implements CommandService {
         } catch (ConfigurationException e) {
             logger.error("Failed to save command prefix to configuration", e);
         }
+    }
+
+    @Override
+    public String getPrefix(String guildId) {
+        if (guildId == null) {
+            return defaultPrefix;
+        }
+
+        GuildStorage guildStorage = storageManager.getGuildStorage(guildId);
+        return guildStorage.get("commands.prefix", String.class).orElse(defaultPrefix);
     }
 
     @Override
@@ -356,16 +351,16 @@ public class SimpleCommandService implements CommandService {
     }
 
     @Override
+    public JDA getJDA() {
+        return jda;
+    }
+
+    @Override
     public void setJDA(JDA jda) {
         this.jda = jda;
 
         // Don't register commands or listeners here - let enable() handle everything
         // This avoids duplicate registrations and multiple sync calls
-    }
-
-    @Override
-    public JDA getJDA() {
-        return jda;
     }
 
     @Override

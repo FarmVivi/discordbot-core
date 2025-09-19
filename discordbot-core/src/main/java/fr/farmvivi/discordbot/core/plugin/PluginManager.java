@@ -126,7 +126,7 @@ public class PluginManager implements PluginLoader, Closeable {
 
             // Create the plugin configuration
             PluginConfiguration pluginConfig = new PluginConfiguration(descriptor.name(), classLoader);
-            
+
             // Create the plugin context
             PluginContextImpl context = new PluginContextImpl(
                     descriptor.name(),
@@ -149,7 +149,7 @@ public class PluginManager implements PluginLoader, Closeable {
             // Initialize the plugin
             plugin.setLifecycle(PluginLifecycle.LOADED);
             plugin.onLoad(context);
-            
+
             // Initialize configuration migration after plugin is loaded
             pluginConfig.initializeMigration(plugin);
 
@@ -570,7 +570,9 @@ public class PluginManager implements PluginLoader, Closeable {
         return enabledOk && discordConnected;
     }
 
-    /** Saves all plugin data prior to reload. */
+    /**
+     * Saves all plugin data prior to reload.
+     */
     private void savePluginState() {
         if (dataStorageManager != null) {
             dataStorageManager.saveAll();
@@ -587,7 +589,9 @@ public class PluginManager implements PluginLoader, Closeable {
         postDisablePlugins();
     }
 
-    /** Disconnects the bot from Discord. */
+    /**
+     * Disconnects the bot from Discord.
+     */
     private void disconnectFromDiscord() {
         logger.info("Disconnecting from Discord...");
         try {
@@ -599,7 +603,9 @@ public class PluginManager implements PluginLoader, Closeable {
         }
     }
 
-    /** Clears all event handlers before plugins are reloaded. */
+    /**
+     * Clears all event handlers before plugins are reloaded.
+     */
     private void clearEventHandlers() {
         logger.info("Cleaning up resources...");
         if (eventManager != null) {
@@ -622,7 +628,9 @@ public class PluginManager implements PluginLoader, Closeable {
         }
     }
 
-    /** Runs the pre-enable phase for all plugins. */
+    /**
+     * Runs the pre-enable phase for all plugins.
+     */
     private void preEnableAllPlugins() {
         logger.info("Pre-enabling plugins...");
         preEnablePlugins();
@@ -667,7 +675,7 @@ public class PluginManager implements PluginLoader, Closeable {
     /**
      * Logs a summary of the reload process including timing statistics.
      *
-     * @param startTime the time when the reload began
+     * @param startTime        the time when the reload began
      * @param discordConnected whether Discord reconnection succeeded
      */
     private void logReloadSummary(long startTime, boolean discordConnected) {

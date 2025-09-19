@@ -24,36 +24,25 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
     private static final Logger logger = LoggerFactory.getLogger(AudioPipeline.class);
-    
+
     // Constantes pour le fondu audio
     private static final int FADE_DURATION_MS = 200;
     private static final int FRAME_DURATION_MS = 20;
     private static final int FADE_STEPS = FADE_DURATION_MS / FRAME_DURATION_MS;
-    
-    // Stratégies de traitement audio
-    private enum Strategy {
-        DIRECT_BYPASS,  // Une seule source, transmission directe
-        MIXING          // Plusieurs sources, mixage
-    }
-    
     private final Guild guild;
     private final EventManager eventManager;
-    
     // Gestionnaires pour les handlers et les priorités
     private final Map<String, SourceHandler> sendHandlers = new ConcurrentHashMap<>();
     private final Map<String, AudioReceiveHandler> receiveHandlers = new ConcurrentHashMap<>();
     private final PriorityManager priorityManager;
-    
     // Mixeur et état
     private final AudioMixer mixer;
-    private Strategy currentStrategy = Strategy.DIRECT_BYPASS;
     private final ReentrantLock strategyLock = new ReentrantLock();
+    private Strategy currentStrategy = Strategy.DIRECT_BYPASS;
     private int priorityThreshold = AudioService.DEFAULT_PRIORITY_THRESHOLD;
-    
     // État cache
     private String lastActivePluginName = null;
     private boolean providedAudioLastFrame = false;
-
     /**
      * Crée un nouveau pipeline audio pour une guilde.
      *
@@ -65,11 +54,11 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         this.eventManager = eventManager;
         this.mixer = new AudioMixer();
         this.priorityManager = new PriorityManager(FADE_STEPS);
-        
+
         // Connecte ce pipeline au AudioManager de la guilde
         guild.getAudioManager().setSendingHandler(this);
         guild.getAudioManager().setReceivingHandler(this);
-        
+
         logger.debug("Created audio pipeline for guild {}", guild.getName());
     }
 
@@ -85,10 +74,10 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         String pluginName = plugin.getName();
         SourceHandler sourceHandler = new SourceHandler(handler, volume, priority);
         sendHandlers.put(pluginName, sourceHandler);
-        
+
         // Met à jour la stratégie si nécessaire
         updateStrategy();
-        
+
         logger.debug("Registered send handler for plugin {} in guild {}", pluginName, guild.getName());
     }
 
@@ -100,15 +89,15 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
     public void deregisterSendHandler(Plugin plugin) {
         String pluginName = plugin.getName();
         sendHandlers.remove(pluginName);
-        
+
         // Réinitialise l'état du dernier plugin actif si nécessaire
         if (pluginName.equals(lastActivePluginName)) {
             lastActivePluginName = null;
         }
-        
+
         // Met à jour la stratégie si nécessaire
         updateStrategy();
-        
+
         logger.debug("Deregistered send handler for plugin {} in guild {}", pluginName, guild.getName());
     }
 
@@ -147,11 +136,11 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         if (sourceHandler != null) {
             int oldVolume = sourceHandler.getBaseVolume();
             sourceHandler.setBaseVolume(volume);
-            
+
             // Émet un événement de changement de volume
             AudioVolumeChangedEvent event = new AudioVolumeChangedEvent(guild, plugin, oldVolume, volume, false);
             eventManager.fireEvent(event);
-            
+
             logger.debug("Set volume to {} for plugin {} in guild {}", volume, pluginName, guild.getName());
         }
     }
@@ -224,14 +213,14 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         guild.getAudioManager().setSendingHandler(null);
         guild.getAudioManager().setReceivingHandler(null);
         guild.getAudioManager().closeAudioConnection();
-        
+
         // Vide les collections
         sendHandlers.clear();
         receiveHandlers.clear();
-        
+
         logger.debug("Closed audio pipeline for guild {}", guild.getName());
     }
-    
+
     /**
      * Met à jour la stratégie de traitement audio en fonction du nombre de sources.
      */
@@ -241,7 +230,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             Strategy newStrategy = sendHandlers.size() <= 1 ? Strategy.DIRECT_BYPASS : Strategy.MIXING;
             if (newStrategy != currentStrategy) {
                 currentStrategy = newStrategy;
-                logger.debug("Switched to {} strategy for guild {}", 
+                logger.debug("Switched to {} strategy for guild {}",
                         currentStrategy == Strategy.DIRECT_BYPASS ? "direct bypass" : "mixing",
                         guild.getName());
             }
@@ -249,11 +238,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             strategyLock.unlock();
         }
     }
-    
-    //
-    // Implémentation de AudioSendHandler
-    //
-    
+
     @Override
     public boolean canProvide() {
         strategyLock.lock();
@@ -264,34 +249,34 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
                 if (sendHandlers.isEmpty()) {
                     return false;
                 }
-                
+
                 // La seule source existante
                 SourceHandler sourceHandler = sendHandlers.values().iterator().next();
                 return sourceHandler.getHandler().canProvide();
             } else {
                 // Mode mixage : plusieurs sources
                 boolean canProvide = false;
-                
+
                 // Préparation pour la détection de sources prioritaires
                 boolean highPriorityActive = false;
                 String highPriorityPluginName = null;
-                
+
                 // Vérifie chaque source
                 for (Map.Entry<String, SourceHandler> entry : sendHandlers.entrySet()) {
                     String pluginName = entry.getKey();
                     SourceHandler sourceHandler = entry.getValue();
                     AudioSendHandler handler = sourceHandler.getHandler();
-                    
+
                     // Vérifie si ce handler peut fournir de l'audio
                     if (handler.canProvide()) {
                         canProvide = true;
-                        
+
                         // Détecte les sources de haute priorité
                         int priority = sourceHandler.getPriority();
                         if (priority >= priorityThreshold) {
                             highPriorityActive = true;
                             highPriorityPluginName = pluginName;
-                            
+
                             // Si un plugin de haute priorité devient actif, démarre le fade out des autres
                             if (lastActivePluginName == null || !lastActivePluginName.equals(pluginName)) {
                                 startFade(pluginName);
@@ -300,23 +285,27 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
                         }
                     }
                 }
-                
+
                 // Si aucune source de haute priorité n'est active et qu'il y en avait une avant,
                 // démarre le fade in pour toutes les sources
                 if (!highPriorityActive && lastActivePluginName != null) {
                     startFadeIn();
                 }
-                
+
                 // Met à jour l'état du dernier plugin actif
                 lastActivePluginName = highPriorityActive ? highPriorityPluginName : null;
-                
+
                 return canProvide;
             }
         } finally {
             strategyLock.unlock();
         }
     }
-    
+
+    //
+    // Implémentation de AudioSendHandler
+    //
+
     @Override
     public ByteBuffer provide20MsAudio() {
         strategyLock.lock();
@@ -324,7 +313,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             ByteBuffer audio;
             int activeSourceCount = 0;
             boolean bypassMode = currentStrategy == Strategy.DIRECT_BYPASS;
-            
+
             if (bypassMode) {
                 // Mode bypass : transmet directement l'audio d'une seule source
                 if (sendHandlers.isEmpty()) {
@@ -332,7 +321,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
                 } else {
                     SourceHandler sourceHandler = sendHandlers.values().iterator().next();
                     AudioSendHandler handler = sourceHandler.getHandler();
-                    
+
                     if (handler.canProvide()) {
                         audio = handler.provide20MsAudio();
                         activeSourceCount = 1;
@@ -343,48 +332,48 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             } else {
                 // Mode mixage : mixe plusieurs sources
                 mixer.reset();
-                
+
                 // Traite chaque source
                 for (Map.Entry<String, SourceHandler> entry : sendHandlers.entrySet()) {
                     String pluginName = entry.getKey();
                     SourceHandler sourceHandler = entry.getValue();
                     AudioSendHandler handler = sourceHandler.getHandler();
-                    
+
                     // Ajoute l'audio de cette source si disponible
                     if (handler.canProvide()) {
                         ByteBuffer sourceAudio = handler.provide20MsAudio();
                         if (sourceAudio != null) {
                             // Calcule le volume effectif en tenant compte des fades
                             float effectiveVolume = calculateEffectiveVolume(pluginName, sourceHandler);
-                            
+
                             // Ajoute au mixeur
                             mixer.addSource(sourceAudio, effectiveVolume);
                             activeSourceCount++;
                         }
                     }
-                    
+
                     // Mets à jour l'état des fades
                     priorityManager.updateFade(pluginName);
                 }
-                
+
                 // Obtient l'audio mixé
                 audio = mixer.mix();
             }
-            
+
             // Émet un événement de mixage
             boolean containsAudio = audio != null;
             AudioFrameMixedEvent event = new AudioFrameMixedEvent(guild, activeSourceCount, bypassMode, containsAudio);
             eventManager.fireEvent(event);
-            
+
             // Met à jour l'état
             providedAudioLastFrame = containsAudio;
-            
+
             return audio;
         } finally {
             strategyLock.unlock();
         }
     }
-    
+
     @Override
     public boolean isOpus() {
         // En mode bypass, utilise le format d'origine
@@ -392,15 +381,11 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             SourceHandler sourceHandler = sendHandlers.values().iterator().next();
             return sourceHandler.getHandler().isOpus();
         }
-        
+
         // En mode mixage, utilise toujours PCM (JDA se chargera de l'encodage)
         return false;
     }
-    
-    //
-    // Implémentation de AudioReceiveHandler
-    //
-    
+
     @Override
     public boolean canReceiveCombined() {
         // Vérifie si au moins un handler peut recevoir l'audio combiné
@@ -411,7 +396,11 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         }
         return false;
     }
-    
+
+    //
+    // Implémentation de AudioReceiveHandler
+    //
+
     @Override
     public boolean canReceiveUser() {
         // Vérifie si au moins un handler peut recevoir l'audio par utilisateur
@@ -422,7 +411,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         }
         return false;
     }
-    
+
     @Override
     public boolean canReceiveEncoded() {
         // Vérifie si au moins un handler peut recevoir l'audio encodé
@@ -433,7 +422,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         }
         return false;
     }
-    
+
     @Override
     public void handleCombinedAudio(CombinedAudio combinedAudio) {
         // Propage l'audio combiné à tous les handlers intéressés
@@ -443,7 +432,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             }
         }
     }
-    
+
     @Override
     public void handleUserAudio(UserAudio userAudio) {
         // Propage l'audio par utilisateur à tous les handlers intéressés
@@ -453,7 +442,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             }
         }
     }
-    
+
     @Override
     public void handleEncodedAudio(net.dv8tion.jda.api.audio.OpusPacket opusPacket) {
         // Propage l'audio encodé à tous les handlers intéressés
@@ -463,11 +452,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             }
         }
     }
-    
-    //
-    // Méthodes de gestion des fades
-    //
-    
+
     /**
      * Démarre un fondu sortant (fade out) pour toutes les sources sauf celle spécifiée.
      *
@@ -480,7 +465,11 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             }
         }
     }
-    
+
+    //
+    // Méthodes de gestion des fades
+    //
+
     /**
      * Démarre un fondu entrant (fade in) pour toutes les sources.
      */
@@ -489,7 +478,7 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
             priorityManager.startFadeIn(pluginName);
         }
     }
-    
+
     /**
      * Calcule le volume effectif pour une source, en tenant compte des fades.
      *
@@ -501,5 +490,11 @@ public class AudioPipeline implements AudioSendHandler, AudioReceiveHandler {
         float baseVolume = sourceHandler.getBaseVolume() / 100.0f;
         float fadeMultiplier = priorityManager.getFadeMultiplier(pluginName);
         return baseVolume * fadeMultiplier;
+    }
+
+    // Stratégies de traitement audio
+    private enum Strategy {
+        DIRECT_BYPASS,  // Une seule source, transmission directe
+        MIXING          // Plusieurs sources, mixage
     }
 }

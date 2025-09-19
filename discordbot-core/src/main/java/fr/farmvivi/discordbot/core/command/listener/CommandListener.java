@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
  * This listener processes slash commands and text commands and passes them to the command service.
  */
 public class CommandListener extends ListenerAdapter {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(CommandListener.class);
-    
+
     private final SimpleCommandService commandService;
-    
+
     /**
      * Creates a new command listener.
      *
@@ -26,20 +26,20 @@ public class CommandListener extends ListenerAdapter {
     public CommandListener(SimpleCommandService commandService) {
         this.commandService = commandService;
     }
-    
+
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         // Pass the event to the command service
         commandService.processCommand(event);
     }
-    
+
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         // Ignore bots
         if (event.getAuthor().isBot()) {
             return;
         }
-        
+
         // Pass the event to the command service
         commandService.processCommand(event);
     }

@@ -160,13 +160,13 @@ public interface CommandBuilder {
     /**
      * Adds a string option to the command with autocomplete.
      *
-     * @param name               the option name
-     * @param description        the option description
-     * @param required           true if the option is required
+     * @param name                 the option name
+     * @param description          the option description
+     * @param required             true if the option is required
      * @param autocompleteProvider the autocomplete provider
      * @return this builder
      */
-    CommandBuilder stringOption(String name, String description, boolean required, 
+    CommandBuilder stringOption(String name, String description, boolean required,
                                 Function<String, List<OptionChoice<String>>> autocompleteProvider);
 
     /**

@@ -119,6 +119,7 @@ audioService.setVolume(guild, this, 75);
 ### 5. Configurer les priorités
 
 Par défaut, les priorités sont définies comme suit :
+
 - Priorité : 0 (la plus basse) à 100 (la plus haute)
 - Seuil de priorité : 70 (les sources avec une priorité ≥ 70 atténuent les autres)
 

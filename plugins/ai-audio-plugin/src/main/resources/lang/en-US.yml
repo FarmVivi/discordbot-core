@@ -8,7 +8,7 @@ aiaudio:
     setlanguage: "Set the speech recognition language"
     confidence: "Show recognition confidence levels"
     privacy: "Manage your privacy settings"
-    
+
   messages:
     plugin_enabled: "AI Audio Plugin enabled!"
     plugin_disabled: "AI Audio Plugin disabled!"
@@ -22,7 +22,7 @@ aiaudio:
     voice_changed: "TTS voice changed to: {voice}"
     language_changed: "Recognition language changed to: {language}"
     analysis_complete: "Audio analysis complete"
-    
+
   errors:
     no_voice_channel: "You must be in a voice channel!"
     no_permission: "You don't have permission to use this command"
@@ -33,12 +33,12 @@ aiaudio:
     invalid_language: "Invalid language: {language}"
     text_too_long: "Text is too long (max {max} characters)"
     rate_limit_exceeded: "Rate limit exceeded. Try again later."
-    
+
   privacy:
     opted_out: "You have opted out of AI audio processing"
     opted_in: "You have opted in to AI audio processing"
     data_deleted: "Your audio data has been deleted"
-    
+
   voice_commands:
     wake_word_detected: "Wake word detected, listening for command..."
     command_recognized: "Command recognized: {command}"

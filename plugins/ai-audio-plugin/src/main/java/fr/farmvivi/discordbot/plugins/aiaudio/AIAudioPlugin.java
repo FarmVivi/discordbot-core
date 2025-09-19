@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 /**
  * AI-powered audio plugin for DiscordBot Core.
- * 
+ * <p>
  * Features:
  * - Voice recognition and transcription
  * - Text-to-speech with multiple voices
@@ -25,35 +25,35 @@ public class AIAudioPlugin extends AbstractPlugin {
     @Override
     public void onEnable() {
         logger.info("AI Audio Plugin enabling...");
-        
+
         // Register permissions
         registerPermissions();
-        
+
         // Initialize AI services
         initializeServices();
-        
+
         // Load configuration
         loadConfiguration();
-        
+
         logger.info("AI Audio Plugin enabled successfully!");
     }
 
     @Override
     public void onDisable() {
         logger.info("AI Audio Plugin disabling...");
-        
+
         if (speechRecognition != null) {
             speechRecognition.shutdown();
         }
-        
+
         if (textToSpeech != null) {
             textToSpeech.shutdown();
         }
-        
+
         if (audioAnalysis != null) {
             audioAnalysis.shutdown();
         }
-        
+
         logger.info("AI Audio Plugin disabled!");
     }
 
@@ -128,6 +128,7 @@ public class AIAudioPlugin extends AbstractPlugin {
         return audioAnalysis;
     }
 }
+
 // Internal permission implementation
 class AIPermission implements Permission {
     private final String name;
@@ -141,11 +142,17 @@ class AIPermission implements Permission {
     }
 
     @Override
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     @Override
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
     @Override
-    public PermissionDefault getDefault() { return def; }
+    public PermissionDefault getDefault() {
+        return def;
+    }
 }

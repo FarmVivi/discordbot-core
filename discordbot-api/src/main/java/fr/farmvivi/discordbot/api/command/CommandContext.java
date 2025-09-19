@@ -3,11 +3,11 @@ package fr.farmvivi.discordbot.api.command;
 import fr.farmvivi.discordbot.api.command.option.CommandOption;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 
 import java.util.Collection;
 import java.util.Locale;

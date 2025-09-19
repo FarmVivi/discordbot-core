@@ -1,7 +1,7 @@
 package fr.farmvivi.discordbot.api.command.event;
 
-import fr.farmvivi.discordbot.api.event.Event;
 import fr.farmvivi.discordbot.api.command.Command;
+import fr.farmvivi.discordbot.api.event.Event;
 
 /**
  * Base class for command events.
@@ -9,7 +9,7 @@ import fr.farmvivi.discordbot.api.command.Command;
 public abstract class CommandEvent implements Event {
 
     private final Command command;
-    
+
     /**
      * Creates a new command event.
      *
@@ -18,7 +18,7 @@ public abstract class CommandEvent implements Event {
     protected CommandEvent(Command command) {
         this.command = command;
     }
-    
+
     /**
      * Gets the command.
      *

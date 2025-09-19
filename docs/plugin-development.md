@@ -11,9 +11,9 @@ This guide covers everything you need to know about developing plugins for Disco
    ```
 
 2. **Customize your plugin**
-   - Edit `pom.xml` with your plugin details
-   - Rename the package and main class
-   - Implement your plugin functionality
+    - Edit `pom.xml` with your plugin details
+    - Rename the package and main class
+    - Implement your plugin functionality
 
 3. **Build and test**
    ```bash
@@ -470,11 +470,12 @@ public void updateSettings(int newMaxLevel) {
 #### For New Plugins
 
 1. **Include Default Config**: Always provide a comprehensive `config.yml` in your JAR's resources
-2. **Start with Version 1**: Use `config_version: 1` in your initial configuration  
+2. **Start with Version 1**: Use `config_version: 1` in your initial configuration
 3. **Document Settings**: Include comments explaining each configuration option
 4. **Use Sensible Defaults**: Provide working defaults that require minimal changes
 5. **Implement Migration**: If your plugin needs configuration migration, implement `ConfigurableMigrationPlugin`
 6. **Validate Settings**: Use `validateConfiguration()` to check required settings during plugin initialization
+
 ```
 
 ### Configuration File Structure

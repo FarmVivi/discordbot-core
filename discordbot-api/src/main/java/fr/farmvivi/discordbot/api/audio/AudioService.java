@@ -15,32 +15,32 @@ public interface AudioService {
      * Valeur minimum pour le volume (0%)
      */
     int MIN_VOLUME = 0;
-    
+
     /**
      * Valeur maximum pour le volume (100%)
      */
     int MAX_VOLUME = 100;
-    
+
     /**
      * Valeur minimum pour la priorité
      */
     int MIN_PRIORITY = 0;
-    
+
     /**
      * Valeur maximum pour la priorité
      */
     int MAX_PRIORITY = 100;
-    
+
     /**
      * Priorité par défaut
      */
     int DEFAULT_PRIORITY = 50;
-    
+
     /**
      * Volume par défaut (100%)
      */
     int DEFAULT_VOLUME = 100;
-    
+
     /**
      * Seuil de priorité par défaut.
      * Les sources audio avec une priorité inférieure seront atténuées

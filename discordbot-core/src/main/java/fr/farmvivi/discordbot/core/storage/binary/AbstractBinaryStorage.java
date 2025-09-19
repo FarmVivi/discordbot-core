@@ -24,12 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractBinaryStorage implements BinaryStorage {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractBinaryStorage.class);
     protected static final int BUFFER_SIZE = 8192;
-
-    protected final String storageName;
-    protected final EventManager eventManager;
-
     // Cache for content types to avoid repeated computation
     private static final Map<String, String> contentTypeCache = new ConcurrentHashMap<>();
+    protected final String storageName;
+    protected final EventManager eventManager;
 
     /**
      * Creates a new abstract binary storage.

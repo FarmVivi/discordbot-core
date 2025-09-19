@@ -51,6 +51,7 @@ The plugin supports multiple languages with localized messages:
 - **French** (`fr-FR.yml`): French translations
 
 Language files are located in `src/main/resources/lang/` and contain:
+
 - Plugin lifecycle messages
 - Audio operation notifications
 - Error messages
@@ -68,10 +69,10 @@ Language files are located in `src/main/resources/lang/` and contain:
 ## Code Structure
 
 - `AudioExamplePlugin.java`: Main plugin class with:
-  - Configuration loading and usage
-  - Language support integration
-  - Lifecycle management
-  - Voice event handlers
+    - Configuration loading and usage
+    - Language support integration
+    - Lifecycle management
+    - Voice event handlers
 - `MySendHandler`: Demonstrates audio sending to voice channels
 - `MyReceiveHandler`: Shows how to receive and process voice channel audio
 - Language files: Localized messages and text
@@ -80,8 +81,9 @@ Language files are located in `src/main/resources/lang/` and contain:
 ## API Demonstrations
 
 This plugin showcases:
+
 - **Configuration API**: Loading and using configuration values
-- **Language API**: Internationalization and localized messages  
+- **Language API**: Internationalization and localized messages
 - **Audio API**: Send and receive audio handlers
 - **Event API**: Voice channel event handling
 - **Storage API**: File management for recordings and samples

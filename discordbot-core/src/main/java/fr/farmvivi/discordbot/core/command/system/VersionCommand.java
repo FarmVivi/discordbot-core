@@ -1,10 +1,10 @@
 package fr.farmvivi.discordbot.core.command.system;
 
-import fr.farmvivi.discordbot.core.Discobocor;
 import fr.farmvivi.discordbot.api.command.Command;
 import fr.farmvivi.discordbot.api.command.CommandContext;
 import fr.farmvivi.discordbot.api.command.CommandResult;
 import fr.farmvivi.discordbot.api.language.LanguageManager;
+import fr.farmvivi.discordbot.core.Discobocor;
 import fr.farmvivi.discordbot.core.command.SimpleCommandBuilder;
 import fr.farmvivi.discordbot.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -53,7 +53,7 @@ public class VersionCommand {
     private CommandResult execute(CommandContext context, Command command) {
         // Set ephemeral for version responses as they are typically informational
         context.setEphemeral(true);
-        
+
         EmbedBuilder embed = new EmbedBuilder().setColor(DiscordColor.DISCORD_BLURPLE.getColor());
 
         embed.setTitle(languageManager.getString(context.getLocale(), "commands.version.title"))

@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 /**
  * Advanced music bot plugin for DiscordBot Core.
- * 
+ * <p>
  * Features:
  * - Play music from YouTube, Spotify, SoundCloud
  * - Playlist management and queue controls
@@ -25,32 +25,32 @@ public class MusicPlugin extends AbstractPlugin {
     @Override
     public void onEnable() {
         logger.info("Music Plugin enabling...");
-        
+
         // Register permissions
         registerPermissions();
-        
+
         // Initialize managers
         this.musicManager = new MusicManager(this);
         this.playlistManager = new PlaylistManager(this);
-        
+
         // Load configuration
         loadConfiguration();
-        
+
         logger.info("Music Plugin enabled successfully!");
     }
 
     @Override
     public void onDisable() {
         logger.info("Music Plugin disabling...");
-        
+
         if (musicManager != null) {
             musicManager.shutdown();
         }
-        
+
         if (playlistManager != null) {
             playlistManager.saveAllPlaylists();
         }
-        
+
         logger.info("Music Plugin disabled!");
     }
 
@@ -123,11 +123,17 @@ class SimplePermission implements Permission {
     }
 
     @Override
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     @Override
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
     @Override
-    public PermissionDefault getDefault() { return def; }
+    public PermissionDefault getDefault() {
+        return def;
+    }
 }

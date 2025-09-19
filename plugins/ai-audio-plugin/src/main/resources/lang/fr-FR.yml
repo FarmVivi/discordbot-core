@@ -8,7 +8,7 @@ aiaudio:
     setlanguage: "Définir la langue de reconnaissance vocale"
     confidence: "Afficher les niveaux de confiance de reconnaissance"
     privacy: "Gérer vos paramètres de confidentialité"
-    
+
   messages:
     plugin_enabled: "Plugin Audio IA activé !"
     plugin_disabled: "Plugin Audio IA désactivé !"
@@ -22,7 +22,7 @@ aiaudio:
     voice_changed: "Voix TTS changée vers : {voice}"
     language_changed: "Langue de reconnaissance changée vers : {language}"
     analysis_complete: "Analyse audio terminée"
-    
+
   errors:
     no_voice_channel: "Vous devez être dans un salon vocal !"
     no_permission: "Vous n'avez pas la permission d'utiliser cette commande"
@@ -33,12 +33,12 @@ aiaudio:
     invalid_language: "Langue invalide : {language}"
     text_too_long: "Texte trop long (max {max} caractères)"
     rate_limit_exceeded: "Limite de débit dépassée. Réessayez plus tard."
-    
+
   privacy:
     opted_out: "Vous avez refusé le traitement audio IA"
     opted_in: "Vous avez accepté le traitement audio IA"
     data_deleted: "Vos données audio ont été supprimées"
-    
+
   voice_commands:
     wake_word_detected: "Mot d'éveil détecté, écoute de la commande..."
     command_recognized: "Commande reconnue : {command}"

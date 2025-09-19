@@ -7,7 +7,6 @@ import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.audio.CombinedAudio;
-import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -258,9 +257,8 @@ public class AudioExamplePlugin extends AbstractPlugin {
     private static class MySendHandler implements AudioSendHandler {
         private static final Logger LOG = LoggerFactory.getLogger(MySendHandler.class);
         private static final int FRAME_SIZE = 3840; // 20ms @ 48kHz, 2 canaux, 16 bits
-
-        private AudioInputStream pcmStream;
         private final byte[] frameBuffer = new byte[FRAME_SIZE];
+        private AudioInputStream pcmStream;
         private ByteBuffer lastBuffer;
         private boolean done = false;
 
@@ -273,6 +271,16 @@ public class AudioExamplePlugin extends AbstractPlugin {
                 LOG.error("Failed to open audio file for playback: {}", audioFile.getAbsolutePath(), e);
                 done = true;
             }
+        }
+
+        private static int readFully(java.io.InputStream in, byte[] b, int off, int len) throws IOException {
+            int total = 0;
+            while (total < len) {
+                int r = in.read(b, off + total, len - total);
+                if (r < 0) break;
+                total += r;
+            }
+            return total == 0 ? -1 : total;
         }
 
         @Override
@@ -320,16 +328,6 @@ public class AudioExamplePlugin extends AbstractPlugin {
                 LOG.warn("Error while closing audio stream", e);
             }
         }
-
-        private static int readFully(java.io.InputStream in, byte[] b, int off, int len) throws IOException {
-            int total = 0;
-            while (total < len) {
-                int r = in.read(b, off + total, len - total);
-                if (r < 0) break;
-                total += r;
-            }
-            return total == 0 ? -1 : total;
-        }
     }
 
     /**
@@ -359,39 +357,6 @@ public class AudioExamplePlugin extends AbstractPlugin {
             } catch (IOException e) {
                 LOG.error("Impossible de démarrer l'enregistrement dans {}", outputFile.getAbsolutePath(), e);
                 this.raf = null;
-            }
-        }
-
-        @Override
-        public boolean canReceiveCombined() {
-            return raf != null;
-        }
-
-        @Override
-        public boolean canReceiveUser() {
-            return false;
-        }
-
-        @Override
-        public void handleCombinedAudio(CombinedAudio combinedAudio) {
-            if (raf == null) return;
-            try {
-                byte[] audio = combinedAudio.getAudioData(1.0); // Volume normal
-                raf.write(audio);
-                dataSize += audio.length;
-            } catch (IOException e) {
-                LOG.error("Erreur d'écriture des données audio dans {}", outputFile.getAbsolutePath(), e);
-            }
-        }
-
-        public void cleanup() {
-            if (raf == null) return;
-            try {
-                finalizeWavHeader(raf, dataSize);
-                raf.close();
-                LOG.info("Arrêt de l'enregistrement dans {}", outputFile.getAbsolutePath());
-            } catch (IOException e) {
-                LOG.warn("Erreur lors de la fermeture de l'enregistrement {}", outputFile.getAbsolutePath(), e);
             }
         }
 
@@ -435,6 +400,39 @@ public class AudioExamplePlugin extends AbstractPlugin {
         private static void writeLEShort(RandomAccessFile raf, short value) throws IOException {
             raf.writeByte(value & 0xFF);
             raf.writeByte((value >> 8) & 0xFF);
+        }
+
+        @Override
+        public boolean canReceiveCombined() {
+            return raf != null;
+        }
+
+        @Override
+        public boolean canReceiveUser() {
+            return false;
+        }
+
+        @Override
+        public void handleCombinedAudio(CombinedAudio combinedAudio) {
+            if (raf == null) return;
+            try {
+                byte[] audio = combinedAudio.getAudioData(1.0); // Volume normal
+                raf.write(audio);
+                dataSize += audio.length;
+            } catch (IOException e) {
+                LOG.error("Erreur d'écriture des données audio dans {}", outputFile.getAbsolutePath(), e);
+            }
+        }
+
+        public void cleanup() {
+            if (raf == null) return;
+            try {
+                finalizeWavHeader(raf, dataSize);
+                raf.close();
+                LOG.info("Arrêt de l'enregistrement dans {}", outputFile.getAbsolutePath());
+            } catch (IOException e) {
+                LOG.warn("Erreur lors de la fermeture de l'enregistrement {}", outputFile.getAbsolutePath(), e);
+            }
         }
     }
 }

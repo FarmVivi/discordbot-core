@@ -60,15 +60,6 @@ public enum OptionType2 {
     }
 
     /**
-     * Gets the corresponding JDA option type.
-     *
-     * @return the JDA option type
-     */
-    public OptionType getJdaType() {
-        return jdaType;
-    }
-
-    /**
      * Converts a JDA option type to our option type.
      *
      * @param jdaType the JDA option type
@@ -81,5 +72,14 @@ public enum OptionType2 {
             }
         }
         throw new IllegalArgumentException("Unsupported JDA option type: " + jdaType);
+    }
+
+    /**
+     * Gets the corresponding JDA option type.
+     *
+     * @return the JDA option type
+     */
+    public OptionType getJdaType() {
+        return jdaType;
     }
 }

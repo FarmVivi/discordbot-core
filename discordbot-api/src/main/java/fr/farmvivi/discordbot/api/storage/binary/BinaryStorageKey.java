@@ -54,25 +54,6 @@ public record BinaryStorageKey(String scope, String path) {
     }
 
     /**
-     * Gets the full key string.
-     *
-     * @return the formatted key
-     */
-    @NotNull
-    public String toString() {
-        return scope + ":" + path;
-    }
-
-    /**
-     * Gets the full path including scope.
-     *
-     * @return the full path
-     */
-    public String getFullPath() {
-        return scope + "/" + path;
-    }
-
-    /**
      * Normalizes a path to use forward slashes and no leading slash.
      *
      * @param path the path to normalize
@@ -92,5 +73,24 @@ public record BinaryStorageKey(String scope, String path) {
         }
 
         return normalized;
+    }
+
+    /**
+     * Gets the full key string.
+     *
+     * @return the formatted key
+     */
+    @NotNull
+    public String toString() {
+        return scope + ":" + path;
+    }
+
+    /**
+     * Gets the full path including scope.
+     *
+     * @return the full path
+     */
+    public String getFullPath() {
+        return scope + "/" + path;
     }
 }

@@ -40,20 +40,20 @@ public record SimpleCommand(
         subcommands = subcommands != null ? List.copyOf(subcommands) : List.of();
         aliases = aliases != null ? Set.copyOf(aliases) : Set.of();
         guildIds = guildIds != null ? Set.copyOf(guildIds) : Set.of();
-        
+
         // Default values for null parameters
         if (category == null) category = "General";
         if (translationKey == null) translationKey = "command." + name;
-        
+
         // Validation
         Objects.requireNonNull(name, "Command name cannot be null");
         Objects.requireNonNull(description, "Command description cannot be null");
-        
+
         // No executor is allowed for commands with subcommands
         if (!subcommands.isEmpty() && executor != null) {
             throw new IllegalArgumentException("Commands with subcommands cannot have an executor");
         }
-        
+
         // Commands without subcommands must have an executor
         if (subcommands.isEmpty() && executor == null) {
             throw new IllegalArgumentException("Commands without subcommands must have an executor");
@@ -147,17 +147,17 @@ public record SimpleCommand(
      * Builder for creating SimpleCommand instances.
      */
     public static class Builder {
+        private final List<CommandOption<?>> options = new ArrayList<>();
+        private final List<Command> subcommands = new ArrayList<>();
+        private final Set<String> aliases = new HashSet<>();
+        private final Set<String> guildIds = new HashSet<>();
         private String name;
         private String description;
         private String category = "General";
-        private final List<CommandOption<?>> options = new ArrayList<>();
-        private final List<Command> subcommands = new ArrayList<>();
         private String group;
         private String permission;
         private String translationKey;
-        private final Set<String> aliases = new HashSet<>();
         private boolean guildOnly = false;
-        private final Set<String> guildIds = new HashSet<>();
         private boolean isSubcommand = false;
         private Command parent;
         private boolean enabled = true;
@@ -375,7 +375,7 @@ public record SimpleCommand(
             if (description == null) {
                 throw new IllegalArgumentException("Command description is required");
             }
-            
+
             if (translationKey == null) {
                 translationKey = "command." + name;
             }

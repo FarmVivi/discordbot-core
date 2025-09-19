@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.Event;
  * Different implementations handle different types of command inputs (slash commands, text commands).
  */
 public interface CommandParser {
-    
+
     /**
      * Checks if this parser can handle the given event.
      *
@@ -18,17 +18,17 @@ public interface CommandParser {
      * @return true if this parser can handle the event
      */
     boolean canParse(Event event);
-    
+
     /**
      * Parses the event and creates a command context.
      *
-     * @param event the JDA event
+     * @param event   the JDA event
      * @param command the command to execute
      * @return the parsed command context
      * @throws CommandParseException if parsing fails
      */
     CommandContext parse(Event event, Command command) throws CommandParseException;
-    
+
     /**
      * Extracts the command name from the event.
      * This is used to determine which command to execute.
@@ -38,7 +38,7 @@ public interface CommandParser {
      * @throws CommandParseException if extraction fails
      */
     String extractCommandName(Event event) throws CommandParseException;
-    
+
     /**
      * Determines if the event actually contains a command invocation.
      * This is used to filter out events that are not command invocations.

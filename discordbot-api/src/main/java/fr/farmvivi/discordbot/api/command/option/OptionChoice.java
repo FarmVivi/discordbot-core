@@ -7,7 +7,7 @@ package fr.farmvivi.discordbot.api.command.option;
  * @param <T> the type of the choice value
  */
 public record OptionChoice<T>(String name, T value) {
-    
+
     /**
      * Creates a new string option choice.
      *
@@ -18,7 +18,7 @@ public record OptionChoice<T>(String name, T value) {
     public static OptionChoice<String> of(String name, String value) {
         return new OptionChoice<>(name, value);
     }
-    
+
     /**
      * Creates a new integer option choice.
      *
@@ -29,7 +29,7 @@ public record OptionChoice<T>(String name, T value) {
     public static OptionChoice<Integer> of(String name, int value) {
         return new OptionChoice<>(name, value);
     }
-    
+
     /**
      * Creates a new double option choice.
      *

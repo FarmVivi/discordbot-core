@@ -7,8 +7,8 @@ import fr.farmvivi.discordbot.api.storage.StorageKey;
  * Event fired when a value is retrieved from storage.
  */
 public class StorageGetEvent extends StorageEvent implements Cancellable {
-    private boolean cancelled = false;
     private final Class<?> type;
+    private boolean cancelled = false;
 
     /**
      * Creates a new storage get event.

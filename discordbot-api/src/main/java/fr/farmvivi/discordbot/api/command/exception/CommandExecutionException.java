@@ -5,7 +5,7 @@ package fr.farmvivi.discordbot.api.command.exception;
  * This includes errors during command business logic execution.
  */
 public class CommandExecutionException extends CommandException {
-    
+
     /**
      * Creates a new command execution exception with a message.
      *
@@ -14,17 +14,17 @@ public class CommandExecutionException extends CommandException {
     public CommandExecutionException(String message) {
         super(message);
     }
-    
+
     /**
      * Creates a new command execution exception with a message and a cause.
      *
      * @param message the error message
-     * @param cause the cause of the exception
+     * @param cause   the cause of the exception
      */
     public CommandExecutionException(String message, Throwable cause) {
         super(message, cause);
     }
-    
+
     /**
      * Creates a new command execution exception with a cause.
      *

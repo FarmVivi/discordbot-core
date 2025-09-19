@@ -13,13 +13,13 @@ public class CommandExecutedEvent extends CommandEvent {
     private final CommandContext context;
     private final CommandResult result;
     private final long executionTimeMs;
-    
+
     /**
      * Creates a new command executed event.
      *
-     * @param command        the command
-     * @param context        the command context
-     * @param result         the command result
+     * @param command         the command
+     * @param context         the command context
+     * @param result          the command result
      * @param executionTimeMs the execution time in milliseconds
      */
     public CommandExecutedEvent(Command command, CommandContext context, CommandResult result, long executionTimeMs) {
@@ -28,7 +28,7 @@ public class CommandExecutedEvent extends CommandEvent {
         this.result = result;
         this.executionTimeMs = executionTimeMs;
     }
-    
+
     /**
      * Gets the command context.
      *
@@ -37,7 +37,7 @@ public class CommandExecutedEvent extends CommandEvent {
     public CommandContext getContext() {
         return context;
     }
-    
+
     /**
      * Gets the command result.
      *
@@ -46,7 +46,7 @@ public class CommandExecutedEvent extends CommandEvent {
     public CommandResult getResult() {
         return result;
     }
-    
+
     /**
      * Gets the execution time in milliseconds.
      *

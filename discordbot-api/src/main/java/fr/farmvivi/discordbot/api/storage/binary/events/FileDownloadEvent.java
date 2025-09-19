@@ -9,8 +9,8 @@ import java.io.File;
  * Event fired before/after a file is downloaded from storage.
  */
 public class FileDownloadEvent extends BinaryStorageEvent implements Cancellable {
-    private boolean cancelled = false;
     private final File destination;
+    private boolean cancelled = false;
 
     /**
      * Creates a new file download event.

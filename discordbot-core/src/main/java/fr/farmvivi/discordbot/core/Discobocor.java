@@ -257,10 +257,10 @@ public class Discobocor {
 
             // Set the startup presence right after connecting
             discordAPI.setStartupPresence();
-            
+
             // Set JDA instance for command service
             commandService.setJDA(discordAPI.getJDA());
-            
+
             // Set JDA instance for console command service
             consoleCommandService.setJDA(discordAPI.getJDA());
         } catch (Exception e) {
@@ -271,7 +271,7 @@ public class Discobocor {
 
         // 4. Enable plugins
         pluginManager.enablePlugins();
-        
+
         // 5. Enable command service after plugins are loaded
         commandService.enable();
 

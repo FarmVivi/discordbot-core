@@ -98,14 +98,14 @@ public interface PluginContext {
      * @return the permission manager
      */
     PermissionManager getPermissionManager();
-    
+
     /**
      * Gets the audio service for managing audio connections.
      *
      * @return the audio service, or null if audio is disabled
      */
     AudioService getAudioService();
-    
+
     /**
      * Gets the command service for registering and managing commands.
      *

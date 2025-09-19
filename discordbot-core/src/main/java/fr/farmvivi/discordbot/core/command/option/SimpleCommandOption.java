@@ -35,7 +35,7 @@ public record SimpleCommandOption<T>(
     public SimpleCommandOption {
         // Ensure immutable collections
         choices = choices != null ? List.copyOf(choices) : List.of();
-        
+
         // Validate required fields
         Objects.requireNonNull(name, "Option name cannot be null");
         Objects.requireNonNull(description, "Option description cannot be null");
@@ -103,11 +103,11 @@ public record SimpleCommandOption<T>(
      * @param <T> the type of the option value
      */
     public static class Builder<T> {
+        private final List<OptionChoice<T>> choices = new ArrayList<>();
         private String name;
         private String description;
         private OptionType2 type;
         private boolean required;
-        private final List<OptionChoice<T>> choices = new ArrayList<>();
         private Predicate<T> validator;
         private Function<String, List<OptionChoice<T>>> autocompleteProvider;
         private Number minValue;

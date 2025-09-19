@@ -74,7 +74,7 @@ public class TextCommandParser implements CommandParser {
         // Get the appropriate prefix for this guild
         String guildId = messageEvent.isFromGuild() ? messageEvent.getGuild().getId() : null;
         String prefix = commandService.getPrefix(guildId);
-        
+
         // Parse the message content
         String content = message.getContentRaw();
         if (!content.startsWith(prefix)) {
@@ -114,7 +114,7 @@ public class TextCommandParser implements CommandParser {
         // Get the appropriate prefix for this guild
         String guildId = messageEvent.isFromGuild() ? messageEvent.getGuild().getId() : null;
         String prefix = commandService.getPrefix(guildId);
-        
+
         String content = messageEvent.getMessage().getContentRaw();
         if (!content.startsWith(prefix)) {
             throw new CommandParseException("Message does not start with the prefix: " + prefix);
@@ -140,15 +140,15 @@ public class TextCommandParser implements CommandParser {
         // Get the appropriate prefix for this guild
         String guildId = messageEvent.isFromGuild() ? messageEvent.getGuild().getId() : null;
         String prefix = commandService.getPrefix(guildId);
-        
+
         // Check if the message starts with the prefix
         String content = messageEvent.getMessage().getContentRaw();
         boolean isCommand = content.startsWith(prefix);
-        
+
         if (isCommand) {
             logger.debug("Text command detected: '{}' with prefix '{}'", content, prefix);
         }
-        
+
         return isCommand;
     }
 

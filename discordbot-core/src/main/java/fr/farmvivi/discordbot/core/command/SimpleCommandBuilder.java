@@ -314,7 +314,7 @@ public class SimpleCommandBuilder implements CommandBuilder {
         }
 
         SimpleCommand command = builder.build();
-        
+
         // Set parent for all subcommands
         for (Command subcommand : command.subcommands()) {
             if (subcommand instanceof SimpleCommand) {
@@ -323,7 +323,7 @@ public class SimpleCommandBuilder implements CommandBuilder {
                         .name(simpleSubcommand.name())
                         .description(simpleSubcommand.description())
                         .category(simpleSubcommand.category());
-                
+
                 // Copy all fields
                 for (CommandOption<?> option : simpleSubcommand.options()) {
                     subcommandBuilder.option(option);
@@ -331,23 +331,23 @@ public class SimpleCommandBuilder implements CommandBuilder {
                 for (Command nestedSubcommand : simpleSubcommand.subcommands()) {
                     subcommandBuilder.subcommand(nestedSubcommand);
                 }
-                
+
                 subcommandBuilder
                         .group(simpleSubcommand.group())
                         .permission(simpleSubcommand.permission())
                         .translationKey(simpleSubcommand.translationKey());
-                
+
                 for (String alias : simpleSubcommand.aliases()) {
                     subcommandBuilder.alias(alias);
                 }
-                
+
                 subcommandBuilder
                         .guildOnly(simpleSubcommand.isGuildOnly());
-                
+
                 for (String guildId : simpleSubcommand.guildIds()) {
                     subcommandBuilder.guildId(guildId);
                 }
-                
+
                 subcommandBuilder
                         .subcommand(true)
                         .parent(command)
@@ -356,7 +356,7 @@ public class SimpleCommandBuilder implements CommandBuilder {
                         .executor(simpleSubcommand.executor());
             }
         }
-        
+
         return command;
     }
 }

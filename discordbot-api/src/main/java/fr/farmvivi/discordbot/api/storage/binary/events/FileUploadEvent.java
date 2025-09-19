@@ -7,9 +7,9 @@ import fr.farmvivi.discordbot.api.storage.binary.BinaryStorageKey;
  * Event fired before/after a file is uploaded to storage.
  */
 public class FileUploadEvent extends BinaryStorageEvent implements Cancellable {
-    private boolean cancelled = false;
     private final Object source; // File or InputStream
     private final boolean overwrite;
+    private boolean cancelled = false;
 
     /**
      * Creates a new file upload event.

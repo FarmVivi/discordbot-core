@@ -5,7 +5,7 @@ package fr.farmvivi.discordbot.api.command.exception;
  * This exception is the parent class for more specific command exceptions.
  */
 public class CommandException extends Exception {
-    
+
     /**
      * Creates a new command exception with a message.
      *
@@ -14,17 +14,17 @@ public class CommandException extends Exception {
     public CommandException(String message) {
         super(message);
     }
-    
+
     /**
      * Creates a new command exception with a message and a cause.
      *
      * @param message the error message
-     * @param cause the cause of the exception
+     * @param cause   the cause of the exception
      */
     public CommandException(String message, Throwable cause) {
         super(message, cause);
     }
-    
+
     /**
      * Creates a new command exception with a cause.
      *

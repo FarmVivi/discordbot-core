@@ -145,6 +145,7 @@ public abstract class AbstractPlugin implements Plugin {
 
     /**
      * Convenience accessor for the plugin configuration.
+     *
      * @return configuration instance
      */
     public Configuration getConfiguration() {
@@ -153,6 +154,7 @@ public abstract class AbstractPlugin implements Plugin {
 
     /**
      * Convenience accessor for the plugin data folder path.
+     *
      * @return absolute path to plugin data folder
      */
     public String getDataFolder() {

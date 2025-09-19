@@ -44,7 +44,7 @@ public class ConsoleCommandParser implements CommandParser {
         }
 
         String input = consoleEvent.getInput();
-        
+
         // Parse the input
         String[] parts = input.split("\\s+", 2);
         String commandName = parts[0].toLowerCase();
@@ -87,7 +87,7 @@ public class ConsoleCommandParser implements CommandParser {
 
         String input = consoleEvent.getInput().trim();
         logger.debug("Console command detected: '{}'", input);
-        
+
         // Any non-empty input is considered a command attempt from console
         return !input.isEmpty();
     }

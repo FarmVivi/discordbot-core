@@ -3,6 +3,7 @@
 This template provides a starting point for creating DiscordBot Core plugins.
 
 ⚠️ **Note**: This template shows the basic plugin structure. For full functionality, you'll need to:
+
 1. Add the `discordbot-core` dependency to your `pom.xml`
 2. Extend `AbstractPlugin` instead of the basic structure shown
 3. Use proper API annotations like `@EventHandler` and `@Command`
@@ -16,13 +17,13 @@ This template provides a starting point for creating DiscordBot Core plugins.
    ```
 
 2. **Customize the plugin**
-   - Edit `pom.xml`:
-     - Change `<artifactId>` to your plugin name
-     - Update `<name>` and `<description>`
-     - Add `discordbot-core` dependency for full API access
-   - Rename the package in `src/main/java/com/example/plugin/` to your own
-   - Rename `TemplatePlugin.java` to your plugin class name
-   - Update the class name and plugin details in the Java file
+    - Edit `pom.xml`:
+        - Change `<artifactId>` to your plugin name
+        - Update `<name>` and `<description>`
+        - Add `discordbot-core` dependency for full API access
+    - Rename the package in `src/main/java/com/example/plugin/` to your own
+    - Rename `TemplatePlugin.java` to your plugin class name
+    - Update the class name and plugin details in the Java file
 
 3. **Add DiscordBot Core dependency** (for full API access)
    ```xml
@@ -50,6 +51,7 @@ This template provides a starting point for creating DiscordBot Core plugins.
 ## Full API Usage (with discordbot-core dependency)
 
 ### Commands
+
 ```java
 @Command(name = "mycommand", description = "My awesome command")
 public CommandResult myCommand(CommandContext ctx) {
@@ -59,6 +61,7 @@ public CommandResult myCommand(CommandContext ctx) {
 ```
 
 ### Event Handlers
+
 ```java
 @EventHandler
 public void onMessageReceived(MessageReceivedEvent event) {
@@ -67,6 +70,7 @@ public void onMessageReceived(MessageReceivedEvent event) {
 ```
 
 ### Configuration
+
 ```java
 // Get config values with defaults
 String value = getConfiguration().getString("my.setting", "default");
@@ -74,6 +78,7 @@ getConfiguration().set("my.setting", "new_value");
 ```
 
 ### Storage
+
 ```java
 // Persist data across restarts
 getPluginDataStorage().set("key", "value");
@@ -81,6 +86,7 @@ String value = getPluginDataStorage().getString("key", "default");
 ```
 
 ### Permissions
+
 ```java
 // Register permissions
 getPluginPermissionManager().registerPermission("myplugin.use", PermissionDefault.TRUE);

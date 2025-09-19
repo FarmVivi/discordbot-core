@@ -14,6 +14,7 @@ config_version: 1
 ```
 
 **Key Features:**
+
 - **Automatic Migration**: When the bot detects an older configuration version, it automatically migrates to the newer format
 - **Backup Creation**: Before any migration, a timestamped backup is created
 - **Plugin Config Copying**: Plugin configs are automatically copied from JAR files when missing
@@ -623,6 +624,7 @@ config_version: 1
 ```
 
 **Migration Path:**
+
 - **Version 0** (Legacy): Configurations without version tracking
 - **Version 1** (Current): Structured configurations with full versioning support
 

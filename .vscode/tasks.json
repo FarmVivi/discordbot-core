@@ -6,7 +6,10 @@
       "label": "package:all",
       "type": "shell",
       "command": "mvn clean package",
-      "group": { "kind": "build", "isDefault": true },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "detail": "Build & test all modules (full lifecycle)"
     },
     {
@@ -71,7 +74,10 @@
       "label": "run:core",
       "type": "shell",
       "command": "mvn -pl discordbot-core -am install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java -DskipTests",
-      "group": { "kind": "test", "isDefault": true },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
       "detail": "Install (skip tests) then start core from run dir"
     },
     {

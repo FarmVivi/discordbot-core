@@ -25,7 +25,7 @@
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.mainClass>fr.farmvivi.discordbot.core.Discobocor</project.mainClass>
-        
+
         <!-- Configuration SonarCloud -->
         <sonar.projectKey>FarmVivi_discordbot-core</sonar.projectKey>
         <sonar.organization>farmvivi</sonar.organization>
@@ -144,7 +144,7 @@
                 <version>5.13.4</version>
                 <scope>test</scope>
             </dependency>
-            
+
             <!-- Mockito -->
             <dependency>
                 <groupId>org.mockito</groupId>
@@ -205,7 +205,7 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <!-- Profil pour l'analyse SonarQube -->
         <profile>
             <id>sonar</id>
@@ -226,7 +226,7 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
-        
+
         <pluginManagement>
             <!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
             <plugins>

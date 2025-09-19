@@ -15,10 +15,10 @@ public class AudioFrameMixedEvent extends AudioEvent {
     /**
      * Crée un nouvel événement de frame mixé.
      *
-     * @param guild            la guilde
+     * @param guild             la guilde
      * @param activeSourceCount le nombre de sources actives
-     * @param bypassMode       true si le frame a été directement transmis (bypass)
-     * @param containsAudio    true si le frame contient de l'audio
+     * @param bypassMode        true si le frame a été directement transmis (bypass)
+     * @param containsAudio     true si le frame contient de l'audio
      */
     public AudioFrameMixedEvent(Guild guild, int activeSourceCount, boolean bypassMode, boolean containsAudio) {
         super(guild);

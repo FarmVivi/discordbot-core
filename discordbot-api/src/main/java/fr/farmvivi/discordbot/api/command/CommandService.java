@@ -35,19 +35,19 @@ public interface CommandService {
     String getPrefix();
 
     /**
+     * Sets the prefix for text commands.
+     *
+     * @param prefix the new command prefix
+     */
+    void setPrefix(String prefix);
+
+    /**
      * Gets the prefix for text commands in a specific guild.
      *
      * @param guildId the guild ID
      * @return the command prefix for the guild
      */
     String getPrefix(String guildId);
-
-    /**
-     * Sets the prefix for text commands.
-     *
-     * @param prefix the new command prefix
-     */
-    void setPrefix(String prefix);
 
     /**
      * Sets the prefix for text commands in a specific guild.
@@ -113,18 +113,18 @@ public interface CommandService {
     void disable();
 
     /**
-     * Sets the JDA instance to use for command handling.
-     *
-     * @param jda the JDA instance
-     */
-    void setJDA(JDA jda);
-
-    /**
      * Gets the JDA instance.
      *
      * @return the JDA instance
      */
     JDA getJDA();
+
+    /**
+     * Sets the JDA instance to use for command handling.
+     *
+     * @param jda the JDA instance
+     */
+    void setJDA(JDA jda);
 
     /**
      * Checks if the service is enabled.

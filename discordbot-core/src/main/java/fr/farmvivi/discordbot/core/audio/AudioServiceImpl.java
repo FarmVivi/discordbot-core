@@ -27,7 +27,7 @@ public class AudioServiceImpl implements AudioService {
     private final EventManager eventManager;
     private final Map<String, AudioPipeline> pipelines = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> pluginGuilds = new ConcurrentHashMap<>();
-    
+
     /**
      * Crée un nouveau service audio.
      *
@@ -42,28 +42,28 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null || plugin == null || handler == null) {
             throw new IllegalArgumentException("Guild, plugin and handler cannot be null");
         }
-        
+
         if (initialVolume < MIN_VOLUME || initialVolume > MAX_VOLUME) {
             throw new IllegalArgumentException("Volume must be between " + MIN_VOLUME + " and " + MAX_VOLUME);
         }
-        
+
         if (priority < MIN_PRIORITY || priority > MAX_PRIORITY) {
             throw new IllegalArgumentException("Priority must be between " + MIN_PRIORITY + " and " + MAX_PRIORITY);
         }
-        
+
         String guildId = guild.getId();
         AudioPipeline pipeline = getOrCreatePipeline(guild);
-        
+
         // Enregistrement du handler
         pipeline.registerSendHandler(plugin, handler, initialVolume, priority);
-        
+
         // Tracking des guildes par plugin
         pluginGuilds.computeIfAbsent(plugin.getName(), k -> ConcurrentHashMap.newKeySet()).add(guildId);
-        
+
         // Émission de l'événement
         AudioSendHandlerRegisteredEvent event = new AudioSendHandlerRegisteredEvent(guild, plugin, handler, initialVolume, priority);
         eventManager.fireEvent(event);
-        
+
         logger.debug("Registered audio send handler for plugin {} in guild {}", plugin.getName(), guild.getName());
     }
 
@@ -72,27 +72,27 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null || plugin == null) {
             return;
         }
-        
+
         String guildId = guild.getId();
         AudioPipeline pipeline = pipelines.get(guildId);
         if (pipeline == null) {
             return;
         }
-        
+
         AudioSendHandler handler = pipeline.getSendHandler(plugin);
         if (handler != null) {
             pipeline.deregisterSendHandler(plugin);
-            
+
             // Émission de l'événement
             AudioSendHandlerRemovedEvent event = new AudioSendHandlerRemovedEvent(guild, plugin, handler);
             eventManager.fireEvent(event);
-            
+
             logger.debug("Deregistered audio send handler for plugin {} in guild {}", plugin.getName(), guild.getName());
-            
+
             // Nettoyage du pipeline si vide
             cleanupPipeline(guild, pipeline);
         }
-        
+
         // Mise à jour du tracking des guildes par plugin
         Set<String> pluginGuildIds = pluginGuilds.get(plugin.getName());
         if (pluginGuildIds != null) {
@@ -108,11 +108,11 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null || plugin == null) {
             return;
         }
-        
+
         if (volume < MIN_VOLUME || volume > MAX_VOLUME) {
             throw new IllegalArgumentException("Volume must be between " + MIN_VOLUME + " and " + MAX_VOLUME);
         }
-        
+
         AudioPipeline pipeline = pipelines.get(guild.getId());
         if (pipeline != null) {
             pipeline.setVolume(plugin, volume);
@@ -124,20 +124,20 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null || plugin == null || handler == null) {
             throw new IllegalArgumentException("Guild, plugin and handler cannot be null");
         }
-        
+
         String guildId = guild.getId();
         AudioPipeline pipeline = getOrCreatePipeline(guild);
-        
+
         // Enregistrement du handler
         pipeline.registerReceiveHandler(plugin, handler);
-        
+
         // Tracking des guildes par plugin
         pluginGuilds.computeIfAbsent(plugin.getName(), k -> ConcurrentHashMap.newKeySet()).add(guildId);
-        
+
         // Émission de l'événement
         AudioReceiveHandlerRegisteredEvent event = new AudioReceiveHandlerRegisteredEvent(guild, plugin, handler);
         eventManager.fireEvent(event);
-        
+
         logger.debug("Registered audio receive handler for plugin {} in guild {}", plugin.getName(), guild.getName());
     }
 
@@ -146,27 +146,27 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null || plugin == null) {
             return;
         }
-        
+
         String guildId = guild.getId();
         AudioPipeline pipeline = pipelines.get(guildId);
         if (pipeline == null) {
             return;
         }
-        
+
         AudioReceiveHandler handler = pipeline.getReceiveHandler(plugin);
         if (handler != null) {
             pipeline.deregisterReceiveHandler(plugin);
-            
+
             // Émission de l'événement
             AudioReceiveHandlerRemovedEvent event = new AudioReceiveHandlerRemovedEvent(guild, plugin, handler);
             eventManager.fireEvent(event);
-            
+
             logger.debug("Deregistered audio receive handler for plugin {} in guild {}", plugin.getName(), guild.getName());
-            
+
             // Nettoyage du pipeline si vide
             cleanupPipeline(guild, pipeline);
         }
-        
+
         // Mise à jour du tracking des guildes par plugin
         Set<String> pluginGuildIds = pluginGuilds.get(plugin.getName());
         if (pluginGuildIds != null) {
@@ -182,11 +182,11 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null) {
             return;
         }
-        
+
         if (threshold < MIN_PRIORITY || threshold > MAX_PRIORITY) {
             throw new IllegalArgumentException("Threshold must be between " + MIN_PRIORITY + " and " + MAX_PRIORITY);
         }
-        
+
         AudioPipeline pipeline = pipelines.get(guild.getId());
         if (pipeline != null) {
             pipeline.setPriorityThreshold(threshold);
@@ -198,7 +198,7 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null || plugin == null) {
             return false;
         }
-        
+
         AudioPipeline pipeline = pipelines.get(guild.getId());
         return pipeline != null && pipeline.hasSendHandler(plugin);
     }
@@ -208,7 +208,7 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null || plugin == null) {
             return false;
         }
-        
+
         AudioPipeline pipeline = pipelines.get(guild.getId());
         return pipeline != null && pipeline.hasReceiveHandler(plugin);
     }
@@ -218,13 +218,13 @@ public class AudioServiceImpl implements AudioService {
         if (guild == null) {
             return;
         }
-        
+
         String guildId = guild.getId();
         AudioPipeline pipeline = pipelines.remove(guildId);
         if (pipeline != null) {
             pipeline.close();
             logger.debug("Closed audio connection for guild {}", guild.getName());
-            
+
             // Mise à jour du tracking des guildes par plugin
             for (Map.Entry<String, Set<String>> entry : pluginGuilds.entrySet()) {
                 entry.getValue().remove(guildId);
@@ -240,7 +240,7 @@ public class AudioServiceImpl implements AudioService {
         if (plugin == null) {
             return;
         }
-        
+
         Set<String> guildIds = pluginGuilds.remove(plugin.getName());
         if (guildIds != null) {
             for (String guildId : guildIds) {
@@ -248,7 +248,7 @@ public class AudioServiceImpl implements AudioService {
                 if (pipeline != null) {
                     pipeline.deregisterSendHandler(plugin);
                     pipeline.deregisterReceiveHandler(plugin);
-                    
+
                     // Nettoyage du pipeline si vide
                     if (pipeline.isEmpty()) {
                         pipeline.close();
@@ -256,11 +256,11 @@ public class AudioServiceImpl implements AudioService {
                     }
                 }
             }
-            
+
             logger.debug("Closed all audio connections for plugin {}", plugin.getName());
         }
     }
-    
+
     /**
      * Obtient le pipeline audio pour une guilde ou en crée un nouveau si nécessaire.
      *
@@ -270,7 +270,7 @@ public class AudioServiceImpl implements AudioService {
     private AudioPipeline getOrCreatePipeline(Guild guild) {
         return pipelines.computeIfAbsent(guild.getId(), k -> new AudioPipeline(guild, eventManager));
     }
-    
+
     /**
      * Nettoie un pipeline audio si nécessaire.
      *

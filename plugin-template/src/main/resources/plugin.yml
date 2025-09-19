@@ -4,4 +4,4 @@ main: com.example.plugin.TemplatePlugin
 description: Template plugin for DiscordBot Core development
 author: YourName
 website: https://github.com/your-username/your-plugin-repo
-dependencies: []
+dependencies: [ ]
