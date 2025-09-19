@@ -199,9 +199,6 @@ config.save();
 
 **How to Use**:
 ```java
-// Register namespace
-getPluginLanguageManager().registerNamespace("myplugin");
-
 // Get translations
 String message = getPluginLanguageManager().getString("welcome", "Hello {0}!", username);
 String localized = getPluginLanguageManager().getString(Locale.FRENCH, "goodbye");

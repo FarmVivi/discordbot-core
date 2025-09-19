@@ -44,9 +44,6 @@ public class CommandExamplePlugin extends AbstractPlugin {
         // Record start time for uptime calculation
         pluginStartTime = System.currentTimeMillis();
 
-        // Register language namespace
-        getPluginLanguageManager().registerNamespace("commands");
-
         // Register permissions
         registerPermissions();
 

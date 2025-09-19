@@ -447,7 +447,6 @@ cp target/my-awesome-plugin-1.0.0.jar /path/to/bot/plugins/
 - Ensure permission defaults are appropriate
 
 **Language Issues**
-- Verify namespace registration: `registerNamespace("yournamespace")`
 - Check language file format and structure
 - Ensure language keys match code usage
 

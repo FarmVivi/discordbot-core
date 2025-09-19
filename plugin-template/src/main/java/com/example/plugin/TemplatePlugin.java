@@ -82,9 +82,6 @@ public class TemplatePlugin extends AbstractPlugin {
         super.onPreEnable();
         logger.info("Pre-enabling {} v{}", getName(), getVersion());
         
-        // Register namespace for translations
-        registerLanguageNamespace();
-        
         // Register permissions
         registerPermissions();
     }
@@ -229,18 +226,6 @@ public class TemplatePlugin extends AbstractPlugin {
             exampleCommandsEnabled = false;
             exampleEventsEnabled = false;
             exampleStorageEnabled = false;
-        }
-    }
-
-    /**
-     * Registers the plugin's language namespace for i18n support.
-     */
-    private void registerLanguageNamespace() {
-        boolean registered = getPluginLanguageManager().registerNamespace("template");
-        if (registered) {
-            logger.debug("Language namespace 'template' registered successfully");
-        } else {
-            logger.warn("Failed to register language namespace 'template'");
         }
     }
 

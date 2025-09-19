@@ -592,20 +592,6 @@ public void restrictedAction(CommandContext ctx) {
 
 ## Internationalization
 
-### Setting Up Languages
-
-```java
-@Override
-public void onEnable() {
-    // Register language namespace
-    getPluginLanguageAdapter().registerNamespace("myplugin");
-    
-    // Load language files
-    getPluginLanguageAdapter().loadLanguageFile("en-US", "lang/en.yml");
-    getPluginLanguageAdapter().loadLanguageFile("fr-FR", "lang/fr.yml");
-}
-```
-
 ### Language Files
 
 ```yaml
