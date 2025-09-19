@@ -7,7 +7,7 @@ This document provides a comprehensive overview of all features and APIs exposed
 | Feature | Description | Entry Points | How to Use | Configuration | Example Plugin |
 |---------|-------------|--------------|------------|---------------|----------------|
 | **Plugin System** | Core plugin lifecycle and management | `AbstractPlugin`, `PluginContext`, `PluginManager` | Extend `AbstractPlugin`, implement lifecycle methods | `plugin.yml` metadata | [Example Template](../plugin-template/) |
-| **Command System** | Slash commands and text commands with permissions | `CommandService`, `CommandBuilder`, `@Command` | Register commands via `CommandService` or builder pattern | Command metadata, cooldowns, permissions | [Example Commands](#) |
+| **Command System** | Slash commands and text commands with permissions | `CommandService`, `CommandBuilder`, `@Command` | Register commands via `CommandService` or builder pattern | Command metadata, cooldowns, permissions | [Example Commands](../examples/plugins/plugin-example-commands/) |
 | **Event System** | Discord and plugin event handling with priorities | `EventManager`, `@EventHandler`, `EventPriority` | Register listeners with `@EventHandler` annotations | Event priorities, async handling | [Example Events](#) |
 | **Permission System** | Role-based permissions with plugin namespacing | `PermissionManager`, `Permission`, `PluginPermissionAdapter` | Register permissions, check with `hasPermission()` | Permission defaults, role mappings | [Example Permissions](#) |
 | **Configuration System** | YAML-based plugin configuration with auto-loading | `Configuration`, file-based configs | Access via `getConfiguration()`, automatic loading | `config.yml` in plugin JAR and data folder | [Example Config](#) |
