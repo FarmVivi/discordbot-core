@@ -802,7 +802,8 @@ public class MyPluginTest {
 
 See the following example plugins:
 
-- **[Audio Example](../discordbot-example-audio/)**: Basic audio processing
+- **[Audio Example](../examples/plugins/plugin-example-audio/)**: Basic audio processing
+- **[Commands Example](../examples/plugins/plugin-example-commands/)**: Command handling implementation
 - **[Music Plugin](../plugins/music-plugin/)**: Advanced music bot
 - **[AI Audio Plugin](../plugins/ai-audio-plugin/)**: AI-powered voice processing
 - **[Plugin Template](../plugin-template/)**: Starting template

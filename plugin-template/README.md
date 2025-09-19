@@ -258,7 +258,8 @@ The template includes all necessary dependencies:
 
 ## Available Examples
 
-- **[Audio Example](../examples/audio/)**: Audio processing with voice channels
+- **[Audio Example](../examples/plugins/plugin-example-audio/)**: Audio processing with voice channels
+- **[Commands Example](../examples/plugins/plugin-example-commands/)**: Command handling implementation
 - **[Music Plugin](../plugins/music-plugin/)**: Advanced music bot (structure only)
 - **[AI Audio Plugin](../plugins/ai-audio-plugin/)**: AI voice processing (structure only)
 

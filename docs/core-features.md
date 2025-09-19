@@ -14,7 +14,7 @@ This document provides a comprehensive overview of all features and APIs exposed
 | **Internationalization (i18n)** | Multi-language support with namespace isolation | `LanguageManager`, `PluginLanguageAdapter` | Register namespace, load language files | Language files in `lang/` directory | [Example i18n](#) |
 | **Data Storage** | Persistent data storage with scoping (global/user/guild) | `DataStorageManager`, `PluginDataStorageAdapter` | Use scoped storage methods (`getGlobalStorage()`, etc.) | Storage backend configuration | [Example Storage](#) |
 | **Binary Storage** | Large file storage with multiple backends (File/S3) | `BinaryStorageManager`, `PluginBinaryStorageAdapter` | Store/retrieve files with automatic namespacing | Storage backend selection | [Example Files](#) |
-| **Audio System** | Advanced audio processing with mixing and priorities | `AudioService`, `AudioSendHandler`, `AudioReceiveHandler` | Register audio handlers with volume/priority | Audio priorities, volume control | [Example Audio](../examples/audio/) |
+| **Audio System** | Advanced audio processing with mixing and priorities | `AudioService`, `AudioSendHandler`, `AudioReceiveHandler` | Register audio handlers with volume/priority | Audio priorities, volume control | [Example Audio](../examples/plugins/plugin-example-audio/) |
 | **Discord Integration** | Full Discord API access through JDA abstraction | `DiscordAPI`, `JDA` instance | Access Discord entities and APIs | Bot token, intents, activity | [Example Discord](#) |
 | **Logging System** | Plugin-specific logging with configurable levels | Plugin `Logger` instance | Use provided logger in `AbstractPlugin` | Log levels, file output | Built into template |
 | **Plugin Communication** | Inter-plugin dependency resolution and access | `PluginLoader`, `PluginManager` | Declare dependencies, access other plugins | `plugin.yml` dependencies | [Example Deps](#) |
@@ -431,7 +431,8 @@ Based on code analysis, the following common bot framework features are **not pr
 
 | Feature | Example Plugin | Location |
 |---------|----------------|----------|
-| Audio System | Audio Example | [examples/audio/](../examples/audio/) |
+| Audio System | Audio Example | [examples/plugins/plugin-example-audio/](../examples/plugins/plugin-example-audio/) |
+| Command System | Example Commands | [examples/plugins/plugin-example-commands/](../examples/plugins/plugin-example-commands/) |
 | Plugin Lifecycle | Template Plugin | [plugin-template/](../plugin-template/) |
 | All Features | *To be created* | [examples/plugins/](#) |
 

@@ -106,7 +106,7 @@ This directory contains comprehensive example plugins demonstrating all core fea
 
 #### Audio System Example *(Already Exists)*
 **Focus**: Audio processing and voice channels  
-**File**: `../audio/` *(Existing)*  
+**File**: `plugin-example-audio/` *(Existing under examples/plugins)*  
 **Status**: ✅ Available
 
 **Features Demonstrated**:
@@ -191,8 +191,8 @@ All examples maintain high code quality:
 
 These examples integrate with the main documentation:
 
-- **[Core Features Matrix](../../docs/core-features.md)**: Links to relevant examples
-- **[Plugin Development Guide](../../docs/plugin-development.md)**: References example implementations  
+- **[Core Features Matrix](../../core-features.md)**: Links to relevant examples
+- **[Plugin Development Guide](../../plugin-development.md)**: References example implementations  
 - **[Template Quickstart](template-quickstart.md)**: Uses examples for learning
 
 ## Contributing New Examples

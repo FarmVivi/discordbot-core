@@ -58,9 +58,9 @@
     {
       "label": "build:examples",
       "type": "shell",
-      "command": "mvn -pl examples/audio -am package -DskipTests",
+      "command": "mvn -pl examples/plugins/plugin-example-audio,examples/plugins/plugin-example-commands -am package -DskipTests",
       "group": "build",
-      "detail": "Build example audio plugin"
+      "detail": "Build example audio and commands plugins"
     },
     {
       "label": "build:template",

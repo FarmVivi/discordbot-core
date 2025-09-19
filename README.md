@@ -60,14 +60,14 @@ Demonstration plugin showing audio API capabilities.
 
 ```
 discordbot-core/
-├── discordbot-api/           # Public API interfaces and contracts
-├── discordbot-core/          # Core implementation and engine
-├── discordbot-example-audio/ # Example audio plugin
-├── plugin-template/          # Template for creating new plugins
-├── plugins/                  # Additional plugin modules
-│   ├── music-plugin/         # Music bot functionality
-│   └── ai-audio-plugin/      # AI voice processing
-└── docs/                     # Documentation and guides
+├── discordbot-api/                        # Public API interfaces and contracts
+├── discordbot-core/                       # Core implementation and engine
+├── examples/plugins/plugin-example-audio/ # Example audio plugin
+├── plugin-template/                       # Template for creating new plugins
+├── plugins/                               # Additional plugin modules
+│   ├── music-plugin/                      # Music bot functionality
+│   └── ai-audio-plugin/                   # AI voice processing
+└── docs/                                  # Documentation and guides
 ```
 
 ## 🚀 Quick Start
@@ -212,7 +212,8 @@ mvn clean install
 
 - **discordbot-api**: Lightweight API interfaces for plugin development
 - **discordbot-core**: Main engine implementation with all features
-- **discordbot-example-audio**: Reference implementation for audio plugins
+- **plugin-example-audio**: Reference implementation for audio plugins
+- **plugin-example-commands**: Reference implementation for command handling
 - **plugin-template**: Starter template for new plugin development
 
 ## 🤝 Contributing
