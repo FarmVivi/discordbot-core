@@ -1,0 +1,7 @@
+name: CommandExamplePlugin
+version: 1.0.0
+main: fr.farmvivi.discordbot.examples.commands.CommandExamplePlugin
+description: Demonstrates command system features including slash commands, text commands, permissions, and cooldowns
+author: DiscordBot Core Team
+website: https://github.com/FarmVivi/discordbot-core
+dependencies: [ ]

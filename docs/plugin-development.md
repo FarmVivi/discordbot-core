@@ -592,20 +592,6 @@ public void restrictedAction(CommandContext ctx) {
 
 ## Internationalization
 
-### Setting Up Languages
-
-```java
-@Override
-public void onEnable() {
-    // Register language namespace
-    getPluginLanguageAdapter().registerNamespace("myplugin");
-    
-    // Load language files
-    getPluginLanguageAdapter().loadLanguageFile("en-US", "lang/en.yml");
-    getPluginLanguageAdapter().loadLanguageFile("fr-FR", "lang/fr.yml");
-}
-```
-
 ### Language Files
 
 ```yaml
@@ -816,7 +802,8 @@ public class MyPluginTest {
 
 See the following example plugins:
 
-- **[Audio Example](../discordbot-example-audio/)**: Basic audio processing
+- **[Audio Example](../examples/plugins/plugin-example-audio/)**: Basic audio processing
+- **[Commands Example](../examples/plugins/plugin-example-commands/)**: Command handling implementation
 - **[Music Plugin](../plugins/music-plugin/)**: Advanced music bot
 - **[AI Audio Plugin](../plugins/ai-audio-plugin/)**: AI-powered voice processing
 - **[Plugin Template](../plugin-template/)**: Starting template

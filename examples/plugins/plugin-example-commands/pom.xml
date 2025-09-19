@@ -8,12 +8,13 @@
         <groupId>fr.farmvivi.discordbot</groupId>
         <artifactId>discordbot-parent</artifactId>
         <version>2.3.27-SNAPSHOT</version>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>plugin-template</artifactId>
+    <artifactId>plugin-example-commands</artifactId>
 
-    <name>Plugin Template</name>
-    <description>Template for creating DiscordBot plugins</description>
+    <name>Plugin Example - Commands</name>
+    <description>Example plugin demonstrating the command system features</description>
 
     <dependencies>
         <!-- API module for plugin development -->
@@ -80,15 +81,6 @@
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
                     </includes>
-                </configuration>
-            </plugin>
-
-            <!-- Resources plugin for filtering -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>

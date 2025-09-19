@@ -47,4 +47,29 @@ public class PluginPermissionAdapter {
     public Set<String> getRegisteredPermissions() {
         return new HashSet<>(registeredPermissions);
     }
+
+    /**
+     * Checks if a user has a permission globally.
+     * Convenience wrapper around {@link PermissionManager#hasPermission(String, String)}.
+     *
+     * @param userId     the user ID
+     * @param permission the permission name
+     * @return true if the user has the permission
+     */
+    public boolean hasPermission(String userId, String permission) {
+        return permissionManager.hasPermission(userId, permission);
+    }
+
+    /**
+     * Checks if a user has a permission in a specific guild.
+     * Convenience wrapper around {@link PermissionManager#hasPermission(String, String, String)}.
+     *
+     * @param userId     the user ID
+     * @param guildId    the guild ID
+     * @param permission the permission name
+     * @return true if the user has the permission
+     */
+    public boolean hasPermission(String userId, String guildId, String permission) {
+        return permissionManager.hasPermission(userId, guildId, permission);
+    }
 }

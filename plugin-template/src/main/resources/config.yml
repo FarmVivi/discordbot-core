@@ -1,45 +1,99 @@
 # Template Plugin Configuration
 config_version: 1
 
-# Example settings
-example:
-  # Enable example feature
-  enabled: true
+# Plugin features control - disable any features not needed
+features:
+  # Enable example commands (set to false to disable all example commands)
+  example_commands: false
   
-  # Example string setting
-  setting: "default_value"
+  # Enable example event handlers (set to false to disable event examples)  
+  example_events: false
   
-  # Example number setting
-  number: 42
+  # Enable data storage examples (set to false to disable storage examples)
+  example_storage: false
   
-  # Example list setting
-  list:
-    - "item1"
-    - "item2"
-    - "item3"
+  # Respond to bot mentions (example feature)
+  respond_to_mentions: false
 
-# Command settings
+# Command system settings
 commands:
-  # Enable template commands
+  # Enable command functionality
   enabled: true
   
-  # Command prefix (if using text commands)
+  # Command prefix for text commands (if supported)
   prefix: "!"
+  
+  # Command cooldown in seconds
+  cooldown: 3
 
-# Permission settings
+# Event system settings  
+events:
+  # Enable event handling
+  enabled: true
+  
+  # Event processing priority
+  priority: "NORMAL"
+
+# Permission system settings
 permissions:
-  # Default permission level for users
+  # Default permission level for basic usage
   default_permission: true
   
-  # Admin permission nodes
+  # Admin permission nodes - users with these can manage the plugin
   admin_nodes:
     - "templateplugin.admin"
     - "templateplugin.config"
+    - "templateplugin.reload"
 
-# Storage settings
+# Data storage settings
 storage:
-  # Enable data persistence
+  # Enable persistent data storage
   enabled: true
   
-  # Data file format (json/yaml)
+  # Storage format preference (json/yaml)
   format: "json"
+  
+  # Auto-save interval in seconds (0 = save immediately)
+  autosave_interval: 30
+
+# Internationalization settings
+i18n:
+  # Default language for this plugin
+  default_language: "en-US"
+  
+  # Fallback to default if translation missing
+  fallback_enabled: true
+
+# Debug and logging settings
+debug:
+  # Log all messages received (can be verbose)
+  log_messages: false
+  
+  # Log plugin lifecycle events
+  log_plugin_events: false
+  
+  # Log configuration changes
+  log_config_changes: true
+  
+  # Extended debug information
+  extended_debug: false
+
+# Example plugin-specific settings
+example:
+  # Example string setting with default
+  message: "Hello from Template Plugin!"
+  
+  # Example numeric setting
+  max_items: 100
+  
+  # Example boolean setting
+  advanced_mode: false
+  
+  # Example list setting
+  allowed_channels: [ ]
+  
+  # Example object setting
+  limits:
+    per_user: 10
+    per_guild: 100
+    global: 1000

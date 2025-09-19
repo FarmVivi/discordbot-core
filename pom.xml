@@ -15,7 +15,8 @@
     <modules>
         <module>discordbot-api</module>
         <module>discordbot-core</module>
-        <module>examples/audio</module>
+        <module>examples/plugins/plugin-example-audio</module>
+        <module>examples/plugins/plugin-example-commands</module>
         <module>plugin-template</module>
         <module>plugins/music-plugin</module>
         <module>plugins/ai-audio-plugin</module>
