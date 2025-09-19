@@ -1,0 +1,82 @@
+# Command Example Plugin Configuration
+config_version: 1
+
+# Plugin enablement
+enabled: false  # Disabled by default - set to true to activate
+
+# Command configurations
+commands:
+  # Basic ping command
+  ping:
+    enabled: true
+    description: "Simple ping-pong command"
+    cooldown: 3  # seconds
+    
+  # Echo command with arguments
+  echo:
+    enabled: true
+    description: "Echo back user input"
+    max_length: 200
+    cooldown: 5
+    
+  # Info command with embeds
+  info:
+    enabled: true
+    description: "Show bot and plugin information"
+    show_detailed: false
+    
+  # Admin-only command
+  admin:
+    enabled: true
+    description: "Administrative command example"
+    permission_required: true
+
+# Command behavior settings
+behavior:
+  # Delete user command messages
+  delete_command_messages: false
+  
+  # Reply privately (ephemeral) by default
+  ephemeral_replies: false
+  
+  # Command prefix for text commands (if enabled)
+  text_prefix: "!"
+  
+  # Enable text commands alongside slash commands
+  text_commands_enabled: false
+
+# Response settings
+responses:
+  # Use embeds for responses
+  use_embeds: true
+  
+  # Bot color for embeds (hex color)
+  embed_color: "#7289DA"
+  
+  # Include command execution time in responses
+  show_execution_time: false
+
+# Cooldown settings
+cooldowns:
+  # Global cooldown between any commands (in seconds)
+  global_cooldown: 1
+  
+  # Per-user cooldown tracking
+  per_user: true
+  
+  # Cooldown bypass permission
+  bypass_permission: "commands.cooldown.bypass"
+
+# Permission settings
+permissions:
+  # Default permission level for commands
+  default_permission: true
+  
+  # Permission nodes for admin commands
+  admin_permission: "commands.admin"
+
+# Debug and logging
+debug:
+  log_command_usage: true
+  log_execution_times: false
+  detailed_errors: false
