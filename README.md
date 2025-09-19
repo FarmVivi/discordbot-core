@@ -186,13 +186,9 @@ Comprehensive documentation is available in the `docs/` directory:
 - [Audio API](docs/audio-api.md)
 - [Configuration Guide](docs/configuration.md)
 - [Event System](docs/events.md)
-
-### 📚 New Comprehensive Documentation
-
-- **[Core Features Matrix](docs/core-features.md)**: Complete overview of all 12 framework features
-- **[Repository Inventory](docs/repo-inventory.md)**: Exhaustive file listing and project structure
-- **[Plugin Template Guide](docs/plugins/template-quickstart.md)**: Step-by-step plugin development guide
-- **[Example Plugins Overview](docs/plugins/examples-overview.md)**: Learning resources for all features
+- [Core Features Matrix](docs/core-features.md): Complete overview of all 12 framework features
+- [Plugin Template Guide](docs/plugins/template-quickstart.md): Step-by-step plugin development guide
+- [Example Plugins Overview](docs/plugins/examples-overview.md): Learning resources for all features
 
 ## 🔧 Development
 

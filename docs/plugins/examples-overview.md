@@ -194,7 +194,6 @@ These examples integrate with the main documentation:
 - **[Core Features Matrix](../../docs/core-features.md)**: Links to relevant examples
 - **[Plugin Development Guide](../../docs/plugin-development.md)**: References example implementations  
 - **[Template Quickstart](template-quickstart.md)**: Uses examples for learning
-- **[Repository Inventory](../../docs/repo-inventory.md)**: Includes all example files
 
 ## Contributing New Examples
 
