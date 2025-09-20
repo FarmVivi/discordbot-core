@@ -1,46 +1,136 @@
+# Music Plugin - French (France) Translations
 music:
-  commands:
-    play: "Jouer de la musique depuis une URL ou une recherche"
-    pause: "Mettre en pause/reprendre la piste actuelle"
-    skip: "Passer la piste actuelle"
-    stop: "Arrêter la musique et vider la file d'attente"
-    queue: "Afficher la file d'attente musicale"
-    nowplaying: "Afficher la piste en cours"
-    volume: "Définir le volume de lecture"
-    shuffle: "Activer/désactiver le mode aléatoire"
-    loop: "Définir le mode de répétition (off/track/queue)"
-    playlist: "Gérer vos playlists"
-    search: "Rechercher des pistes musicales"
-    lyrics: "Afficher les paroles de la piste actuelle"
-
-  messages:
-    plugin_enabled: "Plugin Musique activé !"
-    plugin_disabled: "Plugin Musique désactivé !"
-    track_added: "**{track}** ajouté à la file d'attente"
-    track_playing: "En cours de lecture : **{track}**"
-    track_paused: "Musique en pause"
-    track_resumed: "Musique reprise"
-    track_skipped: "**{track}** passé"
-    queue_cleared: "File d'attente vidée"
+  # Descriptions des commandes
+  command:
+    play:
+      description: "Jouer de la musique à partir d'une URL ou d'une recherche"
+      option:
+        query: "URL ou recherche"
+        now: "Jouer immédiatement, en sautant la piste actuelle"
+    pause:
+      description: "Mettre en pause ou reprendre la lecture"
+    skip:
+      description: "Passer la piste actuelle"
+    stop:
+      description: "Arrêter la lecture et vider la file d'attente"
+    queue:
+      description: "Afficher la file d'attente"
+      option:
+        page: "Numéro de page"
+    nowplaying:
+      description: "Afficher la piste en cours de lecture"
+    volume:
+      description: "Ajuster le volume de lecture"
+      option:
+        level: "Niveau de volume (0-100)"
+    loop:
+      description: "Contrôler le mode de répétition"
+      option:
+        mode: "Mode de répétition"
+      mode:
+        off: "Désactivé"
+        track: "Piste"
+        queue: "File d'attente"
+    shuffle:
+      description: "Activer/désactiver le mode aléatoire"
+    clear:
+      description: "Vider la file d'attente"
+    remove:
+      description: "Retirer une piste de la file d'attente"
+      option:
+        position: "Position de la piste dans la file"
+    seek:
+      description: "Se déplacer à une position dans la piste actuelle"
+      option:
+        time: "Temps (ex: 1:30, 90s, 1m30s)"
+    playlist:
+      description: "Gérer les playlists"
+  
+  # Messages de succès
+  track_added: "Piste ajoutée à la file d'attente"
+  playlist_added: "Playlist ajoutée à la file d'attente"
+  paused: "⏸️ Lecture mise en pause"
+  resumed: "▶️ Lecture reprise"
+  skipped: "⏭️ Piste passée : **{0}**"
+  stopped: "⏹️ Lecture arrêtée"
+  seeked: "⏩ Déplacement à **{0}**"
+  
+  # Messages de volume
+  volume:
+    current: "🔊 Volume actuel : **{0}%**"
+    set: "🔊 Volume défini à **{0}%**"
+  
+  # Messages de répétition
+  loop:
+    disabled: "🔁 Mode répétition désactivé"
+    track: "🔂 Répétition de la piste actuelle"
+    queue: "🔁 Répétition de la file d'attente"
+  
+  # Messages du mode aléatoire
+  shuffle:
+    enabled: "🔀 Mode aléatoire activé"
+    disabled: "🔀 Mode aléatoire désactivé"
+  
+  # Messages de la file d'attente
+  queue:
+    title: "File d'attente"
+    empty: "La file d'attente est vide"
+    now_playing: "En cours de lecture"
+    upcoming: "Pistes à venir ({0})"
+    page: "Page {0} sur {1}"
+    duration: "Durée totale"
+    modes: "Modes de lecture"
+    cleared: "🗑️ **{0}** pistes supprimées de la file d'attente"
+    removed: "🗑️ **{0}** retiré de la file d'attente"
+  
+  # Messages de lecture en cours
+  nowplaying:
+    title: "En cours de lecture"
+    track: "Piste"
+    author: "Artiste"
+    progress: "Progression"
+    duration: "Durée"
+    volume: "Volume"
+    status: "Statut"
+    paused: "En pause"
+    live: "Stream en direct"
+  
+  # Message du lecteur
+  player:
+    no_track: "Aucune piste en cours"
+    paused: "Musique en pause"
+    playing: "En cours de lecture"
+    track: "Piste"
+    progress: "Progression"
+    queue: "File d'attente ({0})"
+    shuffle_mode: "Mode aléatoire actif"
+    more_tracks: "... et {0} de plus"
+    loop: "Répéter"
+    loop_queue: "Répéter la file"
+    shuffle: "Aléatoire"
+    modes: "Modes actifs"
+  
+  # Aide des boutons
+  button:
+    add_help: "Utilisez `/play <recherche>` pour ajouter des pistes à la file d'attente"
+  
+  # Champs communs
+  title: "Titre"
+  name: "Nom"
+  tracks: "Pistes"
+  
+  # Messages d'erreur
+  error:
+    not_in_voice: "Vous devez être dans un salon vocal pour utiliser cette commande"
+    nothing_playing: "Aucune lecture en cours"
     queue_empty: "La file d'attente est vide"
-    volume_set: "Volume défini à {volume}%"
-    shuffle_enabled: "Mode aléatoire activé"
-    shuffle_disabled: "Mode aléatoire désactivé"
-    loop_off: "Répétition désactivée"
-    loop_track: "Répétition de piste activée"
-    loop_queue: "Répétition de file activée"
-
-  errors:
-    no_voice_channel: "Vous devez être dans un salon vocal !"
     no_permission: "Vous n'avez pas la permission d'utiliser cette commande"
-    track_not_found: "Aucune piste trouvée pour : {query}"
-    queue_full: "File d'attente pleine (max {max} pistes)"
-    invalid_volume: "Le volume doit être entre 0 et 100"
-    playlist_not_found: "Playlist introuvable : {name}"
-    track_too_long: "Piste trop longue (max {max} minutes)"
-
-  embed:
-    now_playing_title: "En cours de lecture"
-    queue_title: "File d'attente musicale"
-    search_results_title: "Résultats de recherche"
-    playlist_title: "Playlist : {name}"
+    no_matches: "Aucun résultat trouvé pour votre recherche"
+    load_failed: "Impossible de charger la piste : {0}"
+    invalid_position: "Position invalide. Veuillez spécifier un nombre entre {0} et {1}"
+    remove_failed: "Impossible de retirer la piste"
+    not_seekable: "Cette piste ne supporte pas le déplacement"
+    invalid_time: "Format de temps invalide. Utilisez des formats comme : 1:30, 90s, 1m30s"
+    seek_too_far: "Impossible de se déplacer au-delà de la durée de la piste"
+    wrong_guild: "Ce contrôle est pour un autre serveur"
+    unknown_action: "Action inconnue"

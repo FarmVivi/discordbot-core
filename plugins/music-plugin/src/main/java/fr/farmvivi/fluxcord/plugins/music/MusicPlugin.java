@@ -1,30 +1,44 @@
 package fr.farmvivi.fluxcord.plugins.music;
 
+import fr.farmvivi.fluxcord.api.command.CommandResult;
 import fr.farmvivi.fluxcord.api.event.EventHandler;
 import fr.farmvivi.fluxcord.api.event.EventPriority;
 import fr.farmvivi.fluxcord.api.permissions.Permission;
 import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.plugins.music.commands.*;
+import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
+import fr.farmvivi.fluxcord.plugins.music.ui.MusicPlayerMessage;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Advanced music bot plugin for Fluxcord.
  * <p>
  * Features:
- * - Play music from YouTube, Spotify, SoundCloud
- * - Playlist management and queue controls
+ * - Play music from YouTube, Spotify, SoundCloud, Deezer, Apple Music
+ * - Advanced queue management with shuffle, loop, and priority
+ * - Persistent music player messages with interactive controls
+ * - Playlist management (personal and server playlists)
  * - Audio effects and volume control
- * - Rich embeds with now playing information
- * - Search functionality and favorites
+ * - Multi-language support via Fluxcord i18n API
+ * - Automatic disconnection after inactivity
  */
 public class MusicPlugin extends AbstractPlugin {
 
     private MusicManager musicManager;
     private PlaylistManager playlistManager;
+    private ScheduledExecutorService scheduler;
 
     @Override
     public void onEnable() {
         logger.info("Music Plugin enabling...");
+
+        // Initialize scheduler
+        this.scheduler = Executors.newScheduledThreadPool(2);
 
         // Register permissions
         registerPermissions();
@@ -32,6 +46,9 @@ public class MusicPlugin extends AbstractPlugin {
         // Initialize managers
         this.musicManager = new MusicManager(this);
         this.playlistManager = new PlaylistManager(this);
+
+        // Register commands
+        registerCommands();
 
         // Load configuration
         loadConfiguration();
@@ -42,6 +59,10 @@ public class MusicPlugin extends AbstractPlugin {
     @Override
     public void onDisable() {
         logger.info("Music Plugin disabling...");
+
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
 
         if (musicManager != null) {
             musicManager.shutdown();
@@ -71,36 +92,189 @@ public class MusicPlugin extends AbstractPlugin {
         return getName().toLowerCase() + "." + node;
     }
 
+    private void registerCommands() {
+        // Main commands
+        commandService.registerCommand(this, builder -> {
+            builder.name("play")
+                   .description(lang.getString("music.command.play.description"))
+                   .category("Music")
+                   .aliases("p")
+                   .stringOption("query", lang.getString("music.command.play.option.query"), true)
+                   .booleanOption("now", lang.getString("music.command.play.option.now"), false)
+                   .executor((ctx, cmd) -> {
+                       String query = ctx.getRequiredOption("query");
+                       boolean playNow = ctx.getOption("now", false);
+                       new PlayCommand(this).execute(ctx, query, playNow);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("pause")
+                   .description(lang.getString("music.command.pause.description"))
+                   .category("Music")
+                   .executor((ctx, cmd) -> {
+                       new PauseCommand(this).execute(ctx);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("skip")
+                   .description(lang.getString("music.command.skip.description"))
+                   .category("Music")
+                   .aliases("s", "next")
+                   .executor((ctx, cmd) -> {
+                       new SkipCommand(this).execute(ctx);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("stop")
+                   .description(lang.getString("music.command.stop.description"))
+                   .category("Music")
+                   .executor((ctx, cmd) -> {
+                       new StopCommand(this).execute(ctx);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("queue")
+                   .description(lang.getString("music.command.queue.description"))
+                   .category("Music")
+                   .aliases("q")
+                   .integerOption("page", lang.getString("music.command.queue.option.page"), false, 1, 100)
+                   .executor((ctx, cmd) -> {
+                       int page = ctx.getOption("page", 1);
+                       new QueueCommand(this).execute(ctx, page);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("nowplaying")
+                   .description(lang.getString("music.command.nowplaying.description"))
+                   .category("Music")
+                   .aliases("np", "current")
+                   .executor((ctx, cmd) -> {
+                       new NowPlayingCommand(this).execute(ctx);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("volume")
+                   .description(lang.getString("music.command.volume.description"))
+                   .category("Music")
+                   .aliases("vol")
+                   .integerOption("level", lang.getString("music.command.volume.option.level"), false, 0, 100)
+                   .executor((ctx, cmd) -> {
+                       Integer level = ctx.getOption("level", Integer.class);
+                       new VolumeCommand(this).execute(ctx, level);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("loop")
+                   .description(lang.getString("music.command.loop.description"))
+                   .category("Music")
+                   .stringOption("mode", lang.getString("music.command.loop.option.mode"), false,
+                       ctx -> lang.getOptionChoice("music.command.loop.mode.off", "off"),
+                       ctx -> lang.getOptionChoice("music.command.loop.mode.track", "track"),
+                       ctx -> lang.getOptionChoice("music.command.loop.mode.queue", "queue")
+                   )
+                   .executor((ctx, cmd) -> {
+                       String mode = ctx.getOption("mode", "toggle");
+                       new LoopCommand(this).execute(ctx, mode);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("shuffle")
+                   .description(lang.getString("music.command.shuffle.description"))
+                   .category("Music")
+                   .executor((ctx, cmd) -> {
+                       new ShuffleCommand(this).execute(ctx);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("clear")
+                   .description(lang.getString("music.command.clear.description"))
+                   .category("Music")
+                   .permission(permissionKey("admin"))
+                   .executor((ctx, cmd) -> {
+                       new ClearCommand(this).execute(ctx);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("remove")
+                   .description(lang.getString("music.command.remove.description"))
+                   .category("Music")
+                   .integerOption("position", lang.getString("music.command.remove.option.position"), true, 1, 1000)
+                   .executor((ctx, cmd) -> {
+                       int position = ctx.getRequiredOption("position");
+                       new RemoveCommand(this).execute(ctx, position);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        commandService.registerCommand(this, builder -> {
+            builder.name("seek")
+                   .description(lang.getString("music.command.seek.description"))
+                   .category("Music")
+                   .stringOption("time", lang.getString("music.command.seek.option.time"), true)
+                   .executor((ctx, cmd) -> {
+                       String time = ctx.getRequiredOption("time");
+                       new SeekCommand(this).execute(ctx, time);
+                       return CommandResult.SUCCESS;
+                   });
+        });
+
+        // Register more commands as needed...
+
+        logger.info("Registered {} music commands", 12);
+    }
+
     private void loadConfiguration() {
-        int defaultVolume = getConfiguration().getInt("music.default_volume", 50);
-        int maxQueue = getConfiguration().getInt("music.max_queue_size", 100);
-        int maxTrackDurationMs = getConfiguration().getInt("music.max_track_duration", 600_000);
-        boolean enableSpotify = getConfiguration().getBoolean("music.enable_spotify", true);
-        boolean enableSoundcloud = getConfiguration().getBoolean("music.enable_soundcloud", true);
-        int autoLeaveTimeoutMs = getConfiguration().getInt("music.auto_leave_timeout", 300_000);
+        int defaultVolume = getPluginConfig().getInt("music.default_volume", 50);
+        int maxQueue = getPluginConfig().getInt("music.max_queue_size", 100);
+        int maxTrackDurationMs = getPluginConfig().getInt("music.max_track_duration", 600_000);
+        boolean enableSpotify = getPluginConfig().getBoolean("providers.spotify.enabled", true);
+        boolean enableSoundcloud = getPluginConfig().getBoolean("providers.soundcloud.enabled", true);
+        int autoLeaveTimeoutMs = getPluginConfig().getInt("music.auto_leave_timeout", 300_000);
         logger.info("Music config loaded: vol={}, queue={}, maxTrackMs={}, spotify={}, soundcloud={}, autoLeaveMs={}",
                 defaultVolume, maxQueue, maxTrackDurationMs, enableSpotify, enableSoundcloud, autoLeaveTimeoutMs);
     }
 
-    // TODO: Implement commands when command API is available
-    /*
-    @Command(name = "play", description = "Play music from a URL or search query")
-    public CommandResult playCommand(CommandContext ctx) {
-        // TODO: Implement play command
-        ctx.reply("🎵 Play command - Implementation coming soon!");
-        return CommandResult.SUCCESS;
-    }
-    */
-
     @EventHandler(priority = EventPriority.NORMAL)
     public void onVoiceUpdate(GuildVoiceUpdateEvent event) {
-        // TODO: Handle voice channel events for auto-leave functionality
         if (musicManager != null) {
             musicManager.handleVoiceUpdate(event);
         }
     }
 
-    // Getters for managers (used by other classes)
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onButtonInteraction(ButtonInteractionEvent event) {
+        String buttonId = event.getComponentId();
+        MusicPlayerMessage.ButtonInfo info = MusicPlayerMessage.parseButtonId(buttonId);
+        
+        if (info == null) {
+            return;
+        }
+        
+        // Handle music player button interactions
+        new ButtonHandler(this).handleButton(event, info);
+    }
+
+    // Getters
     public MusicManager getMusicManager() {
         return musicManager;
     }
@@ -108,9 +282,13 @@ public class MusicPlugin extends AbstractPlugin {
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
     }
+    
+    public ScheduledExecutorService getScheduler() {
+        return scheduler;
+    }
 }
 
-// Internal simple permission implementation (mirrors template approach)
+// Internal simple permission implementation
 class SimplePermission implements Permission {
     private final String name;
     private final String description;

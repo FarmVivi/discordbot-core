@@ -1,60 +1,87 @@
 # Music Plugin Configuration
+# Configuration version (automatically managed)
 config_version: 1
 
-# Audio settings
+# Music settings
 music:
-  # Default volume for music playback (0-100)
+  # Default volume for new players (0-100)
   default_volume: 50
   
-  # Maximum queue size per server
+  # Maximum number of tracks in queue
   max_queue_size: 100
   
-  # Maximum track duration (milliseconds)
-  max_track_duration: 600000  # 10 minutes
+  # Maximum track duration in milliseconds (0 = unlimited)
+  max_track_duration: 0
   
-  # Audio quality (low/medium/high)
-  audio_quality: "medium"
+  # Auto-leave timeout in milliseconds (5 minutes)
+  auto_leave_timeout: 300000
+  
+  # Enable vote skip (requires majority vote to skip)
+  vote_skip_enabled: false
+  
+  # Vote skip percentage required (0.0 to 1.0)
+  vote_skip_ratio: 0.5
 
-# Platform support
-platforms:
-  # Enable Spotify integration
-  enable_spotify: true
+# Provider settings
+providers:
+  # YouTube settings
+  youtube:
+    # Email for age-restricted videos (optional)
+    email: ""
+    # Password for age-restricted videos (optional)
+    password: ""
   
-  # Enable SoundCloud integration
-  enable_soundcloud: true
+  # Spotify settings
+  spotify:
+    # Enable Spotify support
+    enabled: true
+    # Spotify client ID (required for Spotify support)
+    client_id: ""
+    # Spotify client secret (required for Spotify support)
+    client_secret: ""
+    # Country code for market availability
+    country_code: "US"
   
-  # Enable YouTube integration (always enabled)
-  enable_youtube: true
-
-# Voice channel behavior
-voice:
-  # Auto-leave when no users in channel
-  auto_leave: true
+  # SoundCloud settings
+  soundcloud:
+    # Enable SoundCloud support
+    enabled: true
   
-  # Auto-leave timeout in seconds
-  auto_leave_timeout: 300  # 5 minutes
+  # Deezer settings
+  deezer:
+    # Master decryption key (required for Deezer support)
+    master_decryption_key: ""
   
-  # Auto-join user's voice channel when playing
-  auto_join: false
+  # Apple Music settings
+  apple_music:
+    # API token (required for Apple Music support)
+    token: ""
+    # Country code for market availability
+    country_code: "US"
+  
+  # Flowery TTS settings
+  flowery_tts:
+    # Voice to use for TTS
+    voice: ""
 
 # Playlist settings
 playlists:
-  # Maximum playlist size
-  max_playlist_size: 500
+  # Maximum number of playlists per user
+  max_per_user: 10
   
-  # Allow public playlists
-  allow_public_playlists: true
+  # Maximum number of playlists per guild
+  max_per_guild: 25
   
-  # Default playlist privacy (public/private)
-  default_privacy: "private"
+  # Maximum tracks per playlist
+  max_tracks: 100
 
-# Permission settings
-permissions:
-  # Allow users to skip their own tracks
-  allow_self_skip: true
+# Performance settings
+performance:
+  # Audio buffer size in milliseconds
+  buffer_size: 400
   
-  # Require vote to skip (percentage of users needed)
-  skip_vote_threshold: 0.5
+  # Frame buffer duration in milliseconds
+  frame_buffer_duration: 5000
   
-  # DJ role permissions
-  dj_role_name: "DJ"
+  # Use native transport (better performance)
+  use_native_transport: true
