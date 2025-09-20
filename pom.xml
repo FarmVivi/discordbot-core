@@ -9,7 +9,7 @@
     <version>2.3.27-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Fluxcord Parent</name>
+    <name>Fluxcord</name>
     <description>Parent POM for Fluxcord multi-module project</description>
 
     <modules>
