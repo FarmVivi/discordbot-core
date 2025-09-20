@@ -7,7 +7,7 @@ import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 /**
- * AI-powered audio plugin for DiscordBot Core.
+ * AI-powered audio plugin for Fluxcord.
  * <p>
  * Features:
  * - Voice recognition and transcription

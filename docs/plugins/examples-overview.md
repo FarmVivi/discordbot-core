@@ -215,7 +215,7 @@ plugin-example-[feature]/
 ├── pom.xml                     # Maven configuration
 ├── README.md                   # Comprehensive documentation
 ├── src/main/
-│   ├── java/fr/farmvivi/discordbot/examples/[feature]/
+│   ├── java/fr/farmvivi/fluxcord/examples/[feature]/
 │   │   └── [Feature]ExamplePlugin.java
 │   └── resources/
 │       ├── plugin.yml          # Plugin metadata

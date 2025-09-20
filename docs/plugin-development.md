@@ -28,7 +28,7 @@ This guide covers everything you need to know about developing plugins for Fluxc
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.core.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 
 public class MyPlugin extends AbstractPlugin {
     

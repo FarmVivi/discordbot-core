@@ -65,7 +65,7 @@ database:
   mysql:
     host: "${DB_HOST:localhost}"
     port: "${DB_PORT:3306}"
-    database: "${DB_NAME:discordbot}"
+    database: "${DB_NAME:fluxcord}"
     username: "${DB_USER:root}"
     password: "${DB_PASSWORD:}"
     
@@ -170,7 +170,7 @@ DISCORD_TOKEN=your_discord_bot_token
 # Database (if using MySQL/PostgreSQL)
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=discordbot
+DB_NAME=fluxcord
 DB_USER=bot_user
 DB_PASSWORD=secure_password
 
@@ -197,7 +197,7 @@ host: "${DB_HOST:localhost}"
 port: "${DB_PORT:3306}"
 
 # Complex expressions
-database_url: "jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:discordbot}"
+database_url: "jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:fluxcord}"
 ```
 
 ### Automatic Plugin Configuration Management
@@ -329,12 +329,12 @@ testing:
 # docker-compose.yml
 version: '3.8'
 services:
-  discordbot:
+  fluxcord:
     build: .
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - DB_HOST=database
-      - DB_NAME=discordbot
+      - DB_NAME=fluxcord
       - DB_USER=bot
       - DB_PASSWORD=${DB_PASSWORD}
     volumes:
@@ -347,7 +347,7 @@ services:
   database:
     image: mysql:8.0
     environment:
-      - MYSQL_DATABASE=discordbot
+      - MYSQL_DATABASE=fluxcord
       - MYSQL_USER=bot
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -421,7 +421,7 @@ database:
   type: "mysql"
   mysql:
     host: "localhost"
-    database: "discordbot"
+    database: "fluxcord"
     username: "bot"
     password: "${DB_PASSWORD}"
 

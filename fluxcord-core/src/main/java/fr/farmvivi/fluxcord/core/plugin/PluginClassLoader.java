@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PluginClassLoader extends URLClassLoader {
     // Core packages that should always be loaded from the parent class loader
     private static final Set<String> CORE_PACKAGES = Set.of(
-            "fr.farmvivi.discordbot.core",
+            "fr.farmvivi.fluxcord.core",
             "org.slf4j",
             "org.yaml.snakeyaml",
             "com.google.gson",

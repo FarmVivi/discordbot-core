@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.examples.commands;
+package fr.farmvivi.fluxcord.examples.commands;
 
 import fr.farmvivi.fluxcord.api.command.Command;
 import fr.farmvivi.fluxcord.api.command.CommandContext;

@@ -29,7 +29,7 @@
     {
       "label": "core:compile+shade",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am compile package -DskipTests",
+      "command": "mvn -pl fluxcord-core -am compile package -DskipTests",
       "group": "build",
       "detail": "Compile+package core (and deps) quickly"
     },
@@ -44,7 +44,7 @@
     {
       "label": "build:core",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am install -DskipTests",
+      "command": "mvn -pl fluxcord-core -am install -DskipTests",
       "group": "build",
       "detail": "Incremental build of core only"
     },
@@ -73,7 +73,7 @@
     {
       "label": "run:core",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java -DskipTests",
+      "command": "mvn -pl fluxcord-core -am install -DskipTests; cd fluxcord-core/run; mvn -f ../pom.xml exec:java -DskipTests",
       "group": {
         "kind": "test",
         "isDefault": true
@@ -83,14 +83,14 @@
     {
       "label": "run:core:clean",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am clean install -DskipTests; cd discordbot-core/run; mvn -f ../pom.xml exec:java -DskipTests",
+      "command": "mvn -pl fluxcord-core -am clean install -DskipTests; cd fluxcord-core/run; mvn -f ../pom.xml exec:java -DskipTests",
       "group": "test",
       "detail": "Clean build then run core"
     },
     {
       "label": "run:core:debug",
       "type": "shell",
-      "command": "mvn -pl discordbot-core -am install -DskipTests -DforkCount=0; cd discordbot-core/run; $env:MAVEN_OPTS='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'; mvn -f ../pom.xml exec:java -DskipTests",
+      "command": "mvn -pl fluxcord-core -am install -DskipTests -DforkCount=0; cd fluxcord-core/run; $env:MAVEN_OPTS='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'; mvn -f ../pom.xml exec:java -DskipTests",
       "group": "test",
       "detail": "Run core with JDWP debug on port 5005"
     },

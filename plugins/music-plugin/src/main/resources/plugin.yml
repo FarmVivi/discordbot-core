@@ -1,8 +1,8 @@
 name: MusicPlugin
 version: 1.0.0
-main: fr.farmvivi.discordbot.plugins.music.MusicPlugin
+main: fr.farmvivi.fluxcord.plugins.music.MusicPlugin
 description: Advanced music bot plugin with playlist management and audio effects
 authors: [ FarmVivi ]
-website: https://github.com/FarmVivi/discordbot-core
+website: https://github.com/FarmVivi/fluxcord
 dependencies: [ ]
 soft-dependencies: [ ]

@@ -1,4 +1,4 @@
-package fr.farmvivi.discordbot.examples.audio;
+package fr.farmvivi.fluxcord.examples.audio;
 
 import fr.farmvivi.fluxcord.api.audio.events.AudioFrameMixedEvent;
 import fr.farmvivi.fluxcord.api.event.EventHandler;

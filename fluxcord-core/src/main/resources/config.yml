@@ -22,7 +22,7 @@ data:
   storage:
     type: FILE  # Options: FILE, DB
     db:
-      url: jdbc:mysql://localhost:3306/discordbot
+      url: "jdbc:mysql://localhost:3306/fluxcord"
       username: username
       password: password
 
@@ -38,4 +38,4 @@ data:
         access_key: your-access-key
         secret_key: your-secret-key
         endpoint: https://s3.amazonaws.com  # Optional, for S3-compatible services
-        prefix: discordbot  # Optional, folder prefix in bucket
+        prefix: "fluxcord"  # Optional, folder prefix in bucket

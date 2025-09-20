@@ -28,7 +28,7 @@ This document provides a comprehensive overview of all features and APIs exposed
 **Entry Points**:
 - `plugin.fr.farmvivi.fluxcord.api.AbstractPlugin` - Base plugin class
 - `plugin.fr.farmvivi.fluxcord.api.PluginContext` - Access to core services
-- `fr.farmvivi.discordbot.api.plugin.PluginManager` - Plugin management
+- `fr.farmvivi.fluxcord.api.plugin.PluginManager` - Plugin management
 
 **How to Use**:
 ```java
@@ -248,7 +248,7 @@ getPluginDataStorage().saveAll();
 **Description**: Large file and binary data storage with multiple backend support.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.storage.BinaryStorageManager` - Binary storage management  
+- `fr.farmvivi.fluxcord.api.storage.BinaryStorageManager` - Binary storage management  
 - `binary.storage.fr.farmvivi.fluxcord.api.PluginBinaryStorageAdapter` - Plugin-scoped binary storage
 
 **How to Use**:

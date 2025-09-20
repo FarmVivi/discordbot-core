@@ -189,7 +189,7 @@ public void onAudioFrameMixed(AudioFrameMixedEvent event) {
 
 ## Exemple complet
 
-Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.discordbot.examples.audio` pour un exemple complet d'utilisation de l'API audio.
+Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.fluxcord.examples.audio` pour un exemple complet d'utilisation de l'API audio.
 
 ## Performances et considérations techniques
 

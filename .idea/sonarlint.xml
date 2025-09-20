@@ -2,7 +2,7 @@
 <project version="4">
   <component name="SonarLintProjectSettings">
     <option name="bindingEnabled" value="true" />
-    <option name="projectKey" value="FarmVivi_discordbot-core" />
+    <option name="projectKey" value="FarmVivi_fluxcord" />
     <option name="serverId" value="farmvivi" />
   </component>
 </project>

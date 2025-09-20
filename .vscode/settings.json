@@ -2,6 +2,6 @@
   "java.configuration.updateBuildConfiguration": "automatic",
   "sonarlint.connectedMode.project": {
     "connectionId": "farmvivi",
-    "projectKey": "FarmVivi_discordbot-core"
+    "projectKey": "FarmVivi_fluxcord"
   }
 }

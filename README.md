@@ -60,8 +60,8 @@ Demonstration plugin showing audio API capabilities.
 
 ```
 fluxcord/
-├── discordbot-api/                        # Public API interfaces and contracts
-├── fluxcord-core/                       # Core implementation and engine
+├── fluxcord-api/                          # Public API interfaces and contracts
+├── fluxcord-core/                         # Core implementation and engine
 ├── examples/plugins/plugin-example-audio/ # Example audio plugin
 ├── plugin-template/                       # Template for creating new plugins
 ├── plugins/                               # Additional plugin modules
@@ -83,7 +83,7 @@ fluxcord/
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/FarmVivi/discordbot-core.git
+git clone https://github.com/FarmVivi/fluxcord.git
 cd fluxcord
 ```
 
@@ -210,7 +210,7 @@ mvn clean install
 
 ### Module Structure
 
-- **discordbot-api**: Lightweight API interfaces for plugin development
+- **fluxcord-api**: Lightweight API interfaces for plugin development
 - **fluxcord-core**: Main engine implementation with all features
 - **plugin-example-audio**: Reference implementation for audio plugins
 - **plugin-example-commands**: Reference implementation for command handling

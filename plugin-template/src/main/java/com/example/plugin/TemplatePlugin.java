@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
- * Template plugin demonstrating the structure and features available to DiscordBot Core plugins.
+ * Template plugin demonstrating the structure and features available to Fluxcord plugins.
  *
  * <p>This plugin serves as a comprehensive starting point for plugin development and showcases:
  * <ul>
