@@ -10,7 +10,7 @@ COPY . .
 # Build all modules (skip tests for faster image builds)
 RUN mvn -T1C -DskipTests package \
     && mkdir -p /workspace/.artifacts /workspace/.bundles/plugins /workspace/.bundles/examples \
-    && cp -f /workspace/discordbot-core/target/*-shaded.jar /workspace/.artifacts/discordbot-core.jar \
+    && cp -f /workspace/fluxcord-core/target/*-shaded.jar /workspace/.artifacts/fluxcord.jar \
     && (cp -f /workspace/plugins/*/target/*.jar /workspace/.bundles/plugins/ 2>/dev/null || true) \
     && (cp -f /workspace/examples/plugins/*/target/*.jar /workspace/.bundles/examples/ 2>/dev/null || true)
 
@@ -19,7 +19,7 @@ RUN mvn -T1C -DskipTests package \
 FROM eclipse-temurin:17.0.16_8-jre-alpine-3.22 AS production
 
 ENV APP_DIR=/app \
-    BUNDLES_DIR=/opt/discordbot/bundles \
+    BUNDLES_DIR=/opt/fluxcord/bundles \
     JAVA_OPTS=""
 
 WORKDIR /app
@@ -28,14 +28,14 @@ WORKDIR /app
 RUN apk add --no-cache curl
 
 ## Core shaded jar
-COPY --from=build /workspace/.artifacts/discordbot-core.jar /app/discordbot-core.jar
+COPY --from=build /workspace/.artifacts/fluxcord.jar /app/fluxcord.jar
 
 # Bundle available plugins (internal plugins)
-RUN mkdir -p /opt/discordbot/bundles/plugins /opt/discordbot/bundles/examples
+RUN mkdir -p /opt/fluxcord/bundles/plugins /opt/fluxcord/bundles/examples
 
 # Copy bundled plugin jars (empty dir is fine)
-COPY --from=build /workspace/.bundles/plugins/ /opt/discordbot/bundles/plugins/
-COPY --from=build /workspace/.bundles/examples/ /opt/discordbot/bundles/examples/
+COPY --from=build /workspace/.bundles/plugins/ /opt/fluxcord/bundles/plugins/
+COPY --from=build /workspace/.bundles/examples/ /opt/fluxcord/bundles/examples/
 
 # Entrypoint script to optionally install/update plugins before launch
 COPY entrypoint.sh /entrypoint.sh

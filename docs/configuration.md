@@ -1,6 +1,6 @@
 # Configuration Guide
 
-DiscordBot Core uses a flexible YAML-based configuration system with **automatic versioning**, **migration support**, environment variable support, and plugin-specific settings.
+Fluxcord uses a flexible YAML-based configuration system with **automatic versioning**, **migration support**, environment variable support, and plugin-specific settings.
 
 ## Configuration Versioning
 
@@ -202,7 +202,7 @@ database_url: "jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:disco
 
 ### Automatic Plugin Configuration Management
 
-**DiscordBot Core now automatically manages plugin configurations:**
+**Fluxcord now automatically manages plugin configurations:**
 
 #### Default Config File Copying
 
@@ -558,22 +558,22 @@ Use the `!config dump` command (if available) to export current configuration fo
 
 ### Upgrading Configuration
 
-When upgrading DiscordBot Core, configuration migrations may be needed:
+When upgrading Fluxcord, configuration migrations may be needed:
 
 ```bash
 # Backup current configuration
 cp config.yml config.yml.backup
 
 # Run migration tool
-java -jar discordbot-core.jar --migrate-config
+java -jar fluxcord.jar --migrate-config
 
 # Verify new configuration
-java -jar discordbot-core.jar --validate-config
+java -jar fluxcord.jar --validate-config
 ```
 
 ### Automatic Configuration Migration
 
-**DiscordBot Core now provides automatic configuration migration with the following features:**
+**Fluxcord now provides automatic configuration migration with the following features:**
 
 #### Migration Process
 
@@ -589,10 +589,10 @@ While migration is automatic, you can also trigger manual operations:
 
 ```bash
 # Force configuration validation
-java -jar discordbot-core.jar --validate-config
+java -jar fluxcord.jar --validate-config
 
 # Show current configuration versions
-java -jar discordbot-core.jar --show-config-versions
+java -jar fluxcord.jar --show-config-versions
 
 # Create manual backup (optional)
 cp config.yml config.yml.manual.backup

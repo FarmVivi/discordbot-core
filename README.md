@@ -1,4 +1,4 @@
-# DiscordBot Core
+# Fluxcord
 
 A modular, generic Discord bot engine designed for flexibility and extensibility. Built with a multi-module Maven architecture, it provides a comprehensive plugin system allowing developers to create powerful Discord bots with minimal effort.
 
@@ -25,7 +25,7 @@ A modular, generic Discord bot engine designed for flexibility and extensibility
 
 ## 🎵 Available Plugins
 
-The DiscordBot Core ecosystem includes several ready-to-use plugins:
+The Fluxcord ecosystem includes several ready-to-use plugins:
 
 ### 🎵 Music Plugin
 
@@ -59,7 +59,7 @@ Demonstration plugin showing audio API capabilities.
 ## 🏗️ Architecture
 
 ```
-discordbot-core/
+fluxcord/
 ├── discordbot-api/                        # Public API interfaces and contracts
 ├── discordbot-core/                       # Core implementation and engine
 ├── examples/plugins/plugin-example-audio/ # Example audio plugin
@@ -84,7 +84,7 @@ discordbot-core/
 
 ```bash
 git clone https://github.com/FarmVivi/discordbot-core.git
-cd discordbot-core
+cd fluxcord
 ```
 
 2. **Build the project**
@@ -103,7 +103,7 @@ cp config.example.yml config.yml
 4. **Run the bot**
 
 ```bash
-java -jar target/discordbot-core.jar
+java -jar target/fluxcord.jar
 ```
 
 ### Docker Deployment
@@ -118,7 +118,7 @@ This automatically builds the application and provides persistent storage for da
 
 ## 🔌 Plugin Development
 
-Creating plugins for DiscordBot Core is straightforward thanks to the provided template and comprehensive API.
+Creating plugins for Fluxcord is straightforward thanks to the provided template and comprehensive API.
 
 ### Using the Plugin Template
 
@@ -238,8 +238,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🌟 Showcase
 
-Built something amazing with DiscordBot Core? We'd love to showcase it! Open an issue or discussion to share your creation.
+Built something amazing with Fluxcord? We'd love to showcase it! Open an issue or discussion to share your creation.
 
 ---
 
-**DiscordBot Core** - *Empowering Discord bot development with modular architecture and comprehensive APIs.*
+**Fluxcord** - *Empowering Discord bot development with modular architecture and comprehensive APIs.*

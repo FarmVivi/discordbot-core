@@ -6,14 +6,14 @@
 
     <parent>
         <groupId>fr.farmvivi.discordbot</groupId>
-        <artifactId>discordbot-parent</artifactId>
+        <artifactId>fluxcord-parent</artifactId>
         <version>2.3.27-SNAPSHOT</version>
     </parent>
 
-    <artifactId>discordbot-api</artifactId>
+    <artifactId>fluxcord-api</artifactId>
 
-    <name>DiscordBot API</name>
-    <description>API interfaces for Discord Bot with plugin support</description>
+    <name>Fluxcord API</name>
+    <description>API interfaces for Fluxcord with plugin support</description>
 
     <dependencies>
         <!-- JDA for Discord API types in interfaces -->

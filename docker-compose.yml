@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: discordbot-app
+    container_name: fluxcord-app
     restart: unless-stopped
     ports:
       # Expose health/readiness HTTP endpoint from the core (see HEALTH_PORT)

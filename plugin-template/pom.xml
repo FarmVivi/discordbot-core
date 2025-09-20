@@ -6,20 +6,20 @@
 
     <parent>
         <groupId>fr.farmvivi.discordbot</groupId>
-        <artifactId>discordbot-parent</artifactId>
+        <artifactId>fluxcord-parent</artifactId>
         <version>2.3.27-SNAPSHOT</version>
     </parent>
 
     <artifactId>plugin-template</artifactId>
 
-    <name>DiscordBot Plugin Template</name>
-    <description>Template for creating DiscordBot plugins</description>
+    <name>Fluxcord Plugin Template</name>
+    <description>Template for creating Fluxcord plugins</description>
 
     <dependencies>
         <!-- API module for plugin development -->
         <dependency>
             <groupId>fr.farmvivi.discordbot</groupId>
-            <artifactId>discordbot-api</artifactId>
+            <artifactId>fluxcord-api</artifactId>
         </dependency>
 
         <!-- JDA for Discord API interactions -->

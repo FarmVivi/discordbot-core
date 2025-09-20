@@ -6,7 +6,7 @@ MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 
 # Function to perform the build
 perform_build() {
-  echo "Building discordbot-core multi-module project..."
+  echo "Building Fluxcord multi-module project..."
   
   # Clean if needed but only when not in Docker (preserve Docker cache)
   if [ "$1" != "build-only" ]; then
@@ -17,7 +17,7 @@ perform_build() {
   mvn package -DskipTests
   
   # Rename jar file for convenience (core module contains the main application)
-  cp discordbot-core/target/discordbot-core-*.jar target/discordbot-core.jar
+  cp fluxcord-core/target/fluxcord-core-*.jar target/fluxcord.jar
   
   echo "Build completed successfully!"
 }
@@ -35,7 +35,7 @@ if [ "$1" = "run" ]; then
   ensure_target
   perform_build
   echo "Starting application..."
-  java -jar target/discordbot-core.jar
+  java -jar target/fluxcord.jar
 elif [ "$1" = "build-only" ]; then
   # Just build (for Docker)
   ensure_target

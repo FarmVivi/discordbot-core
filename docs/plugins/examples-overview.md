@@ -1,6 +1,6 @@
 # Plugin Examples Overview
 
-This directory contains comprehensive example plugins demonstrating all core features of the DiscordBot Core framework. Each plugin focuses on specific functionality while being minimal, complete, and production-ready.
+This directory contains comprehensive example plugins demonstrating all core features of the Fluxcord framework. Each plugin focuses on specific functionality while being minimal, complete, and production-ready.
 
 ## Available Examples
 

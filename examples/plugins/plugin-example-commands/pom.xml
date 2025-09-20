@@ -6,21 +6,21 @@
 
     <parent>
         <groupId>fr.farmvivi.discordbot</groupId>
-        <artifactId>discordbot-parent</artifactId>
+        <artifactId>fluxcord-parent</artifactId>
         <version>2.3.27-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>plugin-example-commands</artifactId>
 
-    <name>DiscordBot Example Plugin - Commands</name>
+    <name>Fluxcord Example Plugin - Commands</name>
     <description>Example plugin demonstrating the command system features</description>
 
     <dependencies>
         <!-- API module for plugin development -->
         <dependency>
             <groupId>fr.farmvivi.discordbot</groupId>
-            <artifactId>discordbot-api</artifactId>
+            <artifactId>fluxcord-api</artifactId>
         </dependency>
 
         <!-- JDA for Discord API interactions -->

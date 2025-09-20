@@ -1,6 +1,6 @@
-# Core Features Matrix - DiscordBot Core
+# Core Features Matrix - Fluxcord
 
-This document provides a comprehensive overview of all features and APIs exposed by the DiscordBot Core framework to plugins.
+This document provides a comprehensive overview of all features and APIs exposed by the Fluxcord framework to plugins.
 
 ## Feature Matrix
 
@@ -438,4 +438,4 @@ Based on code analysis, the following common bot framework features are **not pr
 
 ---
 
-*This documentation is automatically maintained and reflects the current state of the DiscordBot Core framework APIs.*
+*This documentation is automatically maintained and reflects the current state of the Fluxcord framework APIs.*
