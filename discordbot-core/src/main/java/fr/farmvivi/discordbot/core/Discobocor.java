@@ -14,6 +14,7 @@ import fr.farmvivi.discordbot.core.config.CoreConfiguration;
 import fr.farmvivi.discordbot.core.console.ConsoleCommandService;
 import fr.farmvivi.discordbot.core.discord.JDADiscordAPI;
 import fr.farmvivi.discordbot.core.event.SimpleEventManager;
+import fr.farmvivi.discordbot.core.health.HealthServer;
 import fr.farmvivi.discordbot.core.language.LanguageFileLoader;
 import fr.farmvivi.discordbot.core.language.SimpleLanguageManager;
 import fr.farmvivi.discordbot.core.permissions.SimplePermissionManager;
@@ -51,13 +52,15 @@ public class Discobocor {
     private static AudioService audioService;
     private static CommandService commandService;
     private static ConsoleCommandService consoleCommandService;
+    private static HealthServer healthServer;
 
     static {
         Properties properties = new Properties();
         try {
             properties.load(Discobocor.class.getClassLoader().getResourceAsStream("project.properties"));
         } catch (IOException e) {
-            System.out.println("ERROR: Cannot read properties file !");
+            Logger initLogger = LoggerFactory.getLogger("DiscobocorInit");
+            initLogger.error("Cannot read properties file 'project.properties'", e);
             System.exit(1);
         }
 
@@ -76,7 +79,7 @@ public class Discobocor {
     public static void main(String[] args) {
         long startTimeMillis = System.currentTimeMillis();
 
-        logger.info("Démarrage de " + NAME + " v" + VERSION + " en cours...");
+        logger.info("Démarrage de {} v{} en cours...", NAME, VERSION);
 
         // Log system information
         logSystemInfo();
@@ -89,11 +92,14 @@ public class Discobocor {
         // Register shutdown hook for clean shutdown
         registerShutdownHook();
 
+        // Start health HTTP server (not ready yet)
+        startHealthServer();
+
         // Start the bot using the proper sequence
         startBot();
 
         long startFinishedTimeMillis = System.currentTimeMillis();
-        logger.info("Started in " + (float) (startFinishedTimeMillis - startTimeMillis) / 1000 + "s!");
+        logger.info("Started in {}s!", (float) (startFinishedTimeMillis - startTimeMillis) / 1000);
 
         // Keep the main thread alive
         CountDownLatch latch = new CountDownLatch(1);
@@ -108,15 +114,17 @@ public class Discobocor {
      * Logs system information.
      */
     private static void logSystemInfo() {
-        logger.info("System.getProperty('os.name') == '" + System.getProperty("os.name") + "'");
-        logger.info("System.getProperty('os.version') == '" + System.getProperty("os.version") + "'");
-        logger.info("System.getProperty('os.arch') == '" + System.getProperty("os.arch") + "'");
-        logger.info("System.getProperty('java.version') == '" + System.getProperty("java.version") + "'");
-        logger.info("System.getProperty('java.vendor') == '" + System.getProperty("java.vendor") + "'");
-        logger.info("System.getProperty('sun.arch.data.model') == '" + System.getProperty("sun.arch.data.model") + "'");
-        logger.info("System.getProperty('user.timezone') == '" + System.getProperty("user.timezone") + "'");
-        logger.info("System.getProperty('user.country') == '" + System.getProperty("user.country") + "'");
-        logger.info("System.getProperty('user.language') == '" + System.getProperty("user.language") + "'");
+        if (logger.isInfoEnabled()) {
+            logger.info("System.getProperty('os.name') == '{}'", System.getProperty("os.name"));
+            logger.info("System.getProperty('os.version') == '{}'", System.getProperty("os.version"));
+            logger.info("System.getProperty('os.arch') == '{}'", System.getProperty("os.arch"));
+            logger.info("System.getProperty('java.version') == '{}'", System.getProperty("java.version"));
+            logger.info("System.getProperty('java.vendor') == '{}'", System.getProperty("java.vendor"));
+            logger.info("System.getProperty('sun.arch.data.model') == '{}'", System.getProperty("sun.arch.data.model"));
+            logger.info("System.getProperty('user.timezone') == '{}'", System.getProperty("user.timezone"));
+            logger.info("System.getProperty('user.country') == '{}'", System.getProperty("user.country"));
+            logger.info("System.getProperty('user.language') == '{}'", System.getProperty("user.language"));
+        }
     }
 
     /**
@@ -283,6 +291,11 @@ public class Discobocor {
 
         // 8. Set the default presence after all plugins are enabled
         discordAPI.setDefaultPresence();
+
+        // 9. Mark ready for health server
+        if (healthServer != null) {
+            healthServer.setReady(true);
+        }
     }
 
     /**
@@ -328,6 +341,28 @@ public class Discobocor {
 
         if (binaryStorageManager != null) {
             binaryStorageManager.close();
+        }
+
+        if (healthServer != null) {
+            healthServer.stop();
+        }
+    }
+
+    private static void startHealthServer() {
+        String envPort = System.getenv("HEALTH_PORT");
+        int port;
+        try {
+            port = envPort != null && !envPort.isBlank() ? Integer.parseInt(envPort) : 8081;
+        } catch (NumberFormatException nfe) {
+            logger.warn("Invalid HEALTH_PORT '{}', falling back to 8081", envPort);
+            port = 8081;
+        }
+        try {
+            healthServer = new HealthServer(port);
+            healthServer.setVersion(VERSION);
+            healthServer.start();
+        } catch (Exception e) {
+            logger.warn("Failed to start health server on port {}: {}", port, e.getMessage());
         }
     }
 

@@ -16,5 +16,9 @@ services:
       - ./config.yml:/app/config.yml
     environment:
       - JAVA_OPTS=-Xmx1G
-      # Add your environment variables here
-      #- DISCORD_TOKEN=your_token_here
+      # Variables de configuration (exemples):
+      # - DISCORD_TOKEN=your_token_here
+      # - INSTALL_PLUGINS=music-plugin,ai-audio-plugin   # ou '*' pour tous les bundles disponibles
+      # - INSTALL_EXAMPLES=false                         # true pour autoriser l'installation des exemples
+      # - AUTO_UPDATE_PLUGINS=true                       # met à jour automatiquement si une version plus récente est packagée
+      # - HEALTH_PORT=8081                               # port du serveur HTTP de santé (/healthz, /readyz)

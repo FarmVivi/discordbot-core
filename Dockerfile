@@ -1,34 +1,51 @@
 ################ Build ################
-# Build stage for building the application for production
-FROM maven:3.9.11-eclipse-temurin-17-alpine as build
+# Build stage for the full multi-module project
+FROM maven:3.9.11-eclipse-temurin-17-alpine AS build
 
-# Create project directory
-WORKDIR /app
+WORKDIR /workspace
 
-# Copy only pom.xml first to leverage Docker cache for dependencies
-COPY pom.xml .
+# Copy everything (keeps it simple for multi-module; rely on Docker cache)
+COPY . .
 
-# Download dependencies and cache them (but don't build yet)
-RUN mvn dependency:go-offline -B
-
-# Copy source files
-COPY src ./src
-COPY build.sh ./
-
-# Build the application in one step
-RUN chmod +x ./build.sh && \
-    ./build.sh build-only
+# Build all modules (skip tests for faster image builds)
+RUN mvn -T1C -DskipTests package \
+    && mkdir -p /workspace/.artifacts /workspace/.bundles/plugins /workspace/.bundles/examples \
+    && cp -f /workspace/discordbot-core/target/*-shaded.jar /workspace/.artifacts/discordbot-core.jar \
+    && (cp -f /workspace/plugins/*/target/*.jar /workspace/.bundles/plugins/ 2>/dev/null || true) \
+    && (cp -f /workspace/examples/plugins/*/target/*.jar /workspace/.bundles/examples/ 2>/dev/null || true)
 
 ################ Production ################
-# Creates a minimal image for production using distroless base image
-# More info here: https://github.com/GoogleContainerTools/distroless
-FROM gcr.io/distroless/java17-debian12:latest as production
+# Use a small JRE base with shell to run an entrypoint script
+FROM eclipse-temurin:17.0.16_8-jre-alpine-3.22 AS production
 
-# Create project directory
+ENV APP_DIR=/app \
+    BUNDLES_DIR=/opt/discordbot/bundles \
+    JAVA_OPTS=""
+
 WORKDIR /app
 
-# Copy only the built jar file from the core module
-COPY --from=build /app/discordbot-core/target/discordbot-core.jar ./discordbot-core.jar
+# Install curl for healthcheck
+RUN apk add --no-cache curl
 
-# Set the entry point
-ENTRYPOINT ["java", "-jar", "discordbot-core.jar"]
+## Core shaded jar
+COPY --from=build /workspace/.artifacts/discordbot-core.jar /app/discordbot-core.jar
+
+# Bundle available plugins (internal plugins)
+RUN mkdir -p /opt/discordbot/bundles/plugins /opt/discordbot/bundles/examples
+
+# Copy bundled plugin jars (empty dir is fine)
+COPY --from=build /workspace/.bundles/plugins/ /opt/discordbot/bundles/plugins/
+COPY --from=build /workspace/.bundles/examples/ /opt/discordbot/bundles/examples/
+
+# Entrypoint script to optionally install/update plugins before launch
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+VOLUME ["/app/data", "/app/plugins"]
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Docker healthcheck (ready file created by core after full startup)
+# Docker healthcheck: HTTP ready endpoint exposed by the core
+ENV HEALTH_PORT=8081
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD curl -fsS http://127.0.0.1:${HEALTH_PORT}/readyz || exit 1
