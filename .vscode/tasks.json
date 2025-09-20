@@ -12,6 +12,14 @@
       },
       "detail": "Build & test all modules (full lifecycle)"
     },
+    /* ===================== DOCKER ===================== */
+    {
+      "label": "docker:build",
+      "type": "shell",
+      "command": "docker build -t fluxcord:latest .",
+      "group": "build",
+      "detail": "Build Docker image (tag: fluxcord:latest)"
+    },
     {
       "label": "package:all:skipTests",
       "type": "shell",
