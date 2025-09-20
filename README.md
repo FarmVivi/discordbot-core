@@ -61,7 +61,7 @@ Demonstration plugin showing audio API capabilities.
 ```
 fluxcord/
 ├── discordbot-api/                        # Public API interfaces and contracts
-├── discordbot-core/                       # Core implementation and engine
+├── fluxcord-core/                       # Core implementation and engine
 ├── examples/plugins/plugin-example-audio/ # Example audio plugin
 ├── plugin-template/                       # Template for creating new plugins
 ├── plugins/                               # Additional plugin modules
@@ -211,7 +211,7 @@ mvn clean install
 ### Module Structure
 
 - **discordbot-api**: Lightweight API interfaces for plugin development
-- **discordbot-core**: Main engine implementation with all features
+- **fluxcord-core**: Main engine implementation with all features
 - **plugin-example-audio**: Reference implementation for audio plugins
 - **plugin-example-commands**: Reference implementation for command handling
 - **plugin-template**: Starter template for new plugin development

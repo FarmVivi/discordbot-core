@@ -1,6 +1,6 @@
 # Plugin Development Guide
 
-This guide covers everything you need to know about developing plugins for DiscordBot Core.
+This guide covers everything you need to know about developing plugins for Fluxcord.
 
 ## Quick Start
 
@@ -187,7 +187,7 @@ public void onPlayerLevelUp(PlayerLevelUpEvent event) {
 
 ### Automatic Configuration Management
 
-**DiscordBot Core now provides automatic configuration management for plugins:**
+**Fluxcord now provides automatic configuration management for plugins:**
 
 #### Default Configuration Files
 
@@ -226,7 +226,7 @@ messages:
 
 #### Migration Support
 
-DiscordBot Core provides two ways to implement configuration migration in your plugin:
+Fluxcord provides two ways to implement configuration migration in your plugin:
 
 1. **Separate Migration Class (Recommended)** - Keeps your main plugin class clean
 2. **Direct Implementation** - Implement migration logic directly in your plugin class
@@ -832,7 +832,7 @@ public void onEnable() {
 
 ## Resources
 
-- [DiscordBot Core API Documentation](api-reference.md)
+- [Fluxcord API Documentation](api-reference.md)
 - [Command System Guide](commands.md)
 - [Audio API Guide](audio-api.md)
 - [JDA Documentation](https://jda.wiki/)

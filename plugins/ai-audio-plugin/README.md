@@ -1,6 +1,6 @@
 # AI Audio Plugin
 
-AI-powered voice processing and interaction plugin for DiscordBot Core, bringing advanced speech recognition, text-to-speech, and audio analysis capabilities to Discord bots.
+AI-powered voice processing and interaction plugin for Fluxcord, bringing advanced speech recognition, text-to-speech, and audio analysis capabilities to Discord bots.
 
 ## Features
 
@@ -177,7 +177,7 @@ Core features planned:
 
 ## Contributing
 
-This plugin is part of the DiscordBot Core ecosystem. Contributions welcome!
+This plugin is part of the Fluxcord ecosystem. Contributions welcome!
 
 1. Fork the repository
 2. Create a feature branch for AI audio enhancements
@@ -187,4 +187,4 @@ This plugin is part of the DiscordBot Core ecosystem. Contributions welcome!
 
 ## License
 
-Part of DiscordBot Core - Licensed under MIT License
+Part of Fluxcord - Licensed under MIT License

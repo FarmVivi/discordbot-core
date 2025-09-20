@@ -31,7 +31,7 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Main class for the Discord bot core.
+ * Main class for Fluxcord.
  * This class is responsible for loading and managing plugins.
  */
 public class Discobocor {

@@ -1,6 +1,6 @@
-# Audio API pour Discordbot-Core
+# Audio API pour Fluxcord
 
-Cette documentation décrit l'API audio implémentée dans le Discordbot-Core, qui permet aux plugins de gérer les flux audio entrants et sortants avec des fonctionnalités avancées comme le mixage et la gestion des priorités.
+Cette documentation décrit l'API audio implémentée dans Fluxcord, qui permet aux plugins de gérer les flux audio entrants et sortants avec des fonctionnalités avancées comme le mixage et la gestion des priorités.
 
 ## Caractéristiques
 

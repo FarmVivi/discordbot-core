@@ -17,7 +17,7 @@ perform_build() {
   mvn package -DskipTests
   
   # Rename jar file for convenience (core module contains the main application)
-  cp fluxcord-core/target/fluxcord-core-*.jar target/fluxcord.jar
+  cp fluxcord-core/target/fluxcord-core-*-shaded.jar target/fluxcord.jar
   
   echo "Build completed successfully!"
 }

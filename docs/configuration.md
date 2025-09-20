@@ -32,7 +32,7 @@ config_version: 1
 The core configuration is automatically created with comprehensive defaults if missing:
 
 ```yaml
-# Discord Bot Core Configuration
+# Fluxcord Configuration
 # Configuration version (automatically managed)
 config_version: 1
 
@@ -614,7 +614,7 @@ The system provides detailed logging during migrations:
 
 ### Version Compatibility
 
-Each version of DiscordBot Core supports specific configuration schema versions:
+Each version of Fluxcord supports specific configuration schema versions:
 
 ```yaml
 # Configuration version (automatically managed)

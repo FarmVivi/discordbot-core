@@ -138,7 +138,7 @@ This directory contains comprehensive example plugins demonstrating all core fea
    ```
 
 4. **Restart Bot**:
-   Restart your DiscordBot Core instance
+   Restart your Fluxcord instance
 
 ### Example-Specific Setup
 
@@ -235,4 +235,4 @@ plugin-example-[feature]/
 
 ---
 
-*Example plugins are maintained as part of the DiscordBot Core documentation project and serve as definitive implementation references for plugin developers.*
+*Example plugins are maintained as part of the Fluxcord documentation project and serve as definitive implementation references for plugin developers.*

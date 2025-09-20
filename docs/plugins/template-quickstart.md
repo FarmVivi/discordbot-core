@@ -42,7 +42,7 @@ The plugin template provides a comprehensive starting point that demonstrates al
 
 - Java 17 or newer
 - Maven 3.6+ for building
-- DiscordBot Core framework
+- Fluxcord framework
 - IDE with Java support (IntelliJ IDEA recommended)
 
 ### Step 1: Copy the Template

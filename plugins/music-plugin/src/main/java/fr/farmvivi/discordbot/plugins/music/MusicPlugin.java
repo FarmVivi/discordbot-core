@@ -8,7 +8,7 @@ import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 /**
- * Advanced music bot plugin for DiscordBot Core.
+ * Advanced music bot plugin for Fluxcord.
  * <p>
  * Features:
  * - Play music from YouTube, Spotify, SoundCloud
