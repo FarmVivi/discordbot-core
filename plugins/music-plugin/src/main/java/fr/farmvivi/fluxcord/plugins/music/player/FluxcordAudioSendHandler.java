@@ -23,16 +23,20 @@ public class FluxcordAudioSendHandler implements AudioSendHandler {
     }
     
     @Override
-    public boolean canProvide() {
+    public ByteBuffer provide20MsAudio() {
         // Check if we can provide audio data
-        return audioPlayer.provide(frame);
+        if (audioPlayer.provide(frame)) {
+            // Flip buffer to prepare for reading
+            buffer.flip();
+            return buffer;
+        }
+        return null;
     }
     
     @Override
-    public ByteBuffer provide() {
-        // Flip buffer to prepare for reading
-        buffer.flip();
-        return buffer;
+    public boolean canProvide() {
+        // Check if we can provide audio data for the next frame
+        return audioPlayer.provide(frame);
     }
     
     @Override

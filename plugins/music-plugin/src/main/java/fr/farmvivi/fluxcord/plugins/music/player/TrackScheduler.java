@@ -75,7 +75,6 @@ public class TrackScheduler extends AudioEventAdapter {
         return false;
     }
     
-    @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         // Only start next track if this track ended normally or was replaced
         if (endReason.mayStartNext) {
@@ -89,7 +88,6 @@ public class TrackScheduler extends AudioEventAdapter {
         updatePersistentMessage();
     }
     
-    @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         guildManager.getPlugin().getLogger().debug("Started playing: {} in guild: {}", 
             track.getInfo().title, guildManager.getGuild().getName());
@@ -98,7 +96,6 @@ public class TrackScheduler extends AudioEventAdapter {
         updatePersistentMessage();
     }
     
-    @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, Exception exception) {
         guildManager.getPlugin().getLogger().warn("Track exception in guild {}: {}", 
             guildManager.getGuild().getName(), exception.getMessage());
@@ -108,7 +105,6 @@ public class TrackScheduler extends AudioEventAdapter {
         updatePersistentMessage();
     }
     
-    @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         guildManager.getPlugin().getLogger().warn("Track stuck in guild {}: {} ({}ms)", 
             guildManager.getGuild().getName(), track.getInfo().title, thresholdMs);

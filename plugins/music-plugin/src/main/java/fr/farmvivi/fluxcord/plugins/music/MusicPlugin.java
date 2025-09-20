@@ -6,7 +6,7 @@ import fr.farmvivi.fluxcord.api.permissions.Permission;
 import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import fr.farmvivi.fluxcord.plugins.music.audio.FluxcordAudioManager;
-import fr.farmvivi.fluxcord.plugins.music.commands.MusicCommands.*;
+import fr.farmvivi.fluxcord.plugins.music.commands.*;
 import fr.farmvivi.fluxcord.plugins.music.config.MusicConfig;
 import fr.farmvivi.fluxcord.plugins.music.player.GuildMusicManager;
 import fr.farmvivi.fluxcord.plugins.music.player.PersistentMusicPlayerMessage;
@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 import java.util.Map;
 
 /**
@@ -51,7 +52,7 @@ public class MusicPlugin extends AbstractPlugin {
         registerPermissions();
 
         // Initialize managers
-        this.audioManager = new FluxcordAudioManager(this);
+        this.audioManager = new FluxcordAudioManager(this, audioService);
         this.musicManager = new MusicManager(this);
         this.playlistManager = new PlaylistManager(this);
 
@@ -191,15 +192,15 @@ public class MusicPlugin extends AbstractPlugin {
 
     private void loadPersistentMessages() {
         // Load persistent message data from storage
-        Map<String, Object> persistentData = getPluginDataStorage().getMap("persistent_messages");
-        if (persistentData != null) {
-            persistentData.forEach((guildId, data) -> {
+        Optional<Map> persistentData = getPluginDataStorage().getGlobalStorage().get("persistent_messages", Map.class);
+        if (persistentData.isPresent()) {
+            persistentData.get().forEach((guildId, data) -> {
                 if (data instanceof Map) {
                     @SuppressWarnings("unchecked")
                     Map<String, Object> messageData = (Map<String, Object>) data;
-                    PersistentMusicPlayerMessage playerMessage = new PersistentMusicPlayerMessage(this, guildId);
+                    PersistentMusicPlayerMessage playerMessage = new PersistentMusicPlayerMessage(this, (String) guildId);
                     playerMessage.loadFromData(messageData);
-                    playerMessages.put(guildId, playerMessage);
+                    playerMessages.put((String) guildId, playerMessage);
                 }
             });
         }
@@ -211,7 +212,7 @@ public class MusicPlugin extends AbstractPlugin {
         playerMessages.forEach((guildId, playerMessage) -> {
             persistentData.put(guildId, playerMessage.saveToData());
         });
-        getPluginDataStorage().setMap("persistent_messages", persistentData);
+        getPluginDataStorage().getGlobalStorage().set("persistent_messages", persistentData);
     }
 
     private void registerPermission(String permission, String description, PermissionDefault defaultValue) {

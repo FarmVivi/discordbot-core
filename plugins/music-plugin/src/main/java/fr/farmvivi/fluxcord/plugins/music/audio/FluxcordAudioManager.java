@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceMan
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import dev.lavalink.youtube.clients.*;
+import fr.farmvivi.fluxcord.api.audio.AudioService;
 import fr.farmvivi.fluxcord.plugins.music.MusicPlugin;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,10 +22,12 @@ import net.dv8tion.jda.api.entities.Guild;
  */
 public class FluxcordAudioManager {
     private final MusicPlugin plugin;
+    private final AudioService audioService;
     private final AudioPlayerManager audioPlayerManager;
     
-    public FluxcordAudioManager(MusicPlugin plugin) {
+    public FluxcordAudioManager(MusicPlugin plugin, AudioService audioService) {
         this.plugin = plugin;
+        this.audioService = audioService;
         this.audioPlayerManager = new DefaultAudioPlayerManager();
         
         initializeAudioSources();
@@ -74,7 +77,7 @@ public class FluxcordAudioManager {
      * @param priority audio priority
      */
     public void registerAudioHandler(Guild guild, AudioSendHandler handler, int volume, int priority) {
-        plugin.audioService.registerSendHandler(guild, plugin, handler, volume, priority);
+        audioService.registerSendHandler(guild, plugin, handler, volume, priority);
     }
     
     /**
@@ -83,7 +86,7 @@ public class FluxcordAudioManager {
      * @param guild the guild
      */
     public void deregisterAudioHandler(Guild guild) {
-        plugin.audioService.deregisterSendHandler(guild, plugin);
+        audioService.deregisterSendHandler(guild, plugin);
     }
     
     /**
@@ -93,7 +96,7 @@ public class FluxcordAudioManager {
      * @param volume volume level (0-100)
      */
     public void setVolume(Guild guild, int volume) {
-        plugin.audioService.setVolume(guild, plugin, volume);
+        audioService.setVolume(guild, plugin, volume);
     }
     
     /**

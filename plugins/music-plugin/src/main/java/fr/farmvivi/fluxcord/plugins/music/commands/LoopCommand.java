@@ -8,19 +8,18 @@ import java.util.function.BiFunction;
 import fr.farmvivi.fluxcord.api.command.Command;
 
 /**
- * Pause/resume command for music playback.
+ * Loop command to toggle loop mode.
  */
-public class PauseCommand implements BiFunction<CommandContext, Command, CommandResult> {
+public class LoopCommand implements BiFunction<CommandContext, Command, CommandResult> {
     private final MusicPlugin plugin;
     
-    public PauseCommand(MusicPlugin plugin) {
+    public LoopCommand(MusicPlugin plugin) {
         this.plugin = plugin;
     }
     
     @Override
     public CommandResult apply(CommandContext context, Command command) {
-        // TODO: Implement pause/resume functionality
-        context.reply("⏸️ Pause command (Implementation in progress)");
+        context.reply("🔂 Loop command (Implementation in progress)");
         return CommandResult.success();
     }
 }
