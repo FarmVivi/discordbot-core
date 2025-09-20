@@ -1,7 +1,7 @@
 # Music Plugin Configuration
 config_version: 1
 
-# Audio settings
+# Core music settings
 music:
   # Default volume for music playback (0-100)
   default_volume: 50
@@ -9,46 +9,64 @@ music:
   # Maximum queue size per server
   max_queue_size: 100
   
-  # Maximum track duration (milliseconds)
-  max_track_duration: 600000  # 10 minutes
+  # Maximum track duration (milliseconds) - 10 minutes default
+  max_track_duration: 600000
   
-  # Audio quality (low/medium/high)
+  # Maximum playlist import size (to prevent spam)
+  max_playlist_import: 50
+  
+  # Audio quality (low/medium/high) - affects CPU usage
   audio_quality: "medium"
 
-# Platform support
+# Platform support and source configuration
 platforms:
-  # Enable Spotify integration
+  # Enable YouTube integration (primary source)
+  enable_youtube: true
+  
+  # Enable Spotify integration (requires API keys)
   enable_spotify: true
   
   # Enable SoundCloud integration
   enable_soundcloud: true
   
-  # Enable YouTube integration (always enabled)
-  enable_youtube: true
+  # Enable local file support
+  enable_local_files: false
+  
+  # Enable HTTP URL support
+  enable_http_sources: true
 
 # Voice channel behavior
 voice:
   # Auto-leave when no users in channel
   auto_leave: true
   
-  # Auto-leave timeout in seconds
-  auto_leave_timeout: 300  # 5 minutes
+  # Auto-leave timeout in seconds (5 minutes default)
+  auto_leave_timeout: 300
   
   # Auto-join user's voice channel when playing
   auto_join: false
+  
+  # Require bot to be in same voice channel as user for commands
+  require_same_channel: true
 
-# Playlist settings
+# Playlist and favorites settings
 playlists:
-  # Maximum playlist size
+  # Maximum playlist size per user
   max_playlist_size: 500
   
-  # Allow public playlists
+  # Maximum number of favorites per user
+  max_favorites: 100
+  
+  # Allow public playlists (visible to other users)
   allow_public_playlists: true
   
   # Default playlist privacy (public/private)
   default_privacy: "private"
+  
+  # Enable playlist persistence (save/load across restarts)
+  enable_persistence: true
 
-# Permission settings
+# Permission and moderation settings
 permissions:
   # Allow users to skip their own tracks
   allow_self_skip: true
@@ -56,5 +74,56 @@ permissions:
   # Require vote to skip (percentage of users needed)
   skip_vote_threshold: 0.5
   
-  # DJ role permissions
+  # DJ role name for enhanced permissions
   dj_role_name: "DJ"
+  
+  # Allow users to control volume
+  allow_volume_control: true
+  
+  # Max volume non-admins can set
+  max_user_volume: 100
+
+# Advanced features
+features:
+  # Enable now playing messages
+  show_now_playing: true
+  
+  # Enable queue persistence across restarts
+  persistent_queues: false
+  
+  # Enable search command
+  enable_search: true
+  
+  # Enable lyrics command (if available)
+  enable_lyrics: false
+  
+  # Enable audio effects/equalizer
+  enable_effects: false
+  
+  # Show progress bars in embeds
+  show_progress_bars: true
+
+# Performance and limits
+performance:
+  # Maximum concurrent audio connections
+  max_connections: 10
+  
+  # Audio buffer size (affects latency vs stability)
+  buffer_size: "medium"
+  
+  # Enable audio caching
+  enable_caching: true
+  
+  # Cache size in MB
+  cache_size_mb: 100
+
+# Logging and monitoring
+logging:
+  # Log music commands usage
+  log_commands: true
+  
+  # Log track plays for statistics
+  log_plays: false
+  
+  # Debug mode for troubleshooting
+  debug: false

@@ -9,6 +9,12 @@ import fr.farmvivi.fluxcord.plugins.music.command.PauseCommand;
 import fr.farmvivi.fluxcord.plugins.music.command.PlayCommand;
 import fr.farmvivi.fluxcord.plugins.music.command.QueueCommand;
 import fr.farmvivi.fluxcord.plugins.music.command.SkipCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.VolumeCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.StopCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.LoopCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.ShuffleCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.NowPlayingCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.ClearCommand;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 /**
@@ -31,6 +37,12 @@ public class MusicPlugin extends AbstractPlugin {
     private PauseCommand pauseCommand;
     private SkipCommand skipCommand;
     private QueueCommand queueCommand;
+    private VolumeCommand volumeCommand;
+    private StopCommand stopCommand;
+    private LoopCommand loopCommand;
+    private ShuffleCommand shuffleCommand;
+    private NowPlayingCommand nowPlayingCommand;
+    private ClearCommand clearCommand;
 
     @Override
     public void onEnable() {
@@ -75,6 +87,12 @@ public class MusicPlugin extends AbstractPlugin {
         this.pauseCommand = new PauseCommand(this, musicManager.getAudioPlayerService());
         this.skipCommand = new SkipCommand(this, musicManager.getAudioPlayerService());
         this.queueCommand = new QueueCommand(this, musicManager.getAudioPlayerService());
+        this.volumeCommand = new VolumeCommand(this, musicManager.getAudioPlayerService());
+        this.stopCommand = new StopCommand(this, musicManager.getAudioPlayerService(), musicManager.getVoiceChannelService());
+        this.loopCommand = new LoopCommand(this, musicManager.getAudioPlayerService());
+        this.shuffleCommand = new ShuffleCommand(this, musicManager.getAudioPlayerService());
+        this.nowPlayingCommand = new NowPlayingCommand(this, musicManager.getAudioPlayerService());
+        this.clearCommand = new ClearCommand(this, musicManager.getAudioPlayerService());
         
         // TODO: Register commands with command service when command registration API is available
         // This would typically be done through a CommandService or similar API
@@ -96,6 +114,33 @@ public class MusicPlugin extends AbstractPlugin {
         getCommandService().registerCommand("queue", queueCommand::execute)
             .description("Display the current music queue")
             .permission("musicplugin.queue");
+            
+        getCommandService().registerCommand("volume", volumeCommand::execute)
+            .description("Control playback volume")
+            .addOption("volume", "Volume level (0-100)", false)
+            .permission("musicplugin.volume");
+            
+        getCommandService().registerCommand("stop", stopCommand::execute)
+            .description("Stop playback and clear queue")
+            .permission("musicplugin.admin");
+            
+        getCommandService().registerCommand("loop", loopCommand::execute)
+            .description("Control loop modes")
+            .addOption("mode", "Loop mode (off/track/queue)", false)
+            .permission("musicplugin.queue");
+            
+        getCommandService().registerCommand("shuffle", shuffleCommand::execute)
+            .description("Shuffle the queue")
+            .permission("musicplugin.queue");
+            
+        getCommandService().registerCommand("nowplaying", nowPlayingCommand::execute)
+            .description("Show current track information")
+            .aliases("np", "current")
+            .permission("musicplugin.queue");
+            
+        getCommandService().registerCommand("clear", clearCommand::execute)
+            .description("Clear the music queue")
+            .permission("musicplugin.admin");
         */
         
         logger.info("Music commands initialized (registration pending command API availability)");
@@ -160,6 +205,30 @@ public class MusicPlugin extends AbstractPlugin {
     
     public QueueCommand getQueueCommand() {
         return queueCommand;
+    }
+    
+    public VolumeCommand getVolumeCommand() {
+        return volumeCommand;
+    }
+    
+    public StopCommand getStopCommand() {
+        return stopCommand;
+    }
+    
+    public LoopCommand getLoopCommand() {
+        return loopCommand;
+    }
+    
+    public ShuffleCommand getShuffleCommand() {
+        return shuffleCommand;
+    }
+    
+    public NowPlayingCommand getNowPlayingCommand() {
+        return nowPlayingCommand;
+    }
+    
+    public ClearCommand getClearCommand() {
+        return clearCommand;
     }
 }
 
