@@ -1,7 +1,7 @@
 package fr.farmvivi.fluxcord.core.util;
 
 public class EnvironmentUtils {
-    private static final String ENV_PREFIX = "DISCORD_";
+    private static final String ENV_PREFIX = "FLUXCORD_";
 
     /**
      * Gets a string value from environment variables.
