@@ -5,6 +5,10 @@ import fr.farmvivi.fluxcord.api.event.EventPriority;
 import fr.farmvivi.fluxcord.api.permissions.Permission;
 import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.plugins.music.command.PauseCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.PlayCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.QueueCommand;
+import fr.farmvivi.fluxcord.plugins.music.command.SkipCommand;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 /**
@@ -21,6 +25,12 @@ public class MusicPlugin extends AbstractPlugin {
 
     private MusicManager musicManager;
     private PlaylistManager playlistManager;
+    
+    // Command instances
+    private PlayCommand playCommand;
+    private PauseCommand pauseCommand;
+    private SkipCommand skipCommand;
+    private QueueCommand queueCommand;
 
     @Override
     public void onEnable() {
@@ -32,6 +42,9 @@ public class MusicPlugin extends AbstractPlugin {
         // Initialize managers
         this.musicManager = new MusicManager(this);
         this.playlistManager = new PlaylistManager(this);
+
+        // Initialize commands
+        initializeCommands();
 
         // Load configuration
         loadConfiguration();
@@ -52,6 +65,40 @@ public class MusicPlugin extends AbstractPlugin {
         }
 
         logger.info("Music Plugin disabled!");
+    }
+    
+    private void initializeCommands() {
+        logger.info("Initializing music commands...");
+        
+        // Create command instances
+        this.playCommand = new PlayCommand(this, musicManager.getAudioPlayerService(), musicManager.getVoiceChannelService());
+        this.pauseCommand = new PauseCommand(this, musicManager.getAudioPlayerService());
+        this.skipCommand = new SkipCommand(this, musicManager.getAudioPlayerService());
+        this.queueCommand = new QueueCommand(this, musicManager.getAudioPlayerService());
+        
+        // TODO: Register commands with command service when command registration API is available
+        // This would typically be done through a CommandService or similar API
+        /*
+        getCommandService().registerCommand("play", playCommand::execute)
+            .description("Play music from URL or search query")
+            .addOption("query", "Search query or URL", true)
+            .addOption("next", "Play next in queue", false)
+            .permission("musicplugin.play");
+            
+        getCommandService().registerCommand("pause", pauseCommand::execute)
+            .description("Pause or resume music playback")
+            .permission("musicplugin.play");
+            
+        getCommandService().registerCommand("skip", skipCommand::execute)
+            .description("Skip the current track")
+            .permission("musicplugin.skip");
+            
+        getCommandService().registerCommand("queue", queueCommand::execute)
+            .description("Display the current music queue")
+            .permission("musicplugin.queue");
+        */
+        
+        logger.info("Music commands initialized (registration pending command API availability)");
     }
 
     private void registerPermissions() {
@@ -75,26 +122,15 @@ public class MusicPlugin extends AbstractPlugin {
         int defaultVolume = getConfiguration().getInt("music.default_volume", 50);
         int maxQueue = getConfiguration().getInt("music.max_queue_size", 100);
         int maxTrackDurationMs = getConfiguration().getInt("music.max_track_duration", 600_000);
-        boolean enableSpotify = getConfiguration().getBoolean("music.enable_spotify", true);
-        boolean enableSoundcloud = getConfiguration().getBoolean("music.enable_soundcloud", true);
-        int autoLeaveTimeoutMs = getConfiguration().getInt("music.auto_leave_timeout", 300_000);
+        boolean enableSpotify = getConfiguration().getBoolean("platforms.enable_spotify", true);
+        boolean enableSoundcloud = getConfiguration().getBoolean("platforms.enable_soundcloud", true);
+        int autoLeaveTimeoutMs = getConfiguration().getInt("voice.auto_leave_timeout", 300);
         logger.info("Music config loaded: vol={}, queue={}, maxTrackMs={}, spotify={}, soundcloud={}, autoLeaveMs={}",
                 defaultVolume, maxQueue, maxTrackDurationMs, enableSpotify, enableSoundcloud, autoLeaveTimeoutMs);
     }
 
-    // TODO: Implement commands when command API is available
-    /*
-    @Command(name = "play", description = "Play music from a URL or search query")
-    public CommandResult playCommand(CommandContext ctx) {
-        // TODO: Implement play command
-        ctx.reply("🎵 Play command - Implementation coming soon!");
-        return CommandResult.SUCCESS;
-    }
-    */
-
     @EventHandler(priority = EventPriority.NORMAL)
     public void onVoiceUpdate(GuildVoiceUpdateEvent event) {
-        // TODO: Handle voice channel events for auto-leave functionality
         if (musicManager != null) {
             musicManager.handleVoiceUpdate(event);
         }
@@ -107,6 +143,23 @@ public class MusicPlugin extends AbstractPlugin {
 
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
+    }
+    
+    // Getters for commands (for potential external access)
+    public PlayCommand getPlayCommand() {
+        return playCommand;
+    }
+    
+    public PauseCommand getPauseCommand() {
+        return pauseCommand;
+    }
+    
+    public SkipCommand getSkipCommand() {
+        return skipCommand;
+    }
+    
+    public QueueCommand getQueueCommand() {
+        return queueCommand;
     }
 }
 
