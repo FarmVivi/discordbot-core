@@ -51,21 +51,21 @@
     {
       "label": "build:plugins",
       "type": "shell",
-      "command": "mvn -pl plugins/ai-audio-plugin,plugins/music-plugin -am package -DskipTests",
+      "command": "$pom=[xml](Get-Content pom.xml -Raw); $mods=@($pom.project.modules.module); $plugins=$mods | Where-Object { $_ -like 'plugins/*' }; if ($plugins -and $plugins.Count -gt 0) { mvn -pl ($plugins -join ',') -am package -DskipTests } else { Write-Host 'No plugin modules detected' }",
       "group": "build",
       "detail": "Build bundled plugins"
     },
     {
       "label": "build:examples",
       "type": "shell",
-      "command": "mvn -pl examples/plugins/plugin-example-audio,examples/plugins/plugin-example-commands -am package -DskipTests",
+      "command": "$pom=[xml](Get-Content pom.xml -Raw); $mods=@($pom.project.modules.module); $examples=$mods | Where-Object { $_ -like 'examples/plugins/*' }; if ($examples -and $examples.Count -gt 0) { mvn -pl ($examples -join ',') -am package -DskipTests } else { Write-Host 'No example plugin modules detected' }",
       "group": "build",
       "detail": "Build example audio and commands plugins"
     },
     {
       "label": "build:template",
       "type": "shell",
-      "command": "mvn -pl plugin-template -am package -DskipTests",
+      "command": "$pom=[xml](Get-Content pom.xml -Raw); $mods=@($pom.project.modules.module); if ($mods -contains 'plugin-template') { mvn -pl plugin-template -am package -DskipTests } else { Write-Host 'Module plugin-template not present in parent pom' }",
       "group": "build",
       "detail": "Build plugin template"
     },
