@@ -5,7 +5,16 @@ import fr.farmvivi.fluxcord.api.event.EventPriority;
 import fr.farmvivi.fluxcord.api.permissions.Permission;
 import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.plugins.music.audio.FluxcordAudioManager;
+import fr.farmvivi.fluxcord.plugins.music.commands.MusicCommands.*;
+import fr.farmvivi.fluxcord.plugins.music.config.MusicConfig;
+import fr.farmvivi.fluxcord.plugins.music.player.GuildMusicManager;
+import fr.farmvivi.fluxcord.plugins.music.player.PersistentMusicPlayerMessage;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 /**
  * Advanced music bot plugin for Fluxcord.
@@ -16,25 +25,41 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
  * - Audio effects and volume control
  * - Rich embeds with now playing information
  * - Search functionality and favorites
+ * - Persistent music player message with interactive controls
  */
 public class MusicPlugin extends AbstractPlugin {
-
+    
     private MusicManager musicManager;
     private PlaylistManager playlistManager;
+    private FluxcordAudioManager audioManager;
+    private MusicConfig musicConfig;
+    
+    // Per-guild music managers
+    private final Map<String, GuildMusicManager> guildMusicManagers = new ConcurrentHashMap<>();
+    
+    // Persistent player messages
+    private final Map<String, PersistentMusicPlayerMessage> playerMessages = new ConcurrentHashMap<>();
 
     @Override
     public void onEnable() {
         logger.info("Music Plugin enabling...");
 
+        // Load configuration
+        musicConfig = new MusicConfig(this);
+        
         // Register permissions
         registerPermissions();
 
         // Initialize managers
+        this.audioManager = new FluxcordAudioManager(this);
         this.musicManager = new MusicManager(this);
         this.playlistManager = new PlaylistManager(this);
 
-        // Load configuration
-        loadConfiguration();
+        // Register commands
+        registerCommands();
+
+        // Load persistent player messages
+        loadPersistentMessages();
 
         logger.info("Music Plugin enabled successfully!");
     }
@@ -43,6 +68,10 @@ public class MusicPlugin extends AbstractPlugin {
     public void onDisable() {
         logger.info("Music Plugin disabling...");
 
+        // Save persistent player messages
+        savePersistentMessages();
+
+        // Cleanup audio connections
         if (musicManager != null) {
             musicManager.shutdown();
         }
@@ -51,56 +80,175 @@ public class MusicPlugin extends AbstractPlugin {
             playlistManager.saveAllPlaylists();
         }
 
+        // Clear guild managers
+        guildMusicManagers.clear();
+        playerMessages.clear();
+
         logger.info("Music Plugin disabled!");
     }
 
     private void registerPermissions() {
-        registerPermissionNode("play", "Allows playing tracks", PermissionDefault.TRUE);
-        registerPermissionNode("skip", "Allows skipping current track", PermissionDefault.TRUE);
-        registerPermissionNode("queue", "Allows viewing the queue", PermissionDefault.TRUE);
-        registerPermissionNode("volume", "Allows changing playback volume", PermissionDefault.OP);
-        registerPermissionNode("playlist", "Allows managing playlists", PermissionDefault.TRUE);
-        registerPermissionNode("admin", "Allows moderator music actions", PermissionDefault.OP);
+        // Register music permissions
+        registerPermission("music.play", "Allow playing music", PermissionDefault.TRUE);
+        registerPermission("music.skip", "Allow skipping tracks", PermissionDefault.TRUE);
+        registerPermission("music.volume", "Allow changing volume", PermissionDefault.TRUE);
+        registerPermission("music.queue", "Allow viewing and managing queue", PermissionDefault.TRUE);
+        registerPermission("music.playlist", "Allow playlist management", PermissionDefault.TRUE);
+        registerPermission("music.admin", "Allow administrative music controls", PermissionDefault.FALSE);
     }
 
-    private void registerPermissionNode(String node, String description, PermissionDefault def) {
-        getPluginPermissionManager().registerPermission(new SimplePermission(permissionKey(node), description, def));
+    private void registerCommands() {
+        // Basic playback commands
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("play")
+                   .description("Play music from various sources")
+                   .category("Music")
+                   .permission("music.play")
+                   .stringOption("query", "Song name, URL, or search term", true)
+                   .executor(new PlayCommand(this));
+        });
+
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("pause")
+                   .description("Pause/resume music playback")
+                   .category("Music")
+                   .permission("music.play")
+                   .executor(new PauseCommand(this));
+        });
+
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("skip")
+                   .description("Skip the current track")
+                   .category("Music")
+                   .permission("music.skip")
+                   .executor(new SkipCommand(this));
+        });
+
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("stop")
+                   .description("Stop music and clear queue")
+                   .category("Music")
+                   .permission("music.admin")
+                   .executor(new StopCommand(this));
+        });
+
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("nowplaying")
+                   .description("Show current playing track")
+                   .category("Music")
+                   .permission("music.play")
+                   .aliases("np", "current")
+                   .executor(new NowPlayingCommand(this));
+        });
+
+        // Queue management commands
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("queue")
+                   .description("Show the music queue")
+                   .category("Music")
+                   .permission("music.queue")
+                   .integerOption("page", "Page number", false)
+                   .executor(new QueueCommand(this));
+        });
+
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("clear")
+                   .description("Clear the music queue")
+                   .category("Music")
+                   .permission("music.admin")
+                   .executor(new ClearCommand(this));
+        });
+
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("shuffle")
+                   .description("Toggle shuffle mode")
+                   .category("Music")
+                   .permission("music.queue")
+                   .executor(new ShuffleCommand(this));
+        });
+
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("loop")
+                   .description("Toggle loop mode")
+                   .category("Music")
+                   .permission("music.queue")
+                   .stringOption("mode", "Loop mode: off, track, queue", false)
+                   .executor(new LoopCommand(this));
+        });
+
+        // Volume and audio commands
+        pluginCommandAdapter.registerCommand(builder -> {
+            builder.name("volume")
+                   .description("Set or view the volume")
+                   .category("Music")
+                   .permission("music.volume")
+                   .integerOption("level", "Volume level (0-100)", false)
+                   .executor(new VolumeCommand(this));
+        });
+
+        // Additional commands will be added as needed
     }
 
-    private String permissionKey(String node) {
-        return getName().toLowerCase() + "." + node;
+    private void loadPersistentMessages() {
+        // Load persistent message data from storage
+        Map<String, Object> persistentData = getPluginDataStorage().getMap("persistent_messages");
+        if (persistentData != null) {
+            persistentData.forEach((guildId, data) -> {
+                if (data instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> messageData = (Map<String, Object>) data;
+                    PersistentMusicPlayerMessage playerMessage = new PersistentMusicPlayerMessage(this, guildId);
+                    playerMessage.loadFromData(messageData);
+                    playerMessages.put(guildId, playerMessage);
+                }
+            });
+        }
     }
 
-    private void loadConfiguration() {
-        int defaultVolume = getConfiguration().getInt("music.default_volume", 50);
-        int maxQueue = getConfiguration().getInt("music.max_queue_size", 100);
-        int maxTrackDurationMs = getConfiguration().getInt("music.max_track_duration", 600_000);
-        boolean enableSpotify = getConfiguration().getBoolean("music.enable_spotify", true);
-        boolean enableSoundcloud = getConfiguration().getBoolean("music.enable_soundcloud", true);
-        int autoLeaveTimeoutMs = getConfiguration().getInt("music.auto_leave_timeout", 300_000);
-        logger.info("Music config loaded: vol={}, queue={}, maxTrackMs={}, spotify={}, soundcloud={}, autoLeaveMs={}",
-                defaultVolume, maxQueue, maxTrackDurationMs, enableSpotify, enableSoundcloud, autoLeaveTimeoutMs);
+    private void savePersistentMessages() {
+        // Save persistent message data to storage
+        Map<String, Map<String, Object>> persistentData = new ConcurrentHashMap<>();
+        playerMessages.forEach((guildId, playerMessage) -> {
+            persistentData.put(guildId, playerMessage.saveToData());
+        });
+        getPluginDataStorage().setMap("persistent_messages", persistentData);
     }
 
-    // TODO: Implement commands when command API is available
-    /*
-    @Command(name = "play", description = "Play music from a URL or search query")
-    public CommandResult playCommand(CommandContext ctx) {
-        // TODO: Implement play command
-        ctx.reply("🎵 Play command - Implementation coming soon!");
-        return CommandResult.SUCCESS;
+    private void registerPermission(String permission, String description, PermissionDefault defaultValue) {
+        Permission perm = new SimplePermission(permission, description, defaultValue);
+        getPluginPermissionManager().registerPermission(perm);
     }
-    */
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onVoiceUpdate(GuildVoiceUpdateEvent event) {
-        // TODO: Handle voice channel events for auto-leave functionality
         if (musicManager != null) {
             musicManager.handleVoiceUpdate(event);
         }
     }
 
-    // Getters for managers (used by other classes)
+    /**
+     * Get or create a guild music manager for the specified guild.
+     *
+     * @param guild the guild
+     * @return the guild music manager
+     */
+    public GuildMusicManager getGuildMusicManager(Guild guild) {
+        return guildMusicManagers.computeIfAbsent(guild.getId(), 
+            id -> new GuildMusicManager(this, guild));
+    }
+
+    /**
+     * Get or create a persistent player message for the specified guild.
+     *
+     * @param guild the guild
+     * @return the persistent player message
+     */
+    public PersistentMusicPlayerMessage getPersistentPlayerMessage(Guild guild) {
+        return playerMessages.computeIfAbsent(guild.getId(),
+            id -> new PersistentMusicPlayerMessage(this, id));
+    }
+
+    // Getters for managers
     public MusicManager getMusicManager() {
         return musicManager;
     }
@@ -108,18 +256,26 @@ public class MusicPlugin extends AbstractPlugin {
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
     }
+
+    public FluxcordAudioManager getAudioManager() {
+        return audioManager;
+    }
+
+    public MusicConfig getMusicConfig() {
+        return musicConfig;
+    }
 }
 
 // Internal simple permission implementation (mirrors template approach)
 class SimplePermission implements Permission {
     private final String name;
     private final String description;
-    private final PermissionDefault def;
+    private final PermissionDefault defaultValue;
 
-    public SimplePermission(String name, String description, PermissionDefault def) {
+    public SimplePermission(String name, String description, PermissionDefault defaultValue) {
         this.name = name;
         this.description = description;
-        this.def = def;
+        this.defaultValue = defaultValue;
     }
 
     @Override
@@ -134,6 +290,6 @@ class SimplePermission implements Permission {
 
     @Override
     public PermissionDefault getDefault() {
-        return def;
+        return defaultValue;
     }
 }

@@ -78,6 +78,13 @@
             <id>lavalink-maven</id>
             <url>https://maven.lavalink.dev/releases</url>
         </repository>
+
+        <!-- TopiWTF Repository for LavaSrc -->
+        <repository>
+            <id>TopiWTF-releases</id>
+            <name>Topis Maven Repo</name>
+            <url>https://maven.topi.wtf/releases</url>
+        </repository>
     </repositories>
 
     <dependencyManagement>
