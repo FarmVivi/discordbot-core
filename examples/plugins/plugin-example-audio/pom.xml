@@ -11,7 +11,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>discordbot-example-audio</artifactId>
+    <artifactId>plugin-example-audio</artifactId>
 
     <name>DiscordBot Example Plugin - Audio</name>
     <description>Example audio plugin for Discord Bot showing audio handling capabilities</description>

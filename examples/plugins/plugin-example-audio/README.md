@@ -60,7 +60,7 @@ Language files are located in `src/main/resources/lang/` and contain:
 ## Usage
 
 1. **Build the plugin**: `mvn clean package`
-2. **Copy to plugins directory**: `cp target/discordbot-example-audio-*.jar ../../../plugins/`
+2. **Copy to plugins directory**: `cp target/plugin-example-audio-*.jar ../../../plugins/`
 3. **Configure the plugin**: Edit your bot's configuration
 4. **Restart the bot**
 5. **Join a voice channel** to trigger audio functionality (if auto_join is enabled)
