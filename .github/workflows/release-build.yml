@@ -30,8 +30,8 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       # Étape pour enlever "-SNAPSHOT" dans le pom.xml (multi-module)
-      - name: Remove -SNAPSHOT from pom.xml
-        run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false
+      - name: Remove -SNAPSHOT from pom.xml (all modules)
+        run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false -DprocessAllModules
 
       # Construction Maven
       - name: Build with Maven
