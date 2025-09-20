@@ -1,6 +1,6 @@
 # Command Example Plugin
 
-This plugin demonstrates comprehensive command system features in DiscordBot Core, including slash commands, permissions, cooldowns, argument handling, and embed responses.
+This plugin demonstrates comprehensive command system features in Fluxcord, including slash commands, permissions, cooldowns, argument handling, and embed responses.
 
 ## Features Demonstrated
 
@@ -152,7 +152,7 @@ commands:
 
 ### 4. Restart Bot
 
-Restart your DiscordBot Core instance to load the plugin.
+Restart your Fluxcord instance to load the plugin.
 
 ### 5. Test Commands
 
@@ -302,4 +302,4 @@ After exploring this example:
 
 ---
 
-*This example plugin is part of the DiscordBot Core documentation project and demonstrates production-ready command system usage.*
+*This example plugin is part of the Fluxcord documentation project and demonstrates production-ready command system usage.*

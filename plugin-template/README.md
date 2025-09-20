@@ -1,6 +1,6 @@
 # Plugin Template
 
-A comprehensive template for creating DiscordBot Core plugins with best practices, examples, and complete feature coverage.
+A comprehensive template for creating Fluxcord plugins with best practices, examples, and complete feature coverage.
 
 ⚠️ **Quick Start**: All example features are **disabled by default**. Enable them in `config.yml` to explore functionality or keep them disabled for a clean starting point.
 
@@ -239,8 +239,8 @@ The template includes all necessary dependencies:
 ```xml
 <!-- Core API -->
 <dependency>
-    <groupId>fr.farmvivi.discordbot</groupId>
-    <artifactId>discordbot-api</artifactId>
+    <groupId>fr.farmvivi.fluxcord</groupId>
+    <artifactId>fluxcord-api</artifactId>
 </dependency>
 
 <!-- Testing -->
@@ -315,4 +315,4 @@ The template includes all necessary dependencies:
 
 ---
 
-**DiscordBot Core Plugin Template** - *A comprehensive foundation for professional Discord bot plugin development.*
+**Fluxcord Plugin Template** - *A comprehensive foundation for professional Discord bot plugin development.*

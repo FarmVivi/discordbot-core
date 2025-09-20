@@ -1,6 +1,6 @@
 # Configuration Guide
 
-DiscordBot Core uses a flexible YAML-based configuration system with **automatic versioning**, **migration support**, environment variable support, and plugin-specific settings.
+Fluxcord uses a flexible YAML-based configuration system with **automatic versioning**, **migration support**, environment variable support, and plugin-specific settings.
 
 ## Configuration Versioning
 
@@ -32,7 +32,7 @@ config_version: 1
 The core configuration is automatically created with comprehensive defaults if missing:
 
 ```yaml
-# Discord Bot Core Configuration
+# Fluxcord Configuration
 # Configuration version (automatically managed)
 config_version: 1
 
@@ -65,7 +65,7 @@ database:
   mysql:
     host: "${DB_HOST:localhost}"
     port: "${DB_PORT:3306}"
-    database: "${DB_NAME:discordbot}"
+    database: "${DB_NAME:fluxcord}"
     username: "${DB_USER:root}"
     password: "${DB_PASSWORD:}"
     
@@ -170,7 +170,7 @@ DISCORD_TOKEN=your_discord_bot_token
 # Database (if using MySQL/PostgreSQL)
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=discordbot
+DB_NAME=fluxcord
 DB_USER=bot_user
 DB_PASSWORD=secure_password
 
@@ -197,12 +197,12 @@ host: "${DB_HOST:localhost}"
 port: "${DB_PORT:3306}"
 
 # Complex expressions
-database_url: "jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:discordbot}"
+database_url: "jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:fluxcord}"
 ```
 
 ### Automatic Plugin Configuration Management
 
-**DiscordBot Core now automatically manages plugin configurations:**
+**Fluxcord now automatically manages plugin configurations:**
 
 #### Default Config File Copying
 
@@ -329,12 +329,12 @@ testing:
 # docker-compose.yml
 version: '3.8'
 services:
-  discordbot:
+  fluxcord:
     build: .
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - DB_HOST=database
-      - DB_NAME=discordbot
+      - DB_NAME=fluxcord
       - DB_USER=bot
       - DB_PASSWORD=${DB_PASSWORD}
     volumes:
@@ -347,7 +347,7 @@ services:
   database:
     image: mysql:8.0
     environment:
-      - MYSQL_DATABASE=discordbot
+      - MYSQL_DATABASE=fluxcord
       - MYSQL_USER=bot
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -421,7 +421,7 @@ database:
   type: "mysql"
   mysql:
     host: "localhost"
-    database: "discordbot"
+    database: "fluxcord"
     username: "bot"
     password: "${DB_PASSWORD}"
 
@@ -558,22 +558,22 @@ Use the `!config dump` command (if available) to export current configuration fo
 
 ### Upgrading Configuration
 
-When upgrading DiscordBot Core, configuration migrations may be needed:
+When upgrading Fluxcord, configuration migrations may be needed:
 
 ```bash
 # Backup current configuration
 cp config.yml config.yml.backup
 
 # Run migration tool
-java -jar discordbot-core.jar --migrate-config
+java -jar fluxcord.jar --migrate-config
 
 # Verify new configuration
-java -jar discordbot-core.jar --validate-config
+java -jar fluxcord.jar --validate-config
 ```
 
 ### Automatic Configuration Migration
 
-**DiscordBot Core now provides automatic configuration migration with the following features:**
+**Fluxcord now provides automatic configuration migration with the following features:**
 
 #### Migration Process
 
@@ -589,10 +589,10 @@ While migration is automatic, you can also trigger manual operations:
 
 ```bash
 # Force configuration validation
-java -jar discordbot-core.jar --validate-config
+java -jar fluxcord.jar --validate-config
 
 # Show current configuration versions
-java -jar discordbot-core.jar --show-config-versions
+java -jar fluxcord.jar --show-config-versions
 
 # Create manual backup (optional)
 cp config.yml config.yml.manual.backup
@@ -614,7 +614,7 @@ The system provides detailed logging during migrations:
 
 ### Version Compatibility
 
-Each version of DiscordBot Core supports specific configuration schema versions:
+Each version of Fluxcord supports specific configuration schema versions:
 
 ```yaml
 # Configuration version (automatically managed)

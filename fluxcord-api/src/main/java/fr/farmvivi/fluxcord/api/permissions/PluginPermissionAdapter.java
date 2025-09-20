@@ -1,0 +1,75 @@
+package fr.farmvivi.fluxcord.api.permissions;
+
+import fr.farmvivi.fluxcord.api.language.LanguageManager;
+import fr.farmvivi.fluxcord.api.plugin.Plugin;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Manager for plugin-specific permissions.
+ * This provides a convenient way for plugins to register and check their own permissions.
+ */
+public class PluginPermissionAdapter {
+    private final Plugin plugin;
+    private final PermissionManager permissionManager;
+    private final LanguageManager languageManager;
+    private final Set<String> registeredPermissions = new HashSet<>();
+
+    /**
+     * Creates a new plugin permission manager.
+     *
+     * @param plugin            the plugin
+     * @param permissionManager the permission manager
+     * @param languageManager   the language manager
+     */
+    public PluginPermissionAdapter(Plugin plugin, PermissionManager permissionManager, LanguageManager languageManager) {
+        this.plugin = plugin;
+        this.permissionManager = permissionManager;
+        this.languageManager = languageManager;
+    }
+
+    /**
+     * Registers a permission for this plugin.
+     *
+     * @param permission the permission to register
+     */
+    public void registerPermission(Permission permission) {
+        permissionManager.registerPermission(permission, plugin);
+        registeredPermissions.add(permission.getName());
+    }
+
+    /**
+     * Gets all permissions registered by this plugin.
+     *
+     * @return the set of permission names
+     */
+    public Set<String> getRegisteredPermissions() {
+        return new HashSet<>(registeredPermissions);
+    }
+
+    /**
+     * Checks if a user has a permission globally.
+     * Convenience wrapper around {@link PermissionManager#hasPermission(String, String)}.
+     *
+     * @param userId     the user ID
+     * @param permission the permission name
+     * @return true if the user has the permission
+     */
+    public boolean hasPermission(String userId, String permission) {
+        return permissionManager.hasPermission(userId, permission);
+    }
+
+    /**
+     * Checks if a user has a permission in a specific guild.
+     * Convenience wrapper around {@link PermissionManager#hasPermission(String, String, String)}.
+     *
+     * @param userId     the user ID
+     * @param guildId    the guild ID
+     * @param permission the permission name
+     * @return true if the user has the permission
+     */
+    public boolean hasPermission(String userId, String guildId, String permission) {
+        return permissionManager.hasPermission(userId, guildId, permission);
+    }
+}

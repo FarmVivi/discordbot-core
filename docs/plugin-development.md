@@ -1,6 +1,6 @@
 # Plugin Development Guide
 
-This guide covers everything you need to know about developing plugins for DiscordBot Core.
+This guide covers everything you need to know about developing plugins for Fluxcord.
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ This guide covers everything you need to know about developing plugins for Disco
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.core.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 
 public class MyPlugin extends AbstractPlugin {
     
@@ -187,7 +187,7 @@ public void onPlayerLevelUp(PlayerLevelUpEvent event) {
 
 ### Automatic Configuration Management
 
-**DiscordBot Core now provides automatic configuration management for plugins:**
+**Fluxcord now provides automatic configuration management for plugins:**
 
 #### Default Configuration Files
 
@@ -226,7 +226,7 @@ messages:
 
 #### Migration Support
 
-DiscordBot Core provides two ways to implement configuration migration in your plugin:
+Fluxcord provides two ways to implement configuration migration in your plugin:
 
 1. **Separate Migration Class (Recommended)** - Keeps your main plugin class clean
 2. **Direct Implementation** - Implement migration logic directly in your plugin class
@@ -238,8 +238,8 @@ Create a separate class for handling migration logic and specify it in your main
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
-import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+import plugin.fr.farmvivi.fluxcord.api.AbstractPlugin;
+import plugin.fr.farmvivi.fluxcord.api.ConfigurableMigrationPlugin;
 
 public class MyPlugin extends AbstractPlugin {
     
@@ -262,9 +262,9 @@ Then create the migration class:
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
-import fr.farmvivi.discordbot.api.config.Configuration;
-import fr.farmvivi.discordbot.api.config.ConfigurationException;
+import plugin.fr.farmvivi.fluxcord.api.ConfigurableMigrationPlugin;
+import config.fr.farmvivi.fluxcord.api.Configuration;
+import config.fr.farmvivi.fluxcord.api.ConfigurationException;
 
 public class MyPluginMigrator implements ConfigurableMigrationPlugin {
     
@@ -329,10 +329,10 @@ Alternatively, you can implement migration logic directly in your plugin class:
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
-import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
-import fr.farmvivi.discordbot.api.config.Configuration;
-import fr.farmvivi.discordbot.api.config.ConfigurationException;
+import plugin.fr.farmvivi.fluxcord.api.AbstractPlugin;
+import plugin.fr.farmvivi.fluxcord.api.ConfigurableMigrationPlugin;
+import config.fr.farmvivi.fluxcord.api.Configuration;
+import config.fr.farmvivi.fluxcord.api.ConfigurationException;
 
 public class MyPlugin extends AbstractPlugin implements ConfigurableMigrationPlugin {
     
@@ -832,7 +832,7 @@ public void onEnable() {
 
 ## Resources
 
-- [DiscordBot Core API Documentation](api-reference.md)
+- [Fluxcord API Documentation](api-reference.md)
 - [Command System Guide](commands.md)
 - [Audio API Guide](audio-api.md)
 - [JDA Documentation](https://jda.wiki/)

@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.farmvivi.discordbot</groupId>
-    <artifactId>discordbot-parent</artifactId>
+    <groupId>fr.farmvivi.fluxcord</groupId>
+    <artifactId>fluxcord-parent</artifactId>
     <version>2.3.27-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>DiscordBot Parent</name>
-    <description>Parent POM for Discord Bot multi-module project</description>
+    <name>Fluxcord</name>
+    <description>Parent POM for Fluxcord multi-module project</description>
 
     <modules>
-        <module>discordbot-api</module>
-        <module>discordbot-core</module>
+        <module>fluxcord-api</module>
+        <module>fluxcord-core</module>
         <module>examples/plugins/plugin-example-audio</module>
         <module>examples/plugins/plugin-example-commands</module>
         <module>plugin-template</module>
@@ -25,10 +25,10 @@
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mainClass>fr.farmvivi.discordbot.core.Discobocor</project.mainClass>
+        <project.mainClass>fr.farmvivi.fluxcord.core.Discobocor</project.mainClass>
 
         <!-- Configuration SonarCloud -->
-        <sonar.projectKey>FarmVivi_discordbot-core</sonar.projectKey>
+        <sonar.projectKey>FarmVivi_fluxcord</sonar.projectKey>
         <sonar.organization>farmvivi</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <!-- Skip sonar analysis by default - enable with -Psonar profile -->
@@ -84,13 +84,13 @@
         <dependencies>
             <!-- Internal modules -->
             <dependency>
-                <groupId>fr.farmvivi.discordbot</groupId>
-                <artifactId>discordbot-api</artifactId>
+                <groupId>fr.farmvivi.fluxcord</groupId>
+                <artifactId>fluxcord-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.farmvivi.discordbot</groupId>
-                <artifactId>discordbot-core</artifactId>
+                <groupId>fr.farmvivi.fluxcord</groupId>
+                <artifactId>fluxcord-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

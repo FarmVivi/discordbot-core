@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/discordbot-api/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/discordbot-api/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/discordbot-core/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/discordbot-core/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/discordbot-example-audio/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/discordbot-example-audio/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/audio/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/audio/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/plugins/plugin-example-audio/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/plugins/plugin-example-audio/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/plugins/plugin-example-commands/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/plugins/plugin-example-commands/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fluxcord-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fluxcord-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fluxcord-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fluxcord-core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/plugin-template/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/plugin-template/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/plugins/ai-audio-plugin/src/main/java" charset="UTF-8" />

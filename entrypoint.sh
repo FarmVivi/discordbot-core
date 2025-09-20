@@ -9,9 +9,9 @@ set -e
 
 APP_DIR="/app"
 PLUGINS_DIR="$APP_DIR/plugins"
-BUNDLES_PLUGINS_DIR="/opt/discordbot/bundles/plugins"
-BUNDLES_EXAMPLES_DIR="/opt/discordbot/bundles/examples"
-CORE_JAR="$APP_DIR/discordbot-core.jar"
+BUNDLES_PLUGINS_DIR="/opt/fluxcord/bundles/plugins"
+BUNDLES_EXAMPLES_DIR="/opt/fluxcord/bundles/examples"
+CORE_JAR="$APP_DIR/fluxcord.jar"
 HEALTH_PORT="${HEALTH_PORT:-8081}"
 
 INSTALL_PLUGINS="${INSTALL_PLUGINS:-}"

@@ -1,6 +1,6 @@
 # Plugin Template Quickstart Guide
 
-This guide provides step-by-step instructions for using the DiscordBot Core plugin template to create your own plugins.
+This guide provides step-by-step instructions for using the Fluxcord plugin template to create your own plugins.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ This guide provides step-by-step instructions for using the DiscordBot Core plug
 
 ## Template Overview
 
-The plugin template provides a comprehensive starting point that demonstrates all core features of the DiscordBot framework:
+The plugin template provides a comprehensive starting point that demonstrates all core features of the Fluxcord framework:
 
 - **Plugin Lifecycle**: Complete lifecycle management with all phases
 - **Configuration System**: YAML-based configuration with feature toggles
@@ -42,7 +42,7 @@ The plugin template provides a comprehensive starting point that demonstrates al
 
 - Java 17 or newer
 - Maven 3.6+ for building
-- DiscordBot Core framework
+- Fluxcord framework
 - IDE with Java support (IntelliJ IDEA recommended)
 
 ### Step 1: Copy the Template

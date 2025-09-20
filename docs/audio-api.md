@@ -1,6 +1,6 @@
-# Audio API pour Discordbot-Core
+# Audio API pour Fluxcord
 
-Cette documentation décrit l'API audio implémentée dans le Discordbot-Core, qui permet aux plugins de gérer les flux audio entrants et sortants avec des fonctionnalités avancées comme le mixage et la gestion des priorités.
+Cette documentation décrit l'API audio implémentée dans Fluxcord, qui permet aux plugins de gérer les flux audio entrants et sortants avec des fonctionnalités avancées comme le mixage et la gestion des priorités.
 
 ## Caractéristiques
 
@@ -189,7 +189,7 @@ public void onAudioFrameMixed(AudioFrameMixedEvent event) {
 
 ## Exemple complet
 
-Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.discordbot.examples.audio` pour un exemple complet d'utilisation de l'API audio.
+Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.fluxcord.examples.audio` pour un exemple complet d'utilisation de l'API audio.
 
 ## Performances et considérations techniques
 

@@ -1,8 +1,8 @@
 name: CommandExample
 version: 1.0.0
-main: fr.farmvivi.discordbot.examples.commands.CommandExamplePlugin
+main: fr.farmvivi.fluxcord.examples.commands.CommandExamplePlugin
 description: Demonstrates command system features including slash commands, text commands, permissions, and cooldowns
-authors: [ "DiscordBot Core Team" ]
-website: https://github.com/FarmVivi/discordbot-core
+authors: [ "FarmVivi" ]
+website: https://github.com/FarmVivi/fluxcord
 dependencies: [ ]
 soft-dependencies: [ ]

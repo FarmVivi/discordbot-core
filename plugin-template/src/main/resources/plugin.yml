@@ -1,7 +1,7 @@
 name: TemplatePlugin
 version: 1.0.0
 main: com.example.plugin.TemplatePlugin
-description: Template plugin for DiscordBot Core development
+description: Template plugin for Fluxcord development
 authors: [ YourName ]
 website: https://github.com/your-username/your-plugin-repo
 dependencies: [ ]

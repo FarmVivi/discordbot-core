@@ -1,6 +1,6 @@
 # Music Plugin
 
-Advanced music bot functionality for DiscordBot Core with comprehensive playlist management and audio processing.
+Advanced music bot functionality for Fluxcord with comprehensive playlist management and audio processing.
 
 ## Features
 
@@ -127,14 +127,14 @@ Core features planned:
 
 ## Contributing
 
-This plugin is part of the DiscordBot Core ecosystem. Contributions are welcome!
+This plugin is part of the Fluxcord ecosystem. Contributions are welcome!
 
 1. Fork the repository
 2. Create a feature branch
 3. Implement your changes in the music plugin
-4. Test with the DiscordBot Core framework
+4. Test with the Fluxcord framework
 5. Submit a pull request
 
 ## License
 
-Part of DiscordBot Core - Licensed under MIT License
+Part of Fluxcord - Licensed under MIT License

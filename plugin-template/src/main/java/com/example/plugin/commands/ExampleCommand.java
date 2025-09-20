@@ -1,8 +1,8 @@
 package com.example.plugin.commands;
 
-import fr.farmvivi.discordbot.api.command.CommandContext;
-import fr.farmvivi.discordbot.api.command.CommandResult;
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.command.CommandContext;
+import fr.farmvivi.fluxcord.api.command.CommandResult;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 
 /**
  * Example command demonstrating basic command functionality.

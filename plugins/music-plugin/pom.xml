@@ -5,22 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>fr.farmvivi.discordbot</groupId>
-        <artifactId>discordbot-parent</artifactId>
+        <groupId>fr.farmvivi.fluxcord</groupId>
+        <artifactId>fluxcord-parent</artifactId>
         <version>2.3.27-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>music-plugin</artifactId>
 
-    <name>DiscordBot Plugin - Music</name>
+    <name>Fluxcord Plugin - Music</name>
     <description>Advanced music bot plugin with playlist management and audio effects</description>
 
     <dependencies>
         <!-- API module -->
         <dependency>
-            <groupId>fr.farmvivi.discordbot</groupId>
-            <artifactId>discordbot-api</artifactId>
+            <groupId>fr.farmvivi.fluxcord</groupId>
+            <artifactId>fluxcord-api</artifactId>
         </dependency>
 
         <!-- JDA for Discord API -->

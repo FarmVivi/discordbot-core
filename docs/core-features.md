@@ -1,6 +1,6 @@
-# Core Features Matrix - DiscordBot Core
+# Core Features Matrix - Fluxcord
 
-This document provides a comprehensive overview of all features and APIs exposed by the DiscordBot Core framework to plugins.
+This document provides a comprehensive overview of all features and APIs exposed by the Fluxcord framework to plugins.
 
 ## Feature Matrix
 
@@ -26,9 +26,9 @@ This document provides a comprehensive overview of all features and APIs exposed
 **Description**: Core lifecycle management for plugins with dependency resolution.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.plugin.AbstractPlugin` - Base plugin class
-- `fr.farmvivi.discordbot.api.plugin.PluginContext` - Access to core services
-- `fr.farmvivi.discordbot.api.plugin.PluginManager` - Plugin management
+- `plugin.fr.farmvivi.fluxcord.api.AbstractPlugin` - Base plugin class
+- `plugin.fr.farmvivi.fluxcord.api.PluginContext` - Access to core services
+- `fr.farmvivi.fluxcord.api.plugin.PluginManager` - Plugin management
 
 **How to Use**:
 ```java
@@ -60,9 +60,9 @@ public class MyPlugin extends AbstractPlugin {
 **Description**: Unified slash command and text command system with permissions and cooldowns.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.command.CommandService` - Command registration and management
-- `fr.farmvivi.discordbot.api.command.CommandBuilder` - Fluent command creation
-- `fr.farmvivi.discordbot.api.command.CommandContext` - Command execution context
+- `command.fr.farmvivi.fluxcord.api.CommandService` - Command registration and management
+- `command.fr.farmvivi.fluxcord.api.CommandBuilder` - Fluent command creation
+- `command.fr.farmvivi.fluxcord.api.CommandContext` - Command execution context
 
 **How to Use**:
 ```java
@@ -98,9 +98,9 @@ public void onSlashCommand(SlashCommandInteractionEvent event) {
 **Description**: Comprehensive event handling for Discord events and plugin events with priority-based execution.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.event.EventManager` - Event registration and firing
-- `fr.farmvivi.discordbot.api.event.EventHandler` - Annotation for event handlers
-- `fr.farmvivi.discordbot.api.event.EventPriority` - Priority levels
+- `event.fr.farmvivi.fluxcord.api.EventManager` - Event registration and firing
+- `event.fr.farmvivi.fluxcord.api.EventHandler` - Annotation for event handlers
+- `event.fr.farmvivi.fluxcord.api.EventPriority` - Priority levels
 
 **How to Use**:
 ```java
@@ -130,9 +130,9 @@ public void onPluginEvent(PluginEnableEvent event) {
 **Description**: Flexible role-based permissions with plugin-specific namespacing.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.permissions.PermissionManager` - Global permission management
-- `fr.farmvivi.discordbot.api.permissions.PluginPermissionAdapter` - Plugin-scoped permissions
-- `fr.farmvivi.discordbot.api.permissions.Permission` - Permission definition
+- `permissions.fr.farmvivi.fluxcord.api.PermissionManager` - Global permission management
+- `permissions.fr.farmvivi.fluxcord.api.PluginPermissionAdapter` - Plugin-scoped permissions
+- `permissions.fr.farmvivi.fluxcord.api.Permission` - Permission definition
 
 **How to Use**:
 ```java
@@ -163,7 +163,7 @@ if (getPluginPermissionManager().hasPermission(userId, "myplugin.admin")) {
 **Description**: YAML-based configuration with automatic loading and environment variable support.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.config.Configuration` - Configuration interface
+- `config.fr.farmvivi.fluxcord.api.Configuration` - Configuration interface
 - Plugin `config.yml` files
 
 **How to Use**:
@@ -194,8 +194,8 @@ config.save();
 **Description**: Multi-language support with namespace isolation and placeholder replacement.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.language.LanguageManager` - Global language management
-- `fr.farmvivi.discordbot.api.language.PluginLanguageAdapter` - Plugin-scoped translations
+- `language.fr.farmvivi.fluxcord.api.LanguageManager` - Global language management
+- `language.fr.farmvivi.fluxcord.api.PluginLanguageAdapter` - Plugin-scoped translations
 
 **How to Use**:
 ```java
@@ -219,8 +219,8 @@ String localized = getPluginLanguageManager().getString(Locale.FRENCH, "goodbye"
 **Description**: Persistent data storage with automatic scoping by global, user, guild, and user-guild.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.storage.DataStorageManager` - Storage management
-- `fr.farmvivi.discordbot.api.storage.PluginDataStorageAdapter` - Plugin-scoped storage
+- `storage.fr.farmvivi.fluxcord.api.DataStorageManager` - Storage management
+- `storage.fr.farmvivi.fluxcord.api.PluginDataStorageAdapter` - Plugin-scoped storage
 
 **How to Use**:
 ```java
@@ -248,8 +248,8 @@ getPluginDataStorage().saveAll();
 **Description**: Large file and binary data storage with multiple backend support.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.storage.BinaryStorageManager` - Binary storage management  
-- `fr.farmvivi.discordbot.api.storage.binary.PluginBinaryStorageAdapter` - Plugin-scoped binary storage
+- `fr.farmvivi.fluxcord.api.storage.BinaryStorageManager` - Binary storage management  
+- `binary.storage.fr.farmvivi.fluxcord.api.PluginBinaryStorageAdapter` - Plugin-scoped binary storage
 
 **How to Use**:
 ```java
@@ -277,7 +277,7 @@ getPluginBinaryStorage().deleteFile(key);
 **Description**: Advanced audio processing with mixing, priorities, and volume control.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.audio.AudioService` - Audio service management
+- `audio.fr.farmvivi.fluxcord.api.AudioService` - Audio service management
 - `net.dv8tion.jda.api.audio.AudioSendHandler` - Send audio to Discord
 - `net.dv8tion.jda.api.audio.AudioReceiveHandler` - Receive audio from Discord
 
@@ -309,7 +309,7 @@ audioService.registerReceiveHandler(guild, this, receiveHandler);
 **Description**: Full Discord API access through JDA with presence and connection management.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.discord.DiscordAPI` - Discord API wrapper
+- `discord.fr.farmvivi.fluxcord.api.DiscordAPI` - Discord API wrapper
 - `net.dv8tion.jda.api.JDA` - Direct JDA access
 
 **How to Use**:
@@ -365,7 +365,7 @@ logger.debug("Debug information: {}", debugData);
 **Description**: Inter-plugin dependency resolution and communication.
 
 **Entry Points**:
-- `fr.farmvivi.discordbot.api.plugin.PluginLoader` - Access other plugins
+- `plugin.fr.farmvivi.fluxcord.api.PluginLoader` - Access other plugins
 - `plugin.yml` dependency declarations
 
 **How to Use**:
@@ -438,4 +438,4 @@ Based on code analysis, the following common bot framework features are **not pr
 
 ---
 
-*This documentation is automatically maintained and reflects the current state of the DiscordBot Core framework APIs.*
+*This documentation is automatically maintained and reflects the current state of the Fluxcord framework APIs.*

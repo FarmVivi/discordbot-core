@@ -1,6 +1,6 @@
 # Plugin Examples Overview
 
-This directory contains comprehensive example plugins demonstrating all core features of the DiscordBot Core framework. Each plugin focuses on specific functionality while being minimal, complete, and production-ready.
+This directory contains comprehensive example plugins demonstrating all core features of the Fluxcord framework. Each plugin focuses on specific functionality while being minimal, complete, and production-ready.
 
 ## Available Examples
 
@@ -138,7 +138,7 @@ This directory contains comprehensive example plugins demonstrating all core fea
    ```
 
 4. **Restart Bot**:
-   Restart your DiscordBot Core instance
+   Restart your Fluxcord instance
 
 ### Example-Specific Setup
 
@@ -215,7 +215,7 @@ plugin-example-[feature]/
 ├── pom.xml                     # Maven configuration
 ├── README.md                   # Comprehensive documentation
 ├── src/main/
-│   ├── java/fr/farmvivi/discordbot/examples/[feature]/
+│   ├── java/fr/farmvivi/fluxcord/examples/[feature]/
 │   │   └── [Feature]ExamplePlugin.java
 │   └── resources/
 │       ├── plugin.yml          # Plugin metadata
@@ -235,4 +235,4 @@ plugin-example-[feature]/
 
 ---
 
-*Example plugins are maintained as part of the DiscordBot Core documentation project and serve as definitive implementation references for plugin developers.*
+*Example plugins are maintained as part of the Fluxcord documentation project and serve as definitive implementation references for plugin developers.*

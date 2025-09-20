@@ -3,16 +3,17 @@ package com.example.plugin;
 import com.example.plugin.commands.ExampleCommand;
 import com.example.plugin.events.ExampleEventListener;
 import com.example.plugin.services.ExampleDataService;
-import fr.farmvivi.discordbot.api.event.EventHandler;
-import fr.farmvivi.discordbot.api.event.EventPriority;
-import fr.farmvivi.discordbot.api.permissions.Permission;
-import fr.farmvivi.discordbot.api.permissions.PermissionDefault;
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.event.EventHandler;
+import fr.farmvivi.fluxcord.api.event.EventPriority;
+import fr.farmvivi.fluxcord.api.permissions.Permission;
+import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.plugin.PluginContext;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
- * Template plugin demonstrating the structure and features available to DiscordBot Core plugins.
+ * Template plugin demonstrating the structure and features available to Fluxcord plugins.
  *
  * <p>This plugin serves as a comprehensive starting point for plugin development and showcases:
  * <ul>
@@ -45,7 +46,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
  *
  * @author YourName
  * @version 1.0.0
- * @see fr.farmvivi.discordbot.api.plugin.AbstractPlugin
+ * @see AbstractPlugin
  * @since 1.0.0
  */
 public class TemplatePlugin extends AbstractPlugin {
@@ -65,7 +66,7 @@ public class TemplatePlugin extends AbstractPlugin {
      * Use this for early initialization that doesn't depend on other plugins.
      */
     @Override
-    public void onLoad(fr.farmvivi.discordbot.api.plugin.PluginContext context) {
+    public void onLoad(PluginContext context) {
         super.onLoad(context);
         logger.info("Loading {} v{}", getName(), getVersion());
 

@@ -1,6 +1,6 @@
 package com.example.plugin.services;
 
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 
 /**
  * Example service class demonstrating data management and plugin services.

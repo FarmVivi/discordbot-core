@@ -1,15 +1,15 @@
 package com.example.plugin;
 
-import fr.farmvivi.discordbot.api.command.CommandService;
-import fr.farmvivi.discordbot.api.config.Configuration;
-import fr.farmvivi.discordbot.api.discord.DiscordAPI;
-import fr.farmvivi.discordbot.api.event.EventManager;
-import fr.farmvivi.discordbot.api.language.LanguageManager;
-import fr.farmvivi.discordbot.api.permissions.PermissionManager;
-import fr.farmvivi.discordbot.api.plugin.PluginContext;
-import fr.farmvivi.discordbot.api.plugin.PluginLifecycle;
-import fr.farmvivi.discordbot.api.storage.DataStorageManager;
-import fr.farmvivi.discordbot.api.storage.binary.BinaryStorageManager;
+import fr.farmvivi.fluxcord.api.command.CommandService;
+import fr.farmvivi.fluxcord.api.config.Configuration;
+import fr.farmvivi.fluxcord.api.discord.DiscordAPI;
+import fr.farmvivi.fluxcord.api.event.EventManager;
+import fr.farmvivi.fluxcord.api.language.LanguageManager;
+import fr.farmvivi.fluxcord.api.permissions.PermissionManager;
+import fr.farmvivi.fluxcord.api.plugin.PluginContext;
+import fr.farmvivi.fluxcord.api.plugin.PluginLifecycle;
+import fr.farmvivi.fluxcord.api.storage.DataStorageManager;
+import fr.farmvivi.fluxcord.api.storage.binary.BinaryStorageManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

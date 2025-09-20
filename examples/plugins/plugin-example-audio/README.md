@@ -1,6 +1,6 @@
 # Audio Example Plugin
 
-This plugin demonstrates the audio capabilities of DiscordBot Core, showing how to:
+This plugin demonstrates the audio capabilities of Fluxcord, showing how to:
 
 - Play audio files in voice channels
 - Record voice channel audio
