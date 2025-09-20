@@ -134,7 +134,7 @@ cp target/plugin-example-commands-*.jar /path/to/bot/plugins/
 
 ### 3. Configure Plugin
 
-Create or edit `plugins/CommandExamplePlugin/config.yml`:
+Create or edit `plugins/CommandExample/config.yml`:
 
 ```yaml
 enabled: true
