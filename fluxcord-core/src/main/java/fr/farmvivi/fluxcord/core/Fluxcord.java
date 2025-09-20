@@ -34,7 +34,7 @@ import java.util.concurrent.CountDownLatch;
  * Main class for Fluxcord.
  * This class is responsible for loading and managing plugins.
  */
-public class Discobocor {
+public class Fluxcord {
     public static final String NAME;
     public static final String VERSION;
     public static final boolean PRODUCTION;
@@ -57,9 +57,9 @@ public class Discobocor {
     static {
         Properties properties = new Properties();
         try {
-            properties.load(Discobocor.class.getClassLoader().getResourceAsStream("project.properties"));
+            properties.load(Fluxcord.class.getClassLoader().getResourceAsStream("project.properties"));
         } catch (IOException e) {
-            Logger initLogger = LoggerFactory.getLogger("DiscobocorInit");
+            Logger initLogger = LoggerFactory.getLogger("FluxcordInit");
             initLogger.error("Cannot read properties file 'project.properties'", e);
             System.exit(1);
         }

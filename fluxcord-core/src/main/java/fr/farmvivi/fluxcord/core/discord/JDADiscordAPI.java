@@ -1,7 +1,7 @@
 package fr.farmvivi.fluxcord.core.discord;
 
 import fr.farmvivi.fluxcord.api.discord.DiscordAPI;
-import fr.farmvivi.fluxcord.core.Discobocor;
+import fr.farmvivi.fluxcord.core.Fluxcord;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -25,7 +25,7 @@ public class JDADiscordAPI implements DiscordAPI {
     private JDABuilder builder;
     private Activity startupActivity = Activity.playing("starting up...");
     private OnlineStatus startupStatus = OnlineStatus.IDLE;
-    private Activity defaultActivity = Activity.playing("v" + Discobocor.VERSION);
+    private Activity defaultActivity = Activity.playing("v" + Fluxcord.VERSION);
     private OnlineStatus defaultStatus = OnlineStatus.ONLINE;
     private Activity shutdownActivity = Activity.playing("shutting down...");
     private OnlineStatus shutdownStatus = OnlineStatus.DO_NOT_DISTURB;

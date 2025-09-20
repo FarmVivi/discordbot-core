@@ -4,7 +4,7 @@ import fr.farmvivi.fluxcord.api.command.Command;
 import fr.farmvivi.fluxcord.api.command.CommandContext;
 import fr.farmvivi.fluxcord.api.command.CommandResult;
 import fr.farmvivi.fluxcord.api.language.LanguageManager;
-import fr.farmvivi.fluxcord.core.Discobocor;
+import fr.farmvivi.fluxcord.core.Fluxcord;
 import fr.farmvivi.fluxcord.core.command.SimpleCommandBuilder;
 import fr.farmvivi.fluxcord.core.util.DiscordColor;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -57,10 +57,10 @@ public class VersionCommand {
         EmbedBuilder embed = new EmbedBuilder().setColor(DiscordColor.DISCORD_BLURPLE.getColor());
 
         embed.setTitle(languageManager.getString(context.getLocale(), "commands.version.title"))
-                .addField(languageManager.getString(context.getLocale(), "commands.version.name"), Discobocor.NAME, true)
-                .addField(languageManager.getString(context.getLocale(), "commands.version.version"), Discobocor.VERSION, true)
+                .addField(languageManager.getString(context.getLocale(), "commands.version.name"), Fluxcord.NAME, true)
+                .addField(languageManager.getString(context.getLocale(), "commands.version.version"), Fluxcord.VERSION, true)
                 .addField(languageManager.getString(context.getLocale(), "commands.version.mode"),
-                        Discobocor.PRODUCTION
+                        Fluxcord.PRODUCTION
                                 ? languageManager.getString(context.getLocale(), "commands.version.production")
                                 : languageManager.getString(context.getLocale(), "commands.version.development"),
                         true)
