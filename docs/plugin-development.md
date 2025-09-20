@@ -238,8 +238,8 @@ Create a separate class for handling migration logic and specify it in your main
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
-import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
+import plugin.fr.farmvivi.fluxcord.api.AbstractPlugin;
+import plugin.fr.farmvivi.fluxcord.api.ConfigurableMigrationPlugin;
 
 public class MyPlugin extends AbstractPlugin {
     
@@ -262,9 +262,9 @@ Then create the migration class:
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
-import fr.farmvivi.discordbot.api.config.Configuration;
-import fr.farmvivi.discordbot.api.config.ConfigurationException;
+import plugin.fr.farmvivi.fluxcord.api.ConfigurableMigrationPlugin;
+import config.fr.farmvivi.fluxcord.api.Configuration;
+import config.fr.farmvivi.fluxcord.api.ConfigurationException;
 
 public class MyPluginMigrator implements ConfigurableMigrationPlugin {
     
@@ -329,10 +329,10 @@ Alternatively, you can implement migration logic directly in your plugin class:
 ```java
 package com.example.myplugin;
 
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
-import fr.farmvivi.discordbot.api.plugin.ConfigurableMigrationPlugin;
-import fr.farmvivi.discordbot.api.config.Configuration;
-import fr.farmvivi.discordbot.api.config.ConfigurationException;
+import plugin.fr.farmvivi.fluxcord.api.AbstractPlugin;
+import plugin.fr.farmvivi.fluxcord.api.ConfigurableMigrationPlugin;
+import config.fr.farmvivi.fluxcord.api.Configuration;
+import config.fr.farmvivi.fluxcord.api.ConfigurationException;
 
 public class MyPlugin extends AbstractPlugin implements ConfigurableMigrationPlugin {
     

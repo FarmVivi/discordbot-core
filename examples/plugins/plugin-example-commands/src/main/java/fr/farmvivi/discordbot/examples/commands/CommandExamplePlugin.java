@@ -1,11 +1,11 @@
 package fr.farmvivi.discordbot.examples.commands;
 
-import fr.farmvivi.discordbot.api.command.Command;
-import fr.farmvivi.discordbot.api.command.CommandContext;
-import fr.farmvivi.discordbot.api.command.CommandResult;
-import fr.farmvivi.discordbot.api.permissions.Permission;
-import fr.farmvivi.discordbot.api.permissions.PermissionDefault;
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.command.Command;
+import fr.farmvivi.fluxcord.api.command.CommandContext;
+import fr.farmvivi.fluxcord.api.command.CommandResult;
+import fr.farmvivi.fluxcord.api.permissions.Permission;
+import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 

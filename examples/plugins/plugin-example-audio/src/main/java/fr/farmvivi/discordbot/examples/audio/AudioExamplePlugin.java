@@ -1,9 +1,9 @@
 package fr.farmvivi.discordbot.examples.audio;
 
-import fr.farmvivi.discordbot.api.audio.events.AudioFrameMixedEvent;
-import fr.farmvivi.discordbot.api.event.EventHandler;
-import fr.farmvivi.discordbot.api.event.EventPriority;
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.audio.events.AudioFrameMixedEvent;
+import fr.farmvivi.fluxcord.api.event.EventHandler;
+import fr.farmvivi.fluxcord.api.event.EventPriority;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 import net.dv8tion.jda.api.audio.CombinedAudio;

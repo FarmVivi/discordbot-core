@@ -1,8 +1,9 @@
 package com.example.plugin.events;
 
-import fr.farmvivi.discordbot.api.event.EventHandler;
-import fr.farmvivi.discordbot.api.event.EventPriority;
-import fr.farmvivi.discordbot.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.event.EventHandler;
+import fr.farmvivi.fluxcord.api.event.EventPriority;
+import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
+import fr.farmvivi.fluxcord.api.plugin.events.PluginEnableEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
@@ -56,7 +57,7 @@ public class ExampleEventListener {
      * Demonstrates handling internal plugin events.
      */
     @EventHandler(priority = EventPriority.LOW)
-    public void onPluginEvent(fr.farmvivi.discordbot.api.plugin.events.PluginEnableEvent event) {
+    public void onPluginEvent(PluginEnableEvent event) {
         // React to other plugins being enabled
         if (plugin.getConfiguration().getBoolean("debug.log_plugin_events", false)) {
             plugin.getLogger().info("Plugin enabled: {}", event.getPlugin().getName());
