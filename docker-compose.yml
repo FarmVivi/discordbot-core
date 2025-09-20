@@ -5,20 +5,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: discordbot-app
+    restart: unless-stopped
+    ports:
+      # Expose health/readiness HTTP endpoint from the core (see HEALTH_PORT)
+      - "8081:8081"
     volumes:
-      # Mount for local development (uncomment when developing)
-      # Multi-module structure: mount individual modules
-      #- ./discordbot-api/src:/app/discordbot-api/src
-      #- ./discordbot-core/src:/app/discordbot-core/src  
       # Mount for application data persistence
       - ./data:/app/data
       - ./plugins:/app/plugins
-      - ./config.yml:/app/config.yml
+      # If you maintain a custom config at repo root, bind it here. Ensure the file exists.
+      #- ./config.yml:/app/config.yml
     environment:
+      # JVM options (adjust memory as needed)
       - JAVA_OPTS=-Xmx1G
-      # Variables de configuration (exemples):
-      # - DISCORD_TOKEN=your_token_here
-      # - INSTALL_PLUGINS=music-plugin,ai-audio-plugin   # ou '*' pour tous les bundles disponibles
-      # - INSTALL_EXAMPLES=false                         # true pour autoriser l'installation des exemples
-      # - AUTO_UPDATE_PLUGINS=true                       # met à jour automatiquement si une version plus récente est packagée
-      # - HEALTH_PORT=8081                               # port du serveur HTTP de santé (/healthz, /readyz)
+      # Discord bot token (prefer passing via env var at runtime)
+      - DISCORD_TOKEN=${DISCORD_TOKEN:-}
+      # Plugin installation & updates managed by entrypoint.sh
+      - INSTALL_PLUGINS=*
+      - INSTALL_EXAMPLES=false
+      - AUTO_UPDATE_PLUGINS=true
+      # Health HTTP port exposed by the core
+      - HEALTH_PORT=8081

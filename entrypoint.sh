@@ -26,8 +26,14 @@ log_info() { printf '%s [INFO] %s\n' "$(ts)" "$*"; }
 log_warn() { printf '%s [WARN] %s\n' "$(ts)" "$*"; }
 log_err()  { printf '%s [ERROR] %s\n' "$(ts)" "$*" 1>&2; }
 
-log_info "Entrypoint démarré"
+log_info "Entrypoint started"
 log_info "INSTALL_PLUGINS='${INSTALL_PLUGINS:-}' INSTALL_EXAMPLES='${INSTALL_EXAMPLES}' AUTO_UPDATE_PLUGINS='${AUTO_UPDATE_PLUGINS}' HEALTH_PORT='${HEALTH_PORT}'"
+if [ -z "${INSTALL_PLUGINS}" ]; then
+  log_info "No plugins requested for installation (INSTALL_PLUGINS is empty)."
+fi
+if [ "${AUTO_UPDATE_PLUGINS}" != "true" ]; then
+  log_info "Auto-update of plugins is disabled (AUTO_UPDATE_PLUGINS='${AUTO_UPDATE_PLUGINS}')."
+fi
 
 normalize_name() {
   # Extract base artifactId without version suffix
@@ -105,7 +111,7 @@ install_or_update() {
   current=$(find_installed_for "$name")
   if [ -z "$current" ]; then
     cp "$src" "$PLUGINS_DIR/"
-    echo "Installed $name $src_v"
+    log_info "Installed plugin '$name' version $src_v"
     return 0
   fi
   current_v=$(extract_version "$current")
@@ -117,7 +123,7 @@ install_or_update() {
         rm -f "$current"
         cp "$src" "$PLUGINS_DIR/"
         remove_old_versions "$name" "$PLUGINS_DIR/$(basename "$src")"
-        echo "Updated $name $current_v -> $src_v"
+        log_info "Updated plugin '$name' from $current_v to $src_v"
         return 0
         ;;
     esac
@@ -152,20 +158,22 @@ install_from_dir() {
 
 # Install requested plugins from bundled dirs
 if [ -d "$BUNDLES_PLUGINS_DIR" ]; then
-  log_info "Scan plugins packagés dans $BUNDLES_PLUGINS_DIR"
+  log_info "Scanning bundled plugins in $BUNDLES_PLUGINS_DIR"
   install_from_dir "$BUNDLES_PLUGINS_DIR" true
 else
-  log_warn "Aucun bundle plugins trouvé ($BUNDLES_PLUGINS_DIR)"
+  log_warn "No bundled plugins found ($BUNDLES_PLUGINS_DIR)"
 fi
 if [ "$INSTALL_EXAMPLES" = "true" ]; then
   if [ -d "$BUNDLES_EXAMPLES_DIR" ]; then
-    log_info "Scan plugins d'exemple packagés dans $BUNDLES_EXAMPLES_DIR"
+    log_info "Scanning bundled example plugins in $BUNDLES_EXAMPLES_DIR"
     install_from_dir "$BUNDLES_EXAMPLES_DIR" true
   else
-    log_warn "Aucun bundle d'exemples trouvé ($BUNDLES_EXAMPLES_DIR)"
+    log_warn "No bundled example plugins found ($BUNDLES_EXAMPLES_DIR)"
   fi
+else
+  log_info "Installation of example plugins is disabled (INSTALL_EXAMPLES='${INSTALL_EXAMPLES}')."
 fi
 
 # Run application
-log_info "Démarrage de l'application (JAVA_OPTS='$JAVA_OPTS')..."
+log_info "Starting application (JAVA_OPTS='$JAVA_OPTS')..."
 exec java $JAVA_OPTS -jar "$CORE_JAR"
