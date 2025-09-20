@@ -13,7 +13,7 @@
 
     <artifactId>ai-audio-plugin</artifactId>
 
-    <name>DiscordBot AI Audio Plugin</name>
+    <name>DiscordBot Plugin - AI Audio</name>
     <description>AI-powered voice processing and interaction plugin</description>
 
     <dependencies>
@@ -39,7 +39,6 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.12.0</version>
         </dependency>
 
         <!-- JSON processing -->

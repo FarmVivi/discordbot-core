@@ -33,6 +33,19 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <!-- Skip sonar analysis by default - enable with -Psonar profile -->
         <sonar.skip>true</sonar.skip>
+
+        <!-- Dependency versions -->
+        <wylog.version>2.0.0</wylog.version>
+        <jda.version>6.0.0-rc.5</jda.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
+        <gson.version>2.13.2</gson.version>
+        <hikari.version>7.0.2</hikari.version>
+        <mariadb.version>3.5.6</mariadb.version>
+        <aws.sdk.version>2.33.10</aws.sdk.version>
+        <junit.version>5.13.4</junit.version>
+        <mockito.version>5.19.0</mockito.version>
+        <okhttp.version>4.12.0</okhttp.version>
+        <lavaplayer.version>1.4.3</lavaplayer.version>
     </properties>
 
     <repositories>
@@ -86,42 +99,42 @@
             <dependency>
                 <groupId>net.wytrem</groupId>
                 <artifactId>wylog</artifactId>
-                <version>2.0.0</version>
+                <version>${wylog.version}</version>
             </dependency>
 
             <!-- https://github.com/DV8FromTheWorld/JDA -->
             <dependency>
                 <groupId>net.dv8tion</groupId>
                 <artifactId>JDA</artifactId>
-                <version>6.0.0-rc.5</version>
+                <version>${jda.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
-                <version>2.5</version>
+                <version>${snakeyaml.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.13.2</version>
+                <version>${gson.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
-                <version>7.0.2</version>
+                <version>${hikari.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
             <dependency>
                 <groupId>org.mariadb.jdbc</groupId>
                 <artifactId>mariadb-java-client</artifactId>
-                <version>3.5.6</version>
+                <version>${mariadb.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
@@ -129,20 +142,32 @@
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>s3</artifactId>
-                <version>2.33.10</version>
+                <version>${aws.sdk.version}</version>
+            </dependency>
+
+            <!-- Additional external dependencies used by modules -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.walkyst</groupId>
+                <artifactId>lavaplayer-fork</artifactId>
+                <version>${lavaplayer.version}</version>
             </dependency>
 
             <!-- JUnit 5 -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>5.13.4</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.13.4</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -150,13 +175,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.19.0</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
-                <version>5.19.0</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -256,6 +281,21 @@
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.4.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.6.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.5.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>templating-maven-plugin</artifactId>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
