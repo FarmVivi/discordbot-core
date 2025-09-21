@@ -2,6 +2,8 @@ package fr.farmvivi.fluxcord.api.language;
 
 import fr.farmvivi.fluxcord.api.plugin.Plugin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Locale;
 
 /**
@@ -9,6 +11,7 @@ import java.util.Locale;
  * This class wraps the core language manager and handles namespace prefixing automatically.
  */
 public class PluginLanguageAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(PluginLanguageAdapter.class);
     private final LanguageManager languageManager;
     private final String namespace;
     private final Plugin plugin;
@@ -25,7 +28,12 @@ public class PluginLanguageAdapter {
         this.namespace = plugin.getName().toLowerCase();
 
         // Register the namespace automatically
-        languageManager.registerNamespace(namespace);
+        boolean registered = languageManager.registerNamespace(namespace);
+        if (registered) {
+            logger.debug("Registered plugin namespace '{}' for plugin {}", namespace, plugin.getName());
+        } else {
+            logger.debug("Plugin namespace '{}' already registered for plugin {}", namespace, plugin.getName());
+        }
     }
 
     /**
@@ -36,7 +44,11 @@ public class PluginLanguageAdapter {
      * @return the translated string, or the key itself if not found
      */
     public String getString(String key) {
-        return languageManager.getString(namespace + ":" + key);
+        String fullKey = namespace + ":" + key;
+        if (logger.isDebugEnabled()) {
+            logger.debug("[{}] getString key='{}' -> '{}'", plugin.getName(), key, fullKey);
+        }
+        return languageManager.getString(fullKey);
     }
 
     /**
@@ -48,7 +60,11 @@ public class PluginLanguageAdapter {
      * @return the translated string with replacements
      */
     public String getString(String key, Object... args) {
-        return languageManager.getString(namespace + ":" + key, args);
+        String fullKey = namespace + ":" + key;
+        if (logger.isDebugEnabled()) {
+            logger.debug("[{}] getString key='{}' with {} arg(s) -> '{}'", plugin.getName(), key, args == null ? 0 : args.length, fullKey);
+        }
+        return languageManager.getString(fullKey, args);
     }
 
     /**
@@ -60,7 +76,11 @@ public class PluginLanguageAdapter {
      * @return the translated string, or the key itself if not found
      */
     public String getString(Locale locale, String key) {
-        return languageManager.getString(locale, namespace + ":" + key);
+        String fullKey = namespace + ":" + key;
+        if (logger.isDebugEnabled()) {
+            logger.debug("[{}] getString locale={}, key='{}' -> '{}'", plugin.getName(), locale.toLanguageTag(), key, fullKey);
+        }
+        return languageManager.getString(locale, fullKey);
     }
 
     /**
@@ -73,6 +93,10 @@ public class PluginLanguageAdapter {
      * @return the translated string with replacements
      */
     public String getString(Locale locale, String key, Object... args) {
-        return languageManager.getString(locale, namespace + ":" + key, args);
+        String fullKey = namespace + ":" + key;
+        if (logger.isDebugEnabled()) {
+            logger.debug("[{}] getString locale={}, key='{}' with {} arg(s) -> '{}'", plugin.getName(), locale.toLanguageTag(), key, args == null ? 0 : args.length, fullKey);
+        }
+        return languageManager.getString(locale, fullKey, args);
     }
 }

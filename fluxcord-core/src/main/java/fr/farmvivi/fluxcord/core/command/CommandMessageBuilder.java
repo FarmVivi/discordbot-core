@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Builder for creating command response messages.
@@ -359,45 +360,64 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     private String formatForConsole() {
         StringBuilder output = new StringBuilder();
 
-        // Add content if present
+        // Helper: append one console-prefixed line
+        final Consumer<String> appendLine = line -> {
+            if (output.length() > 0) output.append('\n');
+            output.append("[CONSOLE] ").append(line);
+        };
+
+        // Helper: append multi-line text, prefixing each line
+        final Consumer<String> appendBlock = text -> {
+            if (text == null) return;
+            String[] lines = text.split("\\R", -1); // keep empty trailing lines
+            for (String line : lines) {
+                appendLine.accept(line);
+            }
+        };
+
+        // Add content if present (supports multi-line)
         String content = getContent();
         if (content != null && !content.trim().isEmpty()) {
-            output.append("[CONSOLE] ").append(content);
+            appendBlock.accept(content);
         }
 
         // Format embeds for console
         if (!getEmbeds().isEmpty()) {
             for (MessageEmbed embed : getEmbeds()) {
+                // Separate from previous section
                 if (output.length() > 0) {
-                    output.append("\n");
+                    output.append('\n');
                 }
 
-                output.append("[CONSOLE] ");
-
-                // Add title
+                // Title as a single console line
                 if (embed.getTitle() != null) {
-                    output.append("=== ").append(embed.getTitle()).append(" ===\n[CONSOLE] ");
+                    appendLine.accept("=== " + embed.getTitle() + " ===");
                 }
 
-                // Add description
+                // Description may be multi-line
                 if (embed.getDescription() != null) {
-                    output.append(embed.getDescription()).append("\n[CONSOLE] ");
+                    appendBlock.accept(embed.getDescription());
                 }
 
-                // Add fields
+                // Fields: name: value (value may be multi-line)
                 for (MessageEmbed.Field field : embed.getFields()) {
-                    if (field.getName() != null) {
-                        output.append(field.getName()).append(": ");
+                    String name = field.getName();
+                    String value = field.getValue();
+                    if (value == null) {
+                        appendLine.accept((name != null ? name + ": " : ""));
+                    } else {
+                        String[] vLines = value.split("\\R", -1);
+                        if (vLines.length == 0) {
+                            appendLine.accept((name != null ? name + ": " : ""));
+                        } else {
+                            // First line with name prefix
+                            appendLine.accept((name != null ? name + ": " : "") + vLines[0]);
+                            // Remaining lines
+                            for (int i = 1; i < vLines.length; i++) {
+                                appendLine.accept(vLines[i]);
+                            }
+                        }
                     }
-                    if (field.getValue() != null) {
-                        output.append(field.getValue());
-                    }
-                    output.append("\n[CONSOLE] ");
-                }
-
-                // Remove trailing "[CONSOLE] "
-                if (output.toString().endsWith("[CONSOLE] ")) {
-                    output.setLength(output.length() - 10);
                 }
             }
         }

@@ -44,8 +44,6 @@
         <aws.sdk.version>2.34.0</aws.sdk.version>
         <junit.version>5.13.4</junit.version>
         <mockito.version>5.19.0</mockito.version>
-        <okhttp.version>4.12.0</okhttp.version>
-        <lavaplayer.version>1.4.3</lavaplayer.version>
     </properties>
 
     <repositories>
@@ -65,18 +63,6 @@
             <id>github-farmvivi</id>
             <name>github-farmvivi</name>
             <url>https://public:&#103;hp_pcFz95IzNbO7nq0PAxWIT6UCoe1i7o1lnOaY@maven.pkg.github.com/FarmVivi/*</url>
-        </repository>
-
-        <!-- Repository nécessaire pour certaines dépendances communautaires (ex: lavaplayer forks) -->
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-
-        <!-- Repository officiel lavalink (héberge lavaplayer fork dev.arbjerg) -->
-        <repository>
-            <id>lavalink-maven</id>
-            <url>https://maven.lavalink.dev/releases</url>
         </repository>
     </repositories>
 
@@ -143,18 +129,6 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>s3</artifactId>
                 <version>${aws.sdk.version}</version>
-            </dependency>
-
-            <!-- Additional external dependencies used by modules -->
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
-                <version>${okhttp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.walkyst</groupId>
-                <artifactId>lavaplayer-fork</artifactId>
-                <version>${lavaplayer.version}</version>
             </dependency>
 
             <!-- JUnit 5 -->

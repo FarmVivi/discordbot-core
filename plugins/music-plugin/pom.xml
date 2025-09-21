@@ -16,6 +16,27 @@
     <name>Fluxcord Plugin - Music</name>
     <description>Advanced music bot plugin with playlist management and audio effects</description>
 
+    <repositories>
+        <!-- Repository pour JitPack (LavaPlayer fork) -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
+        <!-- Repository officiel lavalink (héberge lavaplayer fork dev.arbjerg) -->
+        <repository>
+            <id>lavalink-maven</id>
+            <url>https://maven.lavalink.dev/releases</url>
+        </repository>
+
+        <!-- Repository pour LavaSrc (Spotify, Deezer, Apple Music support) -->
+        <repository>
+            <id>TopiWTF-releases</id>
+            <name>Topis Maven Repo</name>
+            <url>https://maven.topi.wtf/releases</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- API module -->
         <dependency>
@@ -35,16 +56,102 @@
             <artifactId>wylog</artifactId>
         </dependency>
 
-        <!-- LavaPlayer fork maintenu (ex: walkyst ou sedmelluq legacy). Choisir une version publiée -->
+        <!-- LavaPlayer fork maintenu -->
+        <!-- https://maven.lavalink.dev/#/releases/dev/arbjerg/lavaplayer -->
         <dependency>
-            <groupId>com.github.walkyst</groupId>
-            <artifactId>lavaplayer-fork</artifactId>
-            <version>${lavaplayer.version}</version>
+            <groupId>dev.arbjerg</groupId>
+            <artifactId>lavaplayer</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+
+        <!-- YouTube source pour LavaPlayer -->
+        <!-- https://maven.lavalink.dev/#/releases/dev/lavalink/youtube -->
+        <dependency>
+            <groupId>dev.lavalink.youtube</groupId>
+            <artifactId>common</artifactId>
+            <version>1.13.2</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.lavalink.youtube</groupId>
+            <artifactId>v2</artifactId>
+            <version>1.13.2</version>
+        </dependency>
+
+        <!-- LavaSrc pour sources additionnelles (Spotify, Deezer, Apple Music, etc.) -->
+        <!-- https://maven.topi.wtf/#/releases/com/github/topi314/lavasrc -->
+        <dependency>
+            <groupId>com.github.topi314.lavasrc</groupId>
+            <artifactId>lavasrc</artifactId>
+            <version>4.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.topi314.lavasrc</groupId>
+            <artifactId>protocol-jvm</artifactId>
+            <version>4.6.0</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <!-- Provided by core/runtime -->
+                                    <exclude>fr.farmvivi.fluxcord:fluxcord-api</exclude>
+                                    <exclude>net.dv8tion:JDA</exclude>
+                                    <exclude>net.wytrem:wylog</exclude>
+                                    <!-- Test libs -->
+                                    <exclude>org.junit.jupiter:*</exclude>
+                                    <exclude>org.mockito:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

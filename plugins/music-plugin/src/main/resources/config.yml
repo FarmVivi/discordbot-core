@@ -1,60 +1,116 @@
 # Music Plugin Configuration
+# Configuration version (automatically managed)
 config_version: 1
 
-# Audio settings
+# Music settings
 music:
-  # Default volume for music playback (0-100)
+  # Default volume for new players (0-100)
   default_volume: 50
   
-  # Maximum queue size per server
+  # Maximum number of tracks in queue
   max_queue_size: 100
   
-  # Maximum track duration (milliseconds)
-  max_track_duration: 600000  # 10 minutes
+  # Maximum track duration in milliseconds (0 = unlimited)
+  max_track_duration: 0
   
-  # Audio quality (low/medium/high)
-  audio_quality: "medium"
+  # Auto-leave timeout in milliseconds (5 minutes)
+  auto_leave_timeout: 300000
+  
+  # Enable vote skip (requires majority vote to skip)
+  vote_skip_enabled: false
+  
+  # Vote skip percentage required (0.0 to 1.0)
+  vote_skip_ratio: 0.5
 
-# Platform support
-platforms:
-  # Enable Spotify integration
-  enable_spotify: true
+# Provider settings
+providers:
+  # YouTube settings
+  youtube:
+    # Enable YouTube support
+    enabled: true
+    # Email for age-restricted videos (optional)
+    email: ""
+    # Password for age-restricted videos (optional)
+    password: ""
   
-  # Enable SoundCloud integration
-  enable_soundcloud: true
+  # Spotify settings
+  spotify:
+    # Enable Spotify support
+    enabled: false
+    # Spotify client ID (required for Spotify support)
+    client_id: ""
+    # Spotify client secret (required for Spotify support)
+    client_secret: ""
+    # Country code for market availability
+    country_code: "US"
   
-  # Enable YouTube integration (always enabled)
-  enable_youtube: true
+  # SoundCloud settings
+  soundcloud:
+    # Enable SoundCloud support
+    enabled: false
+  
+  # Deezer settings
+  deezer:
+    # Enable Deezer support
+    enabled: false
+    # Master decryption key (required for Deezer support)
+    master_decryption_key: ""
+    # ARL authentication cookie (required for Deezer support)
+    arl_cookie: ""
+  
+  # Apple Music settings
+  apple_music:
+    # Enable Apple Music support
+    enabled: false
+    # API token (required for Apple Music support)
+    token: ""
+    # Country code for market availability
+    country_code: "US"
+  
+  # Flowery TTS settings
+  flowery_tts:
+    # Enable Flowery TTS support
+    enabled: false
+    # Voice to use for TTS
+    voice: ""
+  
+  # Bandcamp settings
+  bandcamp:
+    # Enable Bandcamp support
+    enabled: false
 
-# Voice channel behavior
-voice:
-  # Auto-leave when no users in channel
-  auto_leave: true
-  
-  # Auto-leave timeout in seconds
-  auto_leave_timeout: 300  # 5 minutes
-  
-  # Auto-join user's voice channel when playing
-  auto_join: false
+  # Vimeo settings
+  vimeo:
+    # Enable Vimeo support
+    enabled: false
+
+  # Twitch settings
+  twitch:
+    # Enable Twitch support
+    enabled: false
+
+  # GetYarn settings
+  getyarn:
+    # Enable GetYarn support
+    enabled: false
+
+  # HTTP settings
+  http:
+    # Enable HTTP support
+    enabled: false
+
+  # Local settings
+  local:
+    # Enable Local file support
+    enabled: false
 
 # Playlist settings
 playlists:
-  # Maximum playlist size
-  max_playlist_size: 500
+  # Maximum number of playlists per user
+  max_per_user: 10
   
-  # Allow public playlists
-  allow_public_playlists: true
+  # Maximum number of playlists per guild
+  max_per_guild: 25
   
-  # Default playlist privacy (public/private)
-  default_privacy: "private"
-
-# Permission settings
-permissions:
-  # Allow users to skip their own tracks
-  allow_self_skip: true
-  
-  # Require vote to skip (percentage of users needed)
-  skip_vote_threshold: 0.5
-  
-  # DJ role permissions
-  dj_role_name: "DJ"
+  # Maximum tracks per playlist
+  max_tracks: 100
