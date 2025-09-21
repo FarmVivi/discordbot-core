@@ -16,6 +16,27 @@
     <name>Fluxcord Plugin - Music</name>
     <description>Advanced music bot plugin with playlist management and audio effects</description>
 
+    <repositories>
+        <!-- Repository pour JitPack (LavaPlayer fork) -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
+        <!-- Repository officiel lavalink (héberge lavaplayer fork dev.arbjerg) -->
+        <repository>
+            <id>lavalink-maven</id>
+            <url>https://maven.lavalink.dev/releases</url>
+        </repository>
+
+        <!-- Repository pour LavaSrc (Spotify, Deezer, Apple Music support) -->
+        <repository>
+            <id>TopiWTF-releases</id>
+            <name>Topis Maven Repo</name>
+            <url>https://maven.topi.wtf/releases</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- API module -->
         <dependency>
@@ -35,14 +56,16 @@
             <artifactId>wylog</artifactId>
         </dependency>
 
-        <!-- LavaPlayer fork maintenu (ex: walkyst ou sedmelluq legacy). Choisir une version publiée -->
+        <!-- LavaPlayer fork maintenu -->
+        <!-- https://maven.lavalink.dev/#/releases/dev/arbjerg/lavaplayer -->
         <dependency>
-            <groupId>com.github.walkyst</groupId>
-            <artifactId>lavaplayer-fork</artifactId>
-            <version>${lavaplayer.version}</version>
+            <groupId>dev.arbjerg</groupId>
+            <artifactId>lavaplayer</artifactId>
+            <version>2.2.3</version>
         </dependency>
 
         <!-- YouTube source pour LavaPlayer -->
+        <!-- https://maven.lavalink.dev/#/releases/dev/lavalink/youtube -->
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>common</artifactId>
@@ -55,6 +78,7 @@
         </dependency>
 
         <!-- LavaSrc pour sources additionnelles (Spotify, Deezer, Apple Music, etc.) -->
+        <!-- https://maven.topi.wtf/#/releases/com/github/topi314/lavasrc -->
         <dependency>
             <groupId>com.github.topi314.lavasrc</groupId>
             <artifactId>lavasrc</artifactId>
