@@ -82,9 +82,10 @@ public class AudioPlayerManager {
         // Deezer source
         boolean deezerEnabled = config.getBoolean("providers.deezer.enabled", false);
         String deezerKey = config.getString("providers.deezer.master_decryption_key", null);
-        if (deezerEnabled && deezerKey != null) {
+        String deezerARL = config.getString("providers.deezer.arl_cookie", null);
+        if (deezerEnabled && deezerKey != null && deezerARL != null) {
             logger.info("Enabling Deezer source provider");
-            DeezerAudioSourceManager deezerSourceManager = new DeezerAudioSourceManager(deezerKey);
+            DeezerAudioSourceManager deezerSourceManager = new DeezerAudioSourceManager(deezerKey, deezerARL);
             playerManager.registerSourceManager(deezerSourceManager);
         }
 

@@ -55,6 +55,8 @@ providers:
     enabled: false
     # Master decryption key (required for Deezer support)
     master_decryption_key: ""
+    # ARL authentication cookie (required for Deezer support)
+    arl_cookie: ""
   
   # Apple Music settings
   apple_music:
