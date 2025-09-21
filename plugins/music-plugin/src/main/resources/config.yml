@@ -26,6 +26,8 @@ music:
 providers:
   # YouTube settings
   youtube:
+    # Enable YouTube support
+    enabled: true
     # Email for age-restricted videos (optional)
     email: ""
     # Password for age-restricted videos (optional)
@@ -34,7 +36,7 @@ providers:
   # Spotify settings
   spotify:
     # Enable Spotify support
-    enabled: true
+    enabled: false
     # Spotify client ID (required for Spotify support)
     client_id: ""
     # Spotify client secret (required for Spotify support)
@@ -45,15 +47,19 @@ providers:
   # SoundCloud settings
   soundcloud:
     # Enable SoundCloud support
-    enabled: true
+    enabled: false
   
   # Deezer settings
   deezer:
+    # Enable Deezer support
+    enabled: false
     # Master decryption key (required for Deezer support)
     master_decryption_key: ""
   
   # Apple Music settings
   apple_music:
+    # Enable Apple Music support
+    enabled: false
     # API token (required for Apple Music support)
     token: ""
     # Country code for market availability
@@ -61,8 +67,40 @@ providers:
   
   # Flowery TTS settings
   flowery_tts:
+    # Enable Flowery TTS support
+    enabled: false
     # Voice to use for TTS
     voice: ""
+  
+  # Bandcamp settings
+  bandcamp:
+    # Enable Bandcamp support
+    enabled: false
+
+  # Vimeo settings
+  vimeo:
+    # Enable Vimeo support
+    enabled: false
+
+  # Twitch settings
+  twitch:
+    # Enable Twitch support
+    enabled: false
+
+  # GetYarn settings
+  getyarn:
+    # Enable GetYarn support
+    enabled: false
+
+  # HTTP settings
+  http:
+    # Enable HTTP support
+    enabled: false
+
+  # Local settings
+  local:
+    # Enable Local file support
+    enabled: false
 
 # Playlist settings
 playlists:

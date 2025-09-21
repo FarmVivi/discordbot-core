@@ -44,61 +44,77 @@ public class AudioPlayerManager {
         Configuration config = plugin.getConfiguration();
 
         // YouTube source with multiple clients for reliability
-        YoutubeAudioSourceManager youtubeManager = new YoutubeAudioSourceManager(true,
-                new MusicWithThumbnail(),
-                new AndroidVrWithThumbnail(),
-                new WebWithThumbnail(),
-                new WebEmbeddedWithThumbnail(),
-                new MWebWithThumbnail(),
-                new IosWithThumbnail(),
-                new AndroidWithThumbnail(),
-                new AndroidMusicWithThumbnail(),
-                new TvHtml5EmbeddedWithThumbnail()
-        );
-        playerManager.registerSourceManager(youtubeManager);
+        boolean youtubeEnabled = config.getBoolean("providers.youtube.enabled", true);
+        YoutubeAudioSourceManager youtubeSourceManager = null;
+        if (youtubeEnabled) {
+            logger.info("Enabling YouTube source provider");
+            youtubeSourceManager = new YoutubeAudioSourceManager(true,
+                    new MusicWithThumbnail(),
+                    new AndroidVrWithThumbnail(),
+                    new WebWithThumbnail(),
+                    new WebEmbeddedWithThumbnail(),
+                    new MWebWithThumbnail(),
+                    new IosWithThumbnail(),
+                    new AndroidWithThumbnail(),
+                    new AndroidMusicWithThumbnail(),
+                    new TvHtml5EmbeddedWithThumbnail()
+            );
+            playerManager.registerSourceManager(youtubeSourceManager);
+        }
 
         // Spotify source
+        boolean spotifyEnabled = config.getBoolean("providers.spotify.enabled", false);
         String spotifyClientId = config.getString("providers.spotify.client_id", null);
         String spotifyClientSecret = config.getString("providers.spotify.client_secret", null);
-        if (spotifyClientId != null && spotifyClientSecret != null) {
+        String spotifyCountryCode = config.getString("providers.spotify.country_code", "US");
+        if (spotifyEnabled && spotifyClientId != null && spotifyClientSecret != null) {
             logger.info("Enabling Spotify source provider");
-            playerManager.registerSourceManager(new SpotifySourceManager(
+            SpotifySourceManager spotifySourceManager = new SpotifySourceManager(
                     spotifyClientId,
                     spotifyClientSecret,
-                    config.getString("providers.spotify.country_code", "US"),
+                    spotifyCountryCode,
                     playerManager,
                     new DefaultMirroringAudioTrackResolver(null)
-            ));
+            );
+            playerManager.registerSourceManager(spotifySourceManager);
         }
 
         // Deezer source
+        boolean deezerEnabled = config.getBoolean("providers.deezer.enabled", false);
         String deezerKey = config.getString("providers.deezer.master_decryption_key", null);
-        if (deezerKey != null) {
+        if (deezerEnabled && deezerKey != null) {
             logger.info("Enabling Deezer source provider");
-            playerManager.registerSourceManager(new DeezerAudioSourceManager(deezerKey));
+            DeezerAudioSourceManager deezerSourceManager = new DeezerAudioSourceManager(deezerKey);
+            playerManager.registerSourceManager(deezerSourceManager);
         }
 
         // Apple Music source
+        boolean appleMusicEnabled = config.getBoolean("providers.apple_music.enabled", false);
         String appleMusicToken = config.getString("providers.apple_music.token", null);
-        if (appleMusicToken != null) {
+        String appleMusicCountryCode = config.getString("providers.apple_music.country_code", "US");
+        if (appleMusicEnabled && appleMusicToken != null) {
             logger.info("Enabling Apple Music source provider");
-            playerManager.registerSourceManager(new AppleMusicSourceManager(
+            AppleMusicSourceManager appleMusicSourceManager = new AppleMusicSourceManager(
                     appleMusicToken,
-                    config.getString("providers.apple_music.country_code", "US"),
+                    appleMusicCountryCode,
                     playerManager,
                     new DefaultMirroringAudioTrackResolver(null)
-            ));
+            );
+            playerManager.registerSourceManager(appleMusicSourceManager);
         }
 
         // Flowery TTS source
+        boolean floweryEnabled = config.getBoolean("providers.flowery_tts.enabled", false);
         String floweryVoice = config.getString("providers.flowery_tts.voice", null);
-        if (floweryVoice != null) {
+        if (floweryEnabled && floweryVoice != null) {
             logger.info("Enabling Flowery TTS source provider");
-            playerManager.registerSourceManager(new FloweryTTSSourceManager(floweryVoice));
+            FloweryTTSSourceManager floweryTTSSourceManager = new FloweryTTSSourceManager(floweryVoice);
+            playerManager.registerSourceManager(floweryTTSSourceManager);
         }
 
         // SoundCloud source
-        if (config.getBoolean("providers.soundcloud.enabled", true)) {
+        boolean soundcloudEnabled = config.getBoolean("providers.soundcloud.enabled", false);
+        if (soundcloudEnabled) {
             logger.info("Enabling SoundCloud source provider");
             SoundCloudDataReader dataReader = new DefaultSoundCloudDataReader();
             SoundCloudDataLoader dataLoader = new DefaultSoundCloudDataLoader();
@@ -106,21 +122,68 @@ public class AudioPlayerManager {
             SoundCloudPlaylistLoader playlistLoader = new DefaultSoundCloudPlaylistLoader(
                     dataLoader, dataReader, formatHandler
             );
-            playerManager.registerSourceManager(new SoundCloudAudioSourceManager(
+            SoundCloudAudioSourceManager soundCloudSourceManager = new SoundCloudAudioSourceManager(
                     true, dataReader, dataLoader, formatHandler, playlistLoader
-            ));
+            );
+            playerManager.registerSourceManager(soundCloudSourceManager);
         }
 
-        // Other sources
-        playerManager.registerSourceManager(new BandcampAudioSourceManager());
-        playerManager.registerSourceManager(new VimeoAudioSourceManager());
-        playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        playerManager.registerSourceManager(new GetyarnAudioSourceManager());
-        playerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
-        playerManager.registerSourceManager(new LocalAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
+        // Bandcamp source
+        boolean bandcampEnabled = config.getBoolean("providers.bandcamp.enabled", false);
+        if (bandcampEnabled) {
+            logger.info("Enabling Bandcamp source provider");
+            BandcampAudioSourceManager bandcampSourceManager = new BandcampAudioSourceManager();
+            playerManager.registerSourceManager(bandcampSourceManager);
+        }
+
+        // Vimeo source
+        boolean vimeoEnabled = config.getBoolean("providers.vimeo.enabled", false);
+        if (vimeoEnabled) {
+            logger.info("Enabling Vimeo source provider");
+            VimeoAudioSourceManager vimeoSourceManager = new VimeoAudioSourceManager();
+            playerManager.registerSourceManager(vimeoSourceManager);
+        }
+
+        // Twitch source
+        boolean twitchEnabled = config.getBoolean("providers.twitch.enabled", false);
+        if (twitchEnabled) {
+            logger.info("Enabling Twitch source provider");
+            TwitchStreamAudioSourceManager twitchSourceManager = new TwitchStreamAudioSourceManager();
+            playerManager.registerSourceManager(twitchSourceManager);
+        }
+
+        // Getyarn source
+        boolean getyarnEnabled = config.getBoolean("providers.getyarn.enabled", false);
+        if (getyarnEnabled) {
+            logger.info("Enabling Getyarn source provider");
+            GetyarnAudioSourceManager getyarnSourceManager = new GetyarnAudioSourceManager();
+            playerManager.registerSourceManager(getyarnSourceManager);
+        }
+
+        // HTTP source
+        boolean httpEnabled = config.getBoolean("providers.http.enabled", false);
+        if (httpEnabled) {
+            logger.info("Enabling HTTP source provider");
+            HttpAudioSourceManager httpSourceManager = new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY);
+            playerManager.registerSourceManager(httpSourceManager);
+        }
+
+        // Local source
+        boolean localEnabled = config.getBoolean("providers.local.enabled", false);
+        if (localEnabled) {
+            logger.info("Enabling Local source provider");
+            LocalAudioSourceManager localSourceManager = new LocalAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY);
+            playerManager.registerSourceManager(localSourceManager);
+        }
 
         // Search source manager
-        playerManager.registerSourceManager(new SearchSourceManager(youtubeManager, "ytsearch:"));
+        if (youtubeSourceManager != null) {
+            logger.info("Enabling Search source provider");
+            SearchSourceManager searchSourceManager = new SearchSourceManager(youtubeSourceManager, "ytsearch:");
+            playerManager.registerSourceManager(searchSourceManager);
+        } else {
+            logger.warn("YouTube source manager is not initialized; Search source provider will have limited functionality.");
+        }
 
         // Enable filter hot swap for effects
         playerManager.getConfiguration().setFilterHotSwapEnabled(true);
