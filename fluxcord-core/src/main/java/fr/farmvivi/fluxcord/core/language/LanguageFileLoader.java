@@ -44,6 +44,7 @@ public class LanguageFileLoader {
         // Chargement de tous les fichiers .yml du dossier de langue
         File[] langFiles = langFolder.listFiles((dir, name) -> name.endsWith(".yml"));
         if (langFiles != null && langFiles.length > 0) {
+            logger.debug("Discovered {} language file(s) in {}", langFiles.length, langFolder.getAbsolutePath());
             for (File langFile : langFiles) {
                 loadLanguageFile(langFile);
             }
@@ -63,14 +64,21 @@ public class LanguageFileLoader {
             // Analyse du code de la locale à partir du nom du fichier
             String localeCode = langFile.getName().replace(".yml", "");
             Locale locale = Locale.forLanguageTag(localeCode);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Loading language file '{}' for locale {} (namespace=core)", langFile.getName(), locale.toLanguageTag());
+            }
 
             // Chargement du fichier de langue
             Yaml yaml = new Yaml();
             try (FileReader reader = new FileReader(langFile)) {
+                logger.debug("Parsing YAML from {}", langFile.getAbsolutePath());
                 Map<String, Object> langData = yaml.load(reader);
                 if (langData != null) {
                     // Conversion de la carte imbriquée en carte plate avec des clés comme "section.key"
                     Map<String, String> flatMap = flattenMap(langData, "");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Flattened {} entries from {}", flatMap.size(), langFile.getName());
+                    }
 
                     // Chargement des chaînes de langue
                     languageManager.loadLanguage("core", locale, flatMap);

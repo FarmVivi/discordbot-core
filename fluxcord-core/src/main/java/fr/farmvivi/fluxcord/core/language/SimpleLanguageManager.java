@@ -54,9 +54,16 @@ public class SimpleLanguageManager implements LanguageManager {
         availableLocales.put(defaultLocale.toLanguageTag(), defaultLocale);
 
         // Always register the "core" namespace
+        if (logger.isDebugEnabled()) {
+            logger.debug("Initializing SimpleLanguageManager with default locale {}", defaultLocale.toLanguageTag());
+            logger.debug("Registering default namespace 'core'");
+        }
         registerNamespace("core");
 
         // Load default resources
+        if (logger.isDebugEnabled()) {
+            logger.debug("Loading default language resources from classpath");
+        }
         loadDefaultResources();
     }
 
@@ -70,7 +77,13 @@ public class SimpleLanguageManager implements LanguageManager {
      */
     private void loadDefaultResources() {
         // Load English and French by default
+        if (logger.isDebugEnabled()) {
+            logger.debug("Loading embedded default resource for core: en-US");
+        }
         loadDefaultResource("core", Locale.forLanguageTag("en-US"), "/lang/en-US.yml");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Loading embedded default resource for core: fr-FR");
+        }
         loadDefaultResource("core", Locale.forLanguageTag("fr-FR"), "/lang/fr-FR.yml");
     }
 
@@ -81,6 +94,7 @@ public class SimpleLanguageManager implements LanguageManager {
      * @param locale       the locale
      * @param resourcePath the path to the resource
      */
+    @SuppressWarnings("java:S3776") // cognitive complexity acceptable here for resource loading; instrumentation added
     private void loadDefaultResource(String namespace, Locale locale, String resourcePath) {
         try {
             InputStream inputStream = getClass().getResourceAsStream(resourcePath);
@@ -95,6 +109,10 @@ public class SimpleLanguageManager implements LanguageManager {
             // Load YAML from the resource
             Yaml yaml = new Yaml();
             try (InputStreamReader reader = new InputStreamReader(inputStream)) {
+                logger.debug("Parsing YAML resource {} for namespace {} and locale {}", resourcePath, namespace, locale.toLanguageTag());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Parsing YAML resource {} for namespace {} and locale {}", resourcePath, namespace, locale.toLanguageTag());
+                }
                 Map<String, Object> langData = yaml.load(reader);
                 if (langData != null) {
                     // Flatten the map
@@ -105,8 +123,25 @@ public class SimpleLanguageManager implements LanguageManager {
                             defaultTranslations.computeIfAbsent(namespace, k -> new ConcurrentHashMap<>());
                     namespaceDefaultTranslations.put(locale, flatMap);
 
-                    logger.info("Loaded {} default strings for namespace {} and locale {} from resource",
-                            flatMap.size(), namespace, locale.toLanguageTag());
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Loaded {} default strings for namespace {} and locale {} from resource",
+                                flatMap.size(), namespace, locale.toLanguageTag());
+                    }
+                    if (logger.isDebugEnabled()) {
+                        // Log a small sample of keys to help trace
+                        int sampleCount = 0;
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Sample keys loaded [");
+                        for (String k : flatMap.keySet()) {
+                            if (sampleCount++ >= 10) break;
+                            sb.append(k).append(", ");
+                        }
+                        if (sampleCount > 0) {
+                            sb.setLength(Math.max(0, sb.length() - 2));
+                        }
+                        sb.append("]");
+                        logger.debug("{}", sb);
+                    }
 
                     // Fire the language loaded event
                     if (eventManager != null) {
@@ -157,7 +192,11 @@ public class SimpleLanguageManager implements LanguageManager {
     }
 
     @Override
+    @SuppressWarnings({"java:S3776", "java:S138"}) // method is intentionally verbose to implement fallback chain; logging added for diagnostics
     public String getString(Locale locale, String key) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getString(locale={}, key={}) invoked", locale.toLanguageTag(), key);
+        }
         // Parse the key to get the namespace and the actual key
         String namespace = "core";
         String actualKey = key;
@@ -180,6 +219,9 @@ public class SimpleLanguageManager implements LanguageManager {
         // 1. Essayer dans la locale spécifiée dans le dossier runtime
         translation = getTranslationFromRuntime(namespace, locale, actualKey);
         if (translation != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Translation hit (runtime) for [{}:{}] in locale {}", namespace, actualKey, locale.toLanguageTag());
+            }
             // If we have an event manager, fire a string retrieval event
             if (eventManager != null) {
                 StringRetrievalEvent event = new StringRetrievalEvent(
@@ -193,10 +235,16 @@ public class SimpleLanguageManager implements LanguageManager {
             }
             return translation;
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Translation miss (runtime) for [{}:{}] in locale {}", namespace, actualKey, locale.toLanguageTag());
+        }
 
         // 2. Essayer dans la locale spécifiée dans les ressources par défaut
         translation = getTranslationFromResources(namespace, locale, actualKey);
         if (translation != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Translation hit (resources) for [{}:{}] in locale {}", namespace, actualKey, locale.toLanguageTag());
+            }
             // If we have an event manager, fire a string retrieval event
             if (eventManager != null) {
                 StringRetrievalEvent event = new StringRetrievalEvent(
@@ -209,6 +257,9 @@ public class SimpleLanguageManager implements LanguageManager {
                 }
             }
             return translation;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Translation miss (resources) for [{}:{}] in locale {}", namespace, actualKey, locale.toLanguageTag());
         }
 
         // 3. Si la locale n'est pas l'anglais, essayer dans la locale anglaise du dossier runtime
@@ -216,6 +267,9 @@ public class SimpleLanguageManager implements LanguageManager {
             Locale englishLocale = Locale.forLanguageTag("en-US");
             translation = getTranslationFromRuntime(namespace, englishLocale, actualKey);
             if (translation != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Translation hit (runtime) for [{}:{}] in fallback en-US", namespace, actualKey);
+                }
                 // If we have an event manager, fire a string retrieval event
                 if (eventManager != null) {
                     StringRetrievalEvent event = new StringRetrievalEvent(
@@ -229,10 +283,16 @@ public class SimpleLanguageManager implements LanguageManager {
                 }
                 return translation;
             }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Translation miss (runtime) for [{}:{}] in fallback en-US", namespace, actualKey);
+            }
 
             // 4. Essayer dans la locale anglaise des ressources par défaut
             translation = getTranslationFromResources(namespace, englishLocale, actualKey);
             if (translation != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Translation hit (resources) for [{}:{}] in fallback en-US", namespace, actualKey);
+                }
                 // If we have an event manager, fire a string retrieval event
                 if (eventManager != null) {
                     StringRetrievalEvent event = new StringRetrievalEvent(
@@ -245,6 +305,9 @@ public class SimpleLanguageManager implements LanguageManager {
                     }
                 }
                 return translation;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Translation miss (resources) for [{}:{}] in fallback en-US", namespace, actualKey);
             }
         }
 
@@ -252,6 +315,9 @@ public class SimpleLanguageManager implements LanguageManager {
         if (!locale.equals(defaultLocale)) {
             translation = getTranslationFromRuntime(namespace, defaultLocale, actualKey);
             if (translation != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Translation hit (runtime) for [{}:{}] in default locale {}", namespace, actualKey, defaultLocale.toLanguageTag());
+                }
                 // If we have an event manager, fire a string retrieval event
                 if (eventManager != null) {
                     StringRetrievalEvent event = new StringRetrievalEvent(
@@ -264,11 +330,17 @@ public class SimpleLanguageManager implements LanguageManager {
                     }
                 }
                 return translation;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Translation miss (runtime) for [{}:{}] in default locale {}", namespace, actualKey, defaultLocale.toLanguageTag());
             }
 
             // 6. Essayer dans la locale par défaut des ressources
             translation = getTranslationFromResources(namespace, defaultLocale, actualKey);
             if (translation != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Translation hit (resources) for [{}:{}] in default locale {}", namespace, actualKey, defaultLocale.toLanguageTag());
+                }
                 // If we have an event manager, fire a string retrieval event
                 if (eventManager != null) {
                     StringRetrievalEvent event = new StringRetrievalEvent(
@@ -282,11 +354,16 @@ public class SimpleLanguageManager implements LanguageManager {
                 }
                 return translation;
             }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Translation miss (resources) for [{}:{}] in default locale {}", namespace, actualKey, defaultLocale.toLanguageTag());
+            }
         }
 
         // 7. Si tout échoue, retourner la clé elle-même et logger un avertissement
+    if (logger.isDebugEnabled()) {
         logger.debug("Translation not found for key: {} in locale: {} (namespace: {})",
-                actualKey, locale.toLanguageTag(), namespace);
+            actualKey, locale.toLanguageTag(), namespace);
+    }
 
         // If we have an event manager, fire a string retrieval event - maybe someone can provide the string
         if (eventManager != null) {
@@ -371,6 +448,9 @@ public class SimpleLanguageManager implements LanguageManager {
 
         // Replace placeholders using MessageFormat
         try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Formatting translation for key {} with {} arg(s)", key, args == null ? 0 : args.length);
+            }
             return MessageFormat.format(value, args);
         } catch (Exception e) {
             logger.warn("Failed to format string: {} with args: {}", value, args, e);
@@ -381,12 +461,16 @@ public class SimpleLanguageManager implements LanguageManager {
     @Override
     public boolean registerNamespace(String namespace) {
         if (registeredNamespaces.containsKey(namespace)) {
+            logger.debug("Namespace '{}' already registered", namespace);
             return false;
         }
 
         registeredNamespaces.put(namespace, true);
         translations.put(namespace, new ConcurrentHashMap<>());
         defaultTranslations.put(namespace, new ConcurrentHashMap<>());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Registered namespace '{}'", namespace);
+        }
 
         // Fire the namespace registered event
         if (eventManager != null) {
@@ -418,8 +502,10 @@ public class SimpleLanguageManager implements LanguageManager {
         // Add the strings
         localeTranslations.putAll(strings);
 
+    if (logger.isInfoEnabled()) {
         logger.info("Loaded {} strings for namespace {} and locale {}",
-                strings.size(), namespace, locale.toLanguageTag());
+            strings.size(), namespace, locale.toLanguageTag());
+    }
 
         // Fire the language loaded event
         if (eventManager != null) {
