@@ -74,14 +74,3 @@ playlists:
   
   # Maximum tracks per playlist
   max_tracks: 100
-
-# Performance settings
-performance:
-  # Audio buffer size in milliseconds
-  buffer_size: 400
-  
-  # Frame buffer duration in milliseconds
-  frame_buffer_duration: 5000
-  
-  # Use native transport (better performance)
-  use_native_transport: true

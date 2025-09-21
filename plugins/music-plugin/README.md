@@ -103,15 +103,6 @@ providers:
 
 ## 🎛️ Advanced Configuration
 
-### Performance Tuning
-
-```yaml
-performance:
-  buffer_size: 400  # Audio buffer in ms
-  frame_buffer_duration: 5000  # Frame buffer in ms
-  use_native_transport: true  # Better performance
-```
-
 ### Playlist Limits
 
 ```yaml
