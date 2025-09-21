@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.fluxcord.api.command.CommandContext;
+import fr.farmvivi.fluxcord.api.language.PluginLanguageAdapter;
 import fr.farmvivi.fluxcord.plugins.music.audio.AudioPlayerManager;
 import fr.farmvivi.fluxcord.plugins.music.player.MusicPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,6 +14,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,8 @@ import java.awt.Color;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Manages music players for different guilds.
@@ -62,7 +68,16 @@ public class MusicManager {
      * Loads and plays a track.
      */
     public void loadTrack(CommandContext ctx, String query, boolean playNow) {
-        Guild guild = ctx.getGuild();
+        Optional<Guild> optGuild = ctx.getGuild();
+        if (optGuild.isEmpty()) {
+            // This command must be used in a guild context
+            PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+            Locale locale = ctx.getLocale();
+            ctx.replyError(lm.getString(locale, "music.error.guild_only"));
+            return;
+        }
+
+        Guild guild = optGuild.get();
         MusicPlayer player = getPlayer(guild);
         MessageChannel channel = ctx.getChannel();
         
@@ -72,11 +87,20 @@ public class MusicManager {
         // Connect to voice channel if not connected
         AudioManager audioManager = guild.getAudioManager();
         if (!audioManager.isConnected()) {
-            AudioChannel voiceChannel = ctx.getMember().getVoiceState().getChannel();
+            Member member = null;
+            if (ctx.getOriginalEvent() instanceof SlashCommandInteractionEvent e) {
+                member = e.getMember();
+            } else if (ctx.getOriginalEvent() instanceof MessageReceivedEvent e) {
+                member = e.getMember();
+            }
+
+            AudioChannel voiceChannel = member != null && member.getVoiceState() != null
+                    ? member.getVoiceState().getChannel()
+                    : null;
+
             if (voiceChannel == null) {
-                ctx.replyError(plugin.getPluginLanguageAdapter().getString(
-                    guild, "music.error.not_in_voice"
-                ));
+                PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+                ctx.replyError(lm.getString(ctx.getLocale(), "music.error.not_in_voice"));
                 return;
             }
             audioManager.openAudioConnection(voiceChannel);
@@ -91,12 +115,15 @@ public class MusicManager {
             public void trackLoaded(AudioTrack track) {
                 logger.info("[{}] Track loaded: {} ({})", 
                     guild.getName(), track.getInfo().title, track.getInfo().uri);
-                
+
+                PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+                Locale locale = ctx.getLocale();
+
                 EmbedBuilder embed = new EmbedBuilder()
                     .setColor(Color.GREEN)
-                    .setTitle(plugin.getPluginLanguageAdapter().getString(guild, "music.track_added"))
+                    .setTitle(lm.getString(locale, "music.track_added"))
                     .addField(
-                        plugin.getPluginLanguageAdapter().getString(guild, "music.title"),
+                        lm.getString(locale, "music.title"),
                         String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
                         false
                     );
@@ -126,17 +153,20 @@ public class MusicManager {
                     // Queue the entire playlist
                     logger.info("[{}] Playlist loaded: {} ({} tracks)", 
                         guild.getName(), playlist.getName(), tracks.size());
-                    
+
+                    PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+                    Locale locale = ctx.getLocale();
+
                     EmbedBuilder embed = new EmbedBuilder()
                         .setColor(Color.GREEN)
-                        .setTitle(plugin.getPluginLanguageAdapter().getString(guild, "music.playlist_added"))
+                        .setTitle(lm.getString(locale, "music.playlist_added"))
                         .addField(
-                            plugin.getPluginLanguageAdapter().getString(guild, "music.name"),
+                            lm.getString(locale, "music.name"),
                             playlist.getName(),
                             false
                         )
                         .addField(
-                            plugin.getPluginLanguageAdapter().getString(guild, "music.tracks"),
+                            lm.getString(locale, "music.tracks"),
                             String.valueOf(tracks.size()),
                             false
                         );
@@ -156,17 +186,15 @@ public class MusicManager {
             @Override
             public void noMatches() {
                 logger.warn("[{}] No matches found for: {}", guild.getName(), query);
-                ctx.replyError(plugin.getPluginLanguageAdapter().getString(
-                    guild, "music.error.no_matches"
-                ));
+                PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+                ctx.replyError(lm.getString(ctx.getLocale(), "music.error.no_matches"));
             }
             
             @Override
             public void loadFailed(FriendlyException exception) {
                 logger.error("[{}] Failed to load track: {}", guild.getName(), query, exception);
-                ctx.replyError(plugin.getPluginLanguageAdapter().getString(
-                    guild, "music.error.load_failed", exception.getMessage()
-                ));
+                PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+                ctx.replyError(lm.getString(ctx.getLocale(), "music.error.load_failed", exception.getMessage()));
             }
         });
     }

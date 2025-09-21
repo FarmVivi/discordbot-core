@@ -1,6 +1,7 @@
 package fr.farmvivi.fluxcord.plugins.music.playlist;
 
-import fr.farmvivi.fluxcord.api.storage.DataStorage;
+import fr.farmvivi.fluxcord.api.storage.PluginDataStorageAdapter;
+import fr.farmvivi.fluxcord.api.storage.PluginGlobalStorage;
 import fr.farmvivi.fluxcord.plugins.music.MusicPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,10 +129,16 @@ public class PlaylistManager {
      * Loads playlists from storage.
      */
     private void loadPlaylists() {
-        DataStorage storage = plugin.getPluginDataStorage();
-        
+        PluginDataStorageAdapter adapter = plugin.getPluginDataStorage();
+        PluginGlobalStorage storage = adapter.getGlobalStorage();
+
         // Load user playlists
-        Map<String, Object> userData = storage.getMap("playlists.user");
+        Map<String, Object> userData = storage.getAll().entrySet().stream()
+                .filter(e -> e.getKey().startsWith("playlists.user."))
+                .collect(java.util.stream.Collectors.toMap(
+                        e -> e.getKey().substring("playlists.user.".length()),
+                        Map.Entry::getValue
+                ));
         for (Map.Entry<String, Object> entry : userData.entrySet()) {
             try {
                 @SuppressWarnings("unchecked")
@@ -144,7 +151,12 @@ public class PlaylistManager {
         }
         
         // Load guild playlists
-        Map<String, Object> guildData = storage.getMap("playlists.guild");
+        Map<String, Object> guildData = storage.getAll().entrySet().stream()
+                .filter(e -> e.getKey().startsWith("playlists.guild."))
+                .collect(java.util.stream.Collectors.toMap(
+                        e -> e.getKey().substring("playlists.guild.".length()),
+                        Map.Entry::getValue
+                ));
         for (Map.Entry<String, Object> entry : guildData.entrySet()) {
             try {
                 @SuppressWarnings("unchecked")
@@ -164,20 +176,30 @@ public class PlaylistManager {
      * Saves playlists to storage.
      */
     private void savePlaylists() {
-        DataStorage storage = plugin.getPluginDataStorage();
-        
+        PluginDataStorageAdapter adapter = plugin.getPluginDataStorage();
+        PluginGlobalStorage storage = adapter.getGlobalStorage();
+
+        // First clear previous entries for this namespace subset
+        // Remove existing user playlists keys
+        storage.getAll().keySet().stream()
+                .filter(k -> k.startsWith("playlists.user."))
+                .forEach(storage::remove);
+
+        // Remove existing guild playlists keys
+        storage.getAll().keySet().stream()
+                .filter(k -> k.startsWith("playlists.guild."))
+                .forEach(storage::remove);
+
         // Save user playlists
-        Map<String, Object> userData = new HashMap<>();
         for (Map.Entry<String, Playlist> entry : userPlaylists.entrySet()) {
-            userData.put(entry.getKey(), entry.getValue().toMap());
+            storage.set("playlists.user." + entry.getKey(), entry.getValue().toMap());
         }
-        storage.set("playlists.user", userData);
-        
+
         // Save guild playlists
-        Map<String, Object> guildData = new HashMap<>();
         for (Map.Entry<String, Playlist> entry : guildPlaylists.entrySet()) {
-            guildData.put(entry.getKey(), entry.getValue().toMap());
+            storage.set("playlists.guild." + entry.getKey(), entry.getValue().toMap());
         }
-        storage.set("playlists.guild", guildData);
+
+        adapter.saveAll();
     }
 }

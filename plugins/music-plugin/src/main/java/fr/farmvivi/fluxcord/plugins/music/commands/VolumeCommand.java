@@ -3,6 +3,9 @@ package fr.farmvivi.fluxcord.plugins.music.commands;
 import fr.farmvivi.fluxcord.api.command.CommandContext;
 import fr.farmvivi.fluxcord.plugins.music.MusicPlugin;
 import fr.farmvivi.fluxcord.plugins.music.player.MusicPlayer;
+import net.dv8tion.jda.api.entities.Guild;
+
+import java.util.Optional;
 
 /**
  * Command to adjust playback volume.
@@ -15,27 +18,32 @@ public class VolumeCommand {
     }
     
     public void execute(CommandContext ctx, Integer level) {
-        MusicPlayer player = plugin.getMusicManager().getPlayer(ctx.getGuild());
-        
-        // Check permission
-        if (!plugin.getPluginPermissionManager().hasPermission(ctx.getUser(), "music.volume")) {
-            ctx.replyError(plugin.getPluginLanguageAdapter().getString(
-                ctx.getGuild(), "music.error.no_permission"
-            ));
+        Optional<Guild> optGuild = ctx.getGuild();
+        if (optGuild.isEmpty()) {
+            ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.guild_only"));
             return;
         }
-        
+        Guild guild = optGuild.get();
+
+        MusicPlayer player = plugin.getMusicManager().getPlayer(guild);
+
+        // Check permission
+        String userId = ctx.getUser().getId();
+        String perm = plugin.getName().toLowerCase() + ".volume";
+        boolean allowed = plugin.getPluginPermissionManager().hasPermission(userId, guild.getId(), perm)
+                || plugin.getPluginPermissionManager().hasPermission(userId, perm);
+        if (!allowed) {
+            ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.no_permission"));
+            return;
+        }
+
         if (level == null) {
             // Show current volume
-            ctx.replyInfo(plugin.getPluginLanguageAdapter().getString(
-                ctx.getGuild(), "music.volume.current", player.getVolume()
-            ));
+            ctx.replyInfo(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.volume.current", player.getVolume()));
         } else {
             // Set new volume
             player.setVolume(level);
-            ctx.replySuccess(plugin.getPluginLanguageAdapter().getString(
-                ctx.getGuild(), "music.volume.set", level
-            ));
+            ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.volume.set", level));
         }
     }
 }

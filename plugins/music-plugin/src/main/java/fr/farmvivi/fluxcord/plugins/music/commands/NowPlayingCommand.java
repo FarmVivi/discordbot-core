@@ -2,12 +2,16 @@ package fr.farmvivi.fluxcord.plugins.music.commands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.fluxcord.api.command.CommandContext;
+import fr.farmvivi.fluxcord.api.language.PluginLanguageAdapter;
 import fr.farmvivi.fluxcord.plugins.music.MusicPlugin;
 import fr.farmvivi.fluxcord.plugins.music.player.MusicPlayer;
 import fr.farmvivi.fluxcord.plugins.music.utils.TimeParser;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 
 import java.awt.Color;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Command to display the currently playing track.
@@ -20,21 +24,28 @@ public class NowPlayingCommand {
     }
     
     public void execute(CommandContext ctx) {
-        MusicPlayer player = plugin.getMusicManager().getPlayer(ctx.getGuild());
+        Optional<Guild> optGuild = ctx.getGuild();
+        if (optGuild.isEmpty()) {
+            PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+            ctx.replyError(lm.getString(ctx.getLocale(), "music.error.guild_only"));
+            return;
+        }
+        Guild guild = optGuild.get();
+        MusicPlayer player = plugin.getMusicManager().getPlayer(guild);
         AudioTrack track = player.getPlayingTrack();
         
         if (track == null) {
-            ctx.replyError(plugin.getPluginLanguageAdapter().getString(
-                ctx.getGuild(), "music.error.nothing_playing"
-            ));
+            PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+            ctx.replyError(lm.getString(ctx.getLocale(), "music.error.nothing_playing"));
             return;
         }
         
+        PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+        Locale locale = ctx.getLocale();
+
         EmbedBuilder embed = new EmbedBuilder()
             .setColor(player.isPaused() ? Color.ORANGE : Color.GREEN)
-            .setTitle(plugin.getPluginLanguageAdapter().getString(
-                ctx.getGuild(), "music.nowplaying.title"
-            ));
+            .setTitle(lm.getString(locale, "music.nowplaying.title"));
         
         // Thumbnail
         if (track.getInfo().artworkUrl != null) {
@@ -43,7 +54,7 @@ public class NowPlayingCommand {
         
         // Track info
         embed.addField(
-            plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.track"),
+            lm.getString(locale, "music.nowplaying.track"),
             String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
             false
         );
@@ -51,7 +62,7 @@ public class NowPlayingCommand {
         // Author/Artist
         if (track.getInfo().author != null && !track.getInfo().author.isEmpty()) {
             embed.addField(
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.author"),
+                lm.getString(locale, "music.nowplaying.author"),
                 track.getInfo().author,
                 true
             );
@@ -66,21 +77,21 @@ public class NowPlayingCommand {
             );
             
             embed.addField(
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.progress"),
+                lm.getString(locale, "music.nowplaying.progress"),
                 progressBar + "\n" + timeInfo,
                 false
             );
         } else {
             embed.addField(
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.duration"),
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.live"),
+                lm.getString(locale, "music.nowplaying.duration"),
+                lm.getString(locale, "music.nowplaying.live"),
                 true
             );
         }
         
         // Volume
         embed.addField(
-            plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.volume"),
+            lm.getString(locale, "music.nowplaying.volume"),
             player.getVolume() + "%",
             true
         );
@@ -88,8 +99,8 @@ public class NowPlayingCommand {
         // Status
         if (player.isPaused()) {
             embed.addField(
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.status"),
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.nowplaying.paused"),
+                lm.getString(locale, "music.nowplaying.status"),
+                lm.getString(locale, "music.nowplaying.paused"),
                 true
             );
         }

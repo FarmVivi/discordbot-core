@@ -8,12 +8,14 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fr.farmvivi.fluxcord.api.storage.PluginGuildStorage;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class MusicPlayerMessage {
     
     public MusicPlayerMessage(MusicPlayer musicPlayer) {
         this.musicPlayer = musicPlayer;
-        this.lang = musicPlayer.getPlugin().getPluginLanguageAdapter();
+        this.lang = musicPlayer.getPlugin().getPluginLanguageManager();
         
         // Try to restore message from storage
         restoreMessage();
@@ -62,8 +64,8 @@ public class MusicPlayerMessage {
         
         lastUpdateTime = now;
         
-        Guild guild = musicPlayer.getGuild();
-        AudioTrack track = musicPlayer.getPlayingTrack();
+    Guild guild = musicPlayer.getGuild();
+    AudioTrack track = musicPlayer.getPlayingTrack();
         
         if (!guild.getAudioManager().isConnected()) {
             delete();
@@ -71,7 +73,7 @@ public class MusicPlayerMessage {
         }
         
         EmbedBuilder embed = createEmbed(track);
-        List<ActionRow> actionRows = createActionRows(track);
+    List<MessageTopLevelComponent> actionRows = createActionRows(track);
         
         if (messageChannel == null) {
             return;
@@ -96,17 +98,17 @@ public class MusicPlayerMessage {
      * Creates the embed for the player message.
      */
     private EmbedBuilder createEmbed(AudioTrack track) {
-        Guild guild = musicPlayer.getGuild();
         EmbedBuilder embed = new EmbedBuilder();
+        java.util.Locale locale = musicPlayer.getPlugin().getContext().getLanguageManager().getDefaultLocale();
         
         if (track == null) {
-            embed.setTitle(lang.getString(guild, "music.player.no_track"))
+            embed.setTitle(lang.getString(locale, "music.player.no_track"))
                  .setColor(Color.RED);
         } else if (musicPlayer.isPaused()) {
-            embed.setTitle(lang.getString(guild, "music.player.paused"))
+            embed.setTitle(lang.getString(locale, "music.player.paused"))
                  .setColor(Color.ORANGE);
         } else {
-            embed.setTitle(lang.getString(guild, "music.player.playing"))
+            embed.setTitle(lang.getString(locale, "music.player.playing"))
                  .setColor(Color.GREEN);
         }
         
@@ -118,7 +120,7 @@ public class MusicPlayerMessage {
             
             // Track info
             embed.addField(
-                lang.getString(guild, "music.player.track"),
+                    lang.getString(locale, "music.player.track"),
                 String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
                 false
             );
@@ -131,7 +133,7 @@ public class MusicPlayerMessage {
                     TimeParser.formatTime(track.getDuration())
                 );
                 embed.addField(
-                    lang.getString(guild, "music.player.progress"),
+                    lang.getString(locale, "music.player.progress"),
                     progressBar + "\n" + timeInfo,
                     false
                 );
@@ -143,14 +145,14 @@ public class MusicPlayerMessage {
                 StringBuilder queueInfo = new StringBuilder();
                 
                 if (musicPlayer.getTrackScheduler().isShuffleMode()) {
-                    queueInfo.append(lang.getString(guild, "music.player.shuffle_mode"));
+                    queueInfo.append(lang.getString(locale, "music.player.shuffle_mode"));
                 } else {
                     List<AudioTrack> queue = musicPlayer.getTrackScheduler().getQueue();
                     int displayed = Math.min(5, queue.size());
                     
                     for (int i = 0; i < displayed; i++) {
                         AudioTrack queueTrack = queue.get(i);
-                        queueInfo.append(String.format("%d. [%s](%s)\n",
+                        queueInfo.append(String.format("%d. [%s](%s)%n",
                             i + 1,
                             queueTrack.getInfo().title,
                             queueTrack.getInfo().uri
@@ -158,12 +160,12 @@ public class MusicPlayerMessage {
                     }
                     
                     if (queue.size() > displayed) {
-                        queueInfo.append(lang.getString(guild, "music.player.more_tracks", queue.size() - displayed));
+                        queueInfo.append(lang.getString(locale, "music.player.more_tracks", queue.size() - displayed));
                     }
                 }
                 
                 embed.addField(
-                    lang.getString(guild, "music.player.queue", queueSize),
+                    lang.getString(locale, "music.player.queue", queueSize),
                     queueInfo.toString(),
                     false
                 );
@@ -172,18 +174,18 @@ public class MusicPlayerMessage {
             // Playback modes
             List<String> modes = new ArrayList<>();
             if (musicPlayer.getTrackScheduler().isLoopMode()) {
-                modes.add(lang.getString(guild, "music.player.loop"));
+                modes.add(lang.getString(locale, "music.player.loop"));
             }
             if (musicPlayer.getTrackScheduler().isLoopQueueMode()) {
-                modes.add(lang.getString(guild, "music.player.loop_queue"));
+                modes.add(lang.getString(locale, "music.player.loop_queue"));
             }
             if (musicPlayer.getTrackScheduler().isShuffleMode()) {
-                modes.add(lang.getString(guild, "music.player.shuffle"));
+                modes.add(lang.getString(locale, "music.player.shuffle"));
             }
             
             if (!modes.isEmpty()) {
                 embed.addField(
-                    lang.getString(guild, "music.player.modes"),
+                    lang.getString(locale, "music.player.modes"),
                     String.join(" • ", modes),
                     false
                 );
@@ -220,8 +222,8 @@ public class MusicPlayerMessage {
     /**
      * Creates action rows with control buttons.
      */
-    private List<ActionRow> createActionRows(AudioTrack track) {
-        List<ActionRow> rows = new ArrayList<>();
+    private List<MessageTopLevelComponent> createActionRows(AudioTrack track) {
+        List<MessageTopLevelComponent> rows = new ArrayList<>();
         
         // Row 1: Main controls
         List<Button> row1 = new ArrayList<>();
@@ -291,7 +293,7 @@ public class MusicPlayerMessage {
         row3.add(Button.secondary(getButtonId("volume:+5"), "+5%"));
         row3.add(Button.secondary(getButtonId("volume:+10"), "+10%"));
         
-        rows.add(ActionRow.of(row3));
+    rows.add(ActionRow.of(row3));
         
         return rows;
     }
@@ -299,10 +301,10 @@ public class MusicPlayerMessage {
     /**
      * Creates a new player message.
      */
-    private void createNewMessage(EmbedBuilder embed, List<ActionRow> actionRows) {
-        MessageCreateBuilder builder = new MessageCreateBuilder()
+    private void createNewMessage(EmbedBuilder embed, List<MessageTopLevelComponent> actionRows) {
+    MessageCreateBuilder builder = new MessageCreateBuilder()
                 .setEmbeds(embed.build())
-                .setComponents(actionRows);
+        .setComponents(actionRows);
         
         messageChannel.sendMessage(builder.build()).queue(m -> {
             if (message != null) {
@@ -377,27 +379,28 @@ public class MusicPlayerMessage {
      */
     private void saveMessage() {
         String guildId = musicPlayer.getGuild().getId();
-        musicPlayer.getPlugin().getPluginDataStorage().set(
-            "player_messages." + guildId + ".message_id", 
-            messageId
-        );
-        musicPlayer.getPlugin().getPluginDataStorage().set(
-            "player_messages." + guildId + ".channel_id", 
-            channelId
-        );
+        PluginGuildStorage guildStorage = musicPlayer.getPlugin().getPluginDataStorage().getGuildStorage(guildId);
+        if (messageId != null) {
+            guildStorage.set("player_messages.message_id", messageId);
+        } else {
+            guildStorage.remove("player_messages.message_id");
+        }
+        if (channelId != null) {
+            guildStorage.set("player_messages.channel_id", channelId);
+        } else {
+            guildStorage.remove("player_messages.channel_id");
+        }
+        musicPlayer.getPlugin().getPluginDataStorage().saveAll();
     }
     
     /**
      * Restores message from storage.
      */
     private void restoreMessage() {
-        String guildId = musicPlayer.getGuild().getId();
-        Long storedMessageId = musicPlayer.getPlugin().getPluginDataStorage().getLong(
-            "player_messages." + guildId + ".message_id"
-        );
-        Long storedChannelId = musicPlayer.getPlugin().getPluginDataStorage().getLong(
-            "player_messages." + guildId + ".channel_id"
-        );
+    String guildId = musicPlayer.getGuild().getId();
+    PluginGuildStorage guildStorage = musicPlayer.getPlugin().getPluginDataStorage().getGuildStorage(guildId);
+    Long storedMessageId = guildStorage.get("player_messages.message_id", Long.class).orElse(null);
+    Long storedChannelId = guildStorage.get("player_messages.channel_id", Long.class).orElse(null);
         
         if (storedMessageId != null && storedChannelId != null) {
             this.messageId = storedMessageId;

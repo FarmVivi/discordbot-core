@@ -54,7 +54,7 @@ public class MusicPlayer {
         
         if (playing) {
             // Register our send handler with the AudioService
-            plugin.getAudioService().registerSendHandler(
+            plugin.getContext().getAudioService().registerSendHandler(
                 guild, 
                 plugin, 
                 sendHandler, 
@@ -74,7 +74,7 @@ public class MusicPlayer {
         trackScheduler.playNow(track);
         
         // Register our send handler with the AudioService
-        plugin.getAudioService().registerSendHandler(
+        plugin.getContext().getAudioService().registerSendHandler(
             guild, 
             plugin, 
             sendHandler, 
@@ -123,7 +123,7 @@ public class MusicPlayer {
         audioPlayer.setVolume(this.volume);
         
         // Update volume in AudioService
-        plugin.getAudioService().setVolume(guild, plugin, this.volume);
+    plugin.getContext().getAudioService().setVolume(guild, plugin, this.volume);
         
         playerMessage.refresh();
     }
@@ -141,7 +141,7 @@ public class MusicPlayer {
     public void handleDisconnect() {
         logger.info("[{}] Handling disconnect, stopping playback", guild.getName());
         stop();
-        plugin.getAudioService().deregisterSendHandler(guild, plugin);
+    plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
         playerMessage.delete();
     }
     
@@ -158,7 +158,7 @@ public class MusicPlayer {
                     guild.getName(), QUIT_TIMEOUT_SECONDS);
                 
                 guild.getAudioManager().closeAudioConnection();
-                plugin.getAudioService().deregisterSendHandler(guild, plugin);
+                plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
                 playerMessage.delete();
             }
         }, QUIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);

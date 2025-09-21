@@ -2,13 +2,17 @@ package fr.farmvivi.fluxcord.plugins.music.commands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import fr.farmvivi.fluxcord.api.command.CommandContext;
+import fr.farmvivi.fluxcord.api.language.PluginLanguageAdapter;
 import fr.farmvivi.fluxcord.plugins.music.MusicPlugin;
 import fr.farmvivi.fluxcord.plugins.music.player.MusicPlayer;
 import fr.farmvivi.fluxcord.plugins.music.utils.TimeParser;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Command to display the music queue.
@@ -22,28 +26,34 @@ public class QueueCommand {
     }
     
     public void execute(CommandContext ctx, int page) {
-        MusicPlayer player = plugin.getMusicManager().getPlayer(ctx.getGuild());
+        Optional<Guild> optGuild = ctx.getGuild();
+        if (optGuild.isEmpty()) {
+            ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.guild_only"));
+            return;
+        }
+        Guild guild = optGuild.get();
+
+        MusicPlayer player = plugin.getMusicManager().getPlayer(guild);
         List<AudioTrack> queue = player.getTrackScheduler().getQueue();
         
         if (queue.isEmpty() && player.getPlayingTrack() == null) {
-            ctx.replyError(plugin.getPluginLanguageAdapter().getString(
-                ctx.getGuild(), "music.queue.empty"
-            ));
+            ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.queue.empty"));
             return;
         }
         
+        PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+        Locale locale = ctx.getLocale();
+
         EmbedBuilder embed = new EmbedBuilder()
             .setColor(Color.BLUE)
-            .setTitle(plugin.getPluginLanguageAdapter().getString(
-                ctx.getGuild(), "music.queue.title"
-            ));
+            .setTitle(lm.getString(locale, "music.queue.title"));
         
         // Add current track
         AudioTrack current = player.getPlayingTrack();
         if (current != null) {
             String status = player.isPaused() ? "⏸️" : "▶️";
             embed.addField(
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.queue.now_playing"),
+                lm.getString(locale, "music.queue.now_playing"),
                 String.format("%s [%s](%s) - %s",
                     status,
                     current.getInfo().title,
@@ -73,18 +83,14 @@ public class QueueCommand {
             }
             
             embed.addField(
-                plugin.getPluginLanguageAdapter().getString(
-                    ctx.getGuild(), "music.queue.upcoming", queue.size()
-                ),
+                lm.getString(locale, "music.queue.upcoming", queue.size()),
                 queueList.toString(),
                 false
             );
             
             // Add page info
             if (totalPages > 1) {
-                embed.setFooter(plugin.getPluginLanguageAdapter().getString(
-                    ctx.getGuild(), "music.queue.page", page, totalPages
-                ));
+                embed.setFooter(lm.getString(locale, "music.queue.page", page, totalPages));
             }
             
             // Add total duration
@@ -95,7 +101,7 @@ public class QueueCommand {
             
             if (totalDuration > 0) {
                 embed.addField(
-                    plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.queue.duration"),
+                    lm.getString(locale, "music.queue.duration"),
                     TimeParser.formatTime(totalDuration),
                     true
                 );
@@ -119,7 +125,7 @@ public class QueueCommand {
             }
             
             embed.addField(
-                plugin.getPluginLanguageAdapter().getString(ctx.getGuild(), "music.queue.modes"),
+                lm.getString(locale, "music.queue.modes"),
                 modes.toString(),
                 true
             );

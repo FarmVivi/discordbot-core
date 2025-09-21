@@ -41,7 +41,7 @@ public class AudioPlayerManager {
     private void initializeSources() {
         logger.info("Initializing audio sources...");
         
-        Configuration config = plugin.getPluginConfig();
+    Configuration config = plugin.getConfiguration();
         
         // YouTube source with multiple clients for reliability
         YoutubeAudioSourceManager youtubeManager = new YoutubeAudioSourceManager(true,

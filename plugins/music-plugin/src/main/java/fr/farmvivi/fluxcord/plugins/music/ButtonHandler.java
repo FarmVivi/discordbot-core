@@ -1,6 +1,7 @@
 package fr.farmvivi.fluxcord.plugins.music;
 
 import fr.farmvivi.fluxcord.plugins.music.player.MusicPlayer;
+import fr.farmvivi.fluxcord.api.language.PluginLanguageAdapter;
 import fr.farmvivi.fluxcord.plugins.music.ui.MusicPlayerMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,15 +20,15 @@ public class ButtonHandler {
     public void handleButton(ButtonInteractionEvent event, MusicPlayerMessage.ButtonInfo info) {
         Guild guild = event.getGuild();
         if (guild == null || !guild.getId().equals(info.guildId)) {
-            event.reply(plugin.getPluginLanguageAdapter().getString("music.error.wrong_guild"))
+            event.reply(plugin.getPluginLanguageManager().getString("music.error.wrong_guild"))
                  .setEphemeral(true)
                  .queue();
             return;
         }
         
         Member member = event.getMember();
-        if (member == null || member.getVoiceState().getChannel() == null) {
-            event.reply(plugin.getPluginLanguageAdapter().getString(guild, "music.error.not_in_voice"))
+        if (member == null || member.getVoiceState() == null || member.getVoiceState().getChannel() == null) {
+            event.reply(plugin.getPluginLanguageManager().getString("music.error.not_in_voice"))
                  .setEphemeral(true)
                  .queue();
             return;
@@ -47,7 +48,7 @@ public class ButtonHandler {
         switch (action) {
             case "add":
                 // This would open a modal or send instructions
-                event.reply(plugin.getPluginLanguageAdapter().getString(guild, "music.button.add_help"))
+             event.reply(plugin.getPluginLanguageManager().getString("music.button.add_help"))
                      .setEphemeral(true)
                      .queue();
                 break;
@@ -140,7 +141,7 @@ public class ButtonHandler {
                 break;
                 
             default:
-                event.reply(plugin.getPluginLanguageAdapter().getString(guild, "music.error.unknown_action"))
+             event.reply(plugin.getPluginLanguageManager().getString("music.error.unknown_action"))
                      .setEphemeral(true)
                      .queue();
                 break;
@@ -148,12 +149,16 @@ public class ButtonHandler {
     }
     
     private boolean hasPermission(Member member, String permission) {
-        return plugin.getPluginPermissionManager().hasPermission(member.getUser(), permission);
+        String userId = member.getId();
+        String guildId = member.getGuild().getId();
+        // Permission nodes are registered as pluginName.node
+        String perm = plugin.getName().toLowerCase() + "." + permission.substring(permission.indexOf('.') + 1);
+        return plugin.getPluginPermissionManager().hasPermission(userId, guildId, perm)
+                || plugin.getPluginPermissionManager().hasPermission(userId, perm);
     }
     
     private void replyNoPermission(ButtonInteractionEvent event) {
-        event.reply(plugin.getPluginLanguageAdapter().getString(
-            event.getGuild(), "music.error.no_permission"
-        )).setEphemeral(true).queue();
+        PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
+        event.reply(lm.getString("music.error.no_permission")).setEphemeral(true).queue();
     }
 }
