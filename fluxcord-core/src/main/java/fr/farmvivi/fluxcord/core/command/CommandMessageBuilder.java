@@ -395,9 +395,9 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
                     output.append("\n[CONSOLE] ");
                 }
 
-                // Remove trailing "[CONSOLE] "
-                if (output.toString().endsWith("[CONSOLE] ")) {
-                    output.setLength(output.length() - 10);
+                // Remove trailing "\n[CONSOLE] "
+                if (output.toString().endsWith("\n[CONSOLE] ")) {
+                    output.setLength(output.length() - 11);
                 }
             }
         }
