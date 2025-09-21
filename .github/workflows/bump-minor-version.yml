@@ -23,7 +23,7 @@ jobs:
       - name: Bump minor version
         run: |
           # 1) Récupération de la version Maven actuelle
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          CURRENT_VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
 
           echo "Version actuelle : $CURRENT_VERSION"
 
@@ -44,18 +44,20 @@ jobs:
           echo "Nouvelle version (Minor bump) : $NEW_VERSION"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-          # 5) Mise à jour du pom.xml pour tous les modules
-          mvn versions:set -DnewVersion="$NEW_VERSION" -DgenerateBackupPoms=false -DprocessAllModules
+          # 5) Mise à jour du pom.xml pour tous les modules + références parent/enfants
+          mvn -B \
+            versions:set -DnewVersion="$NEW_VERSION" -DgenerateBackupPoms=false -DprocessAllModules \
+            versions:update-child-modules -DgenerateBackupPoms=false
 
       - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Ajouter tous les pom.xml modifiés (parent + modules, récursif)
-          git add **/pom.xml pom.xml
+          # Ajouter tous les fichiers modifiés (dont les pom.xml)
+          git add -A
           git commit -m "chore: bump minor version to ${NEW_VERSION}" || echo "Aucun changement à commiter."
 
       - name: Push changes
         run: |
-          git push origin HEAD
+          git push origin "HEAD:${GITHUB_REF_NAME}"
