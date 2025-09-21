@@ -19,20 +19,19 @@ import java.util.concurrent.TimeUnit;
  * Manages audio playback, queue, and player state.
  */
 public class MusicPlayer {
-    private static final Logger logger = LoggerFactory.getLogger(MusicPlayer.class);
     public static final int DEFAULT_VOLUME = 50;
     public static final int QUIT_TIMEOUT_SECONDS = 300; // 5 minutes
-    
+    private static final Logger logger = LoggerFactory.getLogger(MusicPlayer.class);
     private final MusicPlugin plugin;
     private final Guild guild;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
     private final AudioPlayerSendHandler sendHandler;
     private final MusicPlayerMessage playerMessage;
-    
+
     private ScheduledFuture<?> quitTask;
     private int volume = DEFAULT_VOLUME;
-    
+
     public MusicPlayer(MusicPlugin plugin, Guild guild, AudioPlayer audioPlayer) {
         this.plugin = plugin;
         this.guild = guild;
@@ -40,63 +39,63 @@ public class MusicPlayer {
         this.trackScheduler = new TrackScheduler(this, audioPlayer);
         this.sendHandler = new AudioPlayerSendHandler(audioPlayer);
         this.playerMessage = new MusicPlayerMessage(this);
-        
+
         audioPlayer.addListener(trackScheduler);
         audioPlayer.setVolume(volume);
     }
-    
+
     /**
      * Plays a track, adding it to the queue if something is already playing.
      */
     public void playTrack(AudioTrack track) {
         cancelQuitTask();
         boolean playing = trackScheduler.queue(track);
-        
+
         if (playing) {
             // Register our send handler with the AudioService
             plugin.getContext().getAudioService().registerSendHandler(
-                guild, 
-                plugin, 
-                sendHandler, 
-                volume, 
-                50 // Normal priority
+                    guild,
+                    plugin,
+                    sendHandler,
+                    volume,
+                    50 // Normal priority
             );
         }
-        
+
         playerMessage.refresh();
     }
-    
+
     /**
      * Plays a track immediately, skipping the current track if any.
      */
     public void playTrackNow(AudioTrack track) {
         cancelQuitTask();
         trackScheduler.playNow(track);
-        
+
         // Register our send handler with the AudioService
         plugin.getContext().getAudioService().registerSendHandler(
-            guild, 
-            plugin, 
-            sendHandler, 
-            volume, 
-            50 // Normal priority
+                guild,
+                plugin,
+                sendHandler,
+                volume,
+                50 // Normal priority
         );
-        
+
         playerMessage.refresh();
     }
-    
+
     /**
      * Skips the current track.
      */
     public void skipTrack() {
         trackScheduler.nextTrack();
         playerMessage.refresh();
-        
+
         if (audioPlayer.getPlayingTrack() == null && trackScheduler.getQueueSize() == 0) {
             scheduleQuit();
         }
     }
-    
+
     /**
      * Stops playback and clears the queue.
      */
@@ -106,64 +105,43 @@ public class MusicPlayer {
         playerMessage.refresh();
         scheduleQuit();
     }
-    
-    /**
-     * Pauses or resumes playback.
-     */
-    public void setPaused(boolean paused) {
-        audioPlayer.setPaused(paused);
-        playerMessage.refresh();
-    }
-    
-    /**
-     * Sets the playback volume.
-     */
-    public void setVolume(int volume) {
-        this.volume = Math.max(0, Math.min(100, volume));
-        audioPlayer.setVolume(this.volume);
-        
-        // Update volume in AudioService
-    plugin.getContext().getAudioService().setVolume(guild, plugin, this.volume);
-        
-        playerMessage.refresh();
-    }
-    
+
     /**
      * Sets the message channel for player messages.
      */
     public void setMessageChannel(MessageChannel channel) {
         playerMessage.setMessageChannel(channel);
     }
-    
+
     /**
      * Handles voice channel disconnection.
      */
     public void handleDisconnect() {
         logger.info("[{}] Handling disconnect, stopping playback", guild.getName());
         stop();
-    plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
+        plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
         playerMessage.delete();
     }
-    
+
     /**
      * Schedules automatic quit after inactivity.
      */
     private void scheduleQuit() {
         cancelQuitTask();
-        
+
         ScheduledExecutorService scheduler = plugin.getScheduler();
         quitTask = scheduler.schedule(() -> {
             if (audioPlayer.getPlayingTrack() == null && trackScheduler.getQueueSize() == 0) {
-                logger.info("[{}] Auto-leaving voice channel after {} seconds of inactivity", 
-                    guild.getName(), QUIT_TIMEOUT_SECONDS);
-                
+                logger.info("[{}] Auto-leaving voice channel after {} seconds of inactivity",
+                        guild.getName(), QUIT_TIMEOUT_SECONDS);
+
                 guild.getAudioManager().closeAudioConnection();
                 plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
                 playerMessage.delete();
             }
         }, QUIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
-    
+
     /**
      * Cancels the scheduled quit task.
      */
@@ -173,7 +151,7 @@ public class MusicPlayer {
             quitTask = null;
         }
     }
-    
+
     /**
      * Cleans up resources when the player is destroyed.
      */
@@ -183,36 +161,57 @@ public class MusicPlayer {
         audioPlayer.destroy();
         playerMessage.delete();
     }
-    
+
     // Getters
     public Guild getGuild() {
         return guild;
     }
-    
+
     public AudioPlayer getAudioPlayer() {
         return audioPlayer;
     }
-    
+
     public TrackScheduler getTrackScheduler() {
         return trackScheduler;
     }
-    
+
     public MusicPlayerMessage getPlayerMessage() {
         return playerMessage;
     }
-    
+
     public MusicPlugin getPlugin() {
         return plugin;
     }
-    
+
     public int getVolume() {
         return volume;
     }
-    
+
+    /**
+     * Sets the playback volume.
+     */
+    public void setVolume(int volume) {
+        this.volume = Math.max(0, Math.min(100, volume));
+        audioPlayer.setVolume(this.volume);
+
+        // Update volume in AudioService
+        plugin.getContext().getAudioService().setVolume(guild, plugin, this.volume);
+
+        playerMessage.refresh();
+    }
+
     public boolean isPaused() {
         return audioPlayer.isPaused();
     }
-    
+
+    /**
+     * Pauses or resumes playback.
+     */
+    public void setPaused(boolean paused) {
+        audioPlayer.setPaused(paused);
+        playerMessage.refresh();
+    }
+
     public AudioTrack getPlayingTrack() {
         return audioPlayer.getPlayingTrack();
     }

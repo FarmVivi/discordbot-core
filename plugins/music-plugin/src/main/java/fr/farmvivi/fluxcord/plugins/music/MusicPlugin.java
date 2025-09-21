@@ -1,13 +1,13 @@
 package fr.farmvivi.fluxcord.plugins.music;
 
 import fr.farmvivi.fluxcord.api.command.CommandResult;
+import fr.farmvivi.fluxcord.api.command.option.OptionChoice;
 import fr.farmvivi.fluxcord.api.event.EventHandler;
 import fr.farmvivi.fluxcord.api.event.EventPriority;
 import fr.farmvivi.fluxcord.api.permissions.Permission;
 import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import fr.farmvivi.fluxcord.plugins.music.commands.*;
-import fr.farmvivi.fluxcord.api.command.option.OptionChoice;
 import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
 import fr.farmvivi.fluxcord.plugins.music.ui.MusicPlayerMessage;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -97,149 +97,149 @@ public class MusicPlugin extends AbstractPlugin {
         // Main commands
         commandService.registerCommand(this, builder -> {
             builder.name("play")
-                   .description(getPluginLanguageManager().getString("music.command.play.description"))
-                   .category("Music")
-                   .aliases("p")
-                   .stringOption("query", getPluginLanguageManager().getString("music.command.play.option.query"), true)
-                   .booleanOption("now", getPluginLanguageManager().getString("music.command.play.option.now"), false)
-                   .executor((ctx, cmd) -> {
-                       String query = ctx.getRequiredOption("query");
-                       boolean playNow = ctx.getOption("now", false);
-                       new PlayCommand(this).execute(ctx, query, playNow);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.play.description"))
+                    .category("Music")
+                    .aliases("p")
+                    .stringOption("query", getPluginLanguageManager().getString("music.command.play.option.query"), true)
+                    .booleanOption("now", getPluginLanguageManager().getString("music.command.play.option.now"), false)
+                    .executor((ctx, cmd) -> {
+                        String query = ctx.getRequiredOption("query");
+                        boolean playNow = ctx.getOption("now", false);
+                        new PlayCommand(this).execute(ctx, query, playNow);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("pause")
-                   .description(getPluginLanguageManager().getString("music.command.pause.description"))
-                   .category("Music")
-                   .executor((ctx, cmd) -> {
-                       new PauseCommand(this).execute(ctx);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.pause.description"))
+                    .category("Music")
+                    .executor((ctx, cmd) -> {
+                        new PauseCommand(this).execute(ctx);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("skip")
-                   .description(getPluginLanguageManager().getString("music.command.skip.description"))
-                   .category("Music")
-                   .aliases("s", "next")
-                   .executor((ctx, cmd) -> {
-                       new SkipCommand(this).execute(ctx);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.skip.description"))
+                    .category("Music")
+                    .aliases("s", "next")
+                    .executor((ctx, cmd) -> {
+                        new SkipCommand(this).execute(ctx);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("stop")
-                   .description(getPluginLanguageManager().getString("music.command.stop.description"))
-                   .category("Music")
-                   .executor((ctx, cmd) -> {
-                       new StopCommand(this).execute(ctx);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.stop.description"))
+                    .category("Music")
+                    .executor((ctx, cmd) -> {
+                        new StopCommand(this).execute(ctx);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("queue")
-                   .description(getPluginLanguageManager().getString("music.command.queue.description"))
-                   .category("Music")
-                   .aliases("q")
-                   .integerOption("page", getPluginLanguageManager().getString("music.command.queue.option.page"), false, 1, 100)
-                   .executor((ctx, cmd) -> {
-                       int page = ctx.getOption("page", 1);
-                       new QueueCommand(this).execute(ctx, page);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.queue.description"))
+                    .category("Music")
+                    .aliases("q")
+                    .integerOption("page", getPluginLanguageManager().getString("music.command.queue.option.page"), false, 1, 100)
+                    .executor((ctx, cmd) -> {
+                        int page = ctx.getOption("page", 1);
+                        new QueueCommand(this).execute(ctx, page);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("nowplaying")
-                   .description(getPluginLanguageManager().getString("music.command.nowplaying.description"))
-                   .category("Music")
-                   .aliases("np", "current")
-                   .executor((ctx, cmd) -> {
-                       new NowPlayingCommand(this).execute(ctx);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.nowplaying.description"))
+                    .category("Music")
+                    .aliases("np", "current")
+                    .executor((ctx, cmd) -> {
+                        new NowPlayingCommand(this).execute(ctx);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("volume")
-                   .description(getPluginLanguageManager().getString("music.command.volume.description"))
-                   .category("Music")
-                   .aliases("vol")
-                   .integerOption("level", getPluginLanguageManager().getString("music.command.volume.option.level"), false, 0, 100)
-                   .executor((ctx, cmd) -> {
-                       Integer level = ctx.<Integer>getOption("level").orElse(null);
-                       new VolumeCommand(this).execute(ctx, level);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.volume.description"))
+                    .category("Music")
+                    .aliases("vol")
+                    .integerOption("level", getPluginLanguageManager().getString("music.command.volume.option.level"), false, 0, 100)
+                    .executor((ctx, cmd) -> {
+                        Integer level = ctx.<Integer>getOption("level").orElse(null);
+                        new VolumeCommand(this).execute(ctx, level);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("loop")
-                   .description(getPluginLanguageManager().getString("music.command.loop.description"))
-                   .category("Music")
-                   .stringOption(
-                       "mode",
-                       getPluginLanguageManager().getString("music.command.loop.option.mode"),
-                       false,
-                       OptionChoice.of(getPluginLanguageManager().getString("music.command.loop.mode.off"), "off"),
-                       OptionChoice.of(getPluginLanguageManager().getString("music.command.loop.mode.track"), "track"),
-                       OptionChoice.of(getPluginLanguageManager().getString("music.command.loop.mode.queue"), "queue")
-                   )
-                   .executor((ctx, cmd) -> {
-                       String mode = ctx.getOption("mode", "toggle");
-                       new LoopCommand(this).execute(ctx, mode);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.loop.description"))
+                    .category("Music")
+                    .stringOption(
+                            "mode",
+                            getPluginLanguageManager().getString("music.command.loop.option.mode"),
+                            false,
+                            OptionChoice.of(getPluginLanguageManager().getString("music.command.loop.mode.off"), "off"),
+                            OptionChoice.of(getPluginLanguageManager().getString("music.command.loop.mode.track"), "track"),
+                            OptionChoice.of(getPluginLanguageManager().getString("music.command.loop.mode.queue"), "queue")
+                    )
+                    .executor((ctx, cmd) -> {
+                        String mode = ctx.getOption("mode", "toggle");
+                        new LoopCommand(this).execute(ctx, mode);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("shuffle")
-                   .description(getPluginLanguageManager().getString("music.command.shuffle.description"))
-                   .category("Music")
-                   .executor((ctx, cmd) -> {
-                       new ShuffleCommand(this).execute(ctx);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.shuffle.description"))
+                    .category("Music")
+                    .executor((ctx, cmd) -> {
+                        new ShuffleCommand(this).execute(ctx);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("clear")
-                   .description(getPluginLanguageManager().getString("music.command.clear.description"))
-                   .category("Music")
-                   .permission(permissionKey("admin"))
-                   .executor((ctx, cmd) -> {
-                       new ClearCommand(this).execute(ctx);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.clear.description"))
+                    .category("Music")
+                    .permission(permissionKey("admin"))
+                    .executor((ctx, cmd) -> {
+                        new ClearCommand(this).execute(ctx);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("remove")
-                   .description(getPluginLanguageManager().getString("music.command.remove.description"))
-                   .category("Music")
-                   .integerOption("position", getPluginLanguageManager().getString("music.command.remove.option.position"), true, 1, 1000)
-                   .executor((ctx, cmd) -> {
-                       int position = ctx.getRequiredOption("position");
-                       new RemoveCommand(this).execute(ctx, position);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.remove.description"))
+                    .category("Music")
+                    .integerOption("position", getPluginLanguageManager().getString("music.command.remove.option.position"), true, 1, 1000)
+                    .executor((ctx, cmd) -> {
+                        int position = ctx.getRequiredOption("position");
+                        new RemoveCommand(this).execute(ctx, position);
+                        return CommandResult.success();
+                    });
         });
 
         commandService.registerCommand(this, builder -> {
             builder.name("seek")
-                   .description(getPluginLanguageManager().getString("music.command.seek.description"))
-                   .category("Music")
-                   .stringOption("time", getPluginLanguageManager().getString("music.command.seek.option.time"), true)
-                   .executor((ctx, cmd) -> {
-                       String time = ctx.getRequiredOption("time");
-                       new SeekCommand(this).execute(ctx, time);
-                       return CommandResult.success();
-                   });
+                    .description(getPluginLanguageManager().getString("music.command.seek.description"))
+                    .category("Music")
+                    .stringOption("time", getPluginLanguageManager().getString("music.command.seek.option.time"), true)
+                    .executor((ctx, cmd) -> {
+                        String time = ctx.getRequiredOption("time");
+                        new SeekCommand(this).execute(ctx, time);
+                        return CommandResult.success();
+                    });
         });
 
         // Register more commands as needed...
@@ -248,12 +248,12 @@ public class MusicPlugin extends AbstractPlugin {
     }
 
     private void loadConfiguration() {
-    int defaultVolume = getConfiguration().getInt("music.default_volume", 50);
-    int maxQueue = getConfiguration().getInt("music.max_queue_size", 100);
-    int maxTrackDurationMs = getConfiguration().getInt("music.max_track_duration", 600_000);
-    boolean enableSpotify = getConfiguration().getBoolean("providers.spotify.enabled", true);
-    boolean enableSoundcloud = getConfiguration().getBoolean("providers.soundcloud.enabled", true);
-    int autoLeaveTimeoutMs = getConfiguration().getInt("music.auto_leave_timeout", 300_000);
+        int defaultVolume = getConfiguration().getInt("music.default_volume", 50);
+        int maxQueue = getConfiguration().getInt("music.max_queue_size", 100);
+        int maxTrackDurationMs = getConfiguration().getInt("music.max_track_duration", 600_000);
+        boolean enableSpotify = getConfiguration().getBoolean("providers.spotify.enabled", true);
+        boolean enableSoundcloud = getConfiguration().getBoolean("providers.soundcloud.enabled", true);
+        int autoLeaveTimeoutMs = getConfiguration().getInt("music.auto_leave_timeout", 300_000);
         logger.info("Music config loaded: vol={}, queue={}, maxTrackMs={}, spotify={}, soundcloud={}, autoLeaveMs={}",
                 defaultVolume, maxQueue, maxTrackDurationMs, enableSpotify, enableSoundcloud, autoLeaveTimeoutMs);
     }
@@ -269,11 +269,11 @@ public class MusicPlugin extends AbstractPlugin {
     public void onButtonInteraction(ButtonInteractionEvent event) {
         String buttonId = event.getComponentId();
         MusicPlayerMessage.ButtonInfo info = MusicPlayerMessage.parseButtonId(buttonId);
-        
+
         if (info == null) {
             return;
         }
-        
+
         // Handle music player button interactions
         new ButtonHandler(this).handleButton(event, info);
     }
@@ -286,7 +286,7 @@ public class MusicPlugin extends AbstractPlugin {
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
     }
-    
+
     public ScheduledExecutorService getScheduler() {
         return scheduler;
     }

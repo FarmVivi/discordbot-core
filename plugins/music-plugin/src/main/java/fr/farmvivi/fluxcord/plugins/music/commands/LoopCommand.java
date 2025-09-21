@@ -13,11 +13,11 @@ import java.util.Optional;
  */
 public class LoopCommand {
     private final MusicPlugin plugin;
-    
+
     public LoopCommand(MusicPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     public void execute(CommandContext ctx, String mode) {
         Optional<Guild> optGuild = ctx.getGuild();
         if (optGuild.isEmpty()) {
@@ -28,26 +28,26 @@ public class LoopCommand {
 
         MusicPlayer player = plugin.getMusicManager().getPlayer(guild);
         TrackScheduler scheduler = player.getTrackScheduler();
-        
+
         switch (mode.toLowerCase()) {
             case "off":
                 scheduler.setLoopMode(false);
                 scheduler.setLoopQueueMode(false);
                 ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.loop.disabled"));
                 break;
-                
+
             case "track":
                 scheduler.setLoopMode(true);
                 scheduler.setLoopQueueMode(false);
                 ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.loop.track"));
                 break;
-                
+
             case "queue":
                 scheduler.setLoopMode(false);
                 scheduler.setLoopQueueMode(true);
                 ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.loop.queue"));
                 break;
-                
+
             case "toggle":
             default:
                 if (scheduler.isLoopMode()) {
@@ -65,7 +65,7 @@ public class LoopCommand {
                 }
                 break;
         }
-        
+
         player.getPlayerMessage().refresh();
     }
 }

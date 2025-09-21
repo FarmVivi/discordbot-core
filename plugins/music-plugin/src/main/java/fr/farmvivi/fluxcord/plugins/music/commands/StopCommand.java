@@ -12,11 +12,11 @@ import java.util.Optional;
  */
 public class StopCommand {
     private final MusicPlugin plugin;
-    
+
     public StopCommand(MusicPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     public void execute(CommandContext ctx) {
         Optional<Guild> optGuild = ctx.getGuild();
         if (optGuild.isEmpty()) {

@@ -12,7 +12,7 @@ public class Playlist {
     private final List<PlaylistTrack> tracks;
     private final long createdAt;
     private long updatedAt;
-    
+
     public Playlist(String name, String ownerId, boolean isGuildPlaylist) {
         this.name = name;
         this.ownerId = ownerId;
@@ -21,7 +21,37 @@ public class Playlist {
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
     }
-    
+
+    /**
+     * Creates a playlist from a stored map.
+     */
+    public static Playlist fromMap(Map<String, Object> map) {
+        String name = (String) map.get("name");
+        String ownerId = (String) map.get("ownerId");
+        boolean isGuildPlaylist = (Boolean) map.get("isGuildPlaylist");
+
+        Playlist playlist = new Playlist(name, ownerId, isGuildPlaylist);
+
+        // Restore timestamps
+        if (map.containsKey("createdAt")) {
+            // Use reflection or make fields package-private if needed
+        }
+        if (map.containsKey("updatedAt")) {
+            playlist.updatedAt = ((Number) map.get("updatedAt")).longValue();
+        }
+
+        // Restore tracks
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> trackList = (List<Map<String, Object>>) map.get("tracks");
+        if (trackList != null) {
+            for (Map<String, Object> trackMap : trackList) {
+                playlist.tracks.add(PlaylistTrack.fromMap(trackMap));
+            }
+        }
+
+        return playlist;
+    }
+
     /**
      * Adds a track to the playlist.
      */
@@ -29,7 +59,7 @@ public class Playlist {
         tracks.add(new PlaylistTrack(url, title, author, duration));
         updatedAt = System.currentTimeMillis();
     }
-    
+
     /**
      * Removes a track at the specified index.
      */
@@ -41,7 +71,7 @@ public class Playlist {
         updatedAt = System.currentTimeMillis();
         return true;
     }
-    
+
     /**
      * Clears all tracks from the playlist.
      */
@@ -49,7 +79,7 @@ public class Playlist {
         tracks.clear();
         updatedAt = System.currentTimeMillis();
     }
-    
+
     /**
      * Converts the playlist to a map for storage.
      */
@@ -60,75 +90,45 @@ public class Playlist {
         map.put("isGuildPlaylist", isGuildPlaylist);
         map.put("createdAt", createdAt);
         map.put("updatedAt", updatedAt);
-        
+
         List<Map<String, Object>> trackList = new ArrayList<>();
         for (PlaylistTrack track : tracks) {
             trackList.add(track.toMap());
         }
         map.put("tracks", trackList);
-        
+
         return map;
     }
-    
-    /**
-     * Creates a playlist from a stored map.
-     */
-    public static Playlist fromMap(Map<String, Object> map) {
-        String name = (String) map.get("name");
-        String ownerId = (String) map.get("ownerId");
-        boolean isGuildPlaylist = (Boolean) map.get("isGuildPlaylist");
-        
-        Playlist playlist = new Playlist(name, ownerId, isGuildPlaylist);
-        
-        // Restore timestamps
-        if (map.containsKey("createdAt")) {
-            // Use reflection or make fields package-private if needed
-        }
-        if (map.containsKey("updatedAt")) {
-            playlist.updatedAt = ((Number) map.get("updatedAt")).longValue();
-        }
-        
-        // Restore tracks
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> trackList = (List<Map<String, Object>>) map.get("tracks");
-        if (trackList != null) {
-            for (Map<String, Object> trackMap : trackList) {
-                playlist.tracks.add(PlaylistTrack.fromMap(trackMap));
-            }
-        }
-        
-        return playlist;
-    }
-    
+
     // Getters
     public String getName() {
         return name;
     }
-    
+
     public String getOwnerId() {
         return ownerId;
     }
-    
+
     public boolean isGuildPlaylist() {
         return isGuildPlaylist;
     }
-    
+
     public List<PlaylistTrack> getTracks() {
         return Collections.unmodifiableList(tracks);
     }
-    
+
     public int getTrackCount() {
         return tracks.size();
     }
-    
+
     public long getCreatedAt() {
         return createdAt;
     }
-    
+
     public long getUpdatedAt() {
         return updatedAt;
     }
-    
+
     /**
      * Represents a track in a playlist.
      */
@@ -137,14 +137,23 @@ public class Playlist {
         private final String title;
         private final String author;
         private final long duration;
-        
+
         public PlaylistTrack(String url, String title, String author, long duration) {
             this.url = url;
             this.title = title;
             this.author = author;
             this.duration = duration;
         }
-        
+
+        public static PlaylistTrack fromMap(Map<String, Object> map) {
+            return new PlaylistTrack(
+                    (String) map.get("url"),
+                    (String) map.get("title"),
+                    (String) map.get("author"),
+                    ((Number) map.get("duration")).longValue()
+            );
+        }
+
         public Map<String, Object> toMap() {
             Map<String, Object> map = new HashMap<>();
             map.put("url", url);
@@ -153,29 +162,20 @@ public class Playlist {
             map.put("duration", duration);
             return map;
         }
-        
-        public static PlaylistTrack fromMap(Map<String, Object> map) {
-            return new PlaylistTrack(
-                (String) map.get("url"),
-                (String) map.get("title"),
-                (String) map.get("author"),
-                ((Number) map.get("duration")).longValue()
-            );
-        }
-        
+
         // Getters
         public String getUrl() {
             return url;
         }
-        
+
         public String getTitle() {
             return title;
         }
-        
+
         public String getAuthor() {
             return author;
         }
-        
+
         public long getDuration() {
             return duration;
         }

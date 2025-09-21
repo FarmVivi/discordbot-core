@@ -15,11 +15,11 @@ import java.util.Optional;
  */
 public class PlayCommand {
     private final MusicPlugin plugin;
-    
+
     public PlayCommand(MusicPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     public void execute(CommandContext ctx, String query, boolean playNow) {
         Optional<Guild> optGuild = ctx.getGuild();
         if (optGuild.isEmpty()) {

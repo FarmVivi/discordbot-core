@@ -13,11 +13,11 @@ import java.util.Optional;
  */
 public class SkipCommand {
     private final MusicPlugin plugin;
-    
+
     public SkipCommand(MusicPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     public void execute(CommandContext ctx) {
         Optional<Guild> optGuild = ctx.getGuild();
         if (optGuild.isEmpty()) {

@@ -1,8 +1,6 @@
 package fr.farmvivi.fluxcord.plugins.music.source;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioItem;
 import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -32,14 +30,14 @@ public class SearchSourceManager implements AudioSourceManager {
     @Override
     public AudioItem loadItem(com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager manager, AudioReference reference) {
         String identifier = reference.identifier;
-        
+
         // If it doesn't start with a protocol (contains ://), treat it as a search
         if (!identifier.contains("://")) {
             identifier = searchPrefix + identifier;
             AudioReference searchReference = new AudioReference(identifier, reference.title);
             return sourceManager.loadItem(manager, searchReference);
         }
-        
+
         return null;
     }
 

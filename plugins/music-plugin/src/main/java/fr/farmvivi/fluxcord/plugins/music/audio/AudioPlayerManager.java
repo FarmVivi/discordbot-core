@@ -28,21 +28,21 @@ import org.slf4j.LoggerFactory;
  */
 public class AudioPlayerManager {
     private static final Logger logger = LoggerFactory.getLogger(AudioPlayerManager.class);
-    
+
     private final MusicPlugin plugin;
     private final com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager playerManager;
-    
+
     public AudioPlayerManager(MusicPlugin plugin) {
         this.plugin = plugin;
         this.playerManager = new DefaultAudioPlayerManager();
         initializeSources();
     }
-    
+
     private void initializeSources() {
         logger.info("Initializing audio sources...");
-        
-    Configuration config = plugin.getConfiguration();
-        
+
+        Configuration config = plugin.getConfiguration();
+
         // YouTube source with multiple clients for reliability
         YoutubeAudioSourceManager youtubeManager = new YoutubeAudioSourceManager(true,
                 new MusicWithThumbnail(),
@@ -56,28 +56,28 @@ public class AudioPlayerManager {
                 new TvHtml5EmbeddedWithThumbnail()
         );
         playerManager.registerSourceManager(youtubeManager);
-        
+
         // Spotify source
         String spotifyClientId = config.getString("providers.spotify.client_id", null);
         String spotifyClientSecret = config.getString("providers.spotify.client_secret", null);
         if (spotifyClientId != null && spotifyClientSecret != null) {
             logger.info("Enabling Spotify source provider");
             playerManager.registerSourceManager(new SpotifySourceManager(
-                    spotifyClientId, 
-                    spotifyClientSecret, 
+                    spotifyClientId,
+                    spotifyClientSecret,
                     config.getString("providers.spotify.country_code", "US"),
                     playerManager,
                     new DefaultMirroringAudioTrackResolver(null)
             ));
         }
-        
+
         // Deezer source
         String deezerKey = config.getString("providers.deezer.master_decryption_key", null);
         if (deezerKey != null) {
             logger.info("Enabling Deezer source provider");
             playerManager.registerSourceManager(new DeezerAudioSourceManager(deezerKey));
         }
-        
+
         // Apple Music source
         String appleMusicToken = config.getString("providers.apple_music.token", null);
         if (appleMusicToken != null) {
@@ -89,14 +89,14 @@ public class AudioPlayerManager {
                     new DefaultMirroringAudioTrackResolver(null)
             ));
         }
-        
+
         // Flowery TTS source
         String floweryVoice = config.getString("providers.flowery_tts.voice", null);
         if (floweryVoice != null) {
             logger.info("Enabling Flowery TTS source provider");
             playerManager.registerSourceManager(new FloweryTTSSourceManager(floweryVoice));
         }
-        
+
         // SoundCloud source
         if (config.getBoolean("providers.soundcloud.enabled", true)) {
             logger.info("Enabling SoundCloud source provider");
@@ -110,7 +110,7 @@ public class AudioPlayerManager {
                     true, dataReader, dataLoader, formatHandler, playlistLoader
             ));
         }
-        
+
         // Other sources
         playerManager.registerSourceManager(new BandcampAudioSourceManager());
         playerManager.registerSourceManager(new VimeoAudioSourceManager());
@@ -118,20 +118,20 @@ public class AudioPlayerManager {
         playerManager.registerSourceManager(new GetyarnAudioSourceManager());
         playerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
         playerManager.registerSourceManager(new LocalAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
-        
+
         // Search source manager
         playerManager.registerSourceManager(new SearchSourceManager(youtubeManager, "ytsearch:"));
-        
+
         // Enable filter hot swap for effects
         playerManager.getConfiguration().setFilterHotSwapEnabled(true);
-        
+
         logger.info("Audio sources initialized successfully");
     }
-    
+
     public com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager getPlayerManager() {
         return playerManager;
     }
-    
+
     public void shutdown() {
         logger.info("Shutting down audio player manager...");
         playerManager.shutdown();

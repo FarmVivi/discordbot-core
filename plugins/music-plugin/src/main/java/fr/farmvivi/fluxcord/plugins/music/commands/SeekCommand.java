@@ -14,11 +14,11 @@ import java.util.Optional;
  */
 public class SeekCommand {
     private final MusicPlugin plugin;
-    
+
     public SeekCommand(MusicPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     public void execute(CommandContext ctx, String timeStr) {
         Optional<Guild> optGuild = ctx.getGuild();
         if (optGuild.isEmpty()) {
@@ -29,31 +29,31 @@ public class SeekCommand {
 
         MusicPlayer player = plugin.getMusicManager().getPlayer(guild);
         AudioTrack track = player.getPlayingTrack();
-        
+
         if (track == null) {
             ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.nothing_playing"));
             return;
         }
-        
+
         if (!track.isSeekable()) {
             ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.not_seekable"));
             return;
         }
-        
+
         long position = TimeParser.parseTime(timeStr);
         if (position < 0) {
             ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.invalid_time"));
             return;
         }
-        
+
         if (position > track.getDuration()) {
             ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.seek_too_far"));
             return;
         }
-        
+
         track.setPosition(position);
         ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.seeked", TimeParser.formatTime(position)));
-        
+
         player.getPlayerMessage().refresh();
     }
 }

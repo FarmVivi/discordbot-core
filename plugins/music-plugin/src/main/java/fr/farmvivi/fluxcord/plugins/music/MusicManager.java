@@ -11,39 +11,39 @@ import fr.farmvivi.fluxcord.plugins.music.audio.AudioPlayerManager;
 import fr.farmvivi.fluxcord.plugins.music.player.MusicPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages music players for different guilds.
  */
 public class MusicManager {
     private static final Logger logger = LoggerFactory.getLogger(MusicManager.class);
-    
+
     private final MusicPlugin plugin;
     private final AudioPlayerManager audioPlayerManager;
     private final Map<Long, MusicPlayer> players;
-    
+
     public MusicManager(MusicPlugin plugin) {
         this.plugin = plugin;
         this.audioPlayerManager = new AudioPlayerManager(plugin);
         this.players = new ConcurrentHashMap<>();
     }
-    
+
     /**
      * Gets or creates a music player for a guild.
      */
@@ -53,7 +53,7 @@ public class MusicManager {
             return new MusicPlayer(plugin, guild, audioPlayer);
         });
     }
-    
+
     /**
      * Destroys a music player for a guild.
      */
@@ -63,7 +63,7 @@ public class MusicManager {
             player.destroy();
         }
     }
-    
+
     /**
      * Loads and plays a track.
      */
@@ -80,10 +80,10 @@ public class MusicManager {
         Guild guild = optGuild.get();
         MusicPlayer player = getPlayer(guild);
         MessageChannel channel = ctx.getChannel();
-        
+
         // Set the message channel for the player
         player.setMessageChannel(channel);
-        
+
         // Connect to voice channel if not connected
         AudioManager audioManager = guild.getAudioManager();
         if (!audioManager.isConnected()) {
@@ -105,74 +105,74 @@ public class MusicManager {
             }
             audioManager.openAudioConnection(voiceChannel);
         }
-        
+
         // Defer reply for long loading
         ctx.deferReply();
-        
+
         // Load the track
         audioPlayerManager.getPlayerManager().loadItemOrdered(player, query, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                logger.info("[{}] Track loaded: {} ({})", 
-                    guild.getName(), track.getInfo().title, track.getInfo().uri);
+                logger.info("[{}] Track loaded: {} ({})",
+                        guild.getName(), track.getInfo().title, track.getInfo().uri);
 
                 PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
                 Locale locale = ctx.getLocale();
 
                 EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(Color.GREEN)
-                    .setTitle(lm.getString(locale, "music.track_added"))
-                    .addField(
-                        lm.getString(locale, "music.title"),
-                        String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
-                        false
-                    );
-                
+                        .setColor(Color.GREEN)
+                        .setTitle(lm.getString(locale, "music.track_added"))
+                        .addField(
+                                lm.getString(locale, "music.title"),
+                                String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
+                                false
+                        );
+
                 if (track.getInfo().artworkUrl != null) {
                     embed.setThumbnail(track.getInfo().artworkUrl);
                 }
-                
+
                 ctx.replyEmbed(embed);
-                
+
                 if (playNow) {
                     player.playTrackNow(track);
                 } else {
                     player.playTrack(track);
                 }
             }
-            
+
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
                 List<AudioTrack> tracks = playlist.getTracks();
-                
+
                 if (playlist.isSearchResult() && !tracks.isEmpty()) {
                     // For search results, play the first track
                     AudioTrack track = tracks.get(0);
                     trackLoaded(track);
                 } else {
                     // Queue the entire playlist
-                    logger.info("[{}] Playlist loaded: {} ({} tracks)", 
-                        guild.getName(), playlist.getName(), tracks.size());
+                    logger.info("[{}] Playlist loaded: {} ({} tracks)",
+                            guild.getName(), playlist.getName(), tracks.size());
 
                     PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
                     Locale locale = ctx.getLocale();
 
                     EmbedBuilder embed = new EmbedBuilder()
-                        .setColor(Color.GREEN)
-                        .setTitle(lm.getString(locale, "music.playlist_added"))
-                        .addField(
-                            lm.getString(locale, "music.name"),
-                            playlist.getName(),
-                            false
-                        )
-                        .addField(
-                            lm.getString(locale, "music.tracks"),
-                            String.valueOf(tracks.size()),
-                            false
-                        );
-                    
+                            .setColor(Color.GREEN)
+                            .setTitle(lm.getString(locale, "music.playlist_added"))
+                            .addField(
+                                    lm.getString(locale, "music.name"),
+                                    playlist.getName(),
+                                    false
+                            )
+                            .addField(
+                                    lm.getString(locale, "music.tracks"),
+                                    String.valueOf(tracks.size()),
+                                    false
+                            );
+
                     ctx.replyEmbed(embed);
-                    
+
                     for (AudioTrack track : tracks) {
                         if (playNow && tracks.indexOf(track) == 0) {
                             player.playTrackNow(track);
@@ -182,14 +182,14 @@ public class MusicManager {
                     }
                 }
             }
-            
+
             @Override
             public void noMatches() {
                 logger.warn("[{}] No matches found for: {}", guild.getName(), query);
                 PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
                 ctx.replyError(lm.getString(ctx.getLocale(), "music.error.no_matches"));
             }
-            
+
             @Override
             public void loadFailed(FriendlyException exception) {
                 logger.error("[{}] Failed to load track: {}", guild.getName(), query, exception);
@@ -198,7 +198,7 @@ public class MusicManager {
             }
         });
     }
-    
+
     /**
      * Handles voice channel updates.
      */
@@ -213,19 +213,19 @@ public class MusicManager {
             }
         }
     }
-    
+
     /**
      * Shuts down all players and the audio player manager.
      */
     public void shutdown() {
         logger.info("Shutting down music manager...");
-        
+
         // Destroy all players
         for (MusicPlayer player : players.values()) {
             player.destroy();
         }
         players.clear();
-        
+
         // Shut down audio player manager
         audioPlayerManager.shutdown();
     }

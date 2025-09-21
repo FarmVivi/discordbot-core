@@ -6,7 +6,9 @@ import fr.farmvivi.fluxcord.plugins.music.MusicPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -14,16 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PlaylistManager {
     private static final Logger logger = LoggerFactory.getLogger(PlaylistManager.class);
-    
+
     private final MusicPlugin plugin;
     private final Map<String, Playlist> userPlaylists = new ConcurrentHashMap<>();
     private final Map<String, Playlist> guildPlaylists = new ConcurrentHashMap<>();
-    
+
     public PlaylistManager(MusicPlugin plugin) {
         this.plugin = plugin;
         loadPlaylists();
     }
-    
+
     /**
      * Creates a new user playlist.
      */
@@ -32,13 +34,13 @@ public class PlaylistManager {
         if (userPlaylists.containsKey(key)) {
             return null;
         }
-        
+
         Playlist playlist = new Playlist(name, userId, false);
         userPlaylists.put(key, playlist);
         savePlaylists();
         return playlist;
     }
-    
+
     /**
      * Creates a new guild playlist.
      */
@@ -47,27 +49,27 @@ public class PlaylistManager {
         if (guildPlaylists.containsKey(key)) {
             return null;
         }
-        
+
         Playlist playlist = new Playlist(name, guildId, true);
         guildPlaylists.put(key, playlist);
         savePlaylists();
         return playlist;
     }
-    
+
     /**
      * Gets a user playlist.
      */
     public Playlist getUserPlaylist(String userId, String name) {
         return userPlaylists.get(userId + ":" + name.toLowerCase());
     }
-    
+
     /**
      * Gets a guild playlist.
      */
     public Playlist getGuildPlaylist(String guildId, String name) {
         return guildPlaylists.get(guildId + ":" + name.toLowerCase());
     }
-    
+
     /**
      * Gets all playlists for a user.
      */
@@ -80,7 +82,7 @@ public class PlaylistManager {
         }
         return playlists;
     }
-    
+
     /**
      * Gets all playlists for a guild.
      */
@@ -93,7 +95,7 @@ public class PlaylistManager {
         }
         return playlists;
     }
-    
+
     /**
      * Deletes a user playlist.
      */
@@ -105,7 +107,7 @@ public class PlaylistManager {
         }
         return false;
     }
-    
+
     /**
      * Deletes a guild playlist.
      */
@@ -117,14 +119,14 @@ public class PlaylistManager {
         }
         return false;
     }
-    
+
     /**
      * Saves all playlists to storage.
      */
     public void saveAllPlaylists() {
         savePlaylists();
     }
-    
+
     /**
      * Loads playlists from storage.
      */
@@ -149,7 +151,7 @@ public class PlaylistManager {
                 logger.error("Failed to load user playlist: {}", entry.getKey(), e);
             }
         }
-        
+
         // Load guild playlists
         Map<String, Object> guildData = storage.getAll().entrySet().stream()
                 .filter(e -> e.getKey().startsWith("playlists.guild."))
@@ -167,11 +169,11 @@ public class PlaylistManager {
                 logger.error("Failed to load guild playlist: {}", entry.getKey(), e);
             }
         }
-        
-        logger.info("Loaded {} user playlists and {} guild playlists", 
-            userPlaylists.size(), guildPlaylists.size());
+
+        logger.info("Loaded {} user playlists and {} guild playlists",
+                userPlaylists.size(), guildPlaylists.size());
     }
-    
+
     /**
      * Saves playlists to storage.
      */

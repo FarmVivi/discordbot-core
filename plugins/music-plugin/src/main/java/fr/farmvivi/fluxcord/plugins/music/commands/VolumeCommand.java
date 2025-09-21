@@ -12,11 +12,11 @@ import java.util.Optional;
  */
 public class VolumeCommand {
     private final MusicPlugin plugin;
-    
+
     public VolumeCommand(MusicPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     public void execute(CommandContext ctx, Integer level) {
         Optional<Guild> optGuild = ctx.getGuild();
         if (optGuild.isEmpty()) {
