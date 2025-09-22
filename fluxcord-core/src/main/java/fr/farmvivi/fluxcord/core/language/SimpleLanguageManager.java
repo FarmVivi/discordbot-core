@@ -261,6 +261,46 @@ public class SimpleLanguageManager implements LanguageManager {
             logger.debug("Translation miss (resources) for [{}:{}] in locale {}", namespace, actualKey, locale.toLanguageTag());
         }
 
+        // 2b. Chercher une variante de même langue (ex: fr -> fr-FR) avant de passer à l'anglais
+        Locale sameLanguageVariant = findSameLanguageVariant(namespace, locale, actualKey);
+        if (sameLanguageVariant != null) {
+            // Runtime d'abord
+            translation = getTranslationFromRuntime(namespace, sameLanguageVariant, actualKey);
+            if (translation != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Translation hit (runtime) for [{}:{}] using same-language variant {} -> {}",
+                            namespace, actualKey, locale.toLanguageTag(), sameLanguageVariant.toLanguageTag());
+                }
+                if (eventManager != null) {
+                    StringRetrievalEvent event = new StringRetrievalEvent(
+                            namespace, sameLanguageVariant, actualKey, null, translation);
+                    eventManager.fireEvent(event);
+                    if (event.isOverridden()) {
+                        return event.getValue();
+                    }
+                }
+                return translation;
+            }
+
+            // Puis ressources par défaut
+            translation = getTranslationFromResources(namespace, sameLanguageVariant, actualKey);
+            if (translation != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Translation hit (resources) for [{}:{}] using same-language variant {} -> {}",
+                            namespace, actualKey, locale.toLanguageTag(), sameLanguageVariant.toLanguageTag());
+                }
+                if (eventManager != null) {
+                    StringRetrievalEvent event = new StringRetrievalEvent(
+                            namespace, sameLanguageVariant, actualKey, null, translation);
+                    eventManager.fireEvent(event);
+                    if (event.isOverridden()) {
+                        return event.getValue();
+                    }
+                }
+                return translation;
+            }
+        }
+
         // 3. Si la locale n'est pas l'anglais, essayer dans la locale anglaise du dossier runtime
         if (!locale.getLanguage().equals("en")) {
             Locale englishLocale = Locale.forLanguageTag("en-US");
@@ -377,6 +417,42 @@ public class SimpleLanguageManager implements LanguageManager {
         }
 
         return key;
+    }
+
+    /**
+     * Trouve une variante de locale qui partage la même langue et contient la clé recherchée,
+     * en inspectant d'abord les traductions runtime puis les ressources par défaut pour le namespace donné.
+     */
+    private Locale findSameLanguageVariant(String namespace, Locale requested, String key) {
+        // Inspecter les traductions chargées au runtime pour ce namespace
+        Map<Locale, Map<String, String>> nsRuntime = translations.get(namespace);
+        if (nsRuntime != null) {
+            for (Map.Entry<Locale, Map<String, String>> e : nsRuntime.entrySet()) {
+                Locale candidate = e.getKey();
+                if (candidate.equals(requested)) continue;
+                if (!candidate.getLanguage().equalsIgnoreCase(requested.getLanguage())) continue;
+                Map<String, String> map = e.getValue();
+                if (map != null && map.containsKey(key)) {
+                    return candidate;
+                }
+            }
+        }
+
+        // Inspecter les ressources par défaut
+        Map<Locale, Map<String, String>> nsDefaults = defaultTranslations.get(namespace);
+        if (nsDefaults != null) {
+            for (Map.Entry<Locale, Map<String, String>> e : nsDefaults.entrySet()) {
+                Locale candidate = e.getKey();
+                if (candidate.equals(requested)) continue;
+                if (!candidate.getLanguage().equalsIgnoreCase(requested.getLanguage())) continue;
+                Map<String, String> map = e.getValue();
+                if (map != null && map.containsKey(key)) {
+                    return candidate;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
