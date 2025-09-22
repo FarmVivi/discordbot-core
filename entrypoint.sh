@@ -117,14 +117,25 @@ install_or_update() {
   current_v=$(extract_version "$current")
   if [ "$AUTO_UPDATE_PLUGINS" = "true" ]; then
     cmp_versions "$src_v" "$current_v"
-    case $? in
+    res=$?
+    case $res in
       1)
-        # src newer
         rm -f "$current"
         cp "$src" "$PLUGINS_DIR/"
         remove_old_versions "$name" "$PLUGINS_DIR/$(basename "$src")"
         log_info "Updated plugin '$name' from $current_v to $src_v"
         return 0
+        ;;
+      0)
+        case "$src_v" in
+          *-SNAPSHOT)
+            rm -f "$current"
+            cp "$src" "$PLUGINS_DIR/"
+            remove_old_versions "$name" "$PLUGINS_DIR/$(basename "$src")"
+            log_info "Updated plugin '$name' (same SNAPSHOT version $src_v)"
+            return 0
+            ;;
+        esac
         ;;
     esac
   fi
