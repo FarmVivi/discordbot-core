@@ -44,6 +44,7 @@ public class MusicPlayerMessage {
     private ScheduledFuture<?> updateTask;
     private ScheduledFuture<?> progressUpdateTask;
     private long lastUpdateTime = 0;
+    private volatile boolean controlsDirty = false;
 
     public MusicPlayerMessage(MusicPlayer musicPlayer) {
         this.musicPlayer = musicPlayer;
@@ -70,24 +71,37 @@ public class MusicPlayerMessage {
     }
 
     /**
-     * Refreshes the player message with current status.
+     * Refresh request: marque les contrôles comme modifiés et déclenche un rendu différé.
      */
     public void refresh() {
-        // Throttle updates
+        controlsDirty = true;
+        scheduleDelayedUpdate();
+    }
+
+    /**
+     * Effectue le rendu réel si nécessaire (debounced + throttle).
+     */
+    private void renderNow() {
         long now = System.currentTimeMillis();
         if (now - lastUpdateTime < UPDATE_THROTTLE_MS) {
             scheduleDelayedUpdate();
             return;
         }
-
         lastUpdateTime = now;
 
         Guild guild = musicPlayer.getGuild();
         AudioTrack track = musicPlayer.getPlayingTrack();
 
+        // Si plus connecté en vocal, nettoyer
         if (!guild.getAudioManager().isConnected()) {
             delete();
             stopProgressUpdates();
+            return;
+        }
+
+        // N'update que si en lecture (progression) ou si un contrôle a changé
+        boolean isPlaying = track != null && !musicPlayer.isPaused();
+        if (!isPlaying && !controlsDirty) {
             return;
         }
 
@@ -98,34 +112,28 @@ public class MusicPlayerMessage {
             return;
         }
 
-        // If we already have a message, ensure it's still the last in the channel.
-        // If not the last, delete and reprint a new one at the bottom.
+        // Si on a déjà un message, vérifier s'il est encore le dernier du salon
         if (message != null) {
-            // Retrieve the latest message in the channel (1 message)
             messageChannel.getHistory().retrievePast(1).queue(latest -> {
                 boolean isLast = !latest.isEmpty() && latest.get(0).getIdLong() == message.getIdLong();
-
                 if (isLast) {
-                    // Edit in place
                     MessageEditBuilder editBuilder = new MessageEditBuilder()
                             .setEmbeds(embed.build())
                             .setComponents(actionRows);
-
                     message.editMessage(editBuilder.build()).queue(
-                            m -> message = m,
+                            m -> { message = m; controlsDirty = false; },
                             e -> createNewMessage(embed, actionRows)
                     );
                 } else {
-                    // Not last anymore: create a new message and delete the old one
                     createNewMessage(embed, actionRows);
                 }
             }, err -> {
-                // Fallback to edit if we cannot check history
+                // Fallback: tenter l'édition
                 MessageEditBuilder editBuilder = new MessageEditBuilder()
                         .setEmbeds(embed.build())
                         .setComponents(actionRows);
                 message.editMessage(editBuilder.build()).queue(
-                        m -> message = m,
+                        m -> { message = m; controlsDirty = false; },
                         e -> createNewMessage(embed, actionRows)
                 );
             });
@@ -133,7 +141,7 @@ public class MusicPlayerMessage {
             createNewMessage(embed, actionRows);
         }
 
-        // Ensure periodic progress updater is running
+        // S'assurer que le rafraîchissement périodique fonctionne
         startProgressUpdates();
     }
 
@@ -162,14 +170,14 @@ public class MusicPlayerMessage {
             }
 
             // Track info
-            embed.addField(
-                    lang.getString(locale, "music.player.track"),
-                    String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
-                    false
-            );
+        embed.addField(
+            lang.getString(locale, "music.player.track"),
+            String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
+            false
+        );
 
             // Progress bar
-            if (track.getDuration() != Long.MAX_VALUE) {
+        if (track.getDuration() != Long.MAX_VALUE) {
                 String progressBar = createProgressBar(track);
                 String timeInfo = String.format("%s / %s",
                         TimeParser.formatTime(track.getPosition()),
@@ -359,6 +367,7 @@ public class MusicPlayerMessage {
             channelId = m.getChannel().getIdLong();
             saveMessage();
             startProgressUpdates();
+            controlsDirty = false;
         });
     }
 
@@ -371,7 +380,7 @@ public class MusicPlayerMessage {
         }
 
         ScheduledExecutorService scheduler = musicPlayer.getPlugin().getScheduler();
-        updateTask = scheduler.schedule(this::refresh, UPDATE_THROTTLE_MS, TimeUnit.MILLISECONDS);
+        updateTask = scheduler.schedule(this::renderNow, UPDATE_THROTTLE_MS, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -387,7 +396,11 @@ public class MusicPlayerMessage {
         ScheduledExecutorService scheduler = musicPlayer.getPlugin().getScheduler();
         progressUpdateTask = scheduler.scheduleAtFixedRate(() -> {
             try {
-                refresh();
+                // Only refresh periodically while the music is actively playing
+                AudioTrack track = musicPlayer.getPlayingTrack();
+                if (track != null && !musicPlayer.isPaused()) {
+                    scheduleDelayedUpdate();
+                }
             } catch (Exception e) {
                 logger.debug("Periodic refresh failed for guild {}", musicPlayer.getGuild().getId(), e);
             }
