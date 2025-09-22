@@ -31,7 +31,7 @@ public class MusicPlayerMessage {
     private static final Logger logger = LoggerFactory.getLogger(MusicPlayerMessage.class);
     private static final String BUTTON_PREFIX = "music:";
     private static final int UPDATE_THROTTLE_MS = 500;
-    private static final long PROGRESS_UPDATE_INTERVAL_MS = 5000; // 5s
+    private static final long PROGRESS_UPDATE_INTERVAL_MS = 10_000; // 10s
 
     private final MusicPlayer musicPlayer;
     private final PluginLanguageAdapter lang;
@@ -98,16 +98,37 @@ public class MusicPlayerMessage {
             return;
         }
 
-        // Try to edit existing message or create new one
+        // If we already have a message, ensure it's still the last in the channel.
+        // If not the last, delete and reprint a new one at the bottom.
         if (message != null) {
-            MessageEditBuilder editBuilder = new MessageEditBuilder()
-                    .setEmbeds(embed.build())
-                    .setComponents(actionRows);
+            // Retrieve the latest message in the channel (1 message)
+            messageChannel.getHistory().retrievePast(1).queue(latest -> {
+                boolean isLast = !latest.isEmpty() && latest.get(0).getIdLong() == message.getIdLong();
 
-            message.editMessage(editBuilder.build()).queue(
-                    m -> message = m,
-                    e -> createNewMessage(embed, actionRows)
-            );
+                if (isLast) {
+                    // Edit in place
+                    MessageEditBuilder editBuilder = new MessageEditBuilder()
+                            .setEmbeds(embed.build())
+                            .setComponents(actionRows);
+
+                    message.editMessage(editBuilder.build()).queue(
+                            m -> message = m,
+                            e -> createNewMessage(embed, actionRows)
+                    );
+                } else {
+                    // Not last anymore: create a new message and delete the old one
+                    createNewMessage(embed, actionRows);
+                }
+            }, err -> {
+                // Fallback to edit if we cannot check history
+                MessageEditBuilder editBuilder = new MessageEditBuilder()
+                        .setEmbeds(embed.build())
+                        .setComponents(actionRows);
+                message.editMessage(editBuilder.build()).queue(
+                        m -> message = m,
+                        e -> createNewMessage(embed, actionRows)
+                );
+            });
         } else {
             createNewMessage(embed, actionRows);
         }
