@@ -8,11 +8,10 @@ import fr.farmvivi.fluxcord.api.permissions.Permission;
 import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import fr.farmvivi.fluxcord.plugins.music.commands.*;
-import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
-import fr.farmvivi.fluxcord.plugins.music.ui.MusicPlayerMessage;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
-import net.dv8tion.jda.api.JDA;
 import fr.farmvivi.fluxcord.plugins.music.events.MusicButtonListener;
+import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

@@ -192,7 +192,6 @@ public class SimpleLanguageManager implements LanguageManager {
     }
 
     @Override
-    @SuppressWarnings({"java:S3776", "java:S138"}) // method is intentionally verbose to implement fallback chain; logging added for diagnostics
     public String getString(Locale locale, String key) {
         if (logger.isDebugEnabled()) {
             logger.debug("getString(locale={}, key={}) invoked", locale.toLanguageTag(), key);
@@ -360,10 +359,10 @@ public class SimpleLanguageManager implements LanguageManager {
         }
 
         // 7. Si tout échoue, retourner la clé elle-même et logger un avertissement
-    if (logger.isDebugEnabled()) {
-        logger.debug("Translation not found for key: {} in locale: {} (namespace: {})",
-            actualKey, locale.toLanguageTag(), namespace);
-    }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Translation not found for key: {} in locale: {} (namespace: {})",
+                    actualKey, locale.toLanguageTag(), namespace);
+        }
 
         // If we have an event manager, fire a string retrieval event - maybe someone can provide the string
         if (eventManager != null) {
@@ -502,10 +501,10 @@ public class SimpleLanguageManager implements LanguageManager {
         // Add the strings
         localeTranslations.putAll(strings);
 
-    if (logger.isInfoEnabled()) {
-        logger.info("Loaded {} strings for namespace {} and locale {}",
-            strings.size(), namespace, locale.toLanguageTag());
-    }
+        if (logger.isInfoEnabled()) {
+            logger.info("Loaded {} strings for namespace {} and locale {}",
+                    strings.size(), namespace, locale.toLanguageTag());
+        }
 
         // Fire the language loaded event
         if (eventManager != null) {

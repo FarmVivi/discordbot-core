@@ -453,7 +453,10 @@ public class MusicPlayerMessage {
                 if (channel != null) {
                     this.messageChannel = channel;
                     channel.retrieveMessageById(messageId).queue(
-                            m -> { this.message = m; startProgressUpdates(); },
+                            m -> {
+                                this.message = m;
+                                startProgressUpdates();
+                            },
                             e -> {
                                 // Message not found, clear stored IDs
                                 this.messageId = null;

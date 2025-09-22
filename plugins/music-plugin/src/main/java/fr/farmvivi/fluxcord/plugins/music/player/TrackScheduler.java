@@ -159,7 +159,7 @@ public class TrackScheduler extends AudioEventAdapter {
             }
         }
 
-    musicPlayer.refreshUi();
+        musicPlayer.refreshUi();
     }
 
     @Override
@@ -169,7 +169,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
         // Skip to next track on exception
         nextTrack();
-    musicPlayer.refreshUi();
+        musicPlayer.refreshUi();
     }
 
     @Override
@@ -177,7 +177,7 @@ public class TrackScheduler extends AudioEventAdapter {
         String guildName = musicPlayer.getGuild().getName();
         logger.info("[{}] Started playing: {}", guildName, track.getInfo().title);
 
-    musicPlayer.refreshUi();
+        musicPlayer.refreshUi();
     }
 
     // Getters and setters for playback modes

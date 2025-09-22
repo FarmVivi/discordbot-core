@@ -49,14 +49,14 @@ public class ButtonHandler {
             value = parts[1];
         }
 
-    switch (action) {
+        switch (action) {
             case "add":
                 // This would open a modal or send instructions
-        if (!event.isAcknowledged()) {
-            event.reply(plugin.getPluginLanguageManager().getString("music.button.add_help"))
-                .setEphemeral(true)
-                .queue();
-        }
+                if (!event.isAcknowledged()) {
+                    event.reply(plugin.getPluginLanguageManager().getString("music.button.add_help"))
+                            .setEphemeral(true)
+                            .queue();
+                }
                 break;
 
             case "pause":
@@ -135,11 +135,11 @@ public class ButtonHandler {
                 break;
 
             default:
-        if (!event.isAcknowledged()) {
-            event.reply(plugin.getPluginLanguageManager().getString("music.error.unknown_action"))
-                .setEphemeral(true)
-                .queue();
-        }
+                if (!event.isAcknowledged()) {
+                    event.reply(plugin.getPluginLanguageManager().getString("music.error.unknown_action"))
+                            .setEphemeral(true)
+                            .queue();
+                }
                 break;
         }
     }

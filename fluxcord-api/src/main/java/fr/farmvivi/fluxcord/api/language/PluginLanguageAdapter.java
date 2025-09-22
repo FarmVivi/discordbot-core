@@ -1,9 +1,9 @@
 package fr.farmvivi.fluxcord.api.language;
 
 import fr.farmvivi.fluxcord.api.plugin.Plugin;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Locale;
 
 /**
