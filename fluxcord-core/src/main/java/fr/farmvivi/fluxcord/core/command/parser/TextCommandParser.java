@@ -64,11 +64,11 @@ public class TextCommandParser implements CommandParser {
         MessageChannel channel = messageEvent.getChannel();
 
         // Get locale
-        Locale locale = Locale.US;
+        Locale locale = languageManager.getDefaultLocale();
         if (guild != null) {
             Member member = guild.getMember(user);
-            // Just use the default locale US since we can't easily get user locale from message events
-            locale = Locale.US;
+            // Just use the default locale since we can't easily get user locale from message events
+            locale = languageManager.getDefaultLocale();
         }
 
         // Get the appropriate prefix for this guild

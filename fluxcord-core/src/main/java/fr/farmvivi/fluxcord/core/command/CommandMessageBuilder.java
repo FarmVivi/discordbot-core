@@ -53,19 +53,6 @@ public class CommandMessageBuilder extends MessageCreateBuilder {
     }
 
     /**
-     * Creates a new command message builder.
-     * This constructor is for backward compatibility and does not use translations.
-     *
-     * @param event the JDA event that triggered the command
-     */
-    public CommandMessageBuilder(Event event) {
-        super();
-        this.event = event;
-        this.languageManager = null;
-        this.locale = Locale.US;
-    }
-
-    /**
      * Sets the content of the message.
      * This overrides any existing content.
      *

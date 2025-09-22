@@ -61,7 +61,7 @@ public class ConsoleCommandParser implements CommandParser {
 
         // Create console context with locale US since console has no user
         SimpleCommandContext context = new SimpleCommandContext(
-                event, command, null, null, null, Locale.US, options, languageManager
+                event, command, null, null, null, languageManager.getDefaultLocale(), options, languageManager
         );
 
         context.validateOptions();

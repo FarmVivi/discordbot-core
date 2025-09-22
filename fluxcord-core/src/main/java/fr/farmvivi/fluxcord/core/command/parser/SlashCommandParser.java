@@ -57,10 +57,9 @@ public class SlashCommandParser implements CommandParser {
         Guild guild = slashEvent.getGuild();
 
         // Get locale
-        String localeTag = slashEvent.getUserLocale().toLocale().toLanguageTag();
-        Locale locale = Locale.forLanguageTag(localeTag);
+        Locale locale = slashEvent.getUserLocale().toLocale();
         if (locale.getLanguage().isEmpty()) {
-            locale = Locale.US;
+            locale = languageManager.getDefaultLocale();
         }
 
         // Parse options
