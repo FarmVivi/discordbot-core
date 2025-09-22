@@ -70,8 +70,31 @@ public class MusicModalListener extends ListenerAdapter {
                 return;
             }
 
-            String provider = providerValue.getAsString();
+            // Provider may be a STRING_SELECT in a modal; our JDA version doesn't expose values here.
+            // Try getAsString, and if not supported, fallback to the first enabled provider from config (YouTube by default).
+            String provider;
+            try {
+                provider = providerValue.getAsString();
+            } catch (Exception ex) {
+                provider = getDefaultProviderFromConfig();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[MusicModal] Using default provider='{}' due to unsupported modal mapping for 'provider' (modalId={})", provider, modalId);
+                }
+            }
+
+            // Query is a text input
             String query = queryValue.getAsString();
+
+            if (provider == null || provider.isEmpty() || query == null || query.isEmpty()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[MusicModal] Invalid values: provider='{}', queryPresent={} (modalId={})",
+                            provider, query != null && !query.isEmpty(), modalId);
+                }
+                event.reply(plugin.getPluginLanguageManager().getString("music.error.modal.invalid"))
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
 
             if (logger.isDebugEnabled()) {
                 logger.debug("[MusicModal] Input values: provider='{}', query='{}' (len={})", provider, trim(query, 256),
@@ -132,5 +155,24 @@ public class MusicModalListener extends ListenerAdapter {
             default:
                 return query;
         }
+    }
+
+    private String getDefaultProviderFromConfig() {
+        var cfg = plugin.getConfiguration();
+        // Prefer youtube if enabled
+        if (cfg.getBoolean("providers.youtube.enabled", true)) return "youtube";
+        if (cfg.getBoolean("providers.spotify.enabled", false)) return "spotify";
+        if (cfg.getBoolean("providers.soundcloud.enabled", false)) return "soundcloud";
+        if (cfg.getBoolean("providers.deezer.enabled", false)) return "deezer";
+        if (cfg.getBoolean("providers.apple_music.enabled", false)) return "apple_music";
+        if (cfg.getBoolean("providers.bandcamp.enabled", false)) return "bandcamp";
+        if (cfg.getBoolean("providers.vimeo.enabled", false)) return "vimeo";
+        if (cfg.getBoolean("providers.twitch.enabled", false)) return "twitch";
+        if (cfg.getBoolean("providers.getyarn.enabled", false)) return "getyarn";
+        if (cfg.getBoolean("providers.http.enabled", false)) return "http";
+        if (cfg.getBoolean("providers.local.enabled", false)) return "local";
+        if (cfg.getBoolean("providers.flowery_tts.enabled", false)) return "flowery_tts";
+        // Fallback to youtube as a general search-capable provider
+        return "youtube";
     }
 }
