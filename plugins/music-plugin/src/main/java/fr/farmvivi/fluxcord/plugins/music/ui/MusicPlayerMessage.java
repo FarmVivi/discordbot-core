@@ -121,7 +121,10 @@ public class MusicPlayerMessage {
                             .setEmbeds(embed.build())
                             .setComponents(actionRows);
                     message.editMessage(editBuilder.build()).queue(
-                            m -> { message = m; controlsDirty = false; },
+                            m -> {
+                                message = m;
+                                controlsDirty = false;
+                            },
                             e -> createNewMessage(embed, actionRows)
                     );
                 } else {
@@ -133,7 +136,10 @@ public class MusicPlayerMessage {
                         .setEmbeds(embed.build())
                         .setComponents(actionRows);
                 message.editMessage(editBuilder.build()).queue(
-                        m -> { message = m; controlsDirty = false; },
+                        m -> {
+                            message = m;
+                            controlsDirty = false;
+                        },
                         e -> createNewMessage(embed, actionRows)
                 );
             });
@@ -170,14 +176,14 @@ public class MusicPlayerMessage {
             }
 
             // Track info
-        embed.addField(
-            lang.getString(locale, "music.player.track"),
-            String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
-            false
-        );
+            embed.addField(
+                    lang.getString(locale, "music.player.track"),
+                    String.format("[%s](%s)", track.getInfo().title, track.getInfo().uri),
+                    false
+            );
 
             // Progress bar
-        if (track.getDuration() != Long.MAX_VALUE) {
+            if (track.getDuration() != Long.MAX_VALUE) {
                 String progressBar = createProgressBar(track);
                 String timeInfo = String.format("%s / %s",
                         TimeParser.formatTime(track.getPosition()),
@@ -506,15 +512,8 @@ public class MusicPlayerMessage {
     }
 
     /**
-     * Button info extracted from button ID.
-     */
-    public static class ButtonInfo {
-        public final String guildId;
-        public final String action;
-
-        public ButtonInfo(String guildId, String action) {
-            this.guildId = guildId;
-            this.action = action;
-        }
+         * Button info extracted from button ID.
+         */
+        public record ButtonInfo(String guildId, String action) {
     }
 }

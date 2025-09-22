@@ -25,7 +25,7 @@ public class ButtonHandler {
 
     public void handleButton(ButtonInteractionEvent event, MusicPlayerMessage.ButtonInfo info) {
         Guild guild = event.getGuild();
-        if (guild == null || !guild.getId().equals(info.guildId)) {
+        if (guild == null || !guild.getId().equals(info.guildId())) {
             if (!event.isAcknowledged()) {
                 event.reply(plugin.getPluginLanguageManager().getString("music.error.wrong_guild"))
                         .setEphemeral(true)
@@ -47,7 +47,7 @@ public class ButtonHandler {
         MusicPlayer player = plugin.getMusicManager().getPlayer(guild);
 
         // Handle action with optional value (e.g., "volume:+10")
-        String action = info.action;
+        String action = info.action();
         String value = null;
         if (action.contains(":")) {
             String[] parts = action.split(":", 2);

@@ -137,6 +137,7 @@ music:
     no_providers: "No available providers are enabled in the configuration"
     modal:
       invalid: "Invalid modal input. Please try again."
+      unexpected: "An unexpected error occurred. Please try again later."
 
   # Add modal strings
   modal:

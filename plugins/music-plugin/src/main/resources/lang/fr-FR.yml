@@ -137,6 +137,7 @@ music:
     no_providers: "Aucun fournisseur disponible n'est activé dans la configuration"
     modal:
       invalid: "Entrée invalide dans la modale. Veuillez réessayer."
+      unexpected: "Une erreur inattendue est survenue. Veuillez réessayer plus tard."
 
   # Modale d'ajout
   modal:
