@@ -134,3 +134,16 @@ music:
     seek_too_far: "Cannot seek beyond the track duration"
     wrong_guild: "This control is for a different server"
     unknown_action: "Unknown action"
+    no_providers: "No available providers are enabled in the configuration"
+    modal:
+      invalid: "Invalid modal input. Please try again."
+
+  # Add modal strings
+  modal:
+    title: "Add a track"
+    provider:
+      label: "Provider"
+      placeholder: "Choose a source"
+    query:
+      label: "Search or URL"
+      placeholder: "Enter a search or a URL"

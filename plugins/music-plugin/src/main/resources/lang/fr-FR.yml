@@ -134,3 +134,16 @@ music:
     seek_too_far: "Impossible de se déplacer au-delà de la durée de la piste"
     wrong_guild: "Ce contrôle est pour un autre serveur"
     unknown_action: "Action inconnue"
+    no_providers: "Aucun fournisseur disponible n'est activé dans la configuration"
+    modal:
+      invalid: "Entrée invalide dans la modale. Veuillez réessayer."
+
+  # Modale d'ajout
+  modal:
+    title: "Ajouter une piste"
+    provider:
+      label: "Fournisseur"
+      placeholder: "Choisir une source"
+    query:
+      label: "Recherche ou URL"
+      placeholder: "Entrez une recherche ou une URL"

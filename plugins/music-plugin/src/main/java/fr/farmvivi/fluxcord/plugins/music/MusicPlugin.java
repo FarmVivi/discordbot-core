@@ -9,6 +9,7 @@ import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import fr.farmvivi.fluxcord.plugins.music.commands.*;
 import fr.farmvivi.fluxcord.plugins.music.events.MusicButtonListener;
+import fr.farmvivi.fluxcord.plugins.music.events.MusicModalListener;
 import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -57,11 +58,12 @@ public class MusicPlugin extends AbstractPlugin {
         // Register JDA event listeners directly (Discord events)
         try {
             // Register on builder (pre-connect) and on live JDA if already connected
-            MusicButtonListener listener = new MusicButtonListener(this);
-            getContext().getDiscordAPI().getBuilder().addEventListeners(listener);
+            MusicButtonListener buttonListener = new MusicButtonListener(this);
+            MusicModalListener modalListener = new MusicModalListener(this);
+            getContext().getDiscordAPI().getBuilder().addEventListeners(buttonListener, modalListener);
             JDA jda = getContext().getDiscordAPI().getJDA();
             if (jda != null) {
-                jda.addEventListener(listener);
+                jda.addEventListener(buttonListener, modalListener);
             }
         } catch (Exception e) {
             logger.warn("Failed to register JDA listeners for MusicPlugin", e);

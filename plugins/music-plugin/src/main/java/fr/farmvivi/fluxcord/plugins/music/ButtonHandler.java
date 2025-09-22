@@ -3,9 +3,15 @@ package fr.farmvivi.fluxcord.plugins.music;
 import fr.farmvivi.fluxcord.api.language.PluginLanguageAdapter;
 import fr.farmvivi.fluxcord.plugins.music.player.MusicPlayer;
 import fr.farmvivi.fluxcord.plugins.music.ui.MusicPlayerMessage;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.selections.SelectOption;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.modals.Modal;
 
 /**
  * Handles button interactions for the music player.
@@ -51,12 +57,45 @@ public class ButtonHandler {
 
         switch (action) {
             case "add":
-                // This would open a modal or send instructions
-                if (!event.isAcknowledged()) {
-                    event.reply(plugin.getPluginLanguageManager().getString("music.button.add_help"))
-                            .setEphemeral(true)
-                            .queue();
-                }
+        // Open modal to add a new track with provider selection
+        if (event.isAcknowledged()) return;
+
+        // Build provider options dynamically from configuration
+        var providerMenuBuilder = StringSelectMenu.create("provider")
+            .setPlaceholder(plugin.getPluginLanguageManager().getString("music.modal.provider.placeholder"))
+            .setMaxValues(1)
+            .setMinValues(1);
+
+        for (SelectOption opt : ProviderOptions.fromConfig(plugin)) {
+            providerMenuBuilder.addOptions(opt);
+        }
+
+        // Fallback: if no option is available, inform the user
+        if (providerMenuBuilder.getOptions().isEmpty()) {
+            event.reply(plugin.getPluginLanguageManager().getString("music.error.no_providers"))
+                .setEphemeral(true)
+                .queue();
+            return;
+        }
+
+        // Text input for query or URL
+        TextInput queryInput = TextInput.create(
+                "query",
+                TextInputStyle.SHORT
+            )
+            .setPlaceholder(plugin.getPluginLanguageManager().getString("music.modal.query.placeholder"))
+            .setRequired(true)
+            .build();
+
+        String modalId = "music:" + guild.getId() + ":add";
+        Modal modal = Modal.create(modalId, plugin.getPluginLanguageManager().getString("music.modal.title"))
+            .addComponents(
+                Label.of(plugin.getPluginLanguageManager().getString("music.modal.provider.label"), providerMenuBuilder.build()),
+                Label.of(plugin.getPluginLanguageManager().getString("music.modal.query.label"), queryInput)
+            )
+            .build();
+
+        event.replyModal(modal).queue();
                 break;
 
             case "pause":
@@ -157,6 +196,89 @@ public class ButtonHandler {
         PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
         if (!event.isAcknowledged()) {
             event.reply(lm.getString("music.error.no_permission")).setEphemeral(true).queue();
+        }
+    }
+
+    /**
+     * Helper for building provider select options based on configuration and available credentials.
+     */
+    private static final class ProviderOptions {
+        static java.util.List<SelectOption> fromConfig(MusicPlugin plugin) {
+            var cfg = plugin.getConfiguration();
+            var options = new java.util.ArrayList<SelectOption>();
+
+            // YouTube (links)
+            boolean youtubeEnabled = cfg.getBoolean("providers.youtube.enabled", true);
+            if (youtubeEnabled) {
+                options.add(SelectOption.of("YouTube", "youtube").withDefault(true));
+            }
+
+            // Spotify
+            boolean spotifyEnabled = cfg.getBoolean("providers.spotify.enabled", false);
+            String spId = cfg.getString("providers.spotify.client_id", null);
+            String spSecret = cfg.getString("providers.spotify.client_secret", null);
+            if (spotifyEnabled && spId != null && spSecret != null) {
+                options.add(SelectOption.of("Spotify", "spotify"));
+            }
+
+            // Deezer
+            boolean deezerEnabled = cfg.getBoolean("providers.deezer.enabled", false);
+            String dzKey = cfg.getString("providers.deezer.master_decryption_key", null);
+            String dzArl = cfg.getString("providers.deezer.arl_cookie", null);
+            if (deezerEnabled && dzKey != null && dzArl != null) {
+                options.add(SelectOption.of("Deezer", "deezer"));
+            }
+
+            // Apple Music
+            boolean appleEnabled = cfg.getBoolean("providers.apple_music.enabled", false);
+            String appleToken = cfg.getString("providers.apple_music.token", null);
+            if (appleEnabled && appleToken != null) {
+                options.add(SelectOption.of("Apple Music", "apple_music"));
+            }
+
+            // SoundCloud
+            if (cfg.getBoolean("providers.soundcloud.enabled", false)) {
+                options.add(SelectOption.of("SoundCloud", "soundcloud"));
+            }
+
+            // Bandcamp
+            if (cfg.getBoolean("providers.bandcamp.enabled", false)) {
+                options.add(SelectOption.of("Bandcamp", "bandcamp"));
+            }
+
+            // Vimeo
+            if (cfg.getBoolean("providers.vimeo.enabled", false)) {
+                options.add(SelectOption.of("Vimeo", "vimeo"));
+            }
+
+            // Twitch
+            if (cfg.getBoolean("providers.twitch.enabled", false)) {
+                options.add(SelectOption.of("Twitch", "twitch"));
+            }
+
+            // Getyarn
+            if (cfg.getBoolean("providers.getyarn.enabled", false)) {
+                options.add(SelectOption.of("GetYarn", "getyarn"));
+            }
+
+            // HTTP direct
+            if (cfg.getBoolean("providers.http.enabled", false)) {
+                options.add(SelectOption.of("HTTP (direct)", "http"));
+            }
+
+            // Local files
+            if (cfg.getBoolean("providers.local.enabled", false)) {
+                options.add(SelectOption.of("Local", "local"));
+            }
+
+            // Flowery TTS (acts like a generator)
+            boolean floweryEnabled = cfg.getBoolean("providers.flowery_tts.enabled", false);
+            String floweryVoice = cfg.getString("providers.flowery_tts.voice", null);
+            if (floweryEnabled && floweryVoice != null) {
+                options.add(SelectOption.of("Flowery TTS", "flowery_tts"));
+            }
+
+            return options;
         }
     }
 }
