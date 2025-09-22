@@ -20,17 +20,21 @@ public class ButtonHandler {
     public void handleButton(ButtonInteractionEvent event, MusicPlayerMessage.ButtonInfo info) {
         Guild guild = event.getGuild();
         if (guild == null || !guild.getId().equals(info.guildId)) {
-            event.reply(plugin.getPluginLanguageManager().getString("music.error.wrong_guild"))
-                    .setEphemeral(true)
-                    .queue();
+            if (!event.isAcknowledged()) {
+                event.reply(plugin.getPluginLanguageManager().getString("music.error.wrong_guild"))
+                        .setEphemeral(true)
+                        .queue();
+            }
             return;
         }
 
         Member member = event.getMember();
         if (member == null || member.getVoiceState() == null || member.getVoiceState().getChannel() == null) {
-            event.reply(plugin.getPluginLanguageManager().getString("music.error.not_in_voice"))
-                    .setEphemeral(true)
-                    .queue();
+            if (!event.isAcknowledged()) {
+                event.reply(plugin.getPluginLanguageManager().getString("music.error.not_in_voice"))
+                        .setEphemeral(true)
+                        .queue();
+            }
             return;
         }
 
@@ -45,12 +49,14 @@ public class ButtonHandler {
             value = parts[1];
         }
 
-        switch (action) {
+    switch (action) {
             case "add":
                 // This would open a modal or send instructions
-                event.reply(plugin.getPluginLanguageManager().getString("music.button.add_help"))
-                        .setEphemeral(true)
-                        .queue();
+        if (!event.isAcknowledged()) {
+            event.reply(plugin.getPluginLanguageManager().getString("music.button.add_help"))
+                .setEphemeral(true)
+                .queue();
+        }
                 break;
 
             case "pause":
@@ -58,8 +64,8 @@ public class ButtonHandler {
                     replyNoPermission(event);
                     return;
                 }
-                player.setPaused(!player.isPaused());
                 event.deferEdit().queue();
+                player.togglePause();
                 break;
 
             case "skip":
@@ -67,8 +73,8 @@ public class ButtonHandler {
                     replyNoPermission(event);
                     return;
                 }
-                player.skipTrack();
                 event.deferEdit().queue();
+                player.skip();
                 break;
 
             case "stop":
@@ -76,9 +82,8 @@ public class ButtonHandler {
                     replyNoPermission(event);
                     return;
                 }
-                player.stop();
-                guild.getAudioManager().closeAudioConnection();
                 event.deferEdit().queue();
+                player.stopAndLeave();
                 break;
 
             case "clear":
@@ -86,29 +91,23 @@ public class ButtonHandler {
                     replyNoPermission(event);
                     return;
                 }
-                player.getTrackScheduler().clear();
                 event.deferEdit().queue();
+                player.clearQueue();
                 break;
 
             case "loop":
-                player.getTrackScheduler().setLoopMode(!player.getTrackScheduler().isLoopMode());
-                if (player.getTrackScheduler().isLoopMode()) {
-                    player.getTrackScheduler().setLoopQueueMode(false);
-                }
                 event.deferEdit().queue();
+                player.toggleLoop();
                 break;
 
             case "loopqueue":
-                player.getTrackScheduler().setLoopQueueMode(!player.getTrackScheduler().isLoopQueueMode());
-                if (player.getTrackScheduler().isLoopQueueMode()) {
-                    player.getTrackScheduler().setLoopMode(false);
-                }
                 event.deferEdit().queue();
+                player.toggleLoopQueue();
                 break;
 
             case "shuffle":
-                player.getTrackScheduler().setShuffleMode(!player.getTrackScheduler().isShuffleMode());
                 event.deferEdit().queue();
+                player.toggleShuffle();
                 break;
 
             case "volume":
@@ -116,15 +115,14 @@ public class ButtonHandler {
                     replyNoPermission(event);
                     return;
                 }
+                event.deferEdit().queue();
                 if (value != null) {
                     try {
                         int change = Integer.parseInt(value);
-                        int newVolume = Math.max(0, Math.min(100, player.getVolume() + change));
-                        player.setVolume(newVolume);
+                        player.changeVolume(change);
                     } catch (NumberFormatException ignored) {
                     }
                 }
-                event.deferEdit().queue();
                 break;
 
             case "mute":
@@ -132,18 +130,16 @@ public class ButtonHandler {
                     replyNoPermission(event);
                     return;
                 }
-                if (player.getVolume() == 0) {
-                    player.setVolume(50); // Unmute to default volume
-                } else {
-                    player.setVolume(0); // Mute
-                }
                 event.deferEdit().queue();
+                player.toggleMute();
                 break;
 
             default:
-                event.reply(plugin.getPluginLanguageManager().getString("music.error.unknown_action"))
-                        .setEphemeral(true)
-                        .queue();
+        if (!event.isAcknowledged()) {
+            event.reply(plugin.getPluginLanguageManager().getString("music.error.unknown_action"))
+                .setEphemeral(true)
+                .queue();
+        }
                 break;
         }
     }
@@ -159,6 +155,8 @@ public class ButtonHandler {
 
     private void replyNoPermission(ButtonInteractionEvent event) {
         PluginLanguageAdapter lm = plugin.getPluginLanguageManager();
-        event.reply(lm.getString("music.error.no_permission")).setEphemeral(true).queue();
+        if (!event.isAcknowledged()) {
+            event.reply(lm.getString("music.error.no_permission")).setEphemeral(true).queue();
+        }
     }
 }

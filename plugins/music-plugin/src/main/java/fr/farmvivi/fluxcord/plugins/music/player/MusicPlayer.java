@@ -107,6 +107,16 @@ public class MusicPlayer {
     }
 
     /**
+     * Stops playback, clears the queue and leaves the voice channel immediately.
+     * Also deregisters the send handler.
+     */
+    public void stopAndLeave() {
+        stop();
+        guild.getAudioManager().closeAudioConnection();
+        plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
+    }
+
+    /**
      * Sets the message channel for player messages.
      */
     public void setMessageChannel(MessageChannel channel) {
@@ -214,5 +224,86 @@ public class MusicPlayer {
 
     public AudioTrack getPlayingTrack() {
         return audioPlayer.getPlayingTrack();
+    }
+
+    // Convenience action methods (centralize UI refresh logic)
+
+    /**
+     * Force a UI refresh of the player message.
+     */
+    public void refreshUi() {
+        playerMessage.refresh();
+    }
+
+    /**
+     * Toggle pause/resume.
+     */
+    public void togglePause() {
+        setPaused(!isPaused());
+    }
+
+    /**
+     * Skip current track.
+     */
+    public void skip() {
+        skipTrack();
+    }
+
+    /**
+     * Clear the queue only.
+     */
+    public void clearQueue() {
+        trackScheduler.clear();
+        playerMessage.refresh();
+    }
+
+    /**
+     * Toggle single track loop; disables loop queue if enabled.
+     */
+    public void toggleLoop() {
+        boolean enable = !trackScheduler.isLoopMode();
+        trackScheduler.setLoopMode(enable);
+        if (enable) {
+            trackScheduler.setLoopQueueMode(false);
+        }
+        playerMessage.refresh();
+    }
+
+    /**
+     * Toggle loop queue; disables single track loop if enabled.
+     */
+    public void toggleLoopQueue() {
+        boolean enable = !trackScheduler.isLoopQueueMode();
+        trackScheduler.setLoopQueueMode(enable);
+        if (enable) {
+            trackScheduler.setLoopMode(false);
+        }
+        playerMessage.refresh();
+    }
+
+    /**
+     * Toggle shuffle mode.
+     */
+    public void toggleShuffle() {
+        trackScheduler.setShuffleMode(!trackScheduler.isShuffleMode());
+        playerMessage.refresh();
+    }
+
+    /**
+     * Change volume by delta (clamped 0..100).
+     */
+    public void changeVolume(int delta) {
+        setVolume(getVolume() + delta);
+    }
+
+    /**
+     * Toggle mute (0) / default volume.
+     */
+    public void toggleMute() {
+        if (getVolume() == 0) {
+            setVolume(DEFAULT_VOLUME);
+        } else {
+            setVolume(0);
+        }
     }
 }

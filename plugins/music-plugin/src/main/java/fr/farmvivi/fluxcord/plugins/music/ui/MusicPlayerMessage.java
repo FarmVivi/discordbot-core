@@ -31,6 +31,7 @@ public class MusicPlayerMessage {
     private static final Logger logger = LoggerFactory.getLogger(MusicPlayerMessage.class);
     private static final String BUTTON_PREFIX = "music:";
     private static final int UPDATE_THROTTLE_MS = 500;
+    private static final long PROGRESS_UPDATE_INTERVAL_MS = 5000; // 5s
 
     private final MusicPlayer musicPlayer;
     private final PluginLanguageAdapter lang;
@@ -41,6 +42,7 @@ public class MusicPlayerMessage {
     private Long channelId;
 
     private ScheduledFuture<?> updateTask;
+    private ScheduledFuture<?> progressUpdateTask;
     private long lastUpdateTime = 0;
 
     public MusicPlayerMessage(MusicPlayer musicPlayer) {
@@ -85,6 +87,7 @@ public class MusicPlayerMessage {
 
         if (!guild.getAudioManager().isConnected()) {
             delete();
+            stopProgressUpdates();
             return;
         }
 
@@ -108,6 +111,9 @@ public class MusicPlayerMessage {
         } else {
             createNewMessage(embed, actionRows);
         }
+
+        // Ensure periodic progress updater is running
+        startProgressUpdates();
     }
 
     /**
@@ -331,6 +337,7 @@ public class MusicPlayerMessage {
             messageId = m.getIdLong();
             channelId = m.getChannel().getIdLong();
             saveMessage();
+            startProgressUpdates();
         });
     }
 
@@ -347,6 +354,36 @@ public class MusicPlayerMessage {
     }
 
     /**
+     * Starts periodic progress updates (to update progress bar and UI).
+     */
+    private void startProgressUpdates() {
+        if (progressUpdateTask != null && !progressUpdateTask.isDone()) {
+            return;
+        }
+        if (messageChannel == null) {
+            return;
+        }
+        ScheduledExecutorService scheduler = musicPlayer.getPlugin().getScheduler();
+        progressUpdateTask = scheduler.scheduleAtFixedRate(() -> {
+            try {
+                refresh();
+            } catch (Exception e) {
+                logger.debug("Periodic refresh failed for guild {}", musicPlayer.getGuild().getId(), e);
+            }
+        }, PROGRESS_UPDATE_INTERVAL_MS, PROGRESS_UPDATE_INTERVAL_MS, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Stops periodic progress updates.
+     */
+    private void stopProgressUpdates() {
+        if (progressUpdateTask != null && !progressUpdateTask.isDone()) {
+            progressUpdateTask.cancel(false);
+        }
+        progressUpdateTask = null;
+    }
+
+    /**
      * Generates a button ID with guild context.
      */
     private String getButtonId(String action) {
@@ -360,6 +397,7 @@ public class MusicPlayerMessage {
         this.messageChannel = channel;
         this.channelId = channel.getIdLong();
         refresh();
+        startProgressUpdates();
     }
 
     /**
@@ -374,6 +412,7 @@ public class MusicPlayerMessage {
         messageId = null;
         channelId = null;
         saveMessage();
+        stopProgressUpdates();
     }
 
     /**
@@ -414,7 +453,7 @@ public class MusicPlayerMessage {
                 if (channel != null) {
                     this.messageChannel = channel;
                     channel.retrieveMessageById(messageId).queue(
-                            m -> this.message = m,
+                            m -> { this.message = m; startProgressUpdates(); },
                             e -> {
                                 // Message not found, clear stored IDs
                                 this.messageId = null;

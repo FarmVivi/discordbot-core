@@ -11,7 +11,8 @@ import fr.farmvivi.fluxcord.plugins.music.commands.*;
 import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
 import fr.farmvivi.fluxcord.plugins.music.ui.MusicPlayerMessage;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.JDA;
+import fr.farmvivi.fluxcord.plugins.music.events.MusicButtonListener;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -53,6 +54,19 @@ public class MusicPlugin extends AbstractPlugin {
 
         // Load configuration
         loadConfiguration();
+
+        // Register JDA event listeners directly (Discord events)
+        try {
+            // Register on builder (pre-connect) and on live JDA if already connected
+            MusicButtonListener listener = new MusicButtonListener(this);
+            getContext().getDiscordAPI().getBuilder().addEventListeners(listener);
+            JDA jda = getContext().getDiscordAPI().getJDA();
+            if (jda != null) {
+                jda.addEventListener(listener);
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to register JDA listeners for MusicPlugin", e);
+        }
 
         logger.info("Music Plugin enabled successfully!");
     }
@@ -263,19 +277,6 @@ public class MusicPlugin extends AbstractPlugin {
         if (musicManager != null) {
             musicManager.handleVoiceUpdate(event);
         }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onButtonInteraction(ButtonInteractionEvent event) {
-        String buttonId = event.getComponentId();
-        MusicPlayerMessage.ButtonInfo info = MusicPlayerMessage.parseButtonId(buttonId);
-
-        if (info == null) {
-            return;
-        }
-
-        // Handle music player button interactions
-        new ButtonHandler(this).handleButton(event, info);
     }
 
     // Getters
