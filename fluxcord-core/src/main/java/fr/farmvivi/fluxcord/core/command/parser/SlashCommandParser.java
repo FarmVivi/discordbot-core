@@ -58,8 +58,11 @@ public class SlashCommandParser implements CommandParser {
 
         // Get locale
         Locale locale = slashEvent.getUserLocale().toLocale();
+        logger.debug("User locale from interaction: {}", locale);
+        // Fallback to default if locale is not set or invalid
         if (locale.getLanguage().isEmpty()) {
             locale = languageManager.getDefaultLocale();
+            logger.debug("Falling back to default locale: {}", locale);
         }
 
         // Parse options

@@ -65,10 +65,12 @@ public class TextCommandParser implements CommandParser {
 
         // Get locale
         Locale locale = languageManager.getDefaultLocale();
+        logger.debug("Default locale: {}", locale);
         if (guild != null) {
             Member member = guild.getMember(user);
             // Just use the default locale since we can't easily get user locale from message events
             locale = languageManager.getDefaultLocale();
+            logger.debug("Member locale (fallback to default): {}", locale);
         }
 
         // Get the appropriate prefix for this guild
