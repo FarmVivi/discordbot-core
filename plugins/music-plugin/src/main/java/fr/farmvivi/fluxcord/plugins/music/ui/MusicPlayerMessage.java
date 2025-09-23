@@ -92,8 +92,10 @@ public class MusicPlayerMessage {
         Guild guild = musicPlayer.getGuild();
         AudioTrack track = musicPlayer.getPlayingTrack();
 
-        // Si plus connecté en vocal, nettoyer
-        if (!guild.getAudioManager().isConnected()) {
+        // Si non connecté ET rien à afficher, nettoyer; sinon continuer le rendu
+        boolean connected = guild.getAudioManager().isConnected();
+        boolean hasQueue = musicPlayer.getTrackScheduler().getQueueSize() > 0;
+        if (!connected && track == null && !hasQueue) {
             delete();
             stopProgressUpdates();
             return;
