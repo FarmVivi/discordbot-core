@@ -25,8 +25,14 @@
 
         <!-- External dependencies for implementation -->
         <dependency>
-            <groupId>net.wytrem</groupId>
-            <artifactId>wylog</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
             <scope>compile</scope>
         </dependency>
 
@@ -142,8 +148,8 @@
                     <mainClass>${project.mainClass}</mainClass>
                     <systemProperties>
                         <systemProperty>
-                            <key>net.wytrem.wylog.defaultLogLevel</key>
-                            <value>debug</value>
+                            <key>logback.configurationFile</key>
+                            <value>logback.xml</value>
                         </systemProperty>
                     </systemProperties>
                     <workingDirectory>${project.basedir}/run</workingDirectory>

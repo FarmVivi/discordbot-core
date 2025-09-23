@@ -35,7 +35,8 @@
         <sonar.skip>true</sonar.skip>
 
         <!-- Dependency versions -->
-        <wylog.version>2.0.0</wylog.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <logback.version>1.4.7</logback.version>
         <jda.version>6.0.0-rc.5</jda.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <gson.version>2.13.2</gson.version>
@@ -81,11 +82,18 @@
             </dependency>
 
             <!-- External dependencies -->
-            <!-- https://github.com/FarmVivi/WyLog -->
+            <!-- SLF4J API -->
             <dependency>
-                <groupId>net.wytrem</groupId>
-                <artifactId>wylog</artifactId>
-                <version>${wylog.version}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            
+            <!-- Logback implementation -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
             </dependency>
 
             <!-- https://github.com/DV8FromTheWorld/JDA -->
