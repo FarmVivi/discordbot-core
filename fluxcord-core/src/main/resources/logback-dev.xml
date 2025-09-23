@@ -28,8 +28,8 @@
         <appender-ref ref="FILE" />
     </root>
 
-    <!-- Specific logger configurations -->
-    <logger name="fr.farmvivi.fluxcord" level="INFO" />
+    <!-- Specific logger configurations - DEBUG level for development -->
+    <logger name="fr.farmvivi.fluxcord" level="DEBUG" />
     <logger name="net.dv8tion.jda" level="INFO" />
     <logger name="com.zaxxer.hikari" level="WARN" />
     <logger name="org.mariadb" level="WARN" />
