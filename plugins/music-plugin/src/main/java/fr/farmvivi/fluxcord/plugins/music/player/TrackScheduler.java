@@ -65,6 +65,17 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     /**
+     * Adds a track clone at the end of the queue (keeping internal structures in sync).
+     */
+    public void addToQueueEnd(AudioTrack track) {
+        if (track == null) {
+            return;
+        }
+        queue.offer(track);
+        queueList.add(track);
+    }
+
+    /**
      * Starts the next track in the queue.
      */
     public void nextTrack() {
@@ -91,6 +102,17 @@ public class TrackScheduler extends AudioEventAdapter {
             queue.addAll(queueList);
             nextTrack();
         }
+    }
+
+    /**
+     * Skip current track. If loop (single track) is active, keep current by re-adding it to the end of the queue.
+     */
+    public void skip() {
+        AudioTrack current = player.getPlayingTrack();
+        if (current != null && loopMode) {
+            addToQueueEnd(current.makeClone());
+        }
+        nextTrack();
     }
 
     /**
@@ -122,8 +144,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if (index < 0 || index >= queueList.size()) {
             return false;
         }
-
-        AudioTrack removed = queueList.remove(index);
+        queueList.remove(index);
         queue.clear();
         queue.addAll(queueList);
         return true;

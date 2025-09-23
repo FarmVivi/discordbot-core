@@ -88,7 +88,8 @@ public class MusicPlayer {
      * Skips the current track.
      */
     public void skipTrack() {
-        trackScheduler.nextTrack();
+        // Délègue au scheduler : gère le ré-enfilage en mode loop
+        trackScheduler.skip();
         playerMessage.refresh();
 
         if (audioPlayer.getPlayingTrack() == null && trackScheduler.getQueueSize() == 0) {
