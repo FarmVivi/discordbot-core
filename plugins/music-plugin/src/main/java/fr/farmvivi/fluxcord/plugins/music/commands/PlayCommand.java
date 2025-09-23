@@ -43,7 +43,7 @@ public class PlayCommand {
 
         // Check permission (prefer guild-scoped if available)
         String userId = ctx.getUser().getId();
-        String perm = plugin.getName().toLowerCase() + ".play";
+        String perm = plugin.getId() + ".play";
         boolean allowed = plugin.getPluginPermissionManager().hasPermission(userId, guild.getId(), perm)
                 || plugin.getPluginPermissionManager().hasPermission(userId, perm);
         if (!allowed) {

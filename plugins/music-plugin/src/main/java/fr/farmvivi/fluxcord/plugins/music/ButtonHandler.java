@@ -187,7 +187,7 @@ public class ButtonHandler {
         String userId = member.getId();
         String guildId = member.getGuild().getId();
         // Permission nodes are registered as pluginName.node
-        String perm = plugin.getName().toLowerCase() + "." + permission.substring(permission.indexOf('.') + 1);
+        String perm = plugin.getId() + "." + permission.substring(permission.indexOf('.') + 1);
         return plugin.getPluginPermissionManager().hasPermission(userId, guildId, perm)
                 || plugin.getPluginPermissionManager().hasPermission(userId, perm);
     }

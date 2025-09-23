@@ -105,7 +105,7 @@ public class MusicPlugin extends AbstractPlugin {
     }
 
     private String permissionKey(String node) {
-        return getName().toLowerCase() + "." + node;
+        return getId() + "." + node;
     }
 
     private void registerCommands() {

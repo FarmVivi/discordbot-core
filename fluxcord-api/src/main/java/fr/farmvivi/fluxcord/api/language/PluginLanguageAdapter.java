@@ -25,7 +25,7 @@ public class PluginLanguageAdapter {
     public PluginLanguageAdapter(Plugin plugin, LanguageManager languageManager) {
         this.plugin = plugin;
         this.languageManager = languageManager;
-        this.namespace = plugin.getName().toLowerCase();
+        this.namespace = plugin.getId();
 
         // Register the namespace automatically
         boolean registered = languageManager.registerNamespace(namespace);

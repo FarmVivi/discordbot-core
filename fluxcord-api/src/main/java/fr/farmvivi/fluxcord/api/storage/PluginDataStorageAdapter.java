@@ -20,7 +20,7 @@ public class PluginDataStorageAdapter {
     public PluginDataStorageAdapter(Plugin plugin, DataStorageManager storageManager) {
         this.plugin = plugin;
         this.storageManager = storageManager;
-        this.namespace = plugin.getName().toLowerCase();
+        this.namespace = plugin.getId();
     }
 
     /**
