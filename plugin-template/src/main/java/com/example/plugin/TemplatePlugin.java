@@ -369,7 +369,7 @@ public class TemplatePlugin extends AbstractPlugin {
      * @return the full permission name with plugin prefix
      */
     private String pluginPrefix(String node) {
-        return getName().toLowerCase() + "." + node;
+        return getId() + "." + node;
     }
 
     // Simple internal Permission implementation for template usage

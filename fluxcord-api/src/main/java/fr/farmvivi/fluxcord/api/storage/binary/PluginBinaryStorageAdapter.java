@@ -20,7 +20,7 @@ public class PluginBinaryStorageAdapter {
     public PluginBinaryStorageAdapter(Plugin plugin, BinaryStorageManager storageManager) {
         this.plugin = plugin;
         this.storageManager = storageManager;
-        this.namespace = plugin.getName().toLowerCase();
+        this.namespace = plugin.getId();
     }
 
     /**

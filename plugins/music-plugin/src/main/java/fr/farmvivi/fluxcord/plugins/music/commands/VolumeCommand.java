@@ -29,7 +29,7 @@ public class VolumeCommand {
 
         // Check permission
         String userId = ctx.getUser().getId();
-        String perm = plugin.getName().toLowerCase() + ".volume";
+        String perm = plugin.getId() + ".volume";
         boolean allowed = plugin.getPluginPermissionManager().hasPermission(userId, guild.getId(), perm)
                 || plugin.getPluginPermissionManager().hasPermission(userId, perm);
         if (!allowed) {
