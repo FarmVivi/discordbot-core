@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <!-- Configuration des repositories pour optimiser les téléchargements -->
+  <mirrors>
+    <!-- Mirror pour Maven Central (plus rapide) -->
+    <mirror>
+      <id>central-mirror</id>
+      <name>Maven Central Mirror</name>
+      <url>https://repo1.maven.org/maven2/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+
+  <!-- Configuration des repositories -->
+  <profiles>
+    <profile>
+      <id>optimized-repos</id>
+      <repositories>
+        <repository>
+          <id>maven-central</id>
+          <name>Maven Central</name>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>warn</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        
+        <repository>
+          <id>dv8tion</id>
+          <name>m2-dv8tion</name>
+          <url>https://m2.dv8tion.net/releases</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      
+      <pluginRepositories>
+        <pluginRepository>
+          <id>maven-central</id>
+          <name>Maven Central</name>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <!-- Activation du profil optimisé -->
+  <activeProfiles>
+    <activeProfile>optimized-repos</activeProfile>
+  </activeProfiles>
+
+  <!-- Configuration pour accélérer les builds -->
+  <servers>
+    <!-- Configuration pour les repositories privés si nécessaire -->
+  </servers>
+</settings>

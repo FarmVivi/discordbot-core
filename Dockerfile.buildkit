@@ -1,0 +1,72 @@
+# syntax=docker/dockerfile:1
+################ Build ################
+# Build stage for the full multi-module project
+FROM maven:3.9.11-eclipse-temurin-17-alpine AS build
+
+WORKDIR /workspace
+
+# Copy Maven configuration files first for better layer caching
+COPY pom.xml ./
+COPY fluxcord-api/pom.xml ./fluxcord-api/
+COPY fluxcord-core/pom.xml ./fluxcord-core/
+COPY examples/plugins/plugin-example-audio/pom.xml ./examples/plugins/plugin-example-audio/
+COPY examples/plugins/plugin-example-commands/pom.xml ./examples/plugins/plugin-example-commands/
+COPY plugin-template/pom.xml ./plugin-template/
+COPY plugins/music-plugin/pom.xml ./plugins/music-plugin/
+COPY plugins/ai-audio-plugin/pom.xml ./plugins/ai-audio-plugin/
+
+# Copy Maven settings for optimized repositories
+COPY settings.xml /root/.m2/settings.xml
+
+# Download dependencies with cache mount (BuildKit feature)
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn dependency:go-offline -B -T1C
+
+# Copy source code
+COPY . .
+
+# Build with cache mount for Maven repository and local repository
+RUN --mount=type=cache,target=/root/.m2/repository \
+    --mount=type=cache,target=/workspace/target \
+    mvn -T1C -DskipTests -Dmaven.test.skip=true -Dmaven.javadoc.skip=true \
+        -Dmaven.source.skip=true -Dmaven.site.skip=true package \
+    && mkdir -p /workspace/.artifacts /workspace/.bundles/plugins /workspace/.bundles/examples \
+    && cp -f /workspace/fluxcord-core/target/*-shaded.jar /workspace/.artifacts/fluxcord.jar \
+    && (cp -f /workspace/plugins/*/target/*.jar /workspace/.bundles/plugins/ 2>/dev/null || true) \
+    && (cp -f /workspace/examples/plugins/*/target/*.jar /workspace/.bundles/examples/ 2>/dev/null || true)
+
+################ Production ################
+# Use a small JRE base with shell to run an entrypoint script
+FROM eclipse-temurin:17.0.16_8-jre-alpine-3.22 AS production
+
+ENV APP_DIR=/app \
+    BUNDLES_DIR=/opt/fluxcord/bundles \
+    JAVA_OPTS=""
+
+WORKDIR /app
+
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
+## Core shaded jar
+COPY --from=build /workspace/.artifacts/fluxcord.jar /app/fluxcord.jar
+
+# Bundle available plugins (internal plugins)
+RUN mkdir -p /opt/fluxcord/bundles/plugins /opt/fluxcord/bundles/examples
+
+# Copy bundled plugin jars (empty dir is fine)
+COPY --from=build /workspace/.bundles/plugins/ /opt/fluxcord/bundles/plugins/
+COPY --from=build /workspace/.bundles/examples/ /opt/fluxcord/bundles/examples/
+
+# Entrypoint script to optionally install/update plugins before launch
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+VOLUME ["/app/data", "/app/plugins"]
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Docker healthcheck (ready file created by core after full startup)
+# Docker healthcheck: HTTP ready endpoint exposed by the core
+ENV HEALTH_PORT=8081
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD curl -fsS http://127.0.0.1:${HEALTH_PORT}/readyz || exit 1
