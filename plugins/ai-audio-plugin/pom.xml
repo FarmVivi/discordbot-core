@@ -21,24 +21,28 @@
         <dependency>
             <groupId>fr.farmvivi.fluxcord</groupId>
             <artifactId>fluxcord-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- JDA for Discord API -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- WyLog for logging -->
         <dependency>
             <groupId>net.wytrem</groupId>
             <artifactId>wylog</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- JSON processing -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- HTTP client for AI service integration -->
@@ -46,11 +50,61 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>5.1.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>fr.farmvivi.fluxcord:fluxcord-api</exclude>
+                                    <exclude>net.dv8tion:JDA</exclude>
+                                    <exclude>net.wytrem:wylog</exclude>
+                                    <exclude>org.junit.jupiter:*</exclude>
+                                    <exclude>org.mockito:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>okhttp3</pattern>
+                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.okhttp3</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>okio</pattern>
+                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.okio</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google.gson</pattern>
+                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.com.google.gson</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

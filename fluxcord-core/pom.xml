@@ -20,32 +20,38 @@
         <dependency>
             <groupId>fr.farmvivi.fluxcord</groupId>
             <artifactId>fluxcord-api</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- External dependencies for implementation -->
         <dependency>
             <groupId>net.wytrem</groupId>
             <artifactId>wylog</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -57,6 +63,7 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Test dependencies -->

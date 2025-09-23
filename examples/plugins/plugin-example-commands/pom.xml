@@ -21,18 +21,21 @@
         <dependency>
             <groupId>fr.farmvivi.fluxcord</groupId>
             <artifactId>fluxcord-api</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- JDA for Discord API interactions -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- WyLog for logging -->
         <dependency>
             <groupId>net.wytrem</groupId>
             <artifactId>wylog</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->

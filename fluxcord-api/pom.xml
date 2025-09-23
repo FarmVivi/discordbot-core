@@ -20,12 +20,14 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- WyLog for logging interfaces -->
         <dependency>
             <groupId>net.wytrem</groupId>
             <artifactId>wylog</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

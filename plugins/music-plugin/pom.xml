@@ -42,18 +42,29 @@
         <dependency>
             <groupId>fr.farmvivi.fluxcord</groupId>
             <artifactId>fluxcord-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- JDA for Discord API -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- WyLog for logging -->
         <dependency>
             <groupId>net.wytrem</groupId>
             <artifactId>wylog</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- SLF4J API used directly in plugin code -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- LavaPlayer fork maintenu -->
@@ -138,6 +149,20 @@
                                     <exclude>org.mockito:*</exclude>
                                 </excludes>
                             </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>dev.arbjerg</pattern>
+                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.dev.arbjerg</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>dev.lavalink.youtube</pattern>
+                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.dev.lavalink.youtube</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.github.topi314.lavasrc</pattern>
+                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.com.github.topi314.lavasrc</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
