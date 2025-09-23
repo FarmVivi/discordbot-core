@@ -138,17 +138,6 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <artifactSet>
-                                <excludes>
-                                    <!-- Provided by core/runtime -->
-                                    <exclude>fr.farmvivi.fluxcord:fluxcord-api</exclude>
-                                    <exclude>net.dv8tion:JDA</exclude>
-                                    <exclude>net.wytrem:wylog</exclude>
-                                    <!-- Test libs -->
-                                    <exclude>org.junit.jupiter:*</exclude>
-                                    <exclude>org.mockito:*</exclude>
-                                </excludes>
-                            </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>dev.arbjerg</pattern>
