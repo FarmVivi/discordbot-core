@@ -1,5 +1,5 @@
 name: AIAudio
-version: 3.0.0-SNAPSHOT
+version: ${project.version}
 main: fr.farmvivi.fluxcord.plugins.aiaudio.AIAudioPlugin
 description: AI-powered voice processing and interaction plugin
 authors: [ "FarmVivi" ]
