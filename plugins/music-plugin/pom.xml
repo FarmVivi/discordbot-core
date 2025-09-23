@@ -52,20 +52,13 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- WyLog for logging -->
-        <dependency>
-            <groupId>net.wytrem</groupId>
-            <artifactId>wylog</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- SLF4J API used directly in plugin code -->
+        <!-- SLF4J for logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.36</version>
             <scope>provided</scope>
         </dependency>
+
 
         <!-- LavaPlayer fork maintenu -->
         <!-- https://maven.lavalink.dev/#/releases/dev/arbjerg/lavaplayer -->
