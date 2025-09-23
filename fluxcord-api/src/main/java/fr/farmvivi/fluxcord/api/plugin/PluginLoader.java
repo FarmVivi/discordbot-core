@@ -31,12 +31,12 @@ public interface PluginLoader {
     boolean disablePlugin(Plugin plugin);
 
     /**
-     * Gets a loaded plugin by name.
+     * Gets a loaded plugin by ID.
      *
-     * @param name the name of the plugin
+     * @param id the ID of the plugin
      * @return the plugin, or null if not found
      */
-    Plugin getPlugin(String name);
+    Plugin getPlugin(String id);
 
     /**
      * Gets all loaded plugins.
@@ -48,8 +48,8 @@ public interface PluginLoader {
     /**
      * Checks if a plugin is loaded.
      *
-     * @param name the name of the plugin
+     * @param id the ID of the plugin
      * @return true if the plugin is loaded, false otherwise
      */
-    boolean isPluginLoaded(String name);
+    boolean isPluginLoaded(String id);
 }

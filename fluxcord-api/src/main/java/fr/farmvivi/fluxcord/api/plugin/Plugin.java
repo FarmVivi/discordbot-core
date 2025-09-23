@@ -6,14 +6,24 @@ package fr.farmvivi.fluxcord.api.plugin;
  */
 public interface Plugin {
     /**
-     * Gets the name of the plugin.
+     * Gets the unique identifier of the plugin.
+     * This typically matches the Maven artifactId.
      *
-     * @return the plugin's name
+     * @return the plugin's unique identifier
+     */
+    String getId();
+
+    /**
+     * Gets the display name of the plugin.
+     * This typically matches the Maven name.
+     *
+     * @return the plugin's display name
      */
     String getName();
 
     /**
      * Gets the version of the plugin.
+     * This typically matches the Maven version.
      *
      * @return the plugin's version string
      */

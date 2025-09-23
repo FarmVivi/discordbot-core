@@ -13,6 +13,7 @@ import java.util.Map;
  * Immutable record representing plugin metadata loaded from plugin.yml.
  */
 public record PluginDescriptor(
+        String id,
         String name,
         String main,
         String version,
@@ -34,6 +35,7 @@ public record PluginDescriptor(
             Map<String, Object> values = yaml.load(inputStream);
 
             // Extract required fields with validation
+            String id = getRequiredString(values, "id", "Plugin id cannot be empty");
             String name = getRequiredString(values, "name", "Plugin name cannot be empty");
             String main = getRequiredString(values, "main", "Main class cannot be empty");
             String version = getRequiredString(values, "version", "Version cannot be empty");
@@ -45,7 +47,7 @@ public record PluginDescriptor(
             List<String> softDependencies = getStringList(values, "soft-dependencies");
 
             return new PluginDescriptor(
-                    name, main, version, description,
+                    id, name, main, version, description,
                     Collections.unmodifiableList(authors),
                     Collections.unmodifiableList(dependencies),
                     Collections.unmodifiableList(softDependencies)

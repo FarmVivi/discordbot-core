@@ -1,8 +1,8 @@
-name: MusicPlugin
-module: ${project.artifactId}
+id: ${project.artifactId}
+name: ${project.name}
 version: ${project.version}
 main: fr.farmvivi.fluxcord.plugins.music.MusicPlugin
-description: Advanced music bot plugin with playlist management and audio effects
+description: ${project.description}
 authors: [ FarmVivi ]
 website: https://github.com/FarmVivi/fluxcord
 dependencies: [ ]

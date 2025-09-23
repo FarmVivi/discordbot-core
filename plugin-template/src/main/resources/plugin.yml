@@ -1,8 +1,8 @@
-name: TemplatePlugin
-module: ${project.artifactId}
+id: ${project.artifactId}
+name: ${project.name}
 version: ${project.version}
 main: com.example.plugin.TemplatePlugin
-description: Template plugin for Fluxcord development
+description: ${project.description}
 authors: [ YourName ]
 website: https://github.com/your-username/your-plugin-repo
 dependencies: [ ]

@@ -126,18 +126,19 @@ public class PluginManager implements PluginLoader, Closeable {
                 eventManager.fireEvent(loadingEvent);
             }
 
-            // Create the plugin configuration
-            PluginConfiguration pluginConfig = new PluginConfiguration(descriptor.name(), classLoader);
+            // Create the plugin configuration using plugin ID
+            PluginConfiguration pluginConfig = new PluginConfiguration(descriptor.id(), classLoader);
 
             // Create the plugin context
             PluginContextImpl context = new PluginContextImpl(
+                    descriptor.id(),
                     descriptor.name(),
                     descriptor.version(),
-                    LoggerFactory.getLogger(descriptor.name()),
+                    LoggerFactory.getLogger(descriptor.id()),
                     eventManager,
                     discordAPI,
                     pluginConfig,
-                    new File(pluginsFolder, descriptor.name()).getAbsolutePath(),
+                    new File(pluginsFolder, descriptor.id()).getAbsolutePath(),
                     this,
                     classLoader,
                     languageManager,
@@ -157,14 +158,14 @@ public class PluginManager implements PluginLoader, Closeable {
 
             // Load plugin language resources: defaults from JAR then runtime overrides
             try {
-                String namespace = descriptor.name().toLowerCase();
+                String namespace = descriptor.id().toLowerCase();
                 // Register namespace defensively (no-op if already registered in onLoad)
                 languageManager.registerNamespace(namespace);
 
                 int totalLoaded = 0;
                 totalLoaded += loadPluginLanguagesFromJar(jar, namespace);
 
-                File runtimeLang = new File(new File(pluginsFolder, descriptor.name()), "lang");
+                File runtimeLang = new File(new File(pluginsFolder, descriptor.id()), "lang");
                 totalLoaded += loadPluginLanguagesFromFolder(runtimeLang, namespace);
 
                 if (totalLoaded > 0) {
@@ -173,14 +174,14 @@ public class PluginManager implements PluginLoader, Closeable {
                     logger.debug("No language entries found for plugin namespace '{}' (JAR/resources or runtime)", namespace);
                 }
             } catch (Exception e) {
-                logger.error("Failed to load language resources for plugin {}", descriptor.name(), e);
+                logger.error("Failed to load language resources for plugin {} ({})", descriptor.id(), descriptor.name(), e);
             }
 
-            // Store the classloader
-            classLoaders.put(descriptor.name(), classLoader);
+            // Store the classloader using plugin ID
+            classLoaders.put(descriptor.id(), classLoader);
 
-            // Store the descriptor
-            pluginDescriptors.put(descriptor.name(), descriptor);
+            // Store the descriptor using plugin ID
+            pluginDescriptors.put(descriptor.id(), descriptor);
 
             // Fire the plugin loaded event
             if (eventManager != null) {
@@ -289,7 +290,7 @@ public class PluginManager implements PluginLoader, Closeable {
     @Override
     public boolean enablePlugin(Plugin plugin) {
         if (plugin.getLifecycle() != PluginLifecycle.LOADED) {
-            logger.warn("Cannot enable plugin {}: not in LOADED state", plugin.getName());
+            logger.warn("Cannot enable plugin {} ({}): not in LOADED state", plugin.getId(), plugin.getName());
             return false;
         }
 
@@ -299,7 +300,7 @@ public class PluginManager implements PluginLoader, Closeable {
             eventManager.fireEvent(enableEvent);
 
             if (enableEvent.isCancelled()) {
-                logger.warn("Plugin {} enable was cancelled by a listener", plugin.getName());
+                logger.warn("Plugin {} ({}) enable was cancelled by a listener", plugin.getId(), plugin.getName());
                 return false;
             }
         }
@@ -321,10 +322,10 @@ public class PluginManager implements PluginLoader, Closeable {
                 eventManager.fireEvent(enabledEvent);
             }
 
-            logger.info("Plugin enabled: {} v{}", plugin.getName(), plugin.getVersion());
+            logger.info("Plugin enabled: {} ({}) v{}", plugin.getId(), plugin.getName(), plugin.getVersion());
             return true;
         } catch (Exception e) {
-            logger.error("Failed to enable plugin: {}", plugin.getName(), e);
+            logger.error("Failed to enable plugin: {} ({})", plugin.getId(), plugin.getName(), e);
             plugin.setLifecycle(PluginLifecycle.ERROR);
             return false;
         }
@@ -333,7 +334,7 @@ public class PluginManager implements PluginLoader, Closeable {
     @Override
     public boolean disablePlugin(Plugin plugin) {
         if (plugin.getLifecycle() != PluginLifecycle.ENABLED) {
-            logger.warn("Cannot disable plugin {}: not in ENABLED state", plugin.getName());
+            logger.warn("Cannot disable plugin {} ({}): not in ENABLED state", plugin.getId(), plugin.getName());
             return false;
         }
 
@@ -343,7 +344,7 @@ public class PluginManager implements PluginLoader, Closeable {
             eventManager.fireEvent(disableEvent);
 
             if (disableEvent.isCancelled()) {
-                logger.warn("Plugin {} disable was cancelled by a listener", plugin.getName());
+                logger.warn("Plugin {} ({}) disable was cancelled by a listener", plugin.getId(), plugin.getName());
                 return false;
             }
         }
@@ -380,18 +381,18 @@ public class PluginManager implements PluginLoader, Closeable {
                 eventManager.fireEvent(disabledEvent);
             }
 
-            logger.info("Plugin disabled: {}", plugin.getName());
+            logger.info("Plugin disabled: {} ({})", plugin.getId(), plugin.getName());
             return true;
         } catch (Exception e) {
-            logger.error("Failed to disable plugin: {}", plugin.getName(), e);
+            logger.error("Failed to disable plugin: {} ({})", plugin.getId(), plugin.getName(), e);
             plugin.setLifecycle(PluginLifecycle.ERROR);
             return false;
         }
     }
 
     @Override
-    public Plugin getPlugin(String name) {
-        return plugins.get(name);
+    public Plugin getPlugin(String id) {
+        return plugins.get(id);
     }
 
     @Override
@@ -400,8 +401,8 @@ public class PluginManager implements PluginLoader, Closeable {
     }
 
     @Override
-    public boolean isPluginLoaded(String name) {
-        return plugins.containsKey(name);
+    public boolean isPluginLoaded(String id) {
+        return plugins.containsKey(id);
     }
 
     /**
@@ -452,12 +453,12 @@ public class PluginManager implements PluginLoader, Closeable {
     public void preEnablePlugins() {
         logger.info("Pre-enabling plugins...");
         for (Plugin plugin : getPluginsInOrder()) {
-            if (plugin.getLifecycle() == PluginLifecycle.LOADED && !failedPlugins.contains(plugin.getName())) {
+            if (plugin.getLifecycle() == PluginLifecycle.LOADED && !failedPlugins.contains(plugin.getId())) {
                 try {
                     executeLifecyclePhase(plugin, PluginLifecycle.PRE_ENABLING, Plugin::onPreEnable);
                 } catch (Exception e) {
-                    logger.error("Error pre-enabling plugin: {}", plugin.getName(), e);
-                    failedPlugins.add(plugin.getName());
+                    logger.error("Error pre-enabling plugin: {} ({})", plugin.getId(), plugin.getName(), e);
+                    failedPlugins.add(plugin.getId());
                     plugin.setLifecycle(PluginLifecycle.ERROR);
                 }
             }
@@ -470,12 +471,12 @@ public class PluginManager implements PluginLoader, Closeable {
     public void enablePlugins() {
         logger.info("Enabling plugins...");
         for (Plugin plugin : getPluginsInOrder()) {
-            if (plugin.getLifecycle() == PluginLifecycle.PRE_ENABLING && !failedPlugins.contains(plugin.getName())) {
+            if (plugin.getLifecycle() == PluginLifecycle.PRE_ENABLING && !failedPlugins.contains(plugin.getId())) {
                 try {
                     executeLifecyclePhase(plugin, PluginLifecycle.ENABLING, Plugin::onEnable);
                 } catch (Exception e) {
-                    logger.error("Error enabling plugin: {}", plugin.getName(), e);
-                    failedPlugins.add(plugin.getName());
+                    logger.error("Error enabling plugin: {} ({})", plugin.getId(), plugin.getName(), e);
+                    failedPlugins.add(plugin.getId());
                     plugin.setLifecycle(PluginLifecycle.ERROR);
                 }
             }
@@ -488,7 +489,7 @@ public class PluginManager implements PluginLoader, Closeable {
     public void postEnablePlugins() {
         logger.info("Post-enabling plugins...");
         for (Plugin plugin : getPluginsInOrder()) {
-            if (plugin.getLifecycle() == PluginLifecycle.ENABLING && !failedPlugins.contains(plugin.getName())) {
+            if (plugin.getLifecycle() == PluginLifecycle.ENABLING && !failedPlugins.contains(plugin.getId())) {
                 try {
                     executeLifecyclePhase(plugin, PluginLifecycle.POST_ENABLING, Plugin::onPostEnable);
 
@@ -502,10 +503,10 @@ public class PluginManager implements PluginLoader, Closeable {
                         eventManager.fireEvent(new PluginEnabledEvent(plugin));
                     }
 
-                    logger.info("Plugin fully enabled: {} v{}", plugin.getName(), plugin.getVersion());
+                    logger.info("Plugin fully enabled: {} ({}) v{}", plugin.getId(), plugin.getName(), plugin.getVersion());
                 } catch (Exception e) {
-                    logger.error("Error post-enabling plugin: {}", plugin.getName(), e);
-                    failedPlugins.add(plugin.getName());
+                    logger.error("Error post-enabling plugin: {} ({})", plugin.getId(), plugin.getName(), e);
+                    failedPlugins.add(plugin.getId());
                     plugin.setLifecycle(PluginLifecycle.ERROR);
                 }
             }
@@ -522,7 +523,7 @@ public class PluginManager implements PluginLoader, Closeable {
                 try {
                     executeLifecyclePhase(plugin, PluginLifecycle.PRE_DISABLING, Plugin::onPreDisable);
                 } catch (Exception e) {
-                    logger.error("Error pre-disabling plugin: {}", plugin.getName(), e);
+                    logger.error("Error pre-disabling plugin: {} ({})", plugin.getId(), plugin.getName(), e);
                     // Continue anyway
                 }
             }
@@ -539,7 +540,7 @@ public class PluginManager implements PluginLoader, Closeable {
                 try {
                     executeLifecyclePhase(plugin, PluginLifecycle.DISABLING, Plugin::onDisable);
                 } catch (Exception e) {
-                    logger.error("Error disabling plugin: {}", plugin.getName(), e);
+                    logger.error("Error disabling plugin: {} ({})", plugin.getId(), plugin.getName(), e);
                     // Continue anyway
                 }
             }
@@ -566,9 +567,9 @@ public class PluginManager implements PluginLoader, Closeable {
                         eventManager.fireEvent(new PluginDisabledEvent(plugin));
                     }
 
-                    logger.info("Plugin fully disabled: {}", plugin.getName());
+                    logger.info("Plugin fully disabled: {} ({})", plugin.getId(), plugin.getName());
                 } catch (Exception e) {
-                    logger.error("Error post-disabling plugin: {}", plugin.getName(), e);
+                    logger.error("Error post-disabling plugin: {} ({})", plugin.getId(), plugin.getName(), e);
                     // Continue anyway
                 }
             }
@@ -836,11 +837,11 @@ public class PluginManager implements PluginLoader, Closeable {
                 // Parse plugin.yml
                 PluginDescriptor descriptor = PluginDescriptor.fromYaml(jar.getInputStream(entry));
 
-                // Store metadata
-                pluginDescriptors.put(descriptor.name(), descriptor);
-                pluginJarPaths.put(descriptor.name(), file.getAbsolutePath());
+                // Store metadata using plugin ID
+                pluginDescriptors.put(descriptor.id(), descriptor);
+                pluginJarPaths.put(descriptor.id(), file.getAbsolutePath());
 
-                logger.debug("Scanned plugin: {} v{}", descriptor.name(), descriptor.version());
+                logger.debug("Scanned plugin: {} ({}) v{}", descriptor.id(), descriptor.name(), descriptor.version());
             } catch (Exception e) {
                 logger.error("Failed to scan plugin: {}", file.getName(), e);
             }
@@ -886,7 +887,7 @@ public class PluginManager implements PluginLoader, Closeable {
         // Create a map of plugin names to plugin instances
         Map<String, Plugin> pluginMap = new HashMap<>();
         for (Plugin plugin : plugins.values()) {
-            pluginMap.put(plugin.getName(), plugin);
+            pluginMap.put(plugin.getId(), plugin);
         }
 
         // Resolve dependencies
