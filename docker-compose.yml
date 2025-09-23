@@ -14,6 +14,8 @@ services:
       # Mount for application data persistence
       - ./data:/app/data
       - ./plugins:/app/plugins
+      # Persist application logs on host
+      - ./logs:/app/logs
       # If you maintain a custom config at repo root, bind it here. Ensure the file exists.
       #- ./config.yml:/app/config.yml
     environment:
