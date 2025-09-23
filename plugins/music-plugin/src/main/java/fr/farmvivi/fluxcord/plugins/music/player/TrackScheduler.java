@@ -91,7 +91,8 @@ public class TrackScheduler extends AudioEventAdapter {
         } else {
             next = queue.poll();
             if (next != null) {
-                queueList.remove(next);
+                // Remove the first occurrence from queueList
+                queueList.remove(0);
             }
         }
 
@@ -110,6 +111,8 @@ public class TrackScheduler extends AudioEventAdapter {
     public void skip() {
         AudioTrack current = player.getPlayingTrack();
         if (current != null && loopMode) {
+            // En mode loop, on ajoute la piste actuelle à la fin de la queue
+            // pour qu'elle soit rejouée plus tard, pas immédiatement
             addToQueueEnd(current.makeClone());
         }
         nextTrack();
