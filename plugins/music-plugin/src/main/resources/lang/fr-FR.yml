@@ -80,8 +80,8 @@ music:
     page: "Page {0} sur {1}"
     duration: "Durée totale"
     modes: "Modes de lecture"
-    cleared: "🗑️ **{0}** pistes supprimées de la file d'attente"
-    removed: "🗑️ **{0}** retiré de la file d'attente"
+    cleared: "🗑️ **{0}** pistes supprimées de la file d''attente"
+    removed: "🗑️ **{0}** retiré de la file d''attente"
   
   # Messages de lecture en cours
   nowplaying:
@@ -102,17 +102,13 @@ music:
     playing: "En cours de lecture"
     track: "Piste"
     progress: "Progression"
-    queue: "File d'attente ({0})"
+    queue: "File d''attente ({0})"
     shuffle_mode: "Mode aléatoire actif"
     more_tracks: "... et {0} de plus"
     loop: "Répéter"
     loop_queue: "Répéter la file"
     shuffle: "Aléatoire"
     modes: "Modes actifs"
-  
-  # Aide des boutons
-  button:
-    add_help: "Utilisez `/play <recherche>` pour ajouter des pistes à la file d'attente"
   
   # Champs communs
   title: "Titre"

@@ -110,10 +110,6 @@ music:
     shuffle: "Shuffle"
     modes: "Active Modes"
   
-  # Button help
-  button:
-    add_help: "Use `/play <query>` to add tracks to the queue"
-  
   # Common fields
   title: "Title"
   name: "Name"
