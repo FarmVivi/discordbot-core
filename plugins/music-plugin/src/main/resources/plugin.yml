@@ -1,5 +1,5 @@
 name: MusicPlugin
-version: 1.0.0
+version: 3.0.0-SNAPSHOT
 main: fr.farmvivi.fluxcord.plugins.music.MusicPlugin
 description: Advanced music bot plugin with playlist management and audio effects
 authors: [ FarmVivi ]

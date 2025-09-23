@@ -1,5 +1,5 @@
 name: TemplatePlugin
-version: 1.0.0
+version: 3.0.0-SNAPSHOT
 main: com.example.plugin.TemplatePlugin
 description: Template plugin for Fluxcord development
 authors: [ YourName ]

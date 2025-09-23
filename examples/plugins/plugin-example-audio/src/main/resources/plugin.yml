@@ -1,5 +1,5 @@
 name: AudioExample
-version: 1.0.0
+version: 3.0.0-SNAPSHOT
 main: fr.farmvivi.fluxcord.examples.audio.AudioExamplePlugin
 description: Example audio plugin demonstrating audio API capabilities
 authors: [ "FarmVivi" ]
