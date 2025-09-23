@@ -1,4 +1,5 @@
 name: TemplatePlugin
+module: ${project.artifactId}
 version: ${project.version}
 main: com.example.plugin.TemplatePlugin
 description: Template plugin for Fluxcord development

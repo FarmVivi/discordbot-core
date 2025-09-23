@@ -1,4 +1,5 @@
 name: CommandExample
+module: ${project.artifactId}
 version: ${project.version}
 main: fr.farmvivi.fluxcord.examples.commands.CommandExamplePlugin
 description: Demonstrates command system features including slash commands, text commands, permissions, and cooldowns

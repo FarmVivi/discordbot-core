@@ -1,4 +1,5 @@
 name: AudioExample
+module: ${project.artifactId}
 version: ${project.version}
 main: fr.farmvivi.fluxcord.examples.audio.AudioExamplePlugin
 description: Example audio plugin demonstrating audio API capabilities
