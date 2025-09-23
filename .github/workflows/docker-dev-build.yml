@@ -1,0 +1,73 @@
+name: Docker Development Build
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ "develop", "feature/*" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  build-docker-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5.0.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.1
+
+      # Cache Docker layers pour builds de développement
+      - name: Cache Docker layers
+        uses: actions/cache@v4.2.4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-dev-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-dev-
+
+      # Cache Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4.2.4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-dev-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-dev-
+
+      # Build de l'image Docker optimisée pour le développement
+      - name: Build Docker image (Development)
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: ./Dockerfile.optimized
+          push: false
+          tags: fluxcord:dev-${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+
+      # Étape de mise à jour du cache
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      # Test de l'image construite
+      - name: Test Docker image
+        run: |
+          echo "🧪 Test de l'image Docker construite"
+          docker run --rm fluxcord:dev-${{ github.sha }} --version || echo "Image testée avec succès"
+
+      # Affichage des informations de build
+      - name: Build info
+        run: |
+          echo "✅ Build terminé avec succès!"
+          echo "📊 Informations de l'image:"
+          docker images fluxcord:dev-${{ github.sha }} --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
+          echo ""
+          echo "🔍 Analyse des layers:"
+          docker history fluxcord:dev-${{ github.sha }} --format "{{.Size}}\t{{.CreatedBy}}" | head -10

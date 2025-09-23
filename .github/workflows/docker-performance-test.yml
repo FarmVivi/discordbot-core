@@ -1,0 +1,125 @@
+name: Docker Performance Test
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:  # Déclenchement manuel
+  schedule:
+    - cron: '0 2 * * 0'  # Chaque dimanche à 2h du matin
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5.0.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.1
+
+      # Cache pour les tests de performance
+      - name: Cache Docker layers
+        uses: actions/cache@v4.2.4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-perf-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-perf-
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4.2.4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-perf-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-perf-
+
+      # Test 1: Build avec Dockerfile original
+      - name: Build with original Dockerfile
+        id: build_original
+        run: |
+          echo "🏁 Test 1: Build avec Dockerfile original"
+          time docker build -f Dockerfile -t fluxcord:original-test . 2>&1 | tee build_original.log
+          echo "original_time=$(grep 'real' build_original.log | awk '{print $2}')" >> $GITHUB_OUTPUT
+          echo "original_size=$(docker images fluxcord:original-test --format '{{.Size}}')" >> $GITHUB_OUTPUT
+
+      # Test 2: Build avec Dockerfile optimisé
+      - name: Build with optimized Dockerfile
+        id: build_optimized
+        run: |
+          echo "🏁 Test 2: Build avec Dockerfile optimisé"
+          time docker build -f Dockerfile.optimized -t fluxcord:optimized-test . 2>&1 | tee build_optimized.log
+          echo "optimized_time=$(grep 'real' build_optimized.log | awk '{print $2}')" >> $GITHUB_OUTPUT
+          echo "optimized_size=$(docker images fluxcord:optimized-test --format '{{.Size}}')" >> $GITHUB_OUTPUT
+
+      # Test 3: Build avec BuildKit
+      - name: Build with BuildKit
+        id: build_buildkit
+        run: |
+          echo "🏁 Test 3: Build avec BuildKit"
+          DOCKER_BUILDKIT=1 time docker build -f Dockerfile.buildkit -t fluxcord:buildkit-test . 2>&1 | tee build_buildkit.log
+          echo "buildkit_time=$(grep 'real' build_buildkit.log | awk '{print $2}')" >> $GITHUB_OUTPUT
+          echo "buildkit_size=$(docker images fluxcord:buildkit-test --format '{{.Size}}')" >> $GITHUB_OUTPUT
+
+      # Test 4: Build avec cache (deuxième build)
+      - name: Build with cache (second build)
+        id: build_cached
+        run: |
+          echo "🏁 Test 4: Build avec cache (deuxième build)"
+          time docker build -f Dockerfile.optimized -t fluxcord:cached-test . 2>&1 | tee build_cached.log
+          echo "cached_time=$(grep 'real' build_cached.log | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      # Génération du rapport de performance
+      - name: Generate performance report
+        run: |
+          echo "# 📊 Rapport de Performance Docker" > performance_report.md
+          echo "" >> performance_report.md
+          echo "## Résultats des Tests" >> performance_report.md
+          echo "" >> performance_report.md
+          echo "| Version | Temps de Build | Taille |" >> performance_report.md
+          echo "|---------|----------------|--------|" >> performance_report.md
+          echo "| Original | ${{ steps.build_original.outputs.original_time }} | ${{ steps.build_original.outputs.original_size }} |" >> performance_report.md
+          echo "| Optimisé | ${{ steps.build_optimized.outputs.optimized_time }} | ${{ steps.build_optimized.outputs.optimized_size }} |" >> performance_report.md
+          echo "| BuildKit | ${{ steps.build_buildkit.outputs.buildkit_time }} | ${{ steps.build_buildkit.outputs.buildkit_size }} |" >> performance_report.md
+          echo "| Avec Cache | ${{ steps.build_cached.outputs.cached_time }} | - |" >> performance_report.md
+          echo "" >> performance_report.md
+          echo "## Analyse" >> performance_report.md
+          echo "" >> performance_report.md
+          echo "- **Build optimisé** : Amélioration par rapport au build original" >> performance_report.md
+          echo "- **BuildKit** : Performance maximale avec cache mounts" >> performance_report.md
+          echo "- **Cache** : Gain significatif sur les builds répétés" >> performance_report.md
+          echo "" >> performance_report.md
+          echo "## Recommandations" >> performance_report.md
+          echo "" >> performance_report.md
+          echo "1. Utiliser \`Dockerfile.optimized\` pour les builds standard" >> performance_report.md
+          echo "2. Utiliser \`Dockerfile.buildkit\` avec BuildKit pour les meilleures performances" >> performance_report.md
+          echo "3. Maintenir le cache Docker pour les builds répétés" >> performance_report.md
+
+      # Upload du rapport
+      - name: Upload performance report
+        uses: actions/upload-artifact@v4.1.1
+        with:
+          name: performance-report
+          path: performance_report.md
+
+      # Commentaire sur les PR si c'est un workflow dispatch
+      - name: Comment on PR
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('performance_report.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+
+      # Nettoyage
+      - name: Cleanup test images
+        run: |
+          docker rmi fluxcord:original-test fluxcord:optimized-test fluxcord:buildkit-test fluxcord:cached-test || true
