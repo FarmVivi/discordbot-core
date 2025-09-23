@@ -1,7 +1,8 @@
-name: AIAudio
-version: 1.0.0
+id: ${project.artifactId}
+name: ${project.name}
+version: ${project.version}
 main: fr.farmvivi.fluxcord.plugins.aiaudio.AIAudioPlugin
-description: AI-powered voice processing and interaction plugin
+description: ${project.description}
 authors: [ "FarmVivi" ]
 website: https://github.com/FarmVivi/fluxcord
 dependencies: [ ]

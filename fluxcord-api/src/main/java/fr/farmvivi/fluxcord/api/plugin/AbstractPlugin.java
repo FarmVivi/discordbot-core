@@ -48,6 +48,11 @@ public abstract class AbstractPlugin implements Plugin {
     private PluginLifecycle lifecycle = PluginLifecycle.DISCOVERED;
 
     @Override
+    public String getId() {
+        return context.getPluginId();
+    }
+
+    @Override
     public String getName() {
         return context.getPluginName();
     }

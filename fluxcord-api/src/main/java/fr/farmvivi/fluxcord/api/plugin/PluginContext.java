@@ -16,7 +16,16 @@ import org.slf4j.Logger;
  */
 public interface PluginContext {
     /**
+     * Gets the plugin ID as declared in plugin.yml.
+     * This typically matches the Maven artifactId.
+     *
+     * @return the plugin ID
+     */
+    String getPluginId();
+
+    /**
      * Gets the plugin name as declared in plugin.yml.
+     * This typically matches the Maven name.
      *
      * @return the plugin name
      */
@@ -24,6 +33,7 @@ public interface PluginContext {
 
     /**
      * Gets the plugin version as declared in plugin.yml.
+     * This typically matches the Maven version.
      *
      * @return the plugin version
      */
