@@ -44,6 +44,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      # Cache Maven dependencies pour optimiser les builds Docker
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4.2.4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       # Connexion à GHCR
       - name: Login to GHCR
         if: ${{ github.event_name != 'pull_request' }}
@@ -53,16 +62,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build & push de l'image Docker
+      # Build & push de l'image Docker avec optimisations
       - name: Build and push Docker image
         uses: docker/build-push-action@v6.18.0
         with:
           context: .
+          file: ./Dockerfile.buildkit
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
 
       # Étape de mise à jour du cache (workaround)
       - name: Move cache

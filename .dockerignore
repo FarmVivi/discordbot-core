@@ -1,12 +1,74 @@
-Dockerfile
-target/
-
-# Ignore .git folder
+# Git
 .git
+.gitignore
+.gitattributes
 
-# Ignore dev file cotaining sensible data
-dev.txt
+# Documentation
+README.md
+docs/
+*.md
 
-# Ignore scipts
-gource-nvenc.bat
-gource-nvenc.sh
+# Build artifacts
+target/
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Node modules (if any)
+node_modules/
+
+# Docker files (except the one we're using)
+Dockerfile
+Dockerfile.optimized
+Dockerfile.buildkit
+docker-compose.yml
+
+# Build scripts
+build.sh
+build-optimized.sh
+
+# Sonar
+.sonar/
+sonar-project.properties
+
+# Maven wrapper (we use the Maven image)
+.mvn/
+mvnw
+mvnw.cmd
+
+# Test results
+test-results/
+coverage/
+
+# Local configuration
+.env
+.env.local
+.env.*.local
+
+# Cache directories
+.cache/
+.m2/repository/
