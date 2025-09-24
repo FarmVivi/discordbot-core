@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.LinkedList;
 
 /**
  * Manages the track queue and playback behavior for a music player.
