@@ -10,175 +10,236 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Manages the track queue and playback behavior for a music player.
+ * 
+ * <p>This scheduler handles different playback modes including:
+ * <ul>
+ *   <li>Normal mode: plays tracks sequentially and removes them after playing</li>
+ *   <li>Loop mode: repeats the current track indefinitely</li>
+ *   <li>Loop queue mode: repeats the entire queue when reaching the end</li>
+ *   <li>Shuffle mode: plays tracks in random order</li>
+ * </ul>
+ * 
+ * <p>The scheduler maintains a single synchronized queue for all operations to ensure
+ * thread safety and consistency.
  */
 public class TrackScheduler extends AudioEventAdapter {
     private static final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
 
     private final MusicPlayer musicPlayer;
     private final AudioPlayer player;
-    private final BlockingQueue<AudioTrack> queue;
-    private final List<AudioTrack> queueList; // For indexed access
-
+    
+    // Single synchronized list for queue management
+    private final List<AudioTrack> queue;
+    
+    // Track history for loop queue mode
+    private final List<AudioTrack> playedTracks;
+    
+    // Playback modes
     private boolean loopMode = false;
     private boolean loopQueueMode = false;
     private boolean shuffleMode = false;
+    
+    // Random instance for shuffle mode
+    private final Random random = new Random();
 
+    /**
+     * Creates a new TrackScheduler for the given music player.
+     * 
+     * @param musicPlayer the music player that owns this scheduler
+     * @param player the LavaPlayer audio player instance
+     */
     public TrackScheduler(MusicPlayer musicPlayer, AudioPlayer player) {
         this.musicPlayer = musicPlayer;
         this.player = player;
-        this.queue = new LinkedBlockingQueue<>();
-        this.queueList = Collections.synchronizedList(new ArrayList<>());
+        this.queue = Collections.synchronizedList(new LinkedList<>());
+        this.playedTracks = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
      * Adds a track to the queue or plays it immediately if nothing is playing.
-     *
-     * @return true if the track started playing immediately
+     * 
+     * @param track the audio track to queue
+     * @return true if the track started playing immediately, false if it was queued
      */
     public boolean queue(AudioTrack track) {
+        // Attempt to play immediately if nothing is playing
         if (!player.startTrack(track, true)) {
-            queue.offer(track);
-            queueList.add(track);
+            // If something is already playing, add to queue
+            queue.add(track);
+            logger.debug("[{}] Added track to queue: {}", getGuildName(), track.getInfo().title);
             return false;
         }
+        logger.debug("[{}] Started playing track immediately: {}", getGuildName(), track.getInfo().title);
         return true;
     }
 
     /**
      * Plays a track immediately, interrupting current playback.
+     * If a track is currently playing, it will be added to the front of the queue.
+     * 
+     * @param track the audio track to play immediately
      */
     public void playNow(AudioTrack track) {
         AudioTrack currentTrack = player.getPlayingTrack();
         if (currentTrack != null) {
             // Add current track back to the front of the queue
-            queue.offer(currentTrack.makeClone());
-            queueList.add(0, currentTrack.makeClone());
+            queue.add(0, currentTrack.makeClone());
+            logger.debug("[{}] Moved current track to queue front: {}", getGuildName(), currentTrack.getInfo().title);
         }
         player.startTrack(track, false);
     }
 
     /**
-     * Adds a track clone at the end of the queue (keeping internal structures in sync).
+     * Adds a track at the end of the queue.
+     * This method is primarily used internally for loop functionality.
+     * 
+     * @param track the audio track to add to the queue
      */
-    public void addToQueueEnd(AudioTrack track) {
+    private void addToQueueEnd(AudioTrack track) {
         if (track == null) {
             return;
         }
-        queue.offer(track);
-        queueList.add(track);
+        queue.add(track);
+        logger.debug("[{}] Added track to queue end: {}", getGuildName(), track.getInfo().title);
     }
 
     /**
      * Starts the next track in the queue.
+     * Handles different playback modes appropriately.
      */
     public void nextTrack() {
         AudioTrack next = null;
 
-        if (shuffleMode && !queue.isEmpty()) {
-            // Pick a random track from the queue
-            int randomIndex = new Random().nextInt(queueList.size());
-            next = queueList.remove(randomIndex);
-            // Rebuild queue without the selected track
-            queue.clear();
-            queue.addAll(queueList);
-        } else {
-            next = queue.poll();
-            if (next != null) {
-                // Remove the first occurrence from queueList
-                queueList.remove(0);
+        if (!queue.isEmpty()) {
+            if (shuffleMode) {
+                // Pick a random track from the queue
+                int randomIndex = random.nextInt(queue.size());
+                next = queue.remove(randomIndex);
+                logger.debug("[{}] Picked random track from queue at index {}", getGuildName(), randomIndex);
+            } else {
+                // Normal mode: take the first track
+                next = queue.remove(0);
             }
         }
 
         if (next != null) {
             player.startTrack(next, false);
-        } else if (loopQueueMode && !queueList.isEmpty()) {
-            // Re-add all tracks to queue for loop queue mode
-            queue.addAll(queueList);
-            nextTrack();
+            logger.debug("[{}] Started next track: {}", getGuildName(), next.getInfo().title);
+        } else if (loopQueueMode && hasPlayedTracks()) {
+            // Loop queue mode: restart from the beginning
+            logger.debug("[{}] Loop queue mode: restarting queue", getGuildName());
+            restartQueue();
+        } else {
+            logger.debug("[{}] No more tracks to play", getGuildName());
         }
     }
 
     /**
-     * Skip current track. If loop (single track) is active, keep current by re-adding it to the end of the queue.
+     * Skips the current track.
+     * 
+     * <p>In loop mode, the current track is added back to the end of the queue
+     * instead of being discarded. This allows the track to be played again later
+     * in the queue cycle.
      */
     public void skip() {
         AudioTrack current = player.getPlayingTrack();
-        if (current != null && loopMode) {
-            // En mode loop, on ajoute la piste actuelle à la fin de la queue
-            // pour qu'elle soit rejouée plus tard, pas immédiatement
-            addToQueueEnd(current.makeClone());
+        
+        if (current != null) {
+            logger.debug("[{}] Skipping track: {}", getGuildName(), current.getInfo().title);
+            
+            if (loopMode) {
+                // In loop mode, add the current track to the end of the queue
+                addToQueueEnd(current.makeClone());
+                logger.debug("[{}] Loop mode active: added track back to queue", getGuildName());
+            }
         }
+        
+        // Stop the current track and play the next one
+        player.stopTrack();
         nextTrack();
     }
 
     /**
-     * Clears the queue.
+     * Clears the queue and played tracks history.
      */
     public void clear() {
         queue.clear();
-        queueList.clear();
+        playedTracks.clear();
+        logger.debug("[{}] Queue and history cleared", getGuildName());
     }
 
     /**
-     * Gets the queue size.
+     * Gets the current queue size.
+     * 
+     * @return the number of tracks in the queue
      */
     public int getQueueSize() {
         return queue.size();
     }
 
     /**
-     * Gets the queue as a list for display purposes.
+     * Gets a copy of the current queue for display purposes.
+     * 
+     * @return an immutable copy of the queue
      */
     public List<AudioTrack> getQueue() {
-        return new ArrayList<>(queueList);
+        return new ArrayList<>(queue);
     }
 
     /**
      * Removes a track at the specified index.
+     * 
+     * @param index the zero-based index of the track to remove
+     * @return true if the track was successfully removed, false if the index was invalid
      */
     public boolean removeTrack(int index) {
-        if (index < 0 || index >= queueList.size()) {
+        if (index < 0 || index >= queue.size()) {
             return false;
         }
-        queueList.remove(index);
-        queue.clear();
-        queue.addAll(queueList);
+        
+        AudioTrack removed = queue.remove(index);
+        logger.debug("[{}] Removed track at index {}: {}", getGuildName(), index, removed.getInfo().title);
         return true;
     }
 
     /**
-     * Moves a track from one position to another.
+     * Moves a track from one position to another in the queue.
+     * 
+     * @param from the current index of the track
+     * @param to the target index for the track
+     * @return true if the track was successfully moved, false if either index was invalid
      */
     public boolean moveTrack(int from, int to) {
-        if (from < 0 || from >= queueList.size() || to < 0 || to >= queueList.size()) {
+        if (from < 0 || from >= queue.size() || to < 0 || to >= queue.size() || from == to) {
             return false;
         }
 
-        AudioTrack track = queueList.remove(from);
-        queueList.add(to, track);
-        queue.clear();
-        queue.addAll(queueList);
+        AudioTrack track = queue.remove(from);
+        queue.add(to, track);
+        logger.debug("[{}] Moved track from index {} to {}: {}", getGuildName(), from, to, track.getInfo().title);
         return true;
     }
 
+    // Event handlers
+    
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        String guildName = musicPlayer.getGuild().getName();
-        logger.debug("[{}] Track ended: {} - Reason: {}", guildName, track.getInfo().title, endReason);
+        logger.debug("[{}] Track ended: {} - Reason: {}", getGuildName(), track.getInfo().title, endReason);
 
         // Only start the next track if the end reason is suitable for it
         if (endReason.mayStartNext) {
             if (loopMode && endReason != AudioTrackEndReason.STOPPED) {
-                // Loop current track
+                // Loop mode: replay the same track
                 player.startTrack(track.makeClone(), false);
+                logger.debug("[{}] Loop mode: replaying track", getGuildName());
             } else {
+                // Normal end: play next track
                 nextTrack();
             }
         }
@@ -188,8 +249,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        String guildName = musicPlayer.getGuild().getName();
-        logger.error("[{}] Track exception for {}: {}", guildName, track.getInfo().title, exception.getMessage());
+        logger.error("[{}] Track exception for {}: {}", getGuildName(), track.getInfo().title, exception.getMessage());
 
         // Skip to next track on exception
         nextTrack();
@@ -198,34 +258,125 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        String guildName = musicPlayer.getGuild().getName();
-        logger.info("[{}] Started playing: {}", guildName, track.getInfo().title);
-
+        logger.info("[{}] Started playing: {}", getGuildName(), track.getInfo().title);
+        
+        // Add to played tracks history for loop queue mode
+        if (loopQueueMode && !playedTracks.contains(track)) {
+            playedTracks.add(track.makeClone());
+            logger.debug("[{}] Added track to history for loop queue mode", getGuildName());
+        }
+        
         musicPlayer.refreshUi();
     }
 
-    // Getters and setters for playback modes
+    // Playback mode getters and setters
+    
+    /**
+     * Checks if loop mode is enabled.
+     * In loop mode, the current track repeats indefinitely.
+     * 
+     * @return true if loop mode is enabled
+     */
     public boolean isLoopMode() {
         return loopMode;
     }
 
+    /**
+     * Sets the loop mode state.
+     * 
+     * @param loopMode true to enable loop mode, false to disable
+     */
     public void setLoopMode(boolean loopMode) {
         this.loopMode = loopMode;
+        logger.debug("[{}] Loop mode set to: {}", getGuildName(), loopMode);
     }
 
+    /**
+     * Checks if loop queue mode is enabled.
+     * In loop queue mode, the entire queue repeats when reaching the end.
+     * 
+     * @return true if loop queue mode is enabled
+     */
     public boolean isLoopQueueMode() {
         return loopQueueMode;
     }
 
+    /**
+     * Sets the loop queue mode state.
+     * 
+     * @param loopQueueMode true to enable loop queue mode, false to disable
+     */
     public void setLoopQueueMode(boolean loopQueueMode) {
         this.loopQueueMode = loopQueueMode;
+        if (!loopQueueMode) {
+            // Clear history when disabling loop queue mode
+            playedTracks.clear();
+        }
+        logger.debug("[{}] Loop queue mode set to: {}", getGuildName(), loopQueueMode);
     }
 
+    /**
+     * Checks if shuffle mode is enabled.
+     * In shuffle mode, tracks are played in random order.
+     * 
+     * @return true if shuffle mode is enabled
+     */
     public boolean isShuffleMode() {
         return shuffleMode;
     }
 
+    /**
+     * Sets the shuffle mode state.
+     * 
+     * @param shuffleMode true to enable shuffle mode, false to disable
+     */
     public void setShuffleMode(boolean shuffleMode) {
         this.shuffleMode = shuffleMode;
+        logger.debug("[{}] Shuffle mode set to: {}", getGuildName(), shuffleMode);
+    }
+
+    // Private utility methods
+    
+    /**
+     * Gets the guild name for logging purposes.
+     * 
+     * @return the name of the guild
+     */
+    private String getGuildName() {
+        return musicPlayer.getGuild().getName();
+    }
+
+    /**
+     * Checks if any tracks have been played in this session.
+     * Used for loop queue mode to determine if we should restart.
+     * 
+     * @return true if at least one track has been played
+     */
+    private boolean hasPlayedTracks() {
+        return !playedTracks.isEmpty();
+    }
+
+    /**
+     * Restarts the queue for loop queue mode.
+     * This method repopulates the queue with previously played tracks.
+     */
+    private void restartQueue() {
+        if (playedTracks.isEmpty()) {
+            logger.warn("[{}] No tracks in history to restart queue", getGuildName());
+            return;
+        }
+        
+        // Clone all played tracks and add them back to the queue
+        for (AudioTrack track : playedTracks) {
+            queue.add(track.makeClone());
+        }
+        
+        logger.info("[{}] Restarted queue with {} tracks", getGuildName(), playedTracks.size());
+        
+        // Clear history to start fresh for the next cycle
+        playedTracks.clear();
+        
+        // Start playing the first track
+        nextTrack();
     }
 }
