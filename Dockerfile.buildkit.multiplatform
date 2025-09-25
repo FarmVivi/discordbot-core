@@ -39,7 +39,7 @@ RUN --mount=type=cache,target=/root/.m2/repository \
 ################ Production ################
 # Use a small JRE base with shell to run an entrypoint script
 # Using eclipse-temurin:17-jre which has better multi-platform support
-FROM eclipse-temurin:17-jre AS production
+FROM eclipse-temurin:21-jre AS production
 
 ENV APP_DIR=/app \
     BUNDLES_DIR=/opt/fluxcord/bundles \
