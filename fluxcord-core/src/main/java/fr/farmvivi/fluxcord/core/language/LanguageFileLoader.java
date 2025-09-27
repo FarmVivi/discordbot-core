@@ -98,7 +98,6 @@ public class LanguageFileLoader {
      * @param prefix le préfixe pour les clés
      * @return une carte aplatie
      */
-    @SuppressWarnings("unchecked")
     private Map<String, String> flattenMap(Map<String, Object> map, String prefix) {
         Map<String, String> flatMap = new HashMap<>();
 

@@ -143,7 +143,6 @@ public class PlaylistManager {
                 ));
         for (Map.Entry<String, Object> entry : userData.entrySet()) {
             try {
-                @SuppressWarnings("unchecked")
                 Map<String, Object> playlistData = (Map<String, Object>) entry.getValue();
                 Playlist playlist = Playlist.fromMap(playlistData);
                 userPlaylists.put(entry.getKey(), playlist);
@@ -161,7 +160,6 @@ public class PlaylistManager {
                 ));
         for (Map.Entry<String, Object> entry : guildData.entrySet()) {
             try {
-                @SuppressWarnings("unchecked")
                 Map<String, Object> playlistData = (Map<String, Object>) entry.getValue();
                 Playlist playlist = Playlist.fromMap(playlistData);
                 guildPlaylists.put(entry.getKey(), playlist);

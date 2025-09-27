@@ -41,7 +41,6 @@ public class Playlist {
         }
 
         // Restore tracks
-        @SuppressWarnings("unchecked")
         List<Map<String, Object>> trackList = (List<Map<String, Object>>) map.get("tracks");
         if (trackList != null) {
             for (Map<String, Object> trackMap : trackList) {

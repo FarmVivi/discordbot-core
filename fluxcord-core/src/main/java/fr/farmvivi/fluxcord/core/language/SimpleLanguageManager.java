@@ -94,7 +94,6 @@ public class SimpleLanguageManager implements LanguageManager {
      * @param locale       the locale
      * @param resourcePath the path to the resource
      */
-    @SuppressWarnings("java:S3776") // cognitive complexity acceptable here for resource loading; instrumentation added
     private void loadDefaultResource(String namespace, Locale locale, String resourcePath) {
         try {
             InputStream inputStream = getClass().getResourceAsStream(resourcePath);
@@ -162,7 +161,6 @@ public class SimpleLanguageManager implements LanguageManager {
      * @param prefix the key prefix
      * @return a flattened map
      */
-    @SuppressWarnings("unchecked")
     private Map<String, String> flattenMap(Map<String, Object> map, String prefix) {
         Map<String, String> flatMap = new HashMap<>();
 
