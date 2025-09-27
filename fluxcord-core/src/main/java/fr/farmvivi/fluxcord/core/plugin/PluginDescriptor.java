@@ -71,7 +71,6 @@ public record PluginDescriptor(
         return value != null ? value.toString() : defaultValue;
     }
 
-    @SuppressWarnings("unchecked")
     private static List<String> getStringList(Map<String, Object> map, String key) {
         Object value = map.get(key);
         List<String> result = new ArrayList<>();

@@ -91,7 +91,6 @@ public class SimpleCommandContext implements CommandContext {
         return locale;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<T> getOption(String name) {
         Object value = options.get(name);
@@ -106,7 +105,6 @@ public class SimpleCommandContext implements CommandContext {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T getOption(String name, T defaultValue) {
         Object value = options.get(name);
@@ -121,7 +119,6 @@ public class SimpleCommandContext implements CommandContext {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T getRequiredOption(String name) {
         Object value = options.get(name);
@@ -136,7 +133,6 @@ public class SimpleCommandContext implements CommandContext {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<CommandOption<T>> getOptionDefinition(String name) {
         for (CommandOption<?> option : command.getOptions()) {
@@ -315,7 +311,6 @@ public class SimpleCommandContext implements CommandContext {
      * @param value  the value to check
      * @return true if the value has the correct type
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private boolean isValidOptionType(CommandOption option, Object value) {
         if (value == null) {
             return !option.isRequired();

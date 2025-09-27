@@ -165,7 +165,6 @@ public class SimpleEventManager implements EventManager {
                 continue;
             }
 
-            @SuppressWarnings("unchecked")
             Class<? extends Event> eventType = (Class<? extends Event>) parameterType;
 
             // Get the event handler annotation

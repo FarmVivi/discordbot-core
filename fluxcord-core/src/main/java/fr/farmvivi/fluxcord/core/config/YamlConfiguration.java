@@ -108,7 +108,6 @@ public class YamlConfiguration implements Configuration {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getStringList(String key) throws ConfigurationException {
         Object raw = getValueForKey(key);
         if (raw instanceof List) {
@@ -149,7 +148,6 @@ public class YamlConfiguration implements Configuration {
                 current.put(part, child);
                 current = child;
             } else {
-                @SuppressWarnings("unchecked")
                 Map<String, Object> nextMap = (Map<String, Object>) next;
                 current = nextMap;
             }
@@ -216,7 +214,6 @@ public class YamlConfiguration implements Configuration {
             try (FileReader reader = new FileReader(configFile)) {
                 Object loaded = yaml.load(reader);
                 if (loaded instanceof Map) {
-                    @SuppressWarnings("unchecked")
                     Map<String, Object> root = (Map<String, Object>) loaded;
                     values = root;
                 } else if (loaded == null) {
