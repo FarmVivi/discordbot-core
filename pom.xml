@@ -43,7 +43,7 @@
         <hikari.version>7.0.2</hikari.version>
         <mariadb.version>3.5.6</mariadb.version>
         <aws.sdk.version>2.34.2</aws.sdk.version>
-        <junit.version>5.13.4</junit.version>
+        <junit.version>6.0.0</junit.version>
         <mockito.version>5.20.0</mockito.version>
     </properties>
 
