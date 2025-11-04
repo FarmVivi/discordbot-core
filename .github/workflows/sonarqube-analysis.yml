@@ -1,46 +1,35 @@
 name: SonarQube Analysis
 
 permissions:
-  contents: read            # pour checkout
-  pull-requests: write      # pour PR decoration
-  actions: read             # accès aux actions
+  contents: read
+  pull-requests: read
 
 on:
-  # Trigger analysis when pushing to your main branches and with workflow_dispatch
   push:
     branches:
       - main
       - master
       - develop
       - 'releases/**'
-  # Pull request analysis conditionally run with specific comment
-  pull_request_target: # Utiliser pull_request_target au lieu de pull_request
-    types: [ opened, synchronize, reopened ]
-  workflow_dispatch:  # Permet de lancer manuellement le workflow
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
   sonarqube:
-    name: SonarQube
+    name: SonarQube Analysis
     runs-on: ubuntu-latest
-    # Pour pull_request_target, n'exécuter que pour les PR provenant de forks internes
-    if: |
-      (github.event_name == 'push') || 
-      (github.event_name == 'workflow_dispatch') || 
-      (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.owner.login == github.repository_owner)
     steps:
-      - name: Checkout source
+      - name: Checkout source code
         uses: actions/checkout@v5.0.0
         with:
-          fetch-depth: 0  # Récupère tout l'historique pour une meilleure analyse
-          # Pour pull_request_target, checkout le code de la PR
-          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.ref || '' }}
-          repository: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name || github.repository }}
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5.0.0
         with:
           java-version: '17'
-          distribution: "temurin"
+          distribution: temurin
           cache: maven
 
       - name: Cache SonarQube packages
@@ -50,8 +39,8 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build and analyze
+      - name: Build and analyze with SonarQube
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Nécessaire pour PR decoration
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Psonar -DskipTests
