@@ -3,5 +3,6 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "farmvivi",
     "projectKey": "FarmVivi_fluxcord"
-  }
+  },
+  "java.compile.nullAnalysis.mode": "automatic"
 }
