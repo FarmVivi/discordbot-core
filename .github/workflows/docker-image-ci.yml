@@ -64,7 +64,7 @@ jobs:
 
       # Build & push de l'image Docker avec optimisations
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v6.19.1
         with:
           context: .
           file: ./Dockerfile.buildkit
