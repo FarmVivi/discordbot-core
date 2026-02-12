@@ -39,7 +39,7 @@ jobs:
 
       # Build de l'image Docker optimisée pour le développement
       - name: Build Docker image (Development)
-        uses: docker/build-push-action@v6.19.1
+        uses: docker/build-push-action@v6.19.2
         with:
           context: .
           file: ./Dockerfile.optimized
