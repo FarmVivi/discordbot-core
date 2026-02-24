@@ -57,7 +57,7 @@ public class AudioPlayerManager {
                     new IosWithThumbnail(),
                     new AndroidWithThumbnail(),
                     new AndroidMusicWithThumbnail(),
-                    new TvHtml5EmbeddedWithThumbnail()
+                    new TvHtml5SimplyWithThumbnail()
             );
             playerManager.registerSourceManager(youtubeSourceManager);
         }
