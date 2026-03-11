@@ -2,6 +2,11 @@
 
 A modular, generic Discord bot engine designed for flexibility and extensibility. Built with a multi-module Maven architecture, it provides a comprehensive plugin system allowing developers to create powerful Discord bots with minimal effort.
 
+> [!IMPORTANT]
+> Fluxcord is in active development.
+> - `develop`: v3 modular refactor (current active branch)
+> - `main`: v2 legacy monolith (legacy branch with integrated modules such as music)
+
 ## 🚀 Features
 
 ### Core Engine Features
@@ -93,18 +98,21 @@ cd fluxcord
 mvn clean package
 ```
 
-3. **Configure the bot**
+3. **Configure the bot (`develop` / v3)**
 
 ```bash
-cp config.example.yml config.yml
-# Edit config.yml with your bot token and settings
+cp fluxcord-core/src/main/resources/config.yml config.yml
+# Edit config.yml and set discord.token
 ```
 
 4. **Run the bot**
 
 ```bash
-java -jar target/fluxcord.jar
+java -jar fluxcord-core/target/*-shaded.jar
 ```
+
+> [!NOTE]
+> Legacy v2 (`main`) uses `config.json` (not YAML).
 
 ### Docker Deployment
 
