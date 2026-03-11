@@ -21,8 +21,8 @@ services:
     environment:
       # JVM options (adjust memory as needed)
       - JAVA_OPTS=-Xmx1G
-      # Discord bot token (prefer passing via env var at runtime)
-      - DISCORD_TOKEN=${DISCORD_TOKEN:-}
+      # Discord bot token override for core config (env-aware key: discord.token)
+      - FLUXCORD_DISCORD_TOKEN=${FLUXCORD_DISCORD_TOKEN:-}
       # Plugin installation & updates managed by entrypoint.sh
       - INSTALL_PLUGINS=*
       - INSTALL_EXAMPLES=false
