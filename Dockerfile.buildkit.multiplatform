@@ -2,7 +2,7 @@
 ################ Build ################
 # Build stage for the full multi-module project
 # Using maven:3.9-openjdk-25-slim which has better multi-platform support
-FROM maven:3.9-openjdk-25-slim AS build
+FROM maven:3-openjdk-18-slim AS build
 
 WORKDIR /workspace
 
