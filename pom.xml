@@ -41,7 +41,7 @@
         <snakeyaml.version>2.6</snakeyaml.version>
         <gson.version>2.13.2</gson.version>
         <hikari.version>7.0.2</hikari.version>
-        <mariadb.version>3.5.7</mariadb.version>
+        <mariadb.version>3.5.8</mariadb.version>
         <aws.sdk.version>2.42.19</aws.sdk.version>
         <junit.version>6.0.3</junit.version>
         <mockito.version>5.23.0</mockito.version>
