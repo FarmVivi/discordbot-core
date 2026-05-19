@@ -1,6 +1,6 @@
 ################ Build ################
 # Build stage for the full multi-module project
-FROM maven:3.9.13-eclipse-temurin-25-alpine AS build
+FROM maven:3.9.15-eclipse-temurin-26-alpine AS build
 
 WORKDIR /workspace
 
