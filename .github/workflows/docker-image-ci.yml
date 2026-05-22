@@ -24,7 +24,7 @@ jobs:
       # Génération des tags Docker
       - name: Docker metadata
         id: docker_meta
-        uses: docker/metadata-action@v6.0.0
+        uses: docker/metadata-action@v6.1.0
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
