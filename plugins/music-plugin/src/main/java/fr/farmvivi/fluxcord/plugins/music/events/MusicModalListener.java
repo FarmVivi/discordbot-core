@@ -147,8 +147,8 @@ public class MusicModalListener extends ListenerAdapter {
             case "youtube":
                 // Accept either raw search via ytsearch: or expect link; we default to ytsearch for convenience
                 return YTSEARCH_PREFIX + query;
-          case "spotify", "deezer", "apple_music", "soundcloud", "bandcamp",
-              "vimeo", "twitch", "getyarn", "http", "local", "flowery_tts":
+            case "spotify", "deezer", "apple_music", "soundcloud", "bandcamp",
+                 "vimeo", "twitch", "getyarn", "http", "local", "flowery_tts":
                 // These typically expect URLs or identifiers understood by their respective SourceManagers.
                 // Without a URL, fallback to ytsearch (common UX) so the user can search by name.
                 return YTSEARCH_PREFIX + query;

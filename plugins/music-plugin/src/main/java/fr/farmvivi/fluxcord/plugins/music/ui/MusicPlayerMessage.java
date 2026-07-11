@@ -514,8 +514,8 @@ public class MusicPlayerMessage {
     }
 
     /**
-         * Button info extracted from button ID.
-         */
-        public record ButtonInfo(String guildId, String action) {
+     * Button info extracted from button ID.
+     */
+    public record ButtonInfo(String guildId, String action) {
     }
 }

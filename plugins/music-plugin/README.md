@@ -1,6 +1,7 @@
 # Music Plugin for Fluxcord
 
-Advanced music bot functionality for Fluxcord with comprehensive playlist management, multi-source support, and persistent player controls.
+Advanced music bot functionality for Fluxcord with comprehensive playlist management, multi-source support, and
+persistent player controls.
 
 ## 🎵 Features
 

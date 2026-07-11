@@ -44,3 +44,6 @@ data:
         secret_key: your-secret-key
         endpoint: https://s3.amazonaws.com  # Optional, for S3-compatible services
         prefix: "fluxcord"  # Optional, folder prefix in bucket
+        # Use path-style access (endpoint/bucket/key) instead of virtual-host style
+        # (bucket.endpoint/key).
+        path_style_access: false

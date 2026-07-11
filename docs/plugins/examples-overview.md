@@ -1,17 +1,20 @@
 # Plugin Examples Overview
 
-This directory contains comprehensive example plugins demonstrating all core features of the Fluxcord framework. Each plugin focuses on specific functionality while being minimal, complete, and production-ready.
+This directory contains comprehensive example plugins demonstrating all core features of the Fluxcord framework. Each
+plugin focuses on specific functionality while being minimal, complete, and production-ready.
 
 ## Available Examples
 
 ### ✅ Implemented Examples
 
 #### [Command System Example](plugin-example-commands/)
+
 **Focus**: Complete command system demonstration  
 **File**: `plugin-example-commands/`  
 **Status**: ✅ Fully Implemented
 
 **Features Demonstrated**:
+
 - Slash command registration and handling
 - Command arguments with validation
 - Permission-based access control
@@ -23,12 +26,14 @@ This directory contains comprehensive example plugins demonstrating all core fea
 - Configuration-driven behavior
 
 **Commands Available**:
+
 - `/ping` - Basic responsiveness test
 - `/echo <message>` - Argument handling and validation
 - `/info` - Rich embeds with system information
 - `/admin` - Permission checks and access control
 
 **Key Learning Points**:
+
 - How to register different types of commands
 - Implementing permission checks effectively
 - Creating rich Discord embeds
@@ -40,11 +45,13 @@ This directory contains comprehensive example plugins demonstrating all core fea
 ### 🚧 Planned Examples
 
 #### Event System Example
+
 **Focus**: Discord and plugin event handling  
 **File**: `plugin-example-events/` *(Coming Soon)*  
 **Status**: 📋 Planned
 
 **Features to Demonstrate**:
+
 - Discord event listeners (@EventHandler)
 - Event priorities and execution order
 - Event filtering and conditional processing
@@ -53,11 +60,13 @@ This directory contains comprehensive example plugins demonstrating all core fea
 - Async event handling
 
 #### Permission System Example
+
 **Focus**: Advanced permission management  
 **File**: `plugin-example-permissions/` *(Coming Soon)*  
 **Status**: 📋 Planned
 
 **Features to Demonstrate**:
+
 - Permission registration and management
 - Role-based access control
 - Permission inheritance and defaults
@@ -66,11 +75,13 @@ This directory contains comprehensive example plugins demonstrating all core fea
 - Guild-specific permission overrides
 
 #### Storage System Example
+
 **Focus**: Data persistence and management  
 **File**: `plugin-example-storage/` *(Coming Soon)*  
 **Status**: 📋 Planned
 
 **Features to Demonstrate**:
+
 - Global, user, and guild data storage
 - Data serialization and deserialization
 - Storage migrations and versioning
@@ -79,11 +90,13 @@ This directory contains comprehensive example plugins demonstrating all core fea
 - Backup and restore functionality
 
 #### Internationalization Example
+
 **Focus**: Multi-language support  
 **File**: `plugin-example-i18n/` *(Coming Soon)*  
 **Status**: 📋 Planned
 
 **Features to Demonstrate**:
+
 - Language namespace registration
 - Dynamic language switching
 - Placeholder and formatting support
@@ -92,11 +105,13 @@ This directory contains comprehensive example plugins demonstrating all core fea
 - User preference language storage
 
 #### Configuration Example
+
 **Focus**: Advanced configuration management  
 **File**: `plugin-example-config/` *(Coming Soon)*  
 **Status**: 📋 Planned
 
 **Features to Demonstrate**:
+
 - Configuration loading and validation
 - Environment variable substitution
 - Hot configuration reloading
@@ -105,11 +120,13 @@ This directory contains comprehensive example plugins demonstrating all core fea
 - Configuration change events
 
 #### Audio System Example *(Already Exists)*
+
 **Focus**: Audio processing and voice channels  
 **File**: `plugin-example-audio/` *(Existing under examples/plugins)*  
 **Status**: ✅ Available
 
 **Features Demonstrated**:
+
 - Audio send/receive handlers
 - Voice channel management
 - Audio mixing and processing
@@ -143,6 +160,7 @@ This directory contains comprehensive example plugins demonstrating all core fea
 ### Example-Specific Setup
 
 Each example plugin includes:
+
 - **README.md**: Detailed usage instructions and feature documentation
 - **config.yml**: Comprehensive configuration with feature toggles
 - **lang/**: Multi-language support (English and French)
@@ -156,21 +174,24 @@ All example plugins follow these principles:
 ✅ **Feature Toggles**: Individual features can be enabled/disabled  
 ✅ **Rich Configuration**: Extensive customization options  
 ✅ **Debug Support**: Configurable logging and debugging features  
-✅ **Safe Defaults**: Production-safe default settings  
+✅ **Safe Defaults**: Production-safe default settings
 
 ## Learning Path Recommendations
 
 ### For Beginners
+
 1. **Start with Commands**: [`plugin-example-commands/`](plugin-example-commands/) - Learn basic plugin structure
 2. **Add Events**: `plugin-example-events/` *(Coming Soon)* - Understand event handling
 3. **Explore Storage**: `plugin-example-storage/` *(Coming Soon)* - Learn data persistence
 
 ### For Intermediate Developers
+
 1. **Master Permissions**: `plugin-example-permissions/` *(Coming Soon)* - Advanced access control
 2. **Internationalize**: `plugin-example-i18n/` *(Coming Soon)* - Multi-language support
 3. **Advanced Config**: `plugin-example-config/` *(Coming Soon)* - Complex configuration management
 
 ### For Advanced Usage
+
 1. **Audio Processing**: [`../audio/`](../audio/) - Voice channel and audio handling
 2. **Custom Integration**: Combine multiple examples for complex functionality
 3. **Performance Optimization**: Study production patterns and best practices
@@ -192,7 +213,7 @@ All examples maintain high code quality:
 These examples integrate with the main documentation:
 
 - **[Core Features Matrix](../../core-features.md)**: Links to relevant examples
-- **[Plugin Development Guide](../../plugin-development.md)**: References example implementations  
+- **[Plugin Development Guide](../../plugin-development.md)**: References example implementations
 - **[Template Quickstart](template-quickstart.md)**: Uses examples for learning
 
 ## Contributing New Examples
@@ -235,4 +256,5 @@ plugin-example-[feature]/
 
 ---
 
-*Example plugins are maintained as part of the Fluxcord documentation project and serve as definitive implementation references for plugin developers.*
+*Example plugins are maintained as part of the Fluxcord documentation project and serve as definitive implementation
+references for plugin developers.*

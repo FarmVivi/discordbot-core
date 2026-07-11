@@ -4,20 +4,20 @@ This document provides a comprehensive overview of all features and APIs exposed
 
 ## Feature Matrix
 
-| Feature | Description | Entry Points | How to Use | Configuration | Example Plugin |
-|---------|-------------|--------------|------------|---------------|----------------|
-| **Plugin System** | Core plugin lifecycle and management | `AbstractPlugin`, `PluginContext`, `PluginManager` | Extend `AbstractPlugin`, implement lifecycle methods | `plugin.yml` metadata | [Example Template](../plugin-template/) |
-| **Command System** | Slash commands and text commands with permissions | `CommandService`, `CommandBuilder`, `@Command` | Register commands via `CommandService` or builder pattern | Command metadata, cooldowns, permissions | [Example Commands](../examples/plugins/plugin-example-commands/) |
-| **Event System** | Discord and plugin event handling with priorities | `EventManager`, `@EventHandler`, `EventPriority` | Register listeners with `@EventHandler` annotations | Event priorities, async handling | [Example Events](#) |
-| **Permission System** | Role-based permissions with plugin namespacing | `PermissionManager`, `Permission`, `PluginPermissionAdapter` | Register permissions, check with `hasPermission()` | Permission defaults, role mappings | [Example Permissions](#) |
-| **Configuration System** | YAML-based plugin configuration with auto-loading | `Configuration`, file-based configs | Access via `getConfiguration()`, automatic loading | `config.yml` in plugin JAR and data folder | [Example Config](#) |
-| **Internationalization (i18n)** | Multi-language support with namespace isolation | `LanguageManager`, `PluginLanguageAdapter` | Register namespace, load language files | Language files in `lang/` directory | [Example i18n](#) |
-| **Data Storage** | Persistent data storage with scoping (global/user/guild) | `DataStorageManager`, `PluginDataStorageAdapter` | Use scoped storage methods (`getGlobalStorage()`, etc.) | Storage backend configuration | [Example Storage](#) |
-| **Binary Storage** | Large file storage with multiple backends (File/S3) | `BinaryStorageManager`, `PluginBinaryStorageAdapter` | Store/retrieve files with automatic namespacing | Storage backend selection | [Example Files](#) |
-| **Audio System** | Advanced audio processing with mixing and priorities | `AudioService`, `AudioSendHandler`, `AudioReceiveHandler` | Register audio handlers with volume/priority | Audio priorities, volume control | [Example Audio](../examples/plugins/plugin-example-audio/) |
-| **Discord Integration** | Full Discord API access through JDA abstraction | `DiscordAPI`, `JDA` instance | Access Discord entities and APIs | Bot token, intents, activity | [Example Discord](#) |
-| **Logging System** | Plugin-specific logging with configurable levels | Plugin `Logger` instance | Use provided logger in `AbstractPlugin` | Log levels, file output | Built into template |
-| **Plugin Communication** | Inter-plugin dependency resolution and access | `PluginLoader`, `PluginManager` | Declare dependencies, access other plugins | `plugin.yml` dependencies | [Example Deps](#) |
+| Feature                         | Description                                              | Entry Points                                                 | How to Use                                                | Configuration                              | Example Plugin                                                   |
+|---------------------------------|----------------------------------------------------------|--------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------|------------------------------------------------------------------|
+| **Plugin System**               | Core plugin lifecycle and management                     | `AbstractPlugin`, `PluginContext`, `PluginManager`           | Extend `AbstractPlugin`, implement lifecycle methods      | `plugin.yml` metadata                      | [Example Template](../plugin-template/)                          |
+| **Command System**              | Slash commands and text commands with permissions        | `CommandService`, `CommandBuilder`, `@Command`               | Register commands via `CommandService` or builder pattern | Command metadata, cooldowns, permissions   | [Example Commands](../examples/plugins/plugin-example-commands/) |
+| **Event System**                | Discord and plugin event handling with priorities        | `EventManager`, `@EventHandler`, `EventPriority`             | Register listeners with `@EventHandler` annotations       | Event priorities, async handling           | [Example Events](#)                                              |
+| **Permission System**           | Role-based permissions with plugin namespacing           | `PermissionManager`, `Permission`, `PluginPermissionAdapter` | Register permissions, check with `hasPermission()`        | Permission defaults, role mappings         | [Example Permissions](#)                                         |
+| **Configuration System**        | YAML-based plugin configuration with auto-loading        | `Configuration`, file-based configs                          | Access via `getConfiguration()`, automatic loading        | `config.yml` in plugin JAR and data folder | [Example Config](#)                                              |
+| **Internationalization (i18n)** | Multi-language support with namespace isolation          | `LanguageManager`, `PluginLanguageAdapter`                   | Register namespace, load language files                   | Language files in `lang/` directory        | [Example i18n](#)                                                |
+| **Data Storage**                | Persistent data storage with scoping (global/user/guild) | `DataStorageManager`, `PluginDataStorageAdapter`             | Use scoped storage methods (`getGlobalStorage()`, etc.)   | Storage backend configuration              | [Example Storage](#)                                             |
+| **Binary Storage**              | Large file storage with multiple backends (File/S3)      | `BinaryStorageManager`, `PluginBinaryStorageAdapter`         | Store/retrieve files with automatic namespacing           | Storage backend selection                  | [Example Files](#)                                               |
+| **Audio System**                | Advanced audio processing with mixing and priorities     | `AudioService`, `AudioSendHandler`, `AudioReceiveHandler`    | Register audio handlers with volume/priority              | Audio priorities, volume control           | [Example Audio](../examples/plugins/plugin-example-audio/)       |
+| **Discord Integration**         | Full Discord API access through JDA abstraction          | `DiscordAPI`, `JDA` instance                                 | Access Discord entities and APIs                          | Bot token, intents, activity               | [Example Discord](#)                                             |
+| **Logging System**              | Plugin-specific logging with configurable levels         | Plugin `Logger` instance                                     | Use provided logger in `AbstractPlugin`                   | Log levels, file output                    | Built into template                                              |
+| **Plugin Communication**        | Inter-plugin dependency resolution and access            | `PluginLoader`, `PluginManager`                              | Declare dependencies, access other plugins                | `plugin.yml` dependencies                  | [Example Deps](#)                                                |
 
 ## Detailed Feature Documentation
 
@@ -26,11 +26,13 @@ This document provides a comprehensive overview of all features and APIs exposed
 **Description**: Core lifecycle management for plugins with dependency resolution.
 
 **Entry Points**:
+
 - `plugin.fr.farmvivi.fluxcord.api.AbstractPlugin` - Base plugin class
 - `plugin.fr.farmvivi.fluxcord.api.PluginContext` - Access to core services
 - `fr.farmvivi.fluxcord.api.plugin.PluginManager` - Plugin management
 
 **How to Use**:
+
 ```java
 public class MyPlugin extends AbstractPlugin {
     @Override
@@ -47,6 +49,7 @@ public class MyPlugin extends AbstractPlugin {
 ```
 
 **Configuration**:
+
 - `plugin.yml` - Plugin metadata (name, version, dependencies)
 - Automatic data folder creation
 - Lifecycle state management
@@ -60,11 +63,13 @@ public class MyPlugin extends AbstractPlugin {
 **Description**: Unified slash command and text command system with permissions and cooldowns.
 
 **Entry Points**:
+
 - `command.fr.farmvivi.fluxcord.api.CommandService` - Command registration and management
 - `command.fr.farmvivi.fluxcord.api.CommandBuilder` - Fluent command creation
 - `command.fr.farmvivi.fluxcord.api.CommandContext` - Command execution context
 
 **How to Use**:
+
 ```java
 // Using CommandBuilder
 commandService.registerCommand(this, builder -> {
@@ -84,6 +89,7 @@ public void onSlashCommand(SlashCommandInteractionEvent event) {
 ```
 
 **Configuration**:
+
 - Command prefixes (global and per-guild)
 - Cooldowns and rate limiting
 - Permission requirements
@@ -98,11 +104,13 @@ public void onSlashCommand(SlashCommandInteractionEvent event) {
 **Description**: Comprehensive event handling for Discord events and plugin events with priority-based execution.
 
 **Entry Points**:
+
 - `event.fr.farmvivi.fluxcord.api.EventManager` - Event registration and firing
 - `event.fr.farmvivi.fluxcord.api.EventHandler` - Annotation for event handlers
 - `event.fr.farmvivi.fluxcord.api.EventPriority` - Priority levels
 
 **How to Use**:
+
 ```java
 @EventHandler(priority = EventPriority.HIGH)
 public void onMessageReceived(MessageReceivedEvent event) {
@@ -117,6 +125,7 @@ public void onPluginEvent(PluginEnableEvent event) {
 ```
 
 **Configuration**:
+
 - Event priorities (LOW, NORMAL, HIGH, HIGHEST)
 - Async event handling
 - Event cancellation support
@@ -130,11 +139,13 @@ public void onPluginEvent(PluginEnableEvent event) {
 **Description**: Flexible role-based permissions with plugin-specific namespacing.
 
 **Entry Points**:
+
 - `permissions.fr.farmvivi.fluxcord.api.PermissionManager` - Global permission management
 - `permissions.fr.farmvivi.fluxcord.api.PluginPermissionAdapter` - Plugin-scoped permissions
 - `permissions.fr.farmvivi.fluxcord.api.Permission` - Permission definition
 
 **How to Use**:
+
 ```java
 // Register permissions
 getPluginPermissionManager().registerPermission(new SimplePermission(
@@ -150,6 +161,7 @@ if (getPluginPermissionManager().hasPermission(userId, "myplugin.admin")) {
 ```
 
 **Configuration**:
+
 - Permission defaults (TRUE, FALSE, OP, NOT_OP)
 - Guild-specific permissions
 - User and role-based assignments
@@ -163,10 +175,12 @@ if (getPluginPermissionManager().hasPermission(userId, "myplugin.admin")) {
 **Description**: YAML-based configuration with automatic loading and environment variable support.
 
 **Entry Points**:
+
 - `config.fr.farmvivi.fluxcord.api.Configuration` - Configuration interface
 - Plugin `config.yml` files
 
 **How to Use**:
+
 ```java
 // Access configuration
 Configuration config = getConfiguration();
@@ -180,6 +194,7 @@ config.save();
 ```
 
 **Configuration**:
+
 - Default config copying from plugin JAR
 - Environment variable substitution
 - Automatic version migration
@@ -194,10 +209,12 @@ config.save();
 **Description**: Multi-language support with namespace isolation and placeholder replacement.
 
 **Entry Points**:
+
 - `language.fr.farmvivi.fluxcord.api.LanguageManager` - Global language management
 - `language.fr.farmvivi.fluxcord.api.PluginLanguageAdapter` - Plugin-scoped translations
 
 **How to Use**:
+
 ```java
 // Get translations
 String message = getPluginLanguageManager().getString("welcome", "Hello {0}!", username);
@@ -205,6 +222,7 @@ String localized = getPluginLanguageManager().getString(Locale.FRENCH, "goodbye"
 ```
 
 **Configuration**:
+
 - Language files in `lang/` directory (`en-US.yml`, `fr-FR.yml`)
 - Namespace-based key isolation
 - Fallback to default language
@@ -219,10 +237,12 @@ String localized = getPluginLanguageManager().getString(Locale.FRENCH, "goodbye"
 **Description**: Persistent data storage with automatic scoping by global, user, guild, and user-guild.
 
 **Entry Points**:
+
 - `storage.fr.farmvivi.fluxcord.api.DataStorageManager` - Storage management
 - `storage.fr.farmvivi.fluxcord.api.PluginDataStorageAdapter` - Plugin-scoped storage
 
 **How to Use**:
+
 ```java
 // Different storage scopes
 getPluginDataStorage().getGlobalStorage().set("server.uptime", System.currentTimeMillis());
@@ -235,6 +255,7 @@ getPluginDataStorage().saveAll();
 ```
 
 **Configuration**:
+
 - Storage backend selection (File, Database, etc.)
 - Automatic namespacing by plugin
 - Hierarchical key structure
@@ -248,10 +269,12 @@ getPluginDataStorage().saveAll();
 **Description**: Large file and binary data storage with multiple backend support.
 
 **Entry Points**:
-- `fr.farmvivi.fluxcord.api.storage.BinaryStorageManager` - Binary storage management  
+
+- `fr.farmvivi.fluxcord.api.storage.BinaryStorageManager` - Binary storage management
 - `binary.storage.fr.farmvivi.fluxcord.api.PluginBinaryStorageAdapter` - Plugin-scoped binary storage
 
 **How to Use**:
+
 ```java
 // Store and retrieve files
 BinaryStorageKey key = BinaryStorageKey.of("avatars", userId + ".png");
@@ -264,6 +287,7 @@ getPluginBinaryStorage().deleteFile(key);
 ```
 
 **Configuration**:
+
 - Backend selection (File system, S3, etc.)
 - Automatic plugin namespacing
 - Directory structure management
@@ -277,11 +301,13 @@ getPluginBinaryStorage().deleteFile(key);
 **Description**: Advanced audio processing with mixing, priorities, and volume control.
 
 **Entry Points**:
+
 - `audio.fr.farmvivi.fluxcord.api.AudioService` - Audio service management
 - `net.dv8tion.jda.api.audio.AudioSendHandler` - Send audio to Discord
 - `net.dv8tion.jda.api.audio.AudioReceiveHandler` - Receive audio from Discord
 
 **How to Use**:
+
 ```java
 // Register audio handler
 audioService.registerSendHandler(guild, this, audioHandler, 
@@ -296,6 +322,7 @@ audioService.registerReceiveHandler(guild, this, receiveHandler);
 ```
 
 **Configuration**:
+
 - Volume levels (0-100)
 - Priority levels (0-100) with mixing
 - Priority thresholds for automatic ducking
@@ -309,10 +336,12 @@ audioService.registerReceiveHandler(guild, this, receiveHandler);
 **Description**: Full Discord API access through JDA with presence and connection management.
 
 **Entry Points**:
+
 - `discord.fr.farmvivi.fluxcord.api.DiscordAPI` - Discord API wrapper
 - `net.dv8tion.jda.api.JDA` - Direct JDA access
 
 **How to Use**:
+
 ```java
 // Access Discord API
 JDA jda = discordAPI.getJDA();
@@ -326,6 +355,7 @@ discordAPI.connect().thenRun(() -> logger.info("Connected!"));
 ```
 
 **Configuration**:
+
 - Bot token and intents
 - Startup/default/shutdown presence states
 - Connection retry settings
@@ -339,10 +369,12 @@ discordAPI.connect().thenRun(() -> logger.info("Connected!"));
 **Description**: Plugin-specific logging with configurable levels and output destinations.
 
 **Entry Points**:
+
 - Plugin `Logger` instance provided by framework
 - SLF4J logging API
 
 **How to Use**:
+
 ```java
 // Use provided logger
 logger.info("Plugin operation completed");
@@ -352,6 +384,7 @@ logger.debug("Debug information: {}", debugData);
 ```
 
 **Configuration**:
+
 - Log levels per plugin
 - Console and file output
 - Log rotation and retention
@@ -365,10 +398,12 @@ logger.debug("Debug information: {}", debugData);
 **Description**: Inter-plugin dependency resolution and communication.
 
 **Entry Points**:
+
 - `plugin.fr.farmvivi.fluxcord.api.PluginLoader` - Access other plugins
 - `plugin.yml` dependency declarations
 
 **How to Use**:
+
 ```java
 // In plugin.yml
 dependencies: ["OtherPlugin"]
@@ -382,6 +417,7 @@ if (otherPlugin != null && otherPlugin.isEnabled()) {
 ```
 
 **Configuration**:
+
 - Hard dependencies (required)
 - Soft dependencies (optional)
 - Load order management
@@ -393,6 +429,7 @@ if (otherPlugin != null && otherPlugin.isEnabled()) {
 ## Feature Status Summary
 
 ### ✅ Fully Implemented Features
+
 - Plugin System (lifecycle, context, management)
 - Command System (slash and text commands)
 - Event System (Discord and plugin events)
@@ -407,10 +444,11 @@ if (otherPlugin != null && otherPlugin.isEnabled()) {
 - Plugin Communication (dependency resolution)
 
 ### ❌ Not Implemented Features
+
 Based on code analysis, the following common bot framework features are **not present**:
 
 - **Scheduler/Cron System**: No built-in task scheduling or cron job functionality
-- **HTTP Client**: No dedicated HTTP/REST client utilities  
+- **HTTP Client**: No dedicated HTTP/REST client utilities
 - **Caching System**: No built-in caching layer
 - **Metrics/Telemetry**: No metrics collection or monitoring APIs
 - **Database Abstraction**: Only basic storage, no ORM or query builder
@@ -421,7 +459,7 @@ Based on code analysis, the following common bot framework features are **not pr
 ### Plugin Development Recommendations
 
 1. **Essential Features**: All plugins should use Plugin System, Configuration, Logging, and Permissions
-2. **Interactive Features**: Use Command System and Event System for user interaction  
+2. **Interactive Features**: Use Command System and Event System for user interaction
 3. **Data Persistence**: Use Data Storage for settings, Binary Storage for files
 4. **Multi-language**: Implement i18n for broader user base
 5. **Audio Plugins**: Use Audio System for voice channel functionality
@@ -429,12 +467,12 @@ Based on code analysis, the following common bot framework features are **not pr
 
 ### Cross-Reference with Examples
 
-| Feature | Example Plugin | Location |
-|---------|----------------|----------|
-| Audio System | Audio Example | [examples/plugins/plugin-example-audio/](../examples/plugins/plugin-example-audio/) |
-| Command System | Example Commands | [examples/plugins/plugin-example-commands/](../examples/plugins/plugin-example-commands/) |
-| Plugin Lifecycle | Template Plugin | [plugin-template/](../plugin-template/) |
-| All Features | *To be created* | [examples/plugins/](#) |
+| Feature          | Example Plugin   | Location                                                                                  |
+|------------------|------------------|-------------------------------------------------------------------------------------------|
+| Audio System     | Audio Example    | [examples/plugins/plugin-example-audio/](../examples/plugins/plugin-example-audio/)       |
+| Command System   | Example Commands | [examples/plugins/plugin-example-commands/](../examples/plugins/plugin-example-commands/) |
+| Plugin Lifecycle | Template Plugin  | [plugin-template/](../plugin-template/)                                                   |
+| All Features     | *To be created*  | [examples/plugins/](#)                                                                    |
 
 ---
 

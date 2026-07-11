@@ -124,7 +124,7 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -149,7 +149,8 @@
                                 </relocation>
                                 <relocation>
                                     <pattern>com.github.topi314.lavasrc</pattern>
-                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.com.github.topi314.lavasrc</shadedPattern>
+                                    <shadedPattern>fr.farmvivi.fluxcord.shaded.com.github.topi314.lavasrc
+                                    </shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>

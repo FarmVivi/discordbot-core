@@ -1,6 +1,8 @@
 # Fluxcord
 
-A modular, generic Discord bot engine designed for flexibility and extensibility. Built with a multi-module Maven architecture, it provides a comprehensive plugin system allowing developers to create powerful Discord bots with minimal effort.
+A modular, generic Discord bot engine designed for flexibility and extensibility. Built with a multi-module Maven
+architecture, it provides a comprehensive plugin system allowing developers to create powerful Discord bots with minimal
+effort.
 
 > [!IMPORTANT]
 > Fluxcord is in active development.
@@ -166,11 +168,11 @@ The optimized Dockerfiles provide significant performance improvements:
 
 #### 🔧 Build Options
 
-| Dockerfile | Use Case | Performance | Requirements |
-|------------|----------|-------------|--------------|
-| `Dockerfile.optimized` | Standard builds | ⭐⭐⭐ | Docker 17.06+ |
-| `Dockerfile.buildkit` | Maximum performance | ⭐⭐⭐⭐⭐ | Docker 18.09+ with BuildKit |
-| `Dockerfile` | Legacy compatibility | ⭐ | Any Docker version |
+| Dockerfile             | Use Case             | Performance | Requirements                |
+|------------------------|----------------------|-------------|-----------------------------|
+| `Dockerfile.optimized` | Standard builds      | ⭐⭐⭐         | Docker 17.06+               |
+| `Dockerfile.buildkit`  | Maximum performance  | ⭐⭐⭐⭐⭐       | Docker 18.09+ with BuildKit |
+| `Dockerfile`           | Legacy compatibility | ⭐           | Any Docker version          |
 
 #### 📊 Performance Testing
 

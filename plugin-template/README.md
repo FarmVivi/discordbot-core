@@ -2,11 +2,13 @@
 
 A comprehensive template for creating Fluxcord plugins with best practices, examples, and complete feature coverage.
 
-⚠️ **Quick Start**: All example features are **disabled by default**. Enable them in `config.yml` to explore functionality or keep them disabled for a clean starting point.
+⚠️ **Quick Start**: All example features are **disabled by default**. Enable them in `config.yml` to explore
+functionality or keep them disabled for a clean starting point.
 
 ## Features
 
 ### 🎯 Core Functionality
+
 - **Plugin Lifecycle**: Complete lifecycle management with all phases (load, pre-enable, enable, post-enable, disable)
 - **Configuration System**: YAML-based configuration with feature toggles and environment variable support
 - **Command System**: Example slash command registration with permissions and i18n
@@ -17,12 +19,14 @@ A comprehensive template for creating Fluxcord plugins with best practices, exam
 - **Service Architecture**: Organized code structure with service classes
 
 ### 🛠️ Development Tools
+
 - **Unit Testing**: Complete test examples with JUnit 5 and Mockito
 - **Maven Integration**: Proper build configuration with test support
 - **Documentation**: Comprehensive comments and usage examples
 - **Debugging**: Configurable debug logging and extended debug mode
 
 ### 📚 Educational Examples
+
 - **Commands**: Example command with permission checks and i18n
 - **Events**: Discord message event handling with configuration checks
 - **Storage**: User preference management and statistics tracking
@@ -40,6 +44,7 @@ cd my-awesome-plugin
 ### 2. Update Project Details
 
 **Edit `pom.xml`:**
+
 ```xml
 <artifactId>my-awesome-plugin</artifactId>
 <name>My Awesome Plugin</name>
@@ -47,6 +52,7 @@ cd my-awesome-plugin
 ```
 
 **Edit `plugin.yml`:**
+
 ```yaml
 name: MyAwesomePlugin
 version: 1.0.0
@@ -58,6 +64,7 @@ author: YourName
 ### 3. Enable Example Features (Optional)
 
 **Edit `config.yml`:**
+
 ```yaml
 features:
   example_commands: true    # Enable to see command examples
@@ -145,6 +152,7 @@ debug:
 ## Example Code Highlights
 
 ### Command Example
+
 ```java
 commandService.registerCommand(this, builder -> {
     builder.name("template-example")
@@ -154,6 +162,7 @@ commandService.registerCommand(this, builder -> {
 ```
 
 ### Event Example
+
 ```java
 @EventHandler(priority = EventPriority.NORMAL)
 public void onMessageReceived(MessageReceivedEvent event) {
@@ -165,6 +174,7 @@ public void onMessageReceived(MessageReceivedEvent event) {
 ```
 
 ### Storage Example
+
 ```java
 public void saveUserPreference(String userId, String key, Object value) {
     plugin.getPluginDataStorage().getUserStorage(userId).set(key, value);
@@ -173,6 +183,7 @@ public void saveUserPreference(String userId, String key, Object value) {
 ```
 
 ### Permission Example
+
 ```java
 getPluginPermissionManager().registerPermission(new SimplePermission(
     pluginPrefix("use"),
@@ -197,6 +208,7 @@ mvn test -Dtest=TemplatePluginTest -DforkCount=1 -DreuseForks=false
 ```
 
 **Test Features:**
+
 - Plugin lifecycle testing
 - Mock context setup
 - Configuration testing
@@ -208,6 +220,7 @@ mvn test -Dtest=TemplatePluginTest -DforkCount=1 -DreuseForks=false
 Multi-language support with namespace isolation:
 
 **English (`lang/en-US.yml`):**
+
 ```yaml
 template:
   messages:
@@ -218,6 +231,7 @@ template:
 ```
 
 **French (`lang/fr-FR.yml`):**
+
 ```yaml
 template:
   messages:
@@ -228,6 +242,7 @@ template:
 ```
 
 **Usage:**
+
 ```java
 String message = getPluginLanguageManager().getString("messages.welcome_user", username);
 ```
@@ -279,7 +294,7 @@ The template includes all necessary dependencies:
 ✅ **Permission Security**: Permission checks before sensitive operations  
 ✅ **Internationalization**: Multi-language support with fallbacks  
 ✅ **Testing**: Comprehensive unit test coverage  
-✅ **Documentation**: Extensive code comments and external documentation  
+✅ **Documentation**: Extensive code comments and external documentation
 
 ## Development Workflow
 
@@ -293,16 +308,19 @@ The template includes all necessary dependencies:
 ## Troubleshooting
 
 **Plugin Not Loading?**
+
 - Verify `plugin.yml` format and main class path
 - Check for dependency conflicts
 - Review logs for specific error messages
 
 **Examples Not Working?**
+
 - Ensure features are enabled in `config.yml`
 - Check permission configuration
 - Verify language files are properly formatted
 
 **Build Issues?**
+
 - Ensure Java 17+ and Maven 3.6+
 - Check parent POM compatibility
 - Verify all dependencies are available

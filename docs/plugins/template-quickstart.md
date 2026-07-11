@@ -16,7 +16,8 @@ This guide provides step-by-step instructions for using the Fluxcord plugin temp
 
 ## Template Overview
 
-The plugin template provides a comprehensive starting point that demonstrates all core features of the Fluxcord framework:
+The plugin template provides a comprehensive starting point that demonstrates all core features of the Fluxcord
+framework:
 
 - **Plugin Lifecycle**: Complete lifecycle management with all phases
 - **Configuration System**: YAML-based configuration with feature toggles
@@ -34,7 +35,7 @@ The plugin template provides a comprehensive starting point that demonstrates al
 ✅ **Best Practices**: Follows recommended patterns and conventions  
 ✅ **Comprehensive**: Covers all framework features  
 ✅ **Well Documented**: Extensive comments and documentation  
-✅ **Test Ready**: Includes unit tests and test configuration  
+✅ **Test Ready**: Includes unit tests and test configuration
 
 ## Getting Started
 
@@ -78,12 +79,12 @@ dependencies: []
 ### Step 3: Rename Package and Class
 
 1. **Rename the package**:
-   - From: `com.example.plugin`
-   - To: `com.yourcompany.plugin`
+    - From: `com.example.plugin`
+    - To: `com.yourcompany.plugin`
 
 2. **Rename the main class**:
-   - From: `TemplatePlugin.java`
-   - To: `MyAwesomePlugin.java`
+    - From: `TemplatePlugin.java`
+    - To: `MyAwesomePlugin.java`
 
 3. **Update imports** in all files to use your new package name
 
@@ -200,6 +201,7 @@ public CommandResult execute(CommandContext context) {
 ```
 
 **Key Points**:
+
 - Permission checks before execution
 - Localized error and success messages
 - Proper result handling
@@ -228,6 +230,7 @@ public void onMessageReceived(MessageReceivedEvent event) {
 ```
 
 **Key Points**:
+
 - Proper event filtering (skip bots)
 - Configuration-based enabling/disabling
 - Appropriate logging levels
@@ -251,6 +254,7 @@ public void saveUserPreference(String userId, String key, Object value) {
 ```
 
 **Key Points**:
+
 - Proper error handling
 - Appropriate logging
 - Different storage scopes (user, guild, global)
@@ -432,21 +436,25 @@ cp target/my-awesome-plugin-1.0.0.jar /path/to/bot/plugins/
 ### Common Issues
 
 **Plugin Not Loading**
+
 - Check plugin.yml format and syntax
 - Verify main class path is correct
 - Check for missing dependencies
 
 **Configuration Errors**
+
 - Validate YAML syntax in config.yml
 - Check for missing configuration values
 - Review error logs for specific issues
 
 **Permission Issues**
+
 - Verify permissions are registered in onPreEnable()
 - Check permission node names for typos
 - Ensure permission defaults are appropriate
 
 **Language Issues**
+
 - Check language file format and structure
 - Ensure language keys match code usage
 
@@ -482,4 +490,5 @@ logger.error("Error occurred", exception);  // Errors
 
 ---
 
-*This guide covers the essential aspects of plugin development using the template. For advanced features and specific use cases, refer to the core documentation and API reference.*
+*This guide covers the essential aspects of plugin development using the template. For advanced features and specific
+use cases, refer to the core documentation and API reference.*

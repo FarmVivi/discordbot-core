@@ -25,14 +25,14 @@
 
     <!-- Root logger configuration -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
 
     <!-- Specific logger configurations -->
-    <logger name="fr.farmvivi.fluxcord" level="INFO" />
-    <logger name="net.dv8tion.jda" level="INFO" />
-    <logger name="com.zaxxer.hikari" level="WARN" />
-    <logger name="org.mariadb" level="WARN" />
-    <logger name="software.amazon.awssdk" level="WARN" />
+    <logger name="fr.farmvivi.fluxcord" level="INFO"/>
+    <logger name="net.dv8tion.jda" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="org.mariadb" level="WARN"/>
+    <logger name="software.amazon.awssdk" level="WARN"/>
 </configuration>

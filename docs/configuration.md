@@ -80,12 +80,12 @@ Startup validation currently requires:
 
 - `type`: `FILE` or `DB`
 - `DB` mode requires:
-  - `data.storage.db.url`
-  - `data.storage.db.username`
-  - `data.storage.db.password`
+    - `data.storage.db.url`
+    - `data.storage.db.username`
+    - `data.storage.db.password`
 - Optional `DB` keys:
-  - `data.storage.db.max_pool_size` (default: `10`)
-  - `data.storage.db.auto_commit` (default: `true`)
+    - `data.storage.db.max_pool_size` (default: `10`)
+    - `data.storage.db.auto_commit` (default: `true`)
 
 Supported database drivers (the SQL dialect is auto-detected from the JDBC URL):
 
@@ -140,7 +140,8 @@ FLUXCORD_DATA_STORAGE_DB_PASSWORD=secret
 
 List overrides are split by `:`.
 
-Note: keys containing `-` (for example `commands.default-prefix`) are currently difficult to override via environment variables because the key name is mapped as-is except for dots.
+Note: keys containing `-` (for example `commands.default-prefix`) are currently difficult to override via environment
+variables because the key name is mapped as-is except for dots.
 
 ## Configuration Versioning and Migration
 
@@ -150,7 +151,7 @@ Note: keys containing `-` (for example `commands.default-prefix`) are currently 
 - Current core version: `1`
 - Legacy config (missing version / version `0`) is migrated to version `1`
 - A backup is created before migration:
-  - `config.yml.backup.<timestamp>`
+    - `config.yml.backup.<timestamp>`
 
 ### Plugin config
 

@@ -83,7 +83,7 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
-            
+
             <!-- Logback implementation -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>

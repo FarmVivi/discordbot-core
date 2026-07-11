@@ -20,7 +20,9 @@ Ce document explique comment utiliser le système de commandes du bot Discord.
 
 ## Vue d'ensemble
 
-Le système de commandes permet de créer et d'exécuter des commandes dans le bot Discord. Il prend en charge à la fois les commandes slash (/) et les commandes textuelles préfixées. Ce système est conçu pour être facile à utiliser et extensible.
+Le système de commandes permet de créer et d'exécuter des commandes dans le bot Discord. Il prend en charge à la fois
+les commandes slash (/) et les commandes textuelles préfixées. Ce système est conçu pour être facile à utiliser et
+extensible.
 
 Les principales fonctionnalités sont :
 
@@ -306,7 +308,8 @@ Le système vérifie automatiquement si l'utilisateur a la permission avant d'ex
 
 ## Synchronisation avec Discord
 
-Lorsque vous enregistrez une commande, le système la synchronise automatiquement avec Discord pour qu'elle apparaisse dans l'interface utilisateur. Vous pouvez également forcer la synchronisation :
+Lorsque vous enregistrez une commande, le système la synchronise automatiquement avec Discord pour qu'elle apparaisse
+dans l'interface utilisateur. Vous pouvez également forcer la synchronisation :
 
 ```java
 commandService.synchronizeCommands();
@@ -324,7 +327,8 @@ Vous pouvez définir un cooldown pour une commande, qui empêchera un utilisateu
 
 ## Catégories de commandes
 
-Les commandes sont organisées en catégories, qui sont utilisées dans la commande `help`. Vous pouvez créer autant de catégories que vous le souhaitez :
+Les commandes sont organisées en catégories, qui sont utilisées dans la commande `help`. Vous pouvez créer autant de
+catégories que vous le souhaitez :
 
 ```java
 .category("Music")

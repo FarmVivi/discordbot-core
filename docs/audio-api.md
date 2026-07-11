@@ -1,6 +1,7 @@
 # Audio API pour Fluxcord
 
-Cette documentation décrit l'API audio implémentée dans Fluxcord, qui permet aux plugins de gérer les flux audio entrants et sortants avec des fonctionnalités avancées comme le mixage et la gestion des priorités.
+Cette documentation décrit l'API audio implémentée dans Fluxcord, qui permet aux plugins de gérer les flux audio
+entrants et sortants avec des fonctionnalités avancées comme le mixage et la gestion des priorités.
 
 ## Caractéristiques
 
@@ -28,7 +29,8 @@ public void onLoad(PluginContext context) {
 
 ### 2. Enregistrer un handler d'envoi audio
 
-Pour envoyer de l'audio, vous devez implémenter l'interface `AudioSendHandler` de JDA et l'enregistrer auprès du service audio :
+Pour envoyer de l'audio, vous devez implémenter l'interface `AudioSendHandler` de JDA et l'enregistrer auprès du service
+audio :
 
 ```java
 // Crée votre handler d'envoi audio
@@ -61,7 +63,8 @@ public class MyAudioSendHandler implements AudioSendHandler {
 
 ### 3. Enregistrer un handler de réception audio
 
-Pour recevoir de l'audio, vous devez implémenter l'interface `AudioReceiveHandler` de JDA et l'enregistrer auprès du service audio :
+Pour recevoir de l'audio, vous devez implémenter l'interface `AudioReceiveHandler` de JDA et l'enregistrer auprès du
+service audio :
 
 ```java
 // Crée votre handler de réception audio
@@ -132,7 +135,8 @@ audioService.setPriorityThreshold(guild, 80);
 
 ### 6. Nettoyage des ressources
 
-Le service audio nettoie automatiquement les handlers lorsqu'un plugin est désactivé, mais vous pouvez le faire manuellement :
+Le service audio nettoie automatiquement les handlers lorsqu'un plugin est désactivé, mais vous pouvez le faire
+manuellement :
 
 ```java
 // Désenregistre un handler d'envoi
@@ -189,11 +193,13 @@ public void onAudioFrameMixed(AudioFrameMixedEvent event) {
 
 ## Exemple complet
 
-Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.fluxcord.examples.audio` pour un exemple complet d'utilisation de l'API audio.
+Consultez la classe `AudioExamplePlugin.java` dans le package `fr.farmvivi.fluxcord.examples.audio` pour un exemple
+complet d'utilisation de l'API audio.
 
 ## Performances et considérations techniques
 
-- Convention de format interne: fournissez du PCM Little-Endian 48 kHz, 16-bit, stéréo, par trames de 20 ms (3840 octets). Le pipeline convertit en Big-Endian uniquement à la frontière JDA.
+- Convention de format interne: fournissez du PCM Little-Endian 48 kHz, 16-bit, stéréo, par trames de 20 ms (3840
+  octets). Le pipeline convertit en Big-Endian uniquement à la frontière JDA.
 - Le système utilise un mode "bypass" efficace lorsqu'une seule source est active.
 - Le mixage PCM est optimisé (somme en int, clipping dur) et évite les copies inutiles.
 - Les fondus sont calculés de manière progressive pour des transitions douces.

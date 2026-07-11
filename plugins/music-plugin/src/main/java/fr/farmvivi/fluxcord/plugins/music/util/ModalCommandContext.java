@@ -33,37 +33,59 @@ public class ModalCommandContext implements CommandContext {
     }
 
     @Override
-    public Event getOriginalEvent() { return event; }
+    public Event getOriginalEvent() {
+        return event;
+    }
 
     @Override
-    public Command getCommand() { return null; }
+    public Command getCommand() {
+        return null;
+    }
 
     @Override
-    public User getUser() { return event.getUser(); }
+    public User getUser() {
+        return event.getUser();
+    }
 
     @Override
-    public Optional<Guild> getGuild() { return Optional.ofNullable(event.getGuild()); }
+    public Optional<Guild> getGuild() {
+        return Optional.ofNullable(event.getGuild());
+    }
 
     @Override
-    public MessageChannel getChannel() { return event.getChannel(); }
+    public MessageChannel getChannel() {
+        return event.getChannel();
+    }
 
     @Override
-    public Locale getLocale() { return locale; }
+    public Locale getLocale() {
+        return locale;
+    }
 
     @Override
-    public <T> Optional<T> getOption(String name) { return Optional.empty(); }
+    public <T> Optional<T> getOption(String name) {
+        return Optional.empty();
+    }
 
     @Override
-    public <T> T getOption(String name, T defaultValue) { return defaultValue; }
+    public <T> T getOption(String name, T defaultValue) {
+        return defaultValue;
+    }
 
     @Override
-    public <T> T getRequiredOption(String name) { throw new IllegalArgumentException("No options for modal context"); }
+    public <T> T getRequiredOption(String name) {
+        throw new IllegalArgumentException("No options for modal context");
+    }
 
     @Override
-    public <T> Optional<CommandOption<T>> getOptionDefinition(String name) { return Optional.empty(); }
+    public <T> Optional<CommandOption<T>> getOptionDefinition(String name) {
+        return Optional.empty();
+    }
 
     @Override
-    public boolean hasOption(String name) { return false; }
+    public boolean hasOption(String name) {
+        return false;
+    }
 
     @Override
     public void reply(String message) {
@@ -102,19 +124,29 @@ public class ModalCommandContext implements CommandContext {
     }
 
     @Override
-    public void replySuccess(String message) { reply(message); }
+    public void replySuccess(String message) {
+        reply(message);
+    }
 
     @Override
-    public void replyInfo(String message) { reply(message); }
+    public void replyInfo(String message) {
+        reply(message);
+    }
 
     @Override
-    public void replyWarning(String message) { reply(message); }
+    public void replyWarning(String message) {
+        reply(message);
+    }
 
     @Override
-    public void replyError(String message) { reply(message); }
+    public void replyError(String message) {
+        reply(message);
+    }
 
     @Override
-    public void deferReply() { deferReply(this.ephemeral); }
+    public void deferReply() {
+        deferReply(this.ephemeral);
+    }
 
     @Override
     public void deferReply(boolean ephemeral) {
@@ -126,14 +158,22 @@ public class ModalCommandContext implements CommandContext {
     }
 
     @Override
-    public boolean isDeferred() { return deferred; }
+    public boolean isDeferred() {
+        return deferred;
+    }
 
     @Override
-    public boolean isEphemeral() { return ephemeral; }
+    public boolean isEphemeral() {
+        return ephemeral;
+    }
 
     @Override
-    public void setEphemeral(boolean ephemeral) { this.ephemeral = ephemeral; }
+    public void setEphemeral(boolean ephemeral) {
+        this.ephemeral = ephemeral;
+    }
 
     @Override
-    public JDA getJDA() { return event.getJDA(); }
+    public JDA getJDA() {
+        return event.getJDA();
+    }
 }

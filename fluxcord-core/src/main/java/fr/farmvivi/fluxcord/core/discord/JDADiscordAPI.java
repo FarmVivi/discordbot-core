@@ -61,10 +61,10 @@ public class JDADiscordAPI implements DiscordAPI {
                         CacheFlag.EMOJI,
                         CacheFlag.ACTIVITY
                 )
-        .setAutoReconnect(true)
-        // Prevent JDA from registering its own shutdown hook which would
-        // stop the Requester before our plugins finish disabling during JVM shutdown
-        .setEnableShutdownHook(false);
+                .setAutoReconnect(true)
+                // Prevent JDA from registering its own shutdown hook which would
+                // stop the Requester before our plugins finish disabling during JVM shutdown
+                .setEnableShutdownHook(false);
     }
 
     @Override

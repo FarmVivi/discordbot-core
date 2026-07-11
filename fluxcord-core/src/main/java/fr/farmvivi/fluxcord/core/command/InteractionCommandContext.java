@@ -13,7 +13,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * CommandContext adapter for modal interactions.
@@ -123,19 +125,29 @@ public class InteractionCommandContext implements CommandContext {
     }
 
     @Override
-    public void replySuccess(String message) { reply(message); }
+    public void replySuccess(String message) {
+        reply(message);
+    }
 
     @Override
-    public void replyInfo(String message) { reply(message); }
+    public void replyInfo(String message) {
+        reply(message);
+    }
 
     @Override
-    public void replyWarning(String message) { reply(message); }
+    public void replyWarning(String message) {
+        reply(message);
+    }
 
     @Override
-    public void replyError(String message) { reply(message); }
+    public void replyError(String message) {
+        reply(message);
+    }
 
     @Override
-    public void deferReply() { deferReply(true); }
+    public void deferReply() {
+        deferReply(true);
+    }
 
     @Override
     public void deferReply(boolean ephemeral) {
@@ -145,14 +157,20 @@ public class InteractionCommandContext implements CommandContext {
     }
 
     @Override
-    public boolean isDeferred() { return true; }
+    public boolean isDeferred() {
+        return true;
+    }
 
     @Override
-    public boolean isEphemeral() { return true; }
+    public boolean isEphemeral() {
+        return true;
+    }
 
     @Override
     public void setEphemeral(boolean ephemeral) { /* ignored in adapter */ }
 
     @Override
-    public JDA getJDA() { return event.getJDA(); }
+    public JDA getJDA() {
+        return event.getJDA();
+    }
 }

@@ -1,6 +1,7 @@
 # AI Audio Plugin
 
-AI-powered voice processing and interaction plugin for Fluxcord, bringing advanced speech recognition, text-to-speech, and audio analysis capabilities to Discord bots.
+AI-powered voice processing and interaction plugin for Fluxcord, bringing advanced speech recognition, text-to-speech,
+and audio analysis capabilities to Discord bots.
 
 ## Features
 

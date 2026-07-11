@@ -88,4 +88,5 @@ This plugin showcases:
 - **Event API**: Voice channel event handling
 - **Storage API**: File management for recordings and samples
 
-This plugin serves as a comprehensive example for developing audio-enabled plugins with proper configuration management and internationalization support.
+This plugin serves as a comprehensive example for developing audio-enabled plugins with proper configuration management
+and internationalization support.

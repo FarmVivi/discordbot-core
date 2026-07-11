@@ -14,12 +14,16 @@ import java.util.Locale;
  * branch on the dialect when binding parameters.
  */
 enum SqlDialect {
-    /** MySQL / MariaDB family. */
+    /**
+     * MySQL / MariaDB family.
+     */
     MYSQL("LONGTEXT",
             "INSERT INTO storage_data (scope, key_name, value_data) VALUES (?, ?, ?) "
                     + "ON DUPLICATE KEY UPDATE value_data = VALUES(value_data)"),
 
-    /** PostgreSQL. */
+    /**
+     * PostgreSQL.
+     */
     POSTGRESQL("TEXT",
             "INSERT INTO storage_data (scope, key_name, value_data) VALUES (?, ?, ?) "
                     + "ON CONFLICT (scope, key_name) DO UPDATE SET value_data = EXCLUDED.value_data");
@@ -30,20 +34,6 @@ enum SqlDialect {
     SqlDialect(String textColumnType, String upsertStatement) {
         this.textColumnType = textColumnType;
         this.upsertStatement = upsertStatement;
-    }
-
-    /**
-     * @return the column type used to store JSON payloads (e.g. {@code LONGTEXT} or {@code TEXT})
-     */
-    String textColumnType() {
-        return textColumnType;
-    }
-
-    /**
-     * @return an upsert statement with three positional parameters: scope, key_name, value_data
-     */
-    String upsertStatement() {
-        return upsertStatement;
     }
 
     /**
@@ -59,5 +49,19 @@ enum SqlDialect {
             return POSTGRESQL;
         }
         return MYSQL;
+    }
+
+    /**
+     * @return the column type used to store JSON payloads (e.g. {@code LONGTEXT} or {@code TEXT})
+     */
+    String textColumnType() {
+        return textColumnType;
+    }
+
+    /**
+     * @return an upsert statement with three positional parameters: scope, key_name, value_data
+     */
+    String upsertStatement() {
+        return upsertStatement;
     }
 }

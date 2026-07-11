@@ -8,15 +8,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Manages the track queue and playback behavior for a music player.
- * 
+ *
  * <p>This scheduler handles different playback modes including:
  * <ul>
  *   <li>Normal mode: plays tracks sequentially and removes them after playing</li>
@@ -24,7 +20,7 @@ import java.util.Random;
  *   <li>Loop queue mode: repeats the entire queue when reaching the end</li>
  *   <li>Shuffle mode: plays tracks in random order</li>
  * </ul>
- * 
+ *
  * <p>The scheduler maintains a single synchronized queue for all operations to ensure
  * thread safety and consistency.
  */
@@ -33,26 +29,24 @@ public class TrackScheduler extends AudioEventAdapter {
 
     private final MusicPlayer musicPlayer;
     private final AudioPlayer player;
-    
+
     // Single synchronized list for queue management
     private final List<AudioTrack> queue;
-    
+
     // Track history for loop queue mode
     private final List<AudioTrack> playedTracks;
-    
+    // Random instance for shuffle mode
+    private final Random random = new Random();
     // Playback modes
     private boolean loopMode = false;
     private boolean loopQueueMode = false;
     private boolean shuffleMode = false;
-    
-    // Random instance for shuffle mode
-    private final Random random = new Random();
 
     /**
      * Creates a new TrackScheduler for the given music player.
-     * 
+     *
      * @param musicPlayer the music player that owns this scheduler
-     * @param player the LavaPlayer audio player instance
+     * @param player      the LavaPlayer audio player instance
      */
     public TrackScheduler(MusicPlayer musicPlayer, AudioPlayer player) {
         this.musicPlayer = musicPlayer;
@@ -63,7 +57,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Adds a track to the queue or plays it immediately if nothing is playing.
-     * 
+     *
      * @param track the audio track to queue
      * @return true if the track started playing immediately, false if it was queued
      */
@@ -82,7 +76,7 @@ public class TrackScheduler extends AudioEventAdapter {
     /**
      * Plays a track immediately, interrupting current playback.
      * If a track is currently playing, it will be added to the front of the queue.
-     * 
+     *
      * @param track the audio track to play immediately
      */
     public void playNow(AudioTrack track) {
@@ -98,7 +92,7 @@ public class TrackScheduler extends AudioEventAdapter {
     /**
      * Adds a track at the end of the queue.
      * This method is primarily used internally for loop functionality.
-     * 
+     *
      * @param track the audio track to add to the queue
      */
     private void addToQueueEnd(AudioTrack track) {
@@ -142,24 +136,24 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Skips the current track.
-     * 
+     *
      * <p>In loop mode, the current track is added back to the end of the queue
      * instead of being discarded. This allows the track to be played again later
      * in the queue cycle.
      */
     public void skip() {
         AudioTrack current = player.getPlayingTrack();
-        
+
         if (current != null) {
             logger.debug("[{}] Skipping track: {}", getGuildName(), current.getInfo().title);
-            
+
             if (loopMode) {
                 // In loop mode, add the current track to the end of the queue
                 addToQueueEnd(current.makeClone());
                 logger.debug("[{}] Loop mode active: added track back to queue", getGuildName());
             }
         }
-        
+
         // Stop the current track and play the next one
         player.stopTrack();
         nextTrack();
@@ -176,7 +170,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Gets the current queue size.
-     * 
+     *
      * @return the number of tracks in the queue
      */
     public int getQueueSize() {
@@ -185,7 +179,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Gets a copy of the current queue for display purposes.
-     * 
+     *
      * @return an immutable copy of the queue
      */
     public List<AudioTrack> getQueue() {
@@ -194,7 +188,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Removes a track at the specified index.
-     * 
+     *
      * @param index the zero-based index of the track to remove
      * @return true if the track was successfully removed, false if the index was invalid
      */
@@ -202,7 +196,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if (index < 0 || index >= queue.size()) {
             return false;
         }
-        
+
         AudioTrack removed = queue.remove(index);
         logger.debug("[{}] Removed track at index {}: {}", getGuildName(), index, removed.getInfo().title);
         return true;
@@ -210,9 +204,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Moves a track from one position to another in the queue.
-     * 
+     *
      * @param from the current index of the track
-     * @param to the target index for the track
+     * @param to   the target index for the track
      * @return true if the track was successfully moved, false if either index was invalid
      */
     public boolean moveTrack(int from, int to) {
@@ -227,7 +221,7 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     // Event handlers
-    
+
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         logger.debug("[{}] Track ended: {} - Reason: {}", getGuildName(), track.getInfo().title, endReason);
@@ -259,22 +253,22 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         logger.info("[{}] Started playing: {}", getGuildName(), track.getInfo().title);
-        
+
         // Add to played tracks history for loop queue mode
         if (loopQueueMode && !playedTracks.contains(track)) {
             playedTracks.add(track.makeClone());
             logger.debug("[{}] Added track to history for loop queue mode", getGuildName());
         }
-        
+
         musicPlayer.refreshUi();
     }
 
     // Playback mode getters and setters
-    
+
     /**
      * Checks if loop mode is enabled.
      * In loop mode, the current track repeats indefinitely.
-     * 
+     *
      * @return true if loop mode is enabled
      */
     public boolean isLoopMode() {
@@ -283,7 +277,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Sets the loop mode state.
-     * 
+     *
      * @param loopMode true to enable loop mode, false to disable
      */
     public void setLoopMode(boolean loopMode) {
@@ -294,7 +288,7 @@ public class TrackScheduler extends AudioEventAdapter {
     /**
      * Checks if loop queue mode is enabled.
      * In loop queue mode, the entire queue repeats when reaching the end.
-     * 
+     *
      * @return true if loop queue mode is enabled
      */
     public boolean isLoopQueueMode() {
@@ -303,7 +297,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Sets the loop queue mode state.
-     * 
+     *
      * @param loopQueueMode true to enable loop queue mode, false to disable
      */
     public void setLoopQueueMode(boolean loopQueueMode) {
@@ -318,7 +312,7 @@ public class TrackScheduler extends AudioEventAdapter {
     /**
      * Checks if shuffle mode is enabled.
      * In shuffle mode, tracks are played in random order.
-     * 
+     *
      * @return true if shuffle mode is enabled
      */
     public boolean isShuffleMode() {
@@ -327,7 +321,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     /**
      * Sets the shuffle mode state.
-     * 
+     *
      * @param shuffleMode true to enable shuffle mode, false to disable
      */
     public void setShuffleMode(boolean shuffleMode) {
@@ -336,10 +330,10 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     // Private utility methods
-    
+
     /**
      * Gets the guild name for logging purposes.
-     * 
+     *
      * @return the name of the guild
      */
     private String getGuildName() {
@@ -349,7 +343,7 @@ public class TrackScheduler extends AudioEventAdapter {
     /**
      * Checks if any tracks have been played in this session.
      * Used for loop queue mode to determine if we should restart.
-     * 
+     *
      * @return true if at least one track has been played
      */
     private boolean hasPlayedTracks() {
@@ -365,17 +359,17 @@ public class TrackScheduler extends AudioEventAdapter {
             logger.warn("[{}] No tracks in history to restart queue", getGuildName());
             return;
         }
-        
+
         // Clone all played tracks and add them back to the queue
         for (AudioTrack track : playedTracks) {
             queue.add(track.makeClone());
         }
-        
+
         logger.info("[{}] Restarted queue with {} tracks", getGuildName(), playedTracks.size());
-        
+
         // Clear history to start fresh for the next cycle
         playedTracks.clear();
-        
+
         // Start playing the first track
         nextTrack();
     }

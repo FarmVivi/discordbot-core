@@ -57,45 +57,45 @@ public class ButtonHandler {
 
         switch (action) {
             case "add":
-        // Open modal to add a new track with provider selection
-        if (event.isAcknowledged()) return;
+                // Open modal to add a new track with provider selection
+                if (event.isAcknowledged()) return;
 
-        // Build provider options dynamically from configuration
-        var providerMenuBuilder = StringSelectMenu.create("provider")
-            .setPlaceholder(plugin.getPluginLanguageManager().getString("music.modal.provider.placeholder"))
-            .setMaxValues(1)
-            .setMinValues(1);
+                // Build provider options dynamically from configuration
+                var providerMenuBuilder = StringSelectMenu.create("provider")
+                        .setPlaceholder(plugin.getPluginLanguageManager().getString("music.modal.provider.placeholder"))
+                        .setMaxValues(1)
+                        .setMinValues(1);
 
-        for (SelectOption opt : ProviderOptions.fromConfig(plugin)) {
-            providerMenuBuilder.addOptions(opt);
-        }
+                for (SelectOption opt : ProviderOptions.fromConfig(plugin)) {
+                    providerMenuBuilder.addOptions(opt);
+                }
 
-        // Fallback: if no option is available, inform the user
-        if (providerMenuBuilder.getOptions().isEmpty()) {
-            event.reply(plugin.getPluginLanguageManager().getString("music.error.no_providers"))
-                .setEphemeral(true)
-                .queue();
-            return;
-        }
+                // Fallback: if no option is available, inform the user
+                if (providerMenuBuilder.getOptions().isEmpty()) {
+                    event.reply(plugin.getPluginLanguageManager().getString("music.error.no_providers"))
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
 
-        // Text input for query or URL
-        TextInput queryInput = TextInput.create(
-                "query",
-                TextInputStyle.SHORT
-            )
-            .setPlaceholder(plugin.getPluginLanguageManager().getString("music.modal.query.placeholder"))
-            .setRequired(true)
-            .build();
+                // Text input for query or URL
+                TextInput queryInput = TextInput.create(
+                                "query",
+                                TextInputStyle.SHORT
+                        )
+                        .setPlaceholder(plugin.getPluginLanguageManager().getString("music.modal.query.placeholder"))
+                        .setRequired(true)
+                        .build();
 
-        String modalId = "music:" + guild.getId() + ":add";
-        Modal modal = Modal.create(modalId, plugin.getPluginLanguageManager().getString("music.modal.title"))
-            .addComponents(
-                Label.of(plugin.getPluginLanguageManager().getString("music.modal.provider.label"), providerMenuBuilder.build()),
-                Label.of(plugin.getPluginLanguageManager().getString("music.modal.query.label"), queryInput)
-            )
-            .build();
+                String modalId = "music:" + guild.getId() + ":add";
+                Modal modal = Modal.create(modalId, plugin.getPluginLanguageManager().getString("music.modal.title"))
+                        .addComponents(
+                                Label.of(plugin.getPluginLanguageManager().getString("music.modal.provider.label"), providerMenuBuilder.build()),
+                                Label.of(plugin.getPluginLanguageManager().getString("music.modal.query.label"), queryInput)
+                        )
+                        .build();
 
-        event.replyModal(modal).queue();
+                event.replyModal(modal).queue();
                 break;
 
             case "pause":

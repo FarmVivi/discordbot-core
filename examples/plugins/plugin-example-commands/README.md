@@ -1,10 +1,12 @@
 # Command Example Plugin
 
-This plugin demonstrates comprehensive command system features in Fluxcord, including slash commands, permissions, cooldowns, argument handling, and embed responses.
+This plugin demonstrates comprehensive command system features in Fluxcord, including slash commands, permissions,
+cooldowns, argument handling, and embed responses.
 
 ## Features Demonstrated
 
 ### 🎯 Core Command Features
+
 - **Slash Command Registration**: Multiple command types with different complexity levels
 - **Command Arguments**: String options with validation and required parameters
 - **Permission System**: Command-specific permissions with role-based access control
@@ -13,6 +15,7 @@ This plugin demonstrates comprehensive command system features in Fluxcord, incl
 - **Internationalization**: Multi-language command descriptions and responses
 
 ### 📊 Advanced Features
+
 - **Embed Responses**: Rich embed formatting with colors and fields
 - **Command Statistics**: Execution counting and performance monitoring
 - **Configuration-Driven**: All commands configurable via YAML settings
@@ -22,26 +25,30 @@ This plugin demonstrates comprehensive command system features in Fluxcord, incl
 ## Available Commands
 
 ### `/ping`
+
 - **Description**: Simple ping-pong command to test bot responsiveness
 - **Features**: Basic command execution, embed response, cooldown support
 - **Permission**: `commandexample.use` (default: true)
 - **Cooldown**: 3 seconds (configurable)
 
 ### `/echo <message>`
+
 - **Description**: Echo back user input with validation
 - **Features**: Required string argument, length validation, error handling
 - **Permission**: `commandexample.use` (default: true)
 - **Cooldown**: 5 seconds (configurable)
-- **Arguments**: 
-  - `message` (required): Text to echo back (max 200 characters)
+- **Arguments**:
+    - `message` (required): Text to echo back (max 200 characters)
 
 ### `/info`
+
 - **Description**: Display bot and plugin information with rich embeds
 - **Features**: Complex embed creation, uptime calculation, memory usage, statistics
 - **Permission**: `commandexample.use` (default: true)
 - **Cooldown**: None
 
 ### `/admin`
+
 - **Description**: Administrative command demonstrating permission checks
 - **Features**: Permission validation, admin-only access, audit logging
 - **Permission**: `commandexample.admin` (default: OP only)
@@ -102,11 +109,11 @@ cooldowns:
 
 The plugin registers the following permissions:
 
-| Permission | Description | Default |
-|------------|-------------|---------|
-| `commandexample.use` | Allows usage of basic commands | `TRUE` |
-| `commandexample.admin` | Allows usage of admin commands | `OP` |
-| `commandexample.cooldown.bypass` | Bypasses command cooldowns | `OP` |
+| Permission                       | Description                    | Default |
+|----------------------------------|--------------------------------|---------|
+| `commandexample.use`             | Allows usage of basic commands | `TRUE`  |
+| `commandexample.admin`           | Allows usage of admin commands | `OP`    |
+| `commandexample.cooldown.bypass` | Bypasses command cooldowns     | `OP`    |
 
 ### Setting Permissions
 
@@ -157,6 +164,7 @@ Restart your Fluxcord instance to load the plugin.
 ### 5. Test Commands
 
 Try the following commands in Discord:
+
 - `/ping` - Test basic functionality
 - `/echo Hello World` - Test argument handling
 - `/info` - View plugin information
@@ -225,6 +233,7 @@ context.replyEmbeds(embed.build());
 The plugin supports multiple languages with namespace isolation:
 
 ### English (`lang/en-US.yml`)
+
 ```yaml
 commands:
   ping:
@@ -233,6 +242,7 @@ commands:
 ```
 
 ### French (`lang/fr-FR.yml`)
+
 ```yaml
 commands:
   ping:
@@ -241,6 +251,7 @@ commands:
 ```
 
 ### Usage in Code
+
 ```java
 String response = getPluginLanguageManager().getString("ping.response");
 String formatted = getPluginLanguageManager().getString("echo.response", message);
@@ -258,6 +269,7 @@ debug:
 ```
 
 Debug output example:
+
 ```
 [INFO] Ping command executed by: User#1234
 [DEBUG] Command execution time: 15ms
@@ -267,17 +279,20 @@ Debug output example:
 ## Common Issues
 
 ### Commands Not Appearing
+
 - Ensure plugin is enabled: `enabled: true`
 - Check individual command enablement in config
 - Verify bot has permission to register slash commands
 - Restart bot after configuration changes
 
 ### Permission Errors
+
 - Check user has required permissions
 - Verify permission nodes are correctly configured
 - Use `/permissions` commands to debug permission issues
 
 ### Cooldown Issues
+
 - Check cooldown configuration values
 - Verify cooldown bypass permissions for admins
 - Consider global vs per-command cooldowns
@@ -302,4 +317,5 @@ After exploring this example:
 
 ---
 
-*This example plugin is part of the Fluxcord documentation project and demonstrates production-ready command system usage.*
+*This example plugin is part of the Fluxcord documentation project and demonstrates production-ready command system
+usage.*
