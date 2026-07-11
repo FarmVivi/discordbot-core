@@ -24,6 +24,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
     private static final Gson gson = new GsonBuilder().create();
 
     private final HikariDataSource dataSource;
+    private final SqlDialect dialect;
 
     /**
      * Creates a new database data storage.
@@ -33,58 +34,62 @@ public class DatabaseDataStorage extends AbstractDataStorage {
      */
     public DatabaseDataStorage(Configuration configuration, EventManager eventManager) {
         super("database", eventManager);
-        this.dataSource = initializeDataSource(configuration);
+        try {
+            // The JDBC URL determines both the connection and the SQL dialect
+            String jdbcUrl = configuration.getString("data.storage.db.url");
+            this.dialect = SqlDialect.fromJdbcUrl(jdbcUrl);
+            this.dataSource = initializeDataSource(configuration, jdbcUrl);
+        } catch (ConfigurationException e) {
+            logger.error("Missing required database configuration", e);
+            throw new RuntimeException("Failed to initialize database connection", e);
+        }
         initializeSchema();
     }
 
     /**
      * Initializes the database connection using HikariCP.
      *
-     * @param config the configuration
+     * @param config  the configuration
+     * @param jdbcUrl the JDBC connection URL
      * @return the HikariCP data source
+     * @throws ConfigurationException if a required setting is missing
      */
-    private HikariDataSource initializeDataSource(Configuration config) {
+    private HikariDataSource initializeDataSource(Configuration config, String jdbcUrl) throws ConfigurationException {
+        // Required settings
+        String username = config.getString("data.storage.db.username");
+        String password = config.getString("data.storage.db.password");
+
+        // Create and configure HikariCP
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(jdbcUrl);
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
+
+        // Set optimal default values
+        hikariConfig.setMaximumPoolSize(10);
+        hikariConfig.setMinimumIdle(2);
+        hikariConfig.setIdleTimeout(30000);
+        hikariConfig.setMaxLifetime(1800000);
+        hikariConfig.setConnectionTimeout(30000);
+        hikariConfig.setAutoCommit(true);
+
+        // Additional optional configuration
         try {
-            // Required settings
-            String jdbcUrl = config.getString("data.storage.db.url");
-            String username = config.getString("data.storage.db.username");
-            String password = config.getString("data.storage.db.password");
-
-            // Create and configure HikariCP
-            HikariConfig hikariConfig = new HikariConfig();
-            hikariConfig.setJdbcUrl(jdbcUrl);
-            hikariConfig.setUsername(username);
-            hikariConfig.setPassword(password);
-
-            // Set optimal default values
-            hikariConfig.setMaximumPoolSize(10);
-            hikariConfig.setMinimumIdle(2);
-            hikariConfig.setIdleTimeout(30000);
-            hikariConfig.setMaxLifetime(1800000);
-            hikariConfig.setConnectionTimeout(30000);
-            hikariConfig.setAutoCommit(true);
-
-            // Additional optional configuration
-            try {
-                int maxPoolSize = config.getInt("data.storage.db.max_pool_size");
-                hikariConfig.setMaximumPoolSize(maxPoolSize);
-            } catch (ConfigurationException ignored) {
-                // Use default
-            }
-
-            try {
-                boolean autoCommit = config.getBoolean("data.storage.db.auto_commit");
-                hikariConfig.setAutoCommit(autoCommit);
-            } catch (ConfigurationException ignored) {
-                // Use default
-            }
-
-            logger.info("Initializing database connection pool to {}", jdbcUrl);
-            return new HikariDataSource(hikariConfig);
-        } catch (ConfigurationException e) {
-            logger.error("Missing required database configuration", e);
-            throw new RuntimeException("Failed to initialize database connection", e);
+            int maxPoolSize = config.getInt("data.storage.db.max_pool_size");
+            hikariConfig.setMaximumPoolSize(maxPoolSize);
+        } catch (ConfigurationException ignored) {
+            // Use default
         }
+
+        try {
+            boolean autoCommit = config.getBoolean("data.storage.db.auto_commit");
+            hikariConfig.setAutoCommit(autoCommit);
+        } catch (ConfigurationException ignored) {
+            // Use default
+        }
+
+        logger.info("Initializing {} database connection pool to {}", dialect, jdbcUrl);
+        return new HikariDataSource(hikariConfig);
     }
 
     /**
@@ -94,11 +99,11 @@ public class DatabaseDataStorage extends AbstractDataStorage {
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
 
-            // Create the data table
+            // Create the data table (value column type depends on the SQL dialect)
             stmt.execute("CREATE TABLE IF NOT EXISTS storage_data ("
                     + "scope VARCHAR(255) NOT NULL, "
                     + "key_name VARCHAR(255) NOT NULL, "
-                    + "value_data LONGTEXT, "
+                    + "value_data " + dialect.textColumnType() + ", "
                     + "PRIMARY KEY (scope, key_name))");
 
             // Create index for faster scope-based queries
@@ -147,14 +152,11 @@ public class DatabaseDataStorage extends AbstractDataStorage {
         String json = gson.toJson(value);
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO storage_data (scope, key_name, value_data) VALUES (?, ?, ?) " +
-                             "ON DUPLICATE KEY UPDATE value_data = ?")) {
+             PreparedStatement stmt = conn.prepareStatement(dialect.upsertStatement())) {
 
             stmt.setString(1, scope);
             stmt.setString(2, keyName);
             stmt.setString(3, json);
-            stmt.setString(4, json);
 
             int updated = stmt.executeUpdate();
             return updated > 0;

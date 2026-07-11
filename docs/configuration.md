@@ -83,6 +83,16 @@ Startup validation currently requires:
   - `data.storage.db.url`
   - `data.storage.db.username`
   - `data.storage.db.password`
+- Optional `DB` keys:
+  - `data.storage.db.max_pool_size` (default: `10`)
+  - `data.storage.db.auto_commit` (default: `true`)
+
+Supported database drivers (the SQL dialect is auto-detected from the JDBC URL):
+
+- **MySQL / MariaDB** — `jdbc:mysql://host:3306/fluxcord` or `jdbc:mariadb://host:3306/fluxcord`
+- **PostgreSQL** — `jdbc:postgresql://host:5432/fluxcord`
+
+Both drivers are bundled; no extra dependency is required.
 
 Optional file-storage keys:
 

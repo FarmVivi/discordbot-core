@@ -22,6 +22,9 @@ data:
   storage:
     type: FILE  # Options: FILE, DB
     db:
+      # Supported drivers: MySQL/MariaDB and PostgreSQL. The dialect is detected from the URL prefix.
+      #   MySQL/MariaDB: jdbc:mysql://localhost:3306/fluxcord  or  jdbc:mariadb://localhost:3306/fluxcord
+      #   PostgreSQL:    jdbc:postgresql://localhost:5432/fluxcord
       url: "jdbc:mysql://localhost:3306/fluxcord"
       username: username
       password: password
