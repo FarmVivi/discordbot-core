@@ -11,6 +11,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -37,18 +38,21 @@ public class S3BinaryStorage extends AbstractBinaryStorage {
     /**
      * Creates a new S3 binary storage.
      *
-     * @param storageName  the name of the storage
-     * @param bucketName   the S3 bucket name
-     * @param rootPrefix   the root prefix for all objects (can be empty)
-     * @param endpoint     the S3 endpoint URL (null for AWS)
-     * @param region       the AWS region
-     * @param accessKey    the AWS access key
-     * @param secretKey    the AWS secret key
-     * @param eventManager the event manager
+     * @param storageName     the name of the storage
+     * @param bucketName      the S3 bucket name
+     * @param rootPrefix      the root prefix for all objects (can be empty)
+     * @param endpoint        the S3 endpoint URL (null for AWS)
+     * @param region          the AWS region
+     * @param accessKey       the AWS access key
+     * @param secretKey       the AWS secret key
+     * @param pathStyleAccess whether to use path-style access ({@code endpoint/bucket/key})
+     *                        instead of virtual-host style ({@code bucket.endpoint/key});
+     *                        required by S3-compatible services such as Garage or MinIO
+     * @param eventManager    the event manager
      */
     public S3BinaryStorage(String storageName, String bucketName, String rootPrefix,
                            String endpoint, String region, String accessKey, String secretKey,
-                           EventManager eventManager) {
+                           boolean pathStyleAccess, EventManager eventManager) {
         super(storageName, eventManager);
         this.bucketName = bucketName;
         this.rootPrefix = normalizePrefix(rootPrefix);
@@ -74,6 +78,16 @@ public class S3BinaryStorage extends AbstractBinaryStorage {
         if (endpoint != null && !endpoint.isEmpty()) {
             clientBuilder.endpointOverride(URI.create(endpoint));
             presignerBuilder.endpointOverride(URI.create(endpoint));
+        }
+
+        // Path-style access must be applied to both the client and the presigner, otherwise
+        // presigned URLs would point at the virtual-host form and fail on path-style backends.
+        if (pathStyleAccess) {
+            S3Configuration serviceConfiguration = S3Configuration.builder()
+                    .pathStyleAccessEnabled(true)
+                    .build();
+            clientBuilder.serviceConfiguration(serviceConfiguration);
+            presignerBuilder.serviceConfiguration(serviceConfiguration);
         }
 
         this.s3Client = clientBuilder.build();

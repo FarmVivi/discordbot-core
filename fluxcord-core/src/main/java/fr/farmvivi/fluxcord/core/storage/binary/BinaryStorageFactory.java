@@ -46,9 +46,10 @@ public class BinaryStorageFactory {
                 String secretKey = config.getString("data.binary.storage.s3.secret_key");
                 String endpoint = config.getString("data.binary.storage.s3.endpoint", "");
                 String prefix = config.getString("data.binary.storage.s3.prefix", "");
+                boolean pathStyleAccess = config.getBoolean("data.binary.storage.s3.path_style_access", false);
 
                 // Create S3 storage
-                S3BinaryStorage s3Storage = new S3BinaryStorage("s3", bucketName, prefix, endpoint, region, accessKey, secretKey, eventManager);
+                S3BinaryStorage s3Storage = new S3BinaryStorage("s3", bucketName, prefix, endpoint, region, accessKey, secretKey, pathStyleAccess, eventManager);
                 logger.info("Using S3 binary storage with bucket {}", bucketName);
                 return new BinaryStorageManager(s3Storage);
             } catch (Exception e) {
