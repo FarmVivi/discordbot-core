@@ -160,6 +160,26 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     /**
+     * Restores tracks into the queue without starting playback.
+     *
+     * <p>Used when reloading a persisted state: the current track is started separately by
+     * {@link MusicPlayer}, while the remaining queue is repopulated here in order.
+     *
+     * @param tracks the tracks to append to the queue
+     */
+    public void restoreQueue(List<AudioTrack> tracks) {
+        if (tracks == null || tracks.isEmpty()) {
+            return;
+        }
+        for (AudioTrack track : tracks) {
+            if (track != null) {
+                queue.add(track);
+            }
+        }
+        logger.debug("[{}] Restored {} tracks into the queue", getGuildName(), tracks.size());
+    }
+
+    /**
      * Clears the queue and played tracks history.
      */
     public void clear() {

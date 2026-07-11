@@ -42,5 +42,6 @@ public class ShuffleCommand {
         }
 
         player.getPlayerMessage().refresh();
+        player.saveState();
     }
 }

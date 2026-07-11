@@ -45,6 +45,13 @@ public class MusicManager {
     }
 
     /**
+     * Gets the underlying LavaPlayer manager (used for track encode/decode on state persistence).
+     */
+    public com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager getPlayerManager() {
+        return audioPlayerManager.getPlayerManager();
+    }
+
+    /**
      * Gets or creates a music player for a guild.
      */
     public synchronized MusicPlayer getPlayer(Guild guild) {
@@ -212,6 +219,81 @@ public class MusicManager {
                 }
             }
         }
+    }
+
+    /**
+     * Persists the playback state of every active player.
+     * Called on graceful shutdown so the bot can resume where it left off after a restart.
+     */
+    public void saveAllStates() {
+        for (MusicPlayer player : players.values()) {
+            try {
+                player.saveState();
+            } catch (Exception e) {
+                logger.warn("Failed to save state for guild {}", player.getGuild().getId(), e);
+            }
+        }
+    }
+
+    /**
+     * Restores playback for all guilds that have a persisted state.
+     * Must be called once the JDA session is ready and guilds are available.
+     *
+     * @param jda the ready JDA instance
+     */
+    public void restoreAllStates(net.dv8tion.jda.api.JDA jda) {
+        if (!plugin.isPersistenceEnabled()) {
+            logger.info("Playback-state persistence is disabled; skipping restore");
+            return;
+        }
+        logger.info("Restoring music playback state for {} guild(s)...", jda.getGuilds().size());
+        int restored = 0;
+        for (Guild guild : jda.getGuilds()) {
+            try {
+                if (restoreState(guild)) {
+                    restored++;
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to restore state for guild {}", guild.getId(), e);
+            }
+        }
+        logger.info("Restored playback for {} guild(s)", restored);
+    }
+
+    /**
+     * Restores playback for a single guild from its persisted state, if any.
+     *
+     * @param guild the guild
+     * @return true if a state was found and restoration was attempted
+     */
+    private boolean restoreState(Guild guild) {
+        String guildId = guild.getId();
+        java.util.Optional<?> raw = plugin.getPluginDataStorage()
+                .getGuildStorage(guildId)
+                .get(MusicPlayer.STATE_KEY, Map.class);
+        if (raw.isEmpty()) {
+            return false;
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> stateMap = (Map<String, Object>) raw.get();
+        fr.farmvivi.fluxcord.plugins.music.state.PlaybackState state =
+                fr.farmvivi.fluxcord.plugins.music.state.PlaybackState.fromMap(stateMap);
+
+        if (!state.hasPlayback() || state.getVoiceChannelId() == null
+                || state.isExpired(plugin.getPersistenceTtlMillis())) {
+            // Nothing worth restoring (empty or too old); drop the stale entry.
+            if (state.isExpired(plugin.getPersistenceTtlMillis())) {
+                logger.info("Discarding expired playback state for guild {}", guildId);
+            }
+            plugin.getPluginDataStorage().getGuildStorage(guildId).remove(MusicPlayer.STATE_KEY);
+            plugin.getPluginDataStorage().saveAll();
+            return false;
+        }
+
+        MusicPlayer player = getPlayer(guild);
+        player.restoreFromState(state);
+        return true;
     }
 
     /**

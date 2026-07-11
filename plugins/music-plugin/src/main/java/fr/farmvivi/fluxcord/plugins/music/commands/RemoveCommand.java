@@ -44,6 +44,7 @@ public class RemoveCommand {
         if (player.getTrackScheduler().removeTrack(position - 1)) {
             ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.queue.removed", removed.getInfo().title));
             player.getPlayerMessage().refresh();
+            player.saveState();
         } else {
             ctx.replyError(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.error.remove_failed"));
         }

@@ -38,5 +38,6 @@ public class ClearCommand {
         ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.queue.cleared", cleared));
 
         player.getPlayerMessage().refresh();
+        player.saveState();
     }
 }

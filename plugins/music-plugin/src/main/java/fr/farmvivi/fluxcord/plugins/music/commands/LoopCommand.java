@@ -67,5 +67,6 @@ public class LoopCommand {
         }
 
         player.getPlayerMessage().refresh();
+        player.saveState();
     }
 }

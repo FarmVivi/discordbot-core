@@ -10,6 +10,7 @@ import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
 import fr.farmvivi.fluxcord.plugins.music.commands.*;
 import fr.farmvivi.fluxcord.plugins.music.events.MusicButtonListener;
 import fr.farmvivi.fluxcord.plugins.music.events.MusicModalListener;
+import fr.farmvivi.fluxcord.plugins.music.events.MusicReadyListener;
 import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
@@ -34,6 +35,10 @@ public class MusicPlugin extends AbstractPlugin {
     private MusicManager musicManager;
     private PlaylistManager playlistManager;
     private ScheduledExecutorService scheduler;
+
+    // Playback-state persistence settings (loaded from configuration)
+    private boolean persistenceEnabled = true;
+    private long persistenceTtlMillis = 3_600_000L; // 1 hour
 
     @Override
     public void onEnable() {
@@ -60,10 +65,16 @@ public class MusicPlugin extends AbstractPlugin {
             // Register on builder (pre-connect) and on live JDA if already connected
             MusicButtonListener buttonListener = new MusicButtonListener(this);
             MusicModalListener modalListener = new MusicModalListener(this);
-            getContext().getDiscordAPI().getBuilder().addEventListeners(buttonListener, modalListener);
+            MusicReadyListener readyListener = new MusicReadyListener(this);
+            getContext().getDiscordAPI().getBuilder().addEventListeners(buttonListener, modalListener, readyListener);
             JDA jda = getContext().getDiscordAPI().getJDA();
             if (jda != null) {
-                jda.addEventListener(buttonListener, modalListener);
+                jda.addEventListener(buttonListener, modalListener, readyListener);
+                // JDA already connected (e.g. plugin hot-reload): ReadyEvent won't fire again,
+                // so restore persisted playback right away.
+                if (jda.getStatus() == JDA.Status.CONNECTED) {
+                    scheduler.execute(() -> musicManager.restoreAllStates(jda));
+                }
             }
         } catch (Exception e) {
             logger.warn("Failed to register JDA listeners for MusicPlugin", e);
@@ -75,6 +86,12 @@ public class MusicPlugin extends AbstractPlugin {
     @Override
     public void onDisable() {
         logger.info("Music Plugin disabling...");
+
+        // Persist playback state before tearing anything down, so the bot resumes where it
+        // left off after a restart (e.g. Kubernetes pod rescheduling).
+        if (musicManager != null) {
+            musicManager.saveAllStates();
+        }
 
         if (scheduler != null) {
             scheduler.shutdown();
@@ -269,8 +286,30 @@ public class MusicPlugin extends AbstractPlugin {
         boolean enableSpotify = getConfiguration().getBoolean("providers.spotify.enabled", true);
         boolean enableSoundcloud = getConfiguration().getBoolean("providers.soundcloud.enabled", true);
         int autoLeaveTimeoutMs = getConfiguration().getInt("music.auto_leave_timeout", 300_000);
-        logger.info("Music config loaded: vol={}, queue={}, maxTrackMs={}, spotify={}, soundcloud={}, autoLeaveMs={}",
-                defaultVolume, maxQueue, maxTrackDurationMs, enableSpotify, enableSoundcloud, autoLeaveTimeoutMs);
+
+        // Playback-state persistence (resume after restart, e.g. Kubernetes pod rescheduling)
+        this.persistenceEnabled = getConfiguration().getBoolean("music.persistence.enabled", true);
+        int ttlSeconds = getConfiguration().getInt("music.persistence.ttl_seconds", 3600);
+        this.persistenceTtlMillis = ttlSeconds <= 0 ? 0L : ttlSeconds * 1000L;
+
+        logger.info("Music config loaded: vol={}, queue={}, maxTrackMs={}, spotify={}, soundcloud={}, autoLeaveMs={}, persistence={}, persistenceTtlS={}",
+                defaultVolume, maxQueue, maxTrackDurationMs, enableSpotify, enableSoundcloud, autoLeaveTimeoutMs,
+                persistenceEnabled, ttlSeconds);
+    }
+
+    /**
+     * Whether playback-state persistence (save/restore across restarts) is enabled.
+     */
+    public boolean isPersistenceEnabled() {
+        return persistenceEnabled;
+    }
+
+    /**
+     * Maximum age of a persisted playback state before it is considered stale, in milliseconds.
+     * A value of {@code 0} means the state never expires.
+     */
+    public long getPersistenceTtlMillis() {
+        return persistenceTtlMillis;
     }
 
     @EventHandler(priority = EventPriority.NORMAL)

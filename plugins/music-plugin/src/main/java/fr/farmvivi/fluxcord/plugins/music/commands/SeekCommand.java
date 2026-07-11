@@ -55,5 +55,6 @@ public class SeekCommand {
         ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.seeked", TimeParser.formatTime(position)));
 
         player.getPlayerMessage().refresh();
+        player.saveState();
     }
 }

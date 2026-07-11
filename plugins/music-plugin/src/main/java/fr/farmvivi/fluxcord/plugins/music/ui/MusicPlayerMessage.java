@@ -443,6 +443,15 @@ public class MusicPlayerMessage {
     }
 
     /**
+     * Gets the ID of the text channel hosting the player message, if known.
+     *
+     * @return the channel ID, or {@code null} if no channel is set
+     */
+    public Long getChannelId() {
+        return channelId;
+    }
+
+    /**
      * Deletes the player message.
      */
     public void delete() {

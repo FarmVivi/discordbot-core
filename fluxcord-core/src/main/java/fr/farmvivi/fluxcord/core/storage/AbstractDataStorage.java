@@ -47,32 +47,43 @@ public abstract class AbstractDataStorage implements DataStorage {
             }
         }
 
-        // Check cache first
+        // Check cache first.
+        // IMPORTANT: do not use computeIfAbsent here. Eagerly inserting an empty scope map would
+        // shadow lazy-loading backends (e.g. FileDataStorage loads the scope from disk only when
+        // its cache entry is still absent), causing cold-start reads of previously persisted data
+        // to wrongly return empty.
         String scope = key.getScope();
         String keyName = key.getKey();
-        Map<String, Object> scopeCache = cache.computeIfAbsent(scope, k -> new ConcurrentHashMap<>());
+        Map<String, Object> scopeCache = cache.get(scope);
 
-        if (scopeCache.containsKey(keyName)) {
-            T value = type.cast(scopeCache.get(keyName));
+        if (scopeCache != null && scopeCache.containsKey(keyName)) {
+            Object cached = scopeCache.get(keyName);
+            // Only serve from cache when the cached object already matches the requested type.
+            // A lazy backend may have cached raw JSON values (e.g. numbers as Double); in that case
+            // we fall through to doGet so the backend can convert the value to the requested type.
+            if (cached == null || type.isInstance(cached)) {
+                T value = type.cast(cached);
 
-            // Fire post-get event
-            if (eventManager != null) {
-                StorageGetEvent event = new StorageGetEvent(key, type, value);
-                eventManager.fireEvent(event);
+                // Fire post-get event
+                if (eventManager != null) {
+                    StorageGetEvent event = new StorageGetEvent(key, type, value);
+                    eventManager.fireEvent(event);
 
-                if (event.getValue() != value) {
-                    return Optional.ofNullable(type.cast(event.getValue()));
+                    if (event.getValue() != value) {
+                        return Optional.ofNullable(type.cast(event.getValue()));
+                    }
                 }
-            }
 
-            return Optional.ofNullable(value);
+                return Optional.ofNullable(value);
+            }
         }
 
-        // Get from backend
+        // Get from backend (this lets lazy backends load and cache the scope from persistent storage)
         Optional<T> result = doGet(key, type);
 
         // Update cache if found
-        result.ifPresent(value -> scopeCache.put(keyName, value));
+        result.ifPresent(value ->
+                cache.computeIfAbsent(scope, k -> new ConcurrentHashMap<>()).put(keyName, value));
 
         // Fire post-get event
         if (eventManager != null && result.isPresent()) {
