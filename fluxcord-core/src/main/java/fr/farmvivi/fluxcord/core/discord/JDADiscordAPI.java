@@ -5,9 +5,11 @@ import fr.farmvivi.fluxcord.core.Fluxcord;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.audio.AudioModuleConfig;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import club.minnced.discord.jdave.interop.JDaveSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +67,31 @@ public class JDADiscordAPI implements DiscordAPI {
                 // Prevent JDA from registering its own shutdown hook which would
                 // stop the Requester before our plugins finish disabling during JVM shutdown
                 .setEnableShutdownHook(false);
+
+        // Configure the DAVE (Discord E2EE) protocol implementation. Since 2026-03-01
+        // Discord requires a real DAVE session for any audio connection; JDA's built-in
+        // passthrough factory now throws, so audio (music) would otherwise stop working.
+        // We use JDAVE (Foreign Function & Memory bindings for libdave, requires Java 25).
+        configureDaveSession();
+    }
+
+    /**
+     * Configures the DAVE session factory on the builder so that audio connections
+     * remain functional. Fails soft: if the native library cannot be loaded on this
+     * platform, a clear warning is logged and audio features will not work, but the
+     * bot still starts.
+     */
+    private void configureDaveSession() {
+        try {
+            builder.setAudioModuleConfig(new AudioModuleConfig()
+                    .withDaveSessionFactory(new JDaveSessionFactory()));
+            logger.info("DAVE session factory (JDAVE) configured for audio connections");
+        } catch (Throwable t) {
+            logger.error("Failed to initialize the DAVE native library (JDAVE). Audio connections " +
+                    "(music/voice) will NOT work on this platform. Make sure a matching " +
+                    "'jdave-native-*' dependency is present for your OS/architecture and that " +
+                    "the JVM is Java 25+.", t);
+        }
     }
 
     @Override

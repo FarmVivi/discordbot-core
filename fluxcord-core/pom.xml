@@ -42,6 +42,25 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- JDAVE: DAVE (Discord E2EE) protocol implementation for JDA audio.
+             Required since 2026-03-01 for any audio connection to work. Uses the
+             Java 25 Foreign Function & Memory API. -->
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>jdave-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>jdave-native-linux-x86-64</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>jdave-native-win-x86-64</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
@@ -111,6 +130,10 @@
                         <manifest>
                             <mainClass>${project.mainClass}</mainClass>
                         </manifest>
+                        <!-- Allow JDAVE's FFM native access without JVM warnings -->
+                        <manifestEntries>
+                            <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
@@ -134,6 +157,10 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>${project.mainClass}</mainClass>
+                                    <!-- Allow JDAVE's FFM native access without JVM warnings -->
+                                    <manifestEntries>
+                                        <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
+                                    </manifestEntries>
                                 </transformer>
                                 <!-- Merge META-INF/services files (e.g. java.sql.Driver) so JDBC
                                      drivers like PostgreSQL and MariaDB stay registered via SPI -->
