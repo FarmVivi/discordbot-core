@@ -21,6 +21,7 @@ commands:
 data:
   storage:
     type: FILE  # Options: FILE, DB
+    fallback: false  # If true, fall back to file storage when the database is unreachable at startup
     db:
       # Supported drivers: MySQL/MariaDB and PostgreSQL. The dialect is detected from the URL prefix.
       #   MySQL/MariaDB: jdbc:mysql://localhost:3306/fluxcord  or  jdbc:mariadb://localhost:3306/fluxcord
@@ -33,6 +34,7 @@ data:
   binary:
     storage:
       type: FILE  # Options: FILE, S3
+      fallback: false  # If true, fall back to file binary storage when S3 is unreachable at startup
       file:
         folder: binary
       s3:

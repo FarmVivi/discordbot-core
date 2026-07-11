@@ -45,6 +45,10 @@ public class StorageFactory {
                 return new DataStorageManager(dbStorage);
             } catch (Exception e) {
                 logger.error("Failed to initialize database storage: {}", e.getMessage());
+                if (!isFallbackEnabled(config)) {
+                    throw new IllegalStateException(
+                            "Database storage initialization failed and fallback is disabled", e);
+                }
                 logger.info("Falling back to file storage");
                 return createFileStorageManager(config, eventManager);
             }
@@ -86,6 +90,22 @@ public class StorageFactory {
         FileDataStorage fileStorage = new FileDataStorage(storageFolder, eventManager, debounceMs);
         logger.info("Using file storage in {}", storageFolder.getAbsolutePath());
         return new DataStorageManager(fileStorage);
+    }
+
+    /**
+     * Reads whether remote-storage failures should fall back to file storage.
+     * Fallback is disabled by default: a misconfigured or unreachable database should
+     * fail fast rather than silently degrade to local file storage.
+     *
+     * @param config the configuration
+     * @return {@code true} if fallback to file storage is enabled
+     */
+    private static boolean isFallbackEnabled(Configuration config) {
+        try {
+            return config.getBoolean("data.storage.fallback", false);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

@@ -53,6 +53,10 @@ public class BinaryStorageFactory {
                 return new BinaryStorageManager(s3Storage);
             } catch (Exception e) {
                 logger.error("Failed to initialize S3 binary storage: {}", e.getMessage());
+                if (!isFallbackEnabled(config)) {
+                    throw new IllegalStateException(
+                            "S3 binary storage initialization failed and fallback is disabled", e);
+                }
                 logger.info("Falling back to file binary storage");
                 return createFileBinaryStorageManager(config, eventManager);
             }
@@ -86,6 +90,22 @@ public class BinaryStorageFactory {
         FileBinaryStorage fileBinaryStorage = new FileBinaryStorage("file", binaryFolder, eventManager);
         logger.info("Using file binary storage in {}", binaryFolder.getAbsolutePath());
         return new BinaryStorageManager(fileBinaryStorage);
+    }
+
+    /**
+     * Reads whether remote binary-storage failures should fall back to file storage.
+     * Fallback is disabled by default: a misconfigured or unreachable S3 backend should
+     * fail fast rather than silently degrade to local file storage.
+     *
+     * @param config the configuration
+     * @return {@code true} if fallback to file binary storage is enabled
+     */
+    private static boolean isFallbackEnabled(Configuration config) {
+        try {
+            return config.getBoolean("data.binary.storage.fallback", false);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
