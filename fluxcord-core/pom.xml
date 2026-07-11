@@ -44,7 +44,8 @@
 
         <!-- JDAVE: DAVE (Discord E2EE) protocol implementation for JDA audio.
              Required since 2026-03-01 for any audio connection to work. Uses the
-             Java 25 Foreign Function & Memory API. -->
+             Java 25 Foreign Function & Memory API; prebuilt glibc natives (runs on a
+             glibc base image without compiling anything). -->
         <dependency>
             <groupId>club.minnced</groupId>
             <artifactId>jdave-api</artifactId>
