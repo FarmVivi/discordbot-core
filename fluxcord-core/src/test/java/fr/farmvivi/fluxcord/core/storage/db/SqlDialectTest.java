@@ -35,7 +35,7 @@ class SqlDialectTest {
     @Test
     void upsertStatementsUseThreePositionalParameters() {
         for (SqlDialect dialect : SqlDialect.values()) {
-            long placeholders = dialect.upsertStatement().chars().filter(c -> c == '?').count();
+            long placeholders = dialect.upsertStatement("storage_data").chars().filter(c -> c == '?').count();
             assertEquals(3, placeholders,
                     () -> dialect + " upsert must expose exactly three positional parameters");
         }
@@ -45,7 +45,15 @@ class SqlDialectTest {
     void dialectsProvideDistinctColumnTypesAndUpserts() {
         assertEquals("LONGTEXT", SqlDialect.MYSQL.textColumnType());
         assertEquals("TEXT", SqlDialect.POSTGRESQL.textColumnType());
-        assertTrue(SqlDialect.MYSQL.upsertStatement().contains("ON DUPLICATE KEY UPDATE"));
-        assertTrue(SqlDialect.POSTGRESQL.upsertStatement().contains("ON CONFLICT"));
+        assertTrue(SqlDialect.MYSQL.upsertStatement("storage_data").contains("ON DUPLICATE KEY UPDATE"));
+        assertTrue(SqlDialect.POSTGRESQL.upsertStatement("storage_data").contains("ON CONFLICT"));
+    }
+
+    @Test
+    void upsertStatementUsesGivenTableName() {
+        for (SqlDialect dialect : SqlDialect.values()) {
+            assertTrue(dialect.upsertStatement("bot1_storage_data").contains("INTO bot1_storage_data "),
+                    () -> dialect + " upsert must target the provided table name");
+        }
     }
 }

@@ -29,6 +29,10 @@ data:
       url: "jdbc:mysql://localhost:3306/fluxcord"
       username: username
       password: password
+      # Optional prefix for the storage table, so several bots can share the same
+      # database/schema without colliding (e.g. "bot1_" -> table "bot1_storage_data").
+      # Empty = default table name "storage_data". Allowed chars: letters, digits, underscore.
+      table_prefix: ""
 
   # Binary storage settings for large files
   binary:

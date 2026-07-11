@@ -23,8 +23,12 @@ public class DatabaseDataStorage extends AbstractDataStorage {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseDataStorage.class);
     private static final Gson gson = new GsonBuilder().create();
 
+    private static final String BASE_TABLE_NAME = "storage_data";
+
     private final HikariDataSource dataSource;
     private final SqlDialect dialect;
+    private final String tableName;
+    private final String indexName;
 
     /**
      * Creates a new database data storage.
@@ -38,12 +42,38 @@ public class DatabaseDataStorage extends AbstractDataStorage {
             // The JDBC URL determines both the connection and the SQL dialect
             String jdbcUrl = configuration.getString("data.storage.db.url");
             this.dialect = SqlDialect.fromJdbcUrl(jdbcUrl);
+            // Optional table prefix so several bots can share the same database/schema
+            // (e.g. prefix "bot1_" -> table "bot1_storage_data"). Empty by default.
+            String tablePrefix = configuration.getString("data.storage.db.table_prefix", "");
+            this.tableName = sanitizeTablePrefix(tablePrefix) + BASE_TABLE_NAME;
+            this.indexName = "idx_" + tableName + "_scope";
             this.dataSource = initializeDataSource(configuration, jdbcUrl);
         } catch (ConfigurationException e) {
             logger.error("Missing required database configuration", e);
             throw new RuntimeException("Failed to initialize database connection", e);
         }
         initializeSchema();
+    }
+
+    /**
+     * Validates the configured table prefix. Because a table name cannot be passed as a
+     * bound parameter, the prefix is concatenated directly into SQL; we therefore restrict
+     * it to a safe identifier charset to prevent SQL injection.
+     *
+     * @param prefix the raw prefix from configuration (may be empty)
+     * @return the prefix unchanged if valid
+     * @throws IllegalArgumentException if the prefix contains anything other than letters,
+     *                                  digits or underscores
+     */
+    private static String sanitizeTablePrefix(String prefix) {
+        if (prefix == null || prefix.isEmpty()) {
+            return "";
+        }
+        if (!prefix.matches("[A-Za-z0-9_]+")) {
+            throw new IllegalArgumentException("Invalid data.storage.db.table_prefix '" + prefix
+                    + "': only letters, digits and underscores are allowed");
+        }
+        return prefix;
     }
 
     /**
@@ -100,14 +130,14 @@ public class DatabaseDataStorage extends AbstractDataStorage {
              Statement stmt = conn.createStatement()) {
 
             // Create the data table (value column type depends on the SQL dialect)
-            stmt.execute("CREATE TABLE IF NOT EXISTS storage_data ("
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName + " ("
                     + "scope VARCHAR(255) NOT NULL, "
                     + "key_name VARCHAR(255) NOT NULL, "
                     + "value_data " + dialect.textColumnType() + ", "
                     + "PRIMARY KEY (scope, key_name))");
 
             // Create index for faster scope-based queries
-            stmt.execute("CREATE INDEX IF NOT EXISTS idx_storage_data_scope ON storage_data (scope)");
+            stmt.execute("CREATE INDEX IF NOT EXISTS " + indexName + " ON " + tableName + " (scope)");
 
             logger.info("Database schema initialized successfully");
         } catch (SQLException e) {
@@ -125,7 +155,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT value_data FROM storage_data WHERE scope = ? AND key_name = ?")) {
+                     "SELECT value_data FROM " + tableName + " WHERE scope = ? AND key_name = ?")) {
 
             stmt.setString(1, scope);
             stmt.setString(2, keyName);
@@ -152,7 +182,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
         String json = gson.toJson(value);
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(dialect.upsertStatement())) {
+             PreparedStatement stmt = conn.prepareStatement(dialect.upsertStatement(tableName))) {
 
             stmt.setString(1, scope);
             stmt.setString(2, keyName);
@@ -174,7 +204,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT 1 FROM storage_data WHERE scope = ? AND key_name = ?")) {
+                     "SELECT 1 FROM " + tableName + " WHERE scope = ? AND key_name = ?")) {
 
             stmt.setString(1, scope);
             stmt.setString(2, keyName);
@@ -196,7 +226,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "DELETE FROM storage_data WHERE scope = ? AND key_name = ?")) {
+                     "DELETE FROM " + tableName + " WHERE scope = ? AND key_name = ?")) {
 
             stmt.setString(1, scope);
             stmt.setString(2, keyName);
@@ -216,7 +246,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT key_name FROM storage_data WHERE scope = ?")) {
+                     "SELECT key_name FROM " + tableName + " WHERE scope = ?")) {
 
             stmt.setString(1, scope);
 
@@ -238,7 +268,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT key_name, value_data FROM storage_data WHERE scope = ?")) {
+                     "SELECT key_name, value_data FROM " + tableName + " WHERE scope = ?")) {
 
             stmt.setString(1, scope);
 
@@ -261,7 +291,7 @@ public class DatabaseDataStorage extends AbstractDataStorage {
     protected boolean doClear(String scope) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "DELETE FROM storage_data WHERE scope = ?")) {
+                     "DELETE FROM " + tableName + " WHERE scope = ?")) {
 
             stmt.setString(1, scope);
             stmt.executeUpdate();

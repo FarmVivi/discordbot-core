@@ -18,22 +18,22 @@ enum SqlDialect {
      * MySQL / MariaDB family.
      */
     MYSQL("LONGTEXT",
-            "INSERT INTO storage_data (scope, key_name, value_data) VALUES (?, ?, ?) "
+            "INSERT INTO %s (scope, key_name, value_data) VALUES (?, ?, ?) "
                     + "ON DUPLICATE KEY UPDATE value_data = VALUES(value_data)"),
 
     /**
      * PostgreSQL.
      */
     POSTGRESQL("TEXT",
-            "INSERT INTO storage_data (scope, key_name, value_data) VALUES (?, ?, ?) "
+            "INSERT INTO %s (scope, key_name, value_data) VALUES (?, ?, ?) "
                     + "ON CONFLICT (scope, key_name) DO UPDATE SET value_data = EXCLUDED.value_data");
 
     private final String textColumnType;
-    private final String upsertStatement;
+    private final String upsertTemplate;
 
-    SqlDialect(String textColumnType, String upsertStatement) {
+    SqlDialect(String textColumnType, String upsertTemplate) {
         this.textColumnType = textColumnType;
-        this.upsertStatement = upsertStatement;
+        this.upsertTemplate = upsertTemplate;
     }
 
     /**
@@ -59,9 +59,13 @@ enum SqlDialect {
     }
 
     /**
-     * @return an upsert statement with three positional parameters: scope, key_name, value_data
+     * Builds an upsert statement for the given table with three positional parameters:
+     * scope, key_name, value_data.
+     *
+     * @param tableName the (already validated/sanitized) table name to target
+     * @return the dialect-specific upsert statement
      */
-    String upsertStatement() {
-        return upsertStatement;
+    String upsertStatement(String tableName) {
+        return String.format(upsertTemplate, tableName);
     }
 }
