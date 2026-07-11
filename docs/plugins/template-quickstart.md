@@ -41,7 +41,7 @@ framework:
 
 ### Prerequisites
 
-- Java 17 or newer
+- Java 25 or newer
 - Maven 3.6+ for building
 - Fluxcord framework
 - IDE with Java support (IntelliJ IDEA recommended)

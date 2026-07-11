@@ -63,7 +63,7 @@ persistent player controls.
 ### Requirements
 
 - Fluxcord 2.3.27 or higher
-- Java 17 or higher
+- Java 25 or higher
 - (Optional) API keys for premium sources (Spotify, Apple Music, etc.)
 
 ### Basic Setup

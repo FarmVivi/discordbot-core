@@ -321,7 +321,7 @@ The template includes all necessary dependencies:
 
 **Build Issues?**
 
-- Ensure Java 17+ and Maven 3.6+
+- Ensure Java 25+ and Maven 3.6+
 - Check parent POM compatibility
 - Verify all dependencies are available
 

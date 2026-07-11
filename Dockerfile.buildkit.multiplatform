@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 ################ Build ################
 # Build stage for the full multi-module project
-# Using maven:3.9-openjdk-25-slim which has better multi-platform support
-FROM maven:3-openjdk-18-slim AS build
+# Using eclipse-temurin-25 (Debian) which has good multi-platform support
+FROM maven:3.9.16-eclipse-temurin-25 AS build
 
 WORKDIR /workspace
 
@@ -38,8 +38,8 @@ RUN --mount=type=cache,target=/root/.m2/repository \
 
 ################ Production ################
 # Use a small JRE base with shell to run an entrypoint script
-# Using eclipse-temurin:25-jre which has better multi-platform support
-FROM eclipse-temurin:25-jre AS production
+# Using eclipse-temurin:25-jre (Debian) which has better multi-platform support
+FROM eclipse-temurin:25.0.3_9-jre AS production
 
 ENV APP_DIR=/app \
     BUNDLES_DIR=/opt/fluxcord/bundles \
