@@ -45,6 +45,9 @@ public class MusicPlayerMessage {
     private ScheduledFuture<?> progressUpdateTask;
     private long lastUpdateTime = 0;
     private volatile boolean controlsDirty = false;
+    // True while an existing player message is being retrieved from Discord on restore, to avoid
+    // creating a duplicate message before the retrieval resolves.
+    private volatile boolean awaitingMessageRestore = false;
 
     public MusicPlayerMessage(MusicPlayer musicPlayer) {
         this.musicPlayer = musicPlayer;
@@ -145,7 +148,7 @@ public class MusicPlayerMessage {
                         e -> createNewMessage(embed, actionRows)
                 );
             });
-        } else {
+        } else if (!awaitingMessageRestore) {
             createNewMessage(embed, actionRows);
         }
 
@@ -462,7 +465,20 @@ public class MusicPlayerMessage {
         }
         messageId = null;
         channelId = null;
+        awaitingMessageRestore = false;
         saveMessage();
+        stopUpdates();
+    }
+
+    /**
+     * Stops all UI timers without deleting the Discord message or clearing its stored IDs.
+     * Used on graceful shutdown so the existing message can be reused (edited) after a restart.
+     */
+    public void stopUpdates() {
+        if (updateTask != null && !updateTask.isDone()) {
+            updateTask.cancel(false);
+        }
+        updateTask = null;
         stopProgressUpdates();
     }
 
@@ -472,17 +488,36 @@ public class MusicPlayerMessage {
     private void saveMessage() {
         String guildId = musicPlayer.getGuild().getId();
         PluginGuildStorage guildStorage = musicPlayer.getPlugin().getPluginDataStorage().getGuildStorage(guildId);
+        // Persist Discord snowflakes as Strings: stored as JSON numbers they would be reloaded as
+        // doubles and lose precision (a 19-digit ID gets rounded), breaking message retrieval.
         if (messageId != null) {
-            guildStorage.set("player_messages.message_id", messageId);
+            guildStorage.set("player_messages.message_id", String.valueOf(messageId));
         } else {
             guildStorage.remove("player_messages.message_id");
         }
         if (channelId != null) {
-            guildStorage.set("player_messages.channel_id", channelId);
+            guildStorage.set("player_messages.channel_id", String.valueOf(channelId));
         } else {
             guildStorage.remove("player_messages.channel_id");
         }
         musicPlayer.getPlugin().getPluginDataStorage().saveAll();
+    }
+
+    /**
+     * Parses a stored snowflake ID, tolerating legacy/corrupt values.
+     *
+     * @param value the stored string value (may be null)
+     * @return the parsed ID, or {@code null} if absent or unparseable
+     */
+    private static Long parseIdOrNull(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     /**
@@ -491,8 +526,8 @@ public class MusicPlayerMessage {
     private void restoreMessage() {
         String guildId = musicPlayer.getGuild().getId();
         PluginGuildStorage guildStorage = musicPlayer.getPlugin().getPluginDataStorage().getGuildStorage(guildId);
-        Long storedMessageId = guildStorage.get("player_messages.message_id", Long.class).orElse(null);
-        Long storedChannelId = guildStorage.get("player_messages.channel_id", Long.class).orElse(null);
+        Long storedMessageId = parseIdOrNull(guildStorage.get("player_messages.message_id", String.class).orElse(null));
+        Long storedChannelId = parseIdOrNull(guildStorage.get("player_messages.channel_id", String.class).orElse(null));
 
         if (storedMessageId != null && storedChannelId != null) {
             this.messageId = storedMessageId;
@@ -503,20 +538,28 @@ public class MusicPlayerMessage {
                 MessageChannel channel = musicPlayer.getGuild().getTextChannelById(channelId);
                 if (channel != null) {
                     this.messageChannel = channel;
+                    // Block message creation until this retrieval resolves, to avoid duplicates.
+                    this.awaitingMessageRestore = true;
                     channel.retrieveMessageById(messageId).queue(
                             m -> {
                                 this.message = m;
+                                this.awaitingMessageRestore = false;
                                 startProgressUpdates();
+                                // Re-render to reflect the restored state on the existing message.
+                                refresh();
                             },
                             e -> {
-                                // Message not found, clear stored IDs
+                                // Message not found: clear stored IDs and allow a fresh one.
                                 this.messageId = null;
                                 this.channelId = null;
+                                this.awaitingMessageRestore = false;
                                 saveMessage();
+                                refresh();
                             }
                     );
                 }
             } catch (Exception e) {
+                this.awaitingMessageRestore = false;
                 logger.debug("Failed to restore player message for guild {}", guildId, e);
             }
         }

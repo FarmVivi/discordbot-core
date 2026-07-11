@@ -196,6 +196,19 @@ public class MusicPlayer {
         trackScheduler.clear();
         audioPlayer.destroy();
         playerMessage.delete();
+        clearState();
+    }
+
+    /**
+     * Releases runtime resources on graceful shutdown WITHOUT deleting the player message or the
+     * persisted playback state. This lets the bot resume seamlessly after a restart: the saved
+     * state is reloaded and the existing player message is reused (edited) rather than recreated.
+     */
+    public void release() {
+        cancelQuitTask();
+        stopStateAutosave();
+        audioPlayer.destroy();
+        playerMessage.stopUpdates();
     }
 
     // Getters

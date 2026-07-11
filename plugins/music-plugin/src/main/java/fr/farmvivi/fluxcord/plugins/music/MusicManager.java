@@ -302,9 +302,10 @@ public class MusicManager {
     public void shutdown() {
         logger.info("Shutting down music manager...");
 
-        // Destroy all players
+        // Release players without deleting their messages or clearing persisted state, so playback
+        // can resume seamlessly after a restart. State was already saved via saveAllStates().
         for (MusicPlayer player : players.values()) {
-            player.destroy();
+            player.release();
         }
         players.clear();
 
