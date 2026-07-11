@@ -112,6 +112,14 @@ public class S3BinaryStorage extends AbstractBinaryStorage {
 
     /**
      * Ensures the S3 bucket exists, creating it if necessary.
+     *
+     * <p>This method also acts as a connectivity check performed at initialization: it
+     * contacts the remote S3 endpoint and will throw if the bucket cannot be reached or
+     * created (unreachable endpoint, invalid credentials, insufficient permissions). The
+     * exception is intentionally propagated so that the calling factory can fall back to
+     * another binary storage (e.g. file) instead of silently using an unusable S3 backend.
+     *
+     * @throws RuntimeException if the bucket cannot be reached or created
      */
     private void ensureBucketExists() {
         try {
@@ -129,10 +137,14 @@ public class S3BinaryStorage extends AbstractBinaryStorage {
             } catch (Exception ex) {
                 logger.error("[{}] Failed to create bucket {}: {}",
                         storageName, bucketName, ex.getMessage(), ex);
+                throw new IllegalStateException(
+                        "Failed to create S3 bucket " + bucketName + ": " + ex.getMessage(), ex);
             }
         } catch (Exception e) {
             logger.error("[{}] Error checking if bucket {} exists: {}",
                     storageName, bucketName, e.getMessage(), e);
+            throw new IllegalStateException(
+                    "Unable to reach S3 bucket " + bucketName + ": " + e.getMessage(), e);
         }
     }
 
