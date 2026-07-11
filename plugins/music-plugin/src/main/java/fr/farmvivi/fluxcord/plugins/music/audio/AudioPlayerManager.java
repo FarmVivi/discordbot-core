@@ -48,6 +48,16 @@ public class AudioPlayerManager {
         YoutubeAudioSourceManager youtubeSourceManager = null;
         if (youtubeEnabled) {
             logger.info("Enabling YouTube source provider");
+            // Client order matters: clients are queried in the given order until one
+            // succeeds. The first four are the official youtube-source recommended set
+            // (https://github.com/lavalink-devs/youtube-source), in the recommended order:
+            //   MUSIC       -> ytmsearch + music metadata
+            //   ANDROID_VR  -> full feature parity with WEB, most reliable for playback
+            //   WEB         -> full video/search/playlist/mix metadata & playback
+            //   WEBEMBEDDED -> age-restricted fallback
+            // The remaining clients are extra fallbacks, ordered by reliability.
+            // ANDROID is intentionally omitted: it is heavily restricted and frequently
+            // dysfunctional ("ANDROID is broken with no known fix").
             youtubeSourceManager = new YoutubeAudioSourceManager(true,
                     new MusicWithThumbnail(),
                     new AndroidVrWithThumbnail(),
@@ -55,7 +65,6 @@ public class AudioPlayerManager {
                     new WebEmbeddedWithThumbnail(),
                     new MWebWithThumbnail(),
                     new IosWithThumbnail(),
-                    new AndroidWithThumbnail(),
                     new AndroidMusicWithThumbnail(),
                     new TvHtml5SimplyWithThumbnail()
             );
