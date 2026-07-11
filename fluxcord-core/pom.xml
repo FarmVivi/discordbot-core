@@ -57,6 +57,11 @@
         </dependency>
         <dependency>
             <groupId>club.minnced</groupId>
+            <artifactId>jdave-native-linux-aarch64</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
             <artifactId>jdave-native-win-x86-64</artifactId>
             <scope>runtime</scope>
         </dependency>

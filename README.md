@@ -174,6 +174,15 @@ The optimized Dockerfiles provide significant performance improvements:
 | `Dockerfile.buildkit`  | Maximum performance  | ⭐⭐⭐⭐⭐       | Docker 18.09+ with BuildKit |
 | `Dockerfile`           | Legacy compatibility | ⭐           | Any Docker version          |
 
+> **⚠️ Voice/DAVE native (JDAVE + libdave)** — JDA audio requires a DAVE implementation.
+> We use [JDAVE](https://github.com/MinnDevelopment/jdave), whose native `libdave.so` is only
+> published for glibc. To keep the runtime images on **Alpine (musl)**, each Dockerfile has a
+> `libdave-build` stage that compiles `libdave` from source for musl and loads it via
+> `-Djdave.library.path`. The libdave git tag is **pinned** and must match the JDAVE release:
+> when you bump `jdave.version` in the root `pom.xml`, also update `--branch vX.Y.Z` in the
+> `libdave-build` stage of every Dockerfile (see the note above `jdave.version` in `pom.xml`).
+> Current mapping: **jdave 0.1.8 → libdave v1.1.1**.
+
 #### 📊 Performance Testing
 
 Test build performance with the provided script:
