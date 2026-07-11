@@ -39,8 +39,13 @@ public class MusicPlayer {
     private final AudioPlayerSendHandler sendHandler;
     private final MusicPlayerMessage playerMessage;
 
+    private static final int DISCONNECT_GRACE_SECONDS = 5;
+    private static final int MAX_DISCONNECT_CHECKS = 12; // up to ~1 min of reconnection attempts
+
     private ScheduledFuture<?> quitTask;
     private ScheduledFuture<?> stateSaveTask;
+    private ScheduledFuture<?> disconnectCheckTask;
+    private int disconnectChecks = 0;
     private volatile boolean restoring = false;
     private int volume = DEFAULT_VOLUME;
 
@@ -130,11 +135,9 @@ public class MusicPlayer {
      * Also deregisters the send handler.
      */
     public void stopAndLeave() {
-        stop();
+        // Intentional leave: close the connection and clean up immediately (no grace period).
         guild.getAudioManager().closeAudioConnection();
-        plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
-        clearState();
-        stopStateAutosave();
+        handleDisconnect();
     }
 
     /**
@@ -149,11 +152,57 @@ public class MusicPlayer {
      */
     public void handleDisconnect() {
         logger.info("[{}] Handling disconnect, stopping playback", guild.getName());
+        cancelPendingDisconnect();
         stop();
         plugin.getContext().getAudioService().deregisterSendHandler(guild, plugin);
         playerMessage.delete();
         clearState();
         stopStateAutosave();
+    }
+
+    /**
+     * Schedules a delayed check to confirm a voice disconnect. This tolerates transient
+     * voice-server reconnects (JDA briefly drops and reopens the audio connection), which would
+     * otherwise be mistaken for a permanent disconnect.
+     */
+    public void scheduleDisconnectCheck() {
+        cancelPendingDisconnect();
+        disconnectChecks = 0;
+        disconnectCheckTask = plugin.getScheduler().schedule(
+                this::confirmDisconnect, DISCONNECT_GRACE_SECONDS, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Cancels a pending disconnect confirmation (e.g. because the bot has (re)connected).
+     */
+    public void cancelPendingDisconnect() {
+        if (disconnectCheckTask != null && !disconnectCheckTask.isDone()) {
+            disconnectCheckTask.cancel(false);
+        }
+        disconnectCheckTask = null;
+    }
+
+    /**
+     * Confirms whether the bot is genuinely disconnected. If JDA is still (re)connecting, waits and
+     * re-checks; if reconnected, does nothing; otherwise performs the actual disconnect handling.
+     */
+    private void confirmDisconnect() {
+        var audioManager = guild.getAudioManager();
+        if (audioManager.isConnected()) {
+            // Reconnected in the meantime: keep playing.
+            cancelPendingDisconnect();
+            return;
+        }
+        boolean reconnecting = audioManager.isAutoReconnect()
+                && audioManager.getConnectionStatus().shouldReconnect();
+        if (reconnecting && ++disconnectChecks < MAX_DISCONNECT_CHECKS) {
+            // JDA is still trying to (re)connect after a transient failure: give it more time.
+            disconnectCheckTask = plugin.getScheduler().schedule(
+                    this::confirmDisconnect, DISCONNECT_GRACE_SECONDS, TimeUnit.SECONDS);
+            return;
+        }
+        // Genuinely disconnected (kicked, channel deleted, gave up reconnecting, etc.).
+        handleDisconnect();
     }
 
     /**
@@ -192,6 +241,7 @@ public class MusicPlayer {
      */
     public void destroy() {
         cancelQuitTask();
+        cancelPendingDisconnect();
         stopStateAutosave();
         trackScheduler.clear();
         audioPlayer.destroy();
@@ -206,6 +256,7 @@ public class MusicPlayer {
      */
     public void release() {
         cancelQuitTask();
+        cancelPendingDisconnect();
         stopStateAutosave();
         audioPlayer.destroy();
         playerMessage.stopUpdates();

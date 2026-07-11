@@ -32,8 +32,7 @@ public class StopCommand {
             return;
         }
 
-        player.stop();
-        guild.getAudioManager().closeAudioConnection();
+        player.stopAndLeave();
 
         ctx.replySuccess(plugin.getPluginLanguageManager().getString(ctx.getLocale(), "music.stopped"));
     }

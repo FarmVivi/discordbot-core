@@ -207,17 +207,28 @@ public class MusicManager {
     }
 
     /**
-     * Handles voice channel updates.
+     * Handles voice channel updates for the bot itself.
+     *
+     * <p>A "left" update is not treated as a definitive disconnect right away: JDA also closes and
+     * reopens the audio connection on transient voice-server failures, which briefly looks like a
+     * leave. We therefore confirm the disconnect after a grace period, and cancel it if the bot
+     * (re)joins in the meantime.
      */
     public void handleVoiceUpdate(GuildVoiceUpdateEvent event) {
-        // Check if bot was disconnected
-        if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
-            if (event.getChannelLeft() != null && event.getChannelJoined() == null) {
-                MusicPlayer player = players.get(event.getGuild().getIdLong());
-                if (player != null) {
-                    player.handleDisconnect();
-                }
-            }
+        if (!event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
+            return;
+        }
+        MusicPlayer player = players.get(event.getGuild().getIdLong());
+        if (player == null) {
+            return;
+        }
+
+        if (event.getChannelJoined() != null) {
+            // (Re)connected to a voice channel: any pending disconnect is a false alarm.
+            player.cancelPendingDisconnect();
+        } else if (event.getChannelLeft() != null) {
+            // Left a voice channel: confirm after a grace period (may be a transient reconnect).
+            player.scheduleDisconnectCheck();
         }
     }
 
