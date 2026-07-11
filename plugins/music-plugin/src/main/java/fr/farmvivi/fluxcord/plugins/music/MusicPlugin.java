@@ -2,8 +2,6 @@ package fr.farmvivi.fluxcord.plugins.music;
 
 import fr.farmvivi.fluxcord.api.command.CommandResult;
 import fr.farmvivi.fluxcord.api.command.option.OptionChoice;
-import fr.farmvivi.fluxcord.api.event.EventHandler;
-import fr.farmvivi.fluxcord.api.event.EventPriority;
 import fr.farmvivi.fluxcord.api.permissions.Permission;
 import fr.farmvivi.fluxcord.api.permissions.PermissionDefault;
 import fr.farmvivi.fluxcord.api.plugin.AbstractPlugin;
@@ -11,9 +9,9 @@ import fr.farmvivi.fluxcord.plugins.music.commands.*;
 import fr.farmvivi.fluxcord.plugins.music.events.MusicButtonListener;
 import fr.farmvivi.fluxcord.plugins.music.events.MusicModalListener;
 import fr.farmvivi.fluxcord.plugins.music.events.MusicReadyListener;
+import fr.farmvivi.fluxcord.plugins.music.events.MusicVoiceListener;
 import fr.farmvivi.fluxcord.plugins.music.playlist.PlaylistManager;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -66,10 +64,11 @@ public class MusicPlugin extends AbstractPlugin {
             MusicButtonListener buttonListener = new MusicButtonListener(this);
             MusicModalListener modalListener = new MusicModalListener(this);
             MusicReadyListener readyListener = new MusicReadyListener(this);
-            getContext().getDiscordAPI().getBuilder().addEventListeners(buttonListener, modalListener, readyListener);
+            MusicVoiceListener voiceListener = new MusicVoiceListener(this);
+            getContext().getDiscordAPI().getBuilder().addEventListeners(buttonListener, modalListener, readyListener, voiceListener);
             JDA jda = getContext().getDiscordAPI().getJDA();
             if (jda != null) {
-                jda.addEventListener(buttonListener, modalListener, readyListener);
+                jda.addEventListener(buttonListener, modalListener, readyListener, voiceListener);
                 // JDA already connected (e.g. plugin hot-reload): ReadyEvent won't fire again,
                 // so restore persisted playback right away.
                 if (jda.getStatus() == JDA.Status.CONNECTED) {
@@ -310,13 +309,6 @@ public class MusicPlugin extends AbstractPlugin {
      */
     public long getPersistenceTtlMillis() {
         return persistenceTtlMillis;
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onVoiceUpdate(GuildVoiceUpdateEvent event) {
-        if (musicManager != null) {
-            musicManager.handleVoiceUpdate(event);
-        }
     }
 
     // Getters
