@@ -78,7 +78,7 @@
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>v2</artifactId>
-            <version>1.18.1</version>
+            <version>1.18.2</version>
         </dependency>
 
         <!-- LavaSrc pour sources additionnelles (Spotify, Deezer, Apple Music, etc.) -->
