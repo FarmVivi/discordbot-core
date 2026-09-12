@@ -239,7 +239,9 @@ Command command = commandService.newCommand()
     .subcommand(sub -> {
         sub.name("icon")
            .description("Change server icon")
-           .attachmentOption("icon", "New server icon", true)
+           // Restreint le sélecteur de fichiers Discord aux images
+           // (catégories "image"/"video"/"audio" ou extensions sans point, ex. "svg" ; 10 max)
+           .attachmentOption("icon", "New server icon", true, "image")
            .executor((context, cmd) -> {
                // Code d'exécution
                return CommandResult.success();

@@ -27,6 +27,7 @@ import fr.farmvivi.fluxcord.core.command.system.VersionCommand;
 import fr.farmvivi.fluxcord.core.util.Debouncer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.FileType;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -590,7 +591,30 @@ public class SimpleCommandService implements CommandService {
             optionData.setAutoComplete(true);
         }
 
+        // Restrict accepted file types for attachment options (JDA 6.6+)
+        if (option.getType() == OptionType2.ATTACHMENT && !option.getFileTypes().isEmpty()) {
+            optionData.addFileTypes(option.getFileTypes().stream()
+                    .map(SimpleCommandService::toFileType)
+                    .toList());
+        }
+
         return optionData;
+    }
+
+    /**
+     * Converts a Fluxcord file type string to a JDA {@link FileType}.
+     * Generic categories map to JDA's constants; anything else is treated as a file extension.
+     *
+     * @param fileType a category ({@code image}, {@code video}, {@code audio}) or an extension without dot
+     * @return the JDA file type
+     */
+    private static FileType toFileType(String fileType) {
+        return switch (fileType.toLowerCase(Locale.ROOT)) {
+            case "image" -> FileType.IMAGE;
+            case "video" -> FileType.VIDEO;
+            case "audio" -> FileType.AUDIO;
+            default -> FileType.ofExtension(fileType);
+        };
     }
 
     /**

@@ -268,6 +268,17 @@ public class SimpleCommandBuilder implements CommandBuilder {
     }
 
     @Override
+    public CommandBuilder attachmentOption(String name, String description, boolean required, String... fileTypes) {
+        return option(new SimpleCommandOption.Builder<Object>()
+                .name(name)
+                .description(description)
+                .type(OptionType2.ATTACHMENT)
+                .required(required)
+                .fileTypes(List.of(fileTypes))
+                .build());
+    }
+
+    @Override
     public CommandBuilder option(OptionType2 type, String name, String description, boolean required) {
         return option(new SimpleCommandOption.Builder<Object>()
                 .name(name)

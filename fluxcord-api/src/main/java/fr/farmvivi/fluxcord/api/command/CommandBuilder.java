@@ -296,6 +296,22 @@ public interface CommandBuilder {
     CommandBuilder attachmentOption(String name, String description, boolean required);
 
     /**
+     * Adds an attachment option restricted to the given file types.
+     * <p>
+     * Each file type is either a generic category ({@code image}, {@code video}, {@code audio})
+     * or a file extension without the leading dot (e.g. {@code svg}, {@code tar.gz}).
+     * Discord filters the file picker accordingly; at most 10 file types are allowed.
+     *
+     * @param name        the option name
+     * @param description the option description
+     * @param required    true if the option is required
+     * @param fileTypes   the accepted file types
+     * @return this builder
+     * @see fr.farmvivi.fluxcord.api.command.option.CommandOption#getFileTypes()
+     */
+    CommandBuilder attachmentOption(String name, String description, boolean required, String... fileTypes);
+
+    /**
      * Adds a generic option to the command.
      *
      * @param type        the option type

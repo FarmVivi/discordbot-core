@@ -94,6 +94,19 @@ public interface CommandOption<T> {
     Integer getMaxLength();
 
     /**
+     * Gets the accepted file types for attachment options.
+     * <p>
+     * Each entry is either one of the generic categories {@code image}, {@code video}, {@code audio},
+     * or a file extension without the leading dot (e.g. {@code svg}, {@code tar.gz}).
+     * Discord enforces the filter client-side when the user picks a file (max 10 entries).
+     *
+     * @return the accepted file types, or an empty list to accept any file
+     */
+    default List<String> getFileTypes() {
+        return List.of();
+    }
+
+    /**
      * Checks if the value is valid for this option.
      *
      * @param value the value to check

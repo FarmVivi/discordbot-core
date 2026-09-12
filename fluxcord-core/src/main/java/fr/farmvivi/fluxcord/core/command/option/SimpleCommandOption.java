@@ -26,7 +26,8 @@ public record SimpleCommandOption<T>(
         Number minValue,
         Number maxValue,
         Integer minLength,
-        Integer maxLength
+        Integer maxLength,
+        List<String> fileTypes
 ) implements CommandOption<T> {
 
     /**
@@ -35,6 +36,7 @@ public record SimpleCommandOption<T>(
     public SimpleCommandOption {
         // Ensure immutable collections
         choices = choices != null ? List.copyOf(choices) : List.of();
+        fileTypes = fileTypes != null ? List.copyOf(fileTypes) : List.of();
 
         // Validate required fields
         Objects.requireNonNull(name, "Option name cannot be null");
@@ -97,6 +99,11 @@ public record SimpleCommandOption<T>(
         return maxLength;
     }
 
+    @Override
+    public List<String> getFileTypes() {
+        return fileTypes;
+    }
+
     /**
      * Builder for creating SimpleCommandOption instances.
      *
@@ -104,6 +111,7 @@ public record SimpleCommandOption<T>(
      */
     public static class Builder<T> {
         private final List<OptionChoice<T>> choices = new ArrayList<>();
+        private final List<String> fileTypes = new ArrayList<>();
         private String name;
         private String description;
         private OptionType2 type;
@@ -249,6 +257,30 @@ public record SimpleCommandOption<T>(
         }
 
         /**
+         * Adds an accepted file type for attachment options.
+         *
+         * @param fileType a category ({@code image}, {@code video}, {@code audio}) or an extension without dot
+         * @return this builder
+         * @see CommandOption#getFileTypes()
+         */
+        public Builder<T> fileType(String fileType) {
+            this.fileTypes.add(Objects.requireNonNull(fileType, "File type cannot be null"));
+            return this;
+        }
+
+        /**
+         * Adds accepted file types for attachment options.
+         *
+         * @param fileTypes the file types to add
+         * @return this builder
+         * @see #fileType(String)
+         */
+        public Builder<T> fileTypes(List<String> fileTypes) {
+            fileTypes.forEach(this::fileType);
+            return this;
+        }
+
+        /**
          * Builds the option.
          *
          * @return the built option
@@ -266,7 +298,7 @@ public record SimpleCommandOption<T>(
 
             return new SimpleCommandOption<>(
                     name, description, type, required, choices, validator,
-                    autocompleteProvider, minValue, maxValue, minLength, maxLength
+                    autocompleteProvider, minValue, maxValue, minLength, maxLength, fileTypes
             );
         }
     }
